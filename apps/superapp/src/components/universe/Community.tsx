@@ -254,7 +254,7 @@ export function Affiliations({
       aria-label="Riconoscimenti e affiliazioni del club"
       className={tone === "light" ? "" : "mt-6"}
     >
-      <div className="rounded-[18px] bg-white px-1 py-3 shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]">
+      <div className="rounded-[18px] bg-[#13254d] px-1 py-3 shadow-[0_6px_20px_-10px_rgb(6_42_99/0.35)]">
         <ClubCredentials variant="bar" />
       </div>
     </section>

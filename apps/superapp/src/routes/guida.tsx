@@ -3,6 +3,7 @@ import { BellRing, Brain, CalendarDays, ClipboardCheck, ClipboardList, FileText,
 import type { ReactNode } from "react";
 
 import { CastDirectory } from "@/components/scd/CastDirectory";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * "Come funziona": quick guide for the launch, public so families can read it before signing in.
@@ -10,12 +11,7 @@ import { CastDirectory } from "@/components/scd/CastDirectory";
  * config/superapp-audiences.v1.json (UD-078). No personal data.
  */
 export const Route = createFileRoute("/guida")({
-  head: () => ({
-    meta: [
-      { title: "Come funziona l'app | S.C.D. ColicoDerviese" },
-      { name: "description", content: "Guida rapida all'app della S.C.D. ColicoDerviese per tifosi, soci, famiglie, atleti, mister e segreteria: accesso, convocazioni e presa visione, notifiche, certificati e distinta." },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.guida),
   component: Guida,
 });
 
@@ -149,7 +145,7 @@ function Guida() {
 
       <section id="personaggi" aria-labelledby="personaggi-t" className="scroll-mt-24 rounded-2xl border border-border bg-card p-5 sm:p-6">
         <h2 id="personaggi-t" className="m-0 text-[24px] font-bold leading-tight">I nostri personaggi</h2>
-        <p className="mt-1 text-[15px] text-muted-foreground">Una sola chat, Vera, che risponde a tutto e ti porta dal volto giusto; quattro volti con azioni concrete; e i consigli del giorno.</p>
+        <p className="mt-1 text-[15px] text-muted-foreground">Una sola chat, Iride, che risponde a tutto e ti porta dal volto giusto; quattro volti con azioni concrete; e i consigli del giorno.</p>
         <div className="mt-4">
           <CastDirectory />
         </div>

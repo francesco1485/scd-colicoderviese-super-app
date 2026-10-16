@@ -27,6 +27,7 @@ export type WorkAreaId =
   | "scadenzario"
   | "movimenti"
   | "infermeria"
+  | "nutrizionista"
   | "mister"
   | "organigramma"
   | "persone"
@@ -38,7 +39,10 @@ export type WorkAreaId =
   | "posta-collega"
   | "lotteria"
   | "gestionale"
-  | "quadro";
+  | "quadro"
+  | "planning"
+  | "struttura"
+  | "intake";
 
 export interface DriveMaster {
   key: string;
@@ -75,6 +79,7 @@ export const DRIVE_MASTERS = {
   cervelloneDrive: { key: "cervelloneDrive", name: "SCD CERVELLONE · Catalogo e Memoria (Drive)", fileId: null, note: "cartella privata della società" },
   contoSumup: { key: "contoSumup", name: "Conto SumUp della società · estratto movimenti", fileId: null, note: "estratto caricato da Direzione/Tesoreria, privato" },
   supabase: { key: "supabase", name: "Supabase SCD · persone, ruoli e storico", fileId: null, note: "database del club (r59)" },
+  tornei: { key: "tornei", name: "Master Tornei & Iniziative", fileId: null, note: "tornei già pubblicati nell'app; file da collegare" },
   posta: { key: "posta", name: "Casella sportclubcolico@gmail.com", fileId: null, note: "collegamento Gmail da attivare dalla Direzione" },
 } as const satisfies Record<string, DriveMaster>;
 
@@ -231,9 +236,15 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
   },
   infermeria: {
     id: "infermeria", label: "Infermeria", path: pathOf("infermeria"), railId: "infermeria",
-    description: "Servizi dell'infermeria del club e prenotazione, attiva quando lo staff pubblica gli orari.",
-    sources: ["sanitario", "impianti", "inserimenti"],
-    insertRoles: ["Staff sanitario", "Direzione", "Segreteria"],
+    description: "Scadenze dei certificati per squadra (sola lettura), cassette di primo soccorso e defibrillatori per sede. Solo staff sanitario e Direzione.",
+    sources: ["supabase", "sanitario", "impianti", "inserimenti"],
+    insertRoles: ["Staff sanitario", "Direzione"],
+  },
+  nutrizionista: {
+    id: "nutrizionista", label: "Nutrizionista", path: pathOf("nutrizionista"), railId: "nutrizionista",
+    description: "Consigli generali della nutrizionista per fascia d'età e richieste di consulenza. Nessun piano personale, nessuna dieta.",
+    sources: ["supabase", "inserimenti"],
+    insertRoles: ["Nutrizionista", "Direzione"],
   },
   mister: {
     id: "mister", label: "Mister", path: pathOf("mister"), railId: "gestionale",
@@ -264,6 +275,24 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Squadre, partite e attività della settimana dal calendario ufficiale e dal quadro allenamenti. Solo per lo staff con accesso.",
     sources: ["calendario", "quadro", "impianti", "inserimenti"],
     insertRoles: uniq([...registryRoles("gestionale"), "Direzione"]),
+  },
+  planning: {
+    id: "planning", label: "Planning annuale", path: pathOf("planning"), railId: "gestionale",
+    description: "La stagione 2026/27 in una pagina: gare ufficiali, tornei ed eventi, scadenze del club e federali, mese per mese. Solo per lo staff con accesso.",
+    sources: ["calendario", "tornei", "sgsManuale", "cervelloneDrive", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Coordinatore attività sportiva"],
+  },
+  struttura: {
+    id: "struttura", label: "Attività in struttura", path: pathOf("struttura"), railId: "gestionale",
+    description: "Settimana dei centri di Colico e Dervio: allenamenti e gare in casa, turni volontari, aperture, chiusure, attività serali e serate Club House. Ruoli, mai nomi.",
+    sources: ["quadro", "calendario", "impianti", "supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Responsabile struttura"],
+  },
+  intake: {
+    id: "intake", label: "Vetrina richieste", path: pathOf("intake"), railId: "gestionale",
+    description: "Le richieste che arrivano da fuori in un solo catalogo: iscrizioni ai tornei, sponsor, convenzioni, affitto dei campi, visite ai centri e altro. Decide chi ha il ruolo, il pagamento lo registra la Tesoreria dopo l'accettazione.",
+    sources: ["supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Tesoreria"],
   },
   quadro: {
     id: "quadro", label: "Quadro settimanale", path: pathOf("quadro"), railId: "quadro",

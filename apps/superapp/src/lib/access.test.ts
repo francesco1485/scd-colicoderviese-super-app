@@ -76,9 +76,9 @@ describe("access screen content from the registry", () => {
   });
 
   it("says 'ruoli da definire' when the registry has no roles", () => {
+    expect(whoEnters({ roles: [] })).toBe("ruoli da definire");
     const s = accessScreen("infermeria");
-    expect(s.roles).toEqual([]);
-    expect(whoEnters(s)).toBe("ruoli da definire");
+    expect(whoEnters(s)).toBe("responsabile infermeria, Direzione");
   });
 
   it("lists the warehouse office and the kit order source for Magazzino (r83)", () => {
@@ -140,7 +140,7 @@ describe("work areas: real read-only pages behind the same access gate", () => {
       expect(findArea(id), id).toBeDefined();
       expect(ACCESS_SCREEN_IDS, id).not.toContain(id);
     }
-    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "gestionale", "infermeria", "lotteria", "magazzino", "magazzino-cassa", "mister", "movimenti", "organigramma", "persone", "posta", "posta-collega", "pulmini", "quadro", "quote", "richieste", "scadenzario", "segreteria", "tesoreria"]);
+    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "gestionale", "infermeria", "intake", "lotteria", "magazzino", "magazzino-cassa", "mister", "movimenti", "nutrizionista", "organigramma", "persone", "planning", "posta", "posta-collega", "pulmini", "quadro", "quote", "richieste", "scadenzario", "segreteria", "struttura", "tesoreria"]);
   });
 
   it("each has a real route at its canonical path and is marked 'page', not 'access screen'", () => {

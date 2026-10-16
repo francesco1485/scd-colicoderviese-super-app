@@ -1,10 +1,12 @@
 # Agenti SCD
 
-Quaranta agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Quarantotto agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
 | scd-grafica | Disegna e migliora pagine, schermate, grafiche, partendo dalle piattaforme migliori |
+| scd-iride | Responsabile di Iride, la segreteria AI su WhatsApp: conoscenza, regole, qualità (modifiche allo scenario solo con l'ok di Francesco) |
+| scd-tavola-esatta | Riproduce le tavole approvate di Francesco come schermate vere, misurando |
 | scd-loghi-idee | Trova gli stemmi reali degli avversari e idee da altre società |
 | scd-bandi | Cerca bandi e contributi (Italia, Lombardia, UE, fondazioni) con scadenze |
 | scd-mail | Smista la posta del club e prepara bozze di risposta |
@@ -15,7 +17,11 @@ Quaranta agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. Colic
 | scd-sponsor | Pipeline sponsor, offerta LED, contratti, CRM |
 | scd-tesserati | Qualità dell'anagrafica tesserati, svincoli e trasferimenti |
 | scd-atleti | Rose, convocabilità, certificati, presa visione delle convocazioni |
-| scd-azioni | Coordina gli altri agenti su un obiettivo e riporta lo stato |
+| scd-azioni | Direttore d'orchestra: piano, agenti in sequenza e in parallelo, controlli obbligatori, stato (percorso in PIPELINE.md) |
+| scd-google | Mondo Google di sportclubcolico@gmail.com: posta, calendari, Drive, fogli, documenti; mappa, ordine, proposte |
+| scd-skill | Fabbrica delle skill: trova cosa serve, progetta e prova le skill migliori |
+| scd-crescita | Crescita e viralità: creator, social, TV, giornali, sport, grafica; idee che portano gente al campo |
+| scd-super-giornalista | Il Super Giornalista: ogni mattina la Prima pagina del club (notizie, interazione, social, app), coordina comunicazione, social, crescita e community |
 | scd-stratega | Priorità della settimana, rischi, decisioni da prendere |
 | scd-avatar | Crea e ambienta avatar e personaggi 2D e 3D (sintetici, mai volti reali senza consenso) |
 | scd-regista | Il regista del gestionale: cosa fare oggi, in che ordine, chi lo fa, cosa prepara subito Claude |
@@ -40,10 +46,16 @@ Quaranta agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. Colic
 | scd-centralino | Ingresso unico richieste (mail, WhatsApp, telefono), schede, tempi di risposta |
 | scd-community | Famiglie, eventi, fantacalcio, Top11, volontari, partecipazione |
 | scd-ledwall | LED wall del campo: formati, playlist, rotazione sponsor, rapporto di visibilità |
+| scd-diritto-sport-lavoro | Diritto sportivo (NOIF, giustizia sportiva, tesseramenti, svincoli) e del lavoro sportivo (lavoratori sportivi, collaboratori, volontari, rimborsi): consiglio, non decide |
+| scd-rendicontazione | Rendiconto e bilancio, rendicontazione di bandi e contributi, 5x1000, rapporti per gli sponsor |
 | scd-legale | Riforma dello sport, RASD, statuto, GDPR, contratti, assicurazioni (non sostituisce l'avvocato) |
 | scd-cfo | Budget, flusso di cassa a 13 settimane, costo per atleta, scenari, indicatori |
 | scd-commerciale | SCD GROW: listino diritti, proposte, metodo di vendita, rinnovi, ritorno per gli sponsor |
 | scd-negoziazione | Comuni, federazione, scuole, partner: mappa dei rapporti, schede incontro, trattative |
+
+## Percorso e squadre
+
+Sequenza dall'idea al sito vero, passi obbligatori, squadre in parallelo e catene per ogni piattaforma del gestionale: vedi `PIPELINE.md`. Registro dei miglioramenti di skill, agenti e plugin: `MIGLIORAMENTI.md`.
 
 ## Squadra di sviluppo ECC (cartella `ecc/`)
 

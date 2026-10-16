@@ -11,6 +11,7 @@ import { sessionView } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
 import { grantsEngineState, type GrantsClient, type GrantsEngine } from "./person-grants.server";
 import { DB_ROLES, type DbRole } from "./session";
+import { r138Live } from "./registry-live.server";
 import { serverSupabase } from "./supabase.server";
 
 export interface AuditEntry {
@@ -35,6 +36,8 @@ export interface AccessAdminData {
   teams: Array<{ code: string; name: string; status: string }>;
   /** Per-person section grants (r100): "applied" only once the Direzione has had the migration applied. */
   grantsEngine: GrantsEngine;
+  /** r138 live (verified server side): only then the r138 positions are offered (grantablePositions). */
+  r138Live: boolean;
 }
 
 async function context() {
@@ -52,15 +55,17 @@ type AuditRow = { id: number; created_at: string; action: string; actor_email: s
 
 export const getAccessAdmin = createServerFn({ method: "GET" }).handler(async (): Promise<AccessAdminData> => {
   const { gate, org, actorRole, actorEmail, sb } = await context();
-  const base: AccessAdminData = { gate, connected: false, actorRole, actorEmail, accounts: [], audit: [], teams: [], grantsEngine: "unknown" };
+  const base: AccessAdminData = { gate, connected: false, actorRole, actorEmail, accounts: [], audit: [], teams: [], grantsEngine: "unknown", r138Live: false };
   if (gate.view !== "page" || !sb || !org) return base;
-  const [acc, aud, accTeams, teams, grantsEngine] = await Promise.all([
+  const [acc, aud, accTeams, teams, grantsEngine, live] = await Promise.all([
     sb.rpc("scd_admin_accounts", { p_organization_id: org.organizationId }),
     sb.rpc("scd_admin_audit", { p_organization_id: org.organizationId, p_limit: 60 }),
     sb.rpc("scd_admin_account_teams", { p_organization_id: org.organizationId }),
     sb.from("scd_teams").select("code,name,status").eq("organization_id", org.organizationId).order("code"),
     grantsEngineState(sb as unknown as GrantsClient),
+    r138Live(sb),
   ]);
+  base.r138Live = live;
   if (acc.error) return { ...base, grantsEngine };
   const teamsOf = new Map(((accTeams.data ?? []) as Array<{ user_id: string; teams: string[] | null }>).map((r) => [r.user_id, r.teams ?? []]));
   return {
@@ -99,7 +104,8 @@ function explain(error: { code?: string; message: string }): string {
   if (m.includes("cannot edit own access")) return "Non puoi modificare il tuo accesso: chiedilo a un'altra persona della Direzione.";
   if (m.includes("Direzione only")) return "Solo la Direzione può dare o togliere ruoli e aree d'ufficio, o modificare un account d'ufficio.";
   if (m.includes("last Direzione")) return "Deve restare almeno un accesso Direzione attivo.";
-  if (m.includes("unknown position")) return "Area non riconosciuta.";
+  if (m.includes("unknown position"))
+    return "Il database non riconosce uno degli incarichi scelti: togli quell'incarico e salva.";
   if (m.includes("unknown team")) return "Squadra non riconosciuta.";
   if (m.includes("invalid email")) return "E-mail non valida.";
   if (error.code === "42501") return "Non hai i permessi per questa modifica.";

@@ -132,7 +132,7 @@ describe("links that work today", () => {
 describe("Accesso aree menu (board Accesso-aree)", () => {
   it("has the four groups of the board in order", () => {
     expect(ACCESS_MENU.map((g) => g.title)).toEqual(["Per famiglie e tifosi", "Per lo staff tecnico", "Per l'ufficio", "Per le aziende"]);
-    expect(ACCESS_MENU.flatMap((g) => g.entries)).toHaveLength(14);
+    expect(ACCESS_MENU.flatMap((g) => g.entries)).toHaveLength(15);
   });
 
   it("lists only registry areas, each once", () => {

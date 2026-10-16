@@ -14,6 +14,7 @@ import {
   type Kit,
 } from "@/lib/kit-catalog";
 import { memberServices } from "@/lib/member-services";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * Kit ufficiale 2026/27 (UD-110 "compra la tua maglia"): the kit packages from config/scd-kit-catalog.v1.json (supplier
@@ -23,20 +24,7 @@ import { memberServices } from "@/lib/member-services";
  * families are not sent outside the club's ordering flow.
  */
 export const Route = createFileRoute("/kit")({
-  head: () => ({
-    meta: [
-      { title: "Kit ufficiale 2026/27 — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "Il kit ufficiale 2026/27 della S.C.D. ColicoDerviese: kit atleti, kit Primi Calci e kit di rappresentanza, con contenuto e prezzi dalle tavole del fornitore.",
-      },
-      {
-        property: "og:title",
-        content: "Kit ufficiale 2026/27 — S.C.D. ColicoDerviese",
-      },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.kit),
   component: KitPage,
 });
 

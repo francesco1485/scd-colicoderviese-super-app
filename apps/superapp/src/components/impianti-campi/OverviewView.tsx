@@ -38,7 +38,7 @@ export function OverviewView() {
     {
       to: "/gestionale/impianti/dervio",
       title: "Dervio · mappa 2D",
-      text: "Le otto zone del centro, le gare proposte e gli avvisi al Comune.",
+      text: "Le otto zone del centro, le gare proposte e gli avvisi alle squadre.",
       stat: String(dervio.length),
       statLabel: `gare a Dervio nello scenario «${presetLabel(model.preset)}»`,
     },
@@ -106,7 +106,8 @@ export function OverviewView() {
       </ul>
       <SimulationNote>
         L'11 ottobre la società ha deciso di valutare le rotazioni con
-        simulazioni prima di qualsiasi avviso al Comune di Dervio.
+        simulazioni; il Comune di Dervio è già informato con il programma
+        stagionale.
       </SimulationNote>
     </div>
   );

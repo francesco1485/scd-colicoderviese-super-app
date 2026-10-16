@@ -15,6 +15,8 @@ import { romeParts } from "@/lib/home-week";
 import { getPublicSocial } from "@/lib/social.functions";
 import { EMPTY_WORLDS } from "@/lib/vetrina";
 import { getVetrina, type VetrinaDay } from "@/lib/vetrina.functions";
+import { getPublicTrainings } from "@/lib/quadro.functions";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /** Longest wait for the R20 feed (alerts and weekend results) on the public home. */
 const FEED_BUDGET_MS = 1_500;
@@ -79,6 +81,7 @@ export const Route = createFileRoute("/")({
       );
       // Board home (VR-009, 15/10): "Mondo Colico" is the vetrina of the day; news are not shown (no waiting for them).
       // getVetrina also gives the server Rome day (QA day honoured outside production) that seeds the LED wall.
+      const trainingP = getPublicTrainings().catch(() => null);
       const vetrina: VetrinaDay = await getVetrina({
         data: { pressRecent: false },
       }).catch((): VetrinaDay => ({ today, worlds: EMPTY_WORLDS }));
@@ -88,6 +91,7 @@ export const Route = createFileRoute("/")({
         vetrina: vetrina.worlds,
         feed: await feedP,
         notice: await noticeP,
+        training: await trainingP,
         serverNow,
         today,
       };
@@ -126,27 +130,7 @@ export const Route = createFileRoute("/")({
       today,
     };
   },
-  head: () => ({
-    meta: [
-      { title: "S.C.D. ColicoDerviese — Calcio a Colico e Dervio" },
-      {
-        name: "description",
-        content:
-          "La S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio sull'Alto Lago di Como: eventi e tornei, notizie, Fantacalcio SCD, iscrizioni 2026/27 e partner del territorio.",
-      },
-      {
-        property: "og:title",
-        content: "S.C.D. ColicoDerviese — Calcio a Colico e Dervio",
-      },
-      {
-        property: "og:description",
-        content:
-          "Eventi, notizie, giochi, iscrizioni e partner della S.C.D. ColicoDerviese.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.home),
   component: Home,
 });
 
@@ -159,6 +143,7 @@ function Home() {
       vetrina={data.vetrina}
       feed={data.feed}
       notice={data.notice}
+      training={data.training}
       nowMs={data.serverNow}
       today={data.today}
     />

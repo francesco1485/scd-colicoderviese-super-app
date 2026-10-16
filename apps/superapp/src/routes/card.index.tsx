@@ -3,17 +3,11 @@ import { ChevronRight, Store } from "lucide-react";
 
 import { ClubCardFace, ClubCardRules } from "@/components/scd/ClubCards";
 import { CLUB_CARDS, activationText } from "@/lib/club-cards";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /** /card — the three club cards 2026/27 (Direzione 13/10/2026). Public, no personal data. */
 export const Route = createFileRoute("/card/")({
-  head: () => ({
-    meta: [
-      { title: "Le card 2026/27 — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Card Tesserato, Sostenitore e Partner: credito alla Club House, listino dedicato, biglietteria e attività convenzionate." },
-      { property: "og:title", content: "Le card ColicoDerviese 2026/27" },
-      { property: "og:description", content: "Tesserato, Sostenitore e Partner: si attivano alla Club House." },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.card),
   component: CardIndexPage,
 });
 

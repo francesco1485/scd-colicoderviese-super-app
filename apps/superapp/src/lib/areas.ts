@@ -239,6 +239,7 @@ export const WORK_AREA_IDS: readonly string[] = [
   "scadenzario",
   "movimenti",
   "infermeria",
+  "nutrizionista",
   "mister",
   "organigramma",
   "persone",
@@ -249,10 +250,16 @@ export const WORK_AREA_IDS: readonly string[] = [
   "posta",
   "posta-collega",
   "lotteria",
+  // Attività in struttura (Francesco 15/10/2026 14:33): sites, shifts and evening activities, staged r135.
+  "struttura",
   // Direzione 15/10/2026 ("Ok" to closing the internal pages): the staff preview of /gestionale, /gestionale/mappa
   // and /quadro was open without access; now they answer with the access screen like the other work areas.
   "gestionale",
   "quadro",
+  // Planning annuale (Francesco 15-16/10/2026, missing gestionali): same staff gate as /gestionale.
+  "planning",
+  // Vetrina richieste (UD-163, Francesco 16/10/2026 15:44): one catalogue of external requests, r139 STAGED.
+  "intake",
 ];
 
 /**
@@ -384,10 +391,10 @@ export const ACCESS_MENU: readonly MenuGroup[] = [
         reserved: false,
       },
       {
-        id: "infermeria",
-        label: "Infermeria",
-        blurb: "Emergenza, staff e certificato medico",
-        icon: "plus",
+        id: "nutrizionista",
+        label: "Nutrizionista",
+        blurb: "Consigli di Era per i tuoi figli, consulenza",
+        icon: "star",
         reserved: true,
       },
       {
@@ -428,6 +435,13 @@ export const ACCESS_MENU: readonly MenuGroup[] = [
         label: "Magazzino",
         blurb: "Kit, taglie, consegne",
         icon: "box",
+        reserved: true,
+      },
+      {
+        id: "infermeria",
+        label: "Infermeria",
+        blurb: "Certificati, cassette e DAE",
+        icon: "plus",
         reserved: true,
       },
     ],

@@ -105,7 +105,7 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
           role="region"
           aria-label="Cookie e privacy"
           data-testid="cookie-banner"
-          className={`flex items-center gap-3 bg-white px-4 py-0.5 text-[var(--scd-ink)] lg:justify-center ${interior ? "fixed inset-x-0 bottom-0 z-[45] border-t border-[#d5dfec] pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)]" : "relative z-[1] border-b border-[#d5dfec]"}`}
+          className={`flex items-center gap-3 bg-white px-4 py-0.5 text-[var(--scd-ink)] lg:justify-center ${interior ? "fixed inset-x-0 bottom-0 z-[45] border-t border-[#d5dfec] pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_16px_-10px_rgb(11_42_91/0.35)]" : "relative z-[1] border-t border-[#d5dfec]"}`}
         >
           <p className="m-0 min-w-0 flex-1 text-[12.5px] leading-[1.3] text-[var(--scd-sub)] lg:flex-none">
             Solo cookie tecnici: nessuna statistica, nessuna pubblicità.{" "}
@@ -122,7 +122,7 @@ export function CookieConsent({ interior = false }: { interior?: boolean } = {})
           aria-labelledby="ck-t"
           aria-describedby="ck-d"
           data-testid="cookie-banner-consent"
-          className="fixed inset-x-3 bottom-[calc(118px+env(safe-area-inset-bottom))] z-[70] mx-auto max-w-[560px] rounded-[18px] border-2 border-[var(--uv-gold)] bg-white p-4 text-[var(--scd-ink)] shadow-[0_18px_50px_rgb(0_0_0/0.5)] lg:bottom-[62px]"
+          className="fixed inset-x-3 bottom-[calc(110px+env(safe-area-inset-bottom))] z-[70] mx-auto max-w-[560px] rounded-[18px] border-2 border-[var(--uv-gold)] bg-white p-4 text-[var(--scd-ink)] shadow-[0_18px_50px_rgb(0_0_0/0.5)] lg:bottom-[62px]"
         >
           <div className="flex items-center justify-between gap-2">
             <b id="ck-t" className="font-uv text-[22px] uppercase leading-none">

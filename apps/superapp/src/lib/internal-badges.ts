@@ -98,6 +98,7 @@ const AREA_BADGE: Readonly<Record<string, InternalBadgeId>> = {
   mister: "area-staff-dirigenti",
   organigramma: "area-responsabili-attivita",
   "impianti-campi": "area-responsabili-attivita",
+  struttura: "area-responsabili-attivita",
   segreteria: "area-segreteria",
   persone: "area-segreteria",
   certificati: "area-segreteria",

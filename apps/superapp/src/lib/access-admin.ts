@@ -3,7 +3,7 @@
  * rules (scd_access_admin_guard); here they only shape the screen (what is offered, what is greyed out).
  */
 import { GRANT_AUDIT_LABEL, grantAuditSummary } from "./person-grants";
-import { DB_ROLES, KNOWN_POSITIONS, type DbRole } from "./session";
+import { DB_ROLES, KNOWN_POSITIONS, positionLive, type DbRole } from "./session";
 
 export const OFFICE_ROLES: readonly DbRole[] = [
   "DIRECTION",
@@ -18,6 +18,11 @@ export const OFFICE_POSITIONS: readonly string[] = [
   "dirigenza",
   "segreteria",
   "tesoreria",
+  // r138 (UD-161, review R2): only the Direzione assigns them.
+  "direttore-sportivo-agonistica",
+  "direttore-sportivo-generale",
+  "responsabile-safeguarding",
+  "fisioterapista",
 ];
 
 /** Positions that come only from the coarse role (never assigned by hand). */
@@ -61,6 +66,10 @@ export const POSITION_LABEL: Readonly<Record<string, string>> = {
   dirigenza: "Dirigenza (acquisti)",
   "responsabile-attivita-base": "Responsabile attività di base",
   "coordinatore-attivita-sportiva": "Coordinatore attività sportiva",
+  "direttore-sportivo-agonistica": "Direttore sportivo agonistica",
+  "direttore-sportivo-generale": "Direttore sportivo generale",
+  "responsabile-safeguarding": "Responsabile tutela minori (safeguarding)",
+  fisioterapista: "Fisioterapista",
   "dirigente-annata": "Dirigente di annata",
   mister: "Mister",
   "responsabile-trasporti": "Responsabile trasporti (pulmini)",
@@ -80,6 +89,7 @@ export const POSITION_LABEL: Readonly<Record<string, string>> = {
   "responsabile-lavanderia": "Responsabile lavanderia",
   "collaboratore-lavanderia-pulizia": "Collaboratore lavanderia e pulizia",
   "responsabile-infermeria": "Responsabile infermeria",
+  nutrizionista: "Nutrizionista",
   moderatore: "Moderatore contenuti",
   "collaboratore-magazzino": "Collaboratore magazzino",
   "dirigente-collaboratore": "Dirigente collaboratore (anche genitore)",
@@ -98,6 +108,11 @@ export const POSITION_GROUPS: ReadonlyArray<{
       "coordinatore-attivita-sportiva",
       "responsabile-attivita-base",
     ],
+  },
+  {
+    // r138 (UD-161): assigned only by the Direzione (office_pos in scd_access_admin_guard), shown only when r138 is live.
+    label: "Direttori sportivi e tutela (solo Direzione)",
+    ids: ["direttore-sportivo-agonistica", "direttore-sportivo-generale", "responsabile-safeguarding", "fisioterapista"],
   },
   {
     label: "Servizi",
@@ -122,6 +137,7 @@ export const POSITION_GROUPS: ReadonlyArray<{
       "responsabile-lavanderia",
       "collaboratore-lavanderia-pulizia",
       "responsabile-infermeria",
+      "nutrizionista",
     ],
   },
   {
@@ -173,10 +189,15 @@ export function grantableRoles(actor: DbRole | null): DbRole[] {
   return [];
 }
 
-export function grantablePositions(actor: DbRole | null): string[] {
-  if (actor === "DIRECTION") return [...ASSIGNABLE_POSITIONS];
+/**
+ * Positions this actor may add. r138 positions only when the server verified that r138 is live (r138Live), so the
+ * Accessi page never offers a position the database would refuse.
+ */
+export function grantablePositions(actor: DbRole | null, r138Live = false): string[] {
+  const live = ASSIGNABLE_POSITIONS.filter((p) => positionLive(p, r138Live));
+  if (actor === "DIRECTION") return live;
   if (actor === "SECRETARIAT")
-    return ASSIGNABLE_POSITIONS.filter((p) => !OFFICE_POSITIONS.includes(p));
+    return live.filter((p) => !OFFICE_POSITIONS.includes(p));
   return [];
 }
 

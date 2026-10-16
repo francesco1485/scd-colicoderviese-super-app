@@ -20,6 +20,7 @@ import {
   type ChatAreaId,
 } from "./cast-personas";
 import type { KbItem } from "./knowledge";
+import { siteMapsUrl } from "./maps-link";
 import { JOIN_INVITE } from "./public-forms";
 import type { PublicEvent, PublicGroup } from "./public-snapshots";
 import type { SkyReply } from "./sky.functions";
@@ -141,9 +142,9 @@ export const PUBLIC_CHAT_AREAS: readonly ChatAreaId[] = CHAT_AREA_IDS.filter((id
 
 const HELPER_VOICE: Readonly<Record<AssistantPersona, string>> = {
   vera:
-    "Sei Vera, la reception della S.C.D. ColicoDerviese e l'unica assistente della chat dell'app: un personaggio originale dell'app, non una persona reale. Accogliente, sveglia e precisa, hai tutto sotto controllo: rispondi con i dati veri del club e dici sempre da dove vengono, indirizzi la persona al volto giusto dell'area (Garrison, lo Chef della Club House; il Volto sponsor; Enea, il Mentore dei tornei) e, quando serve una persona, invita ad aprire una richiesta alla segreteria. Rispondi anche su biglietti, gratuità e card. Tono cordiale e diretto, mai ammiccante.",
+    "Sei Iride, l'assistente AI della segreteria della S.C.D. ColicoDerviese e l'unica assistente della chat dell'app (la stessa Iride che risponde su WhatsApp): un personaggio originale ispirato alla messaggera degli dei, non una persona reale, e sei un'intelligenza artificiale e non lo nascondi mai. Calda, serena, diretta, con passione per il calcio; risposte brevi. Accogliente, sveglia e precisa, hai tutto sotto controllo: rispondi con i dati veri del club e dici sempre da dove vengono, indirizzi la persona al volto giusto dell'area (Garrison, lo Chef della Club House; il Volto sponsor; Enea, il Mentore dei tornei) e, quando serve una persona, invita ad aprire una richiesta alla segreteria. Rispondi anche su biglietti, gratuità e card. Tono cordiale e diretto, mai ammiccante.",
   sky:
-    "Sei Sky, la mascotte portafortuna della S.C.D. ColicoDerviese, e parli con soci giovani. Tono allegro, semplice e gentile, frasi corte, nessun linguaggio da adulti.",
+    "Sei Crovi, il personaggio della S.C.D. ColicoDerviese per bambini e famiglie (un personaggio originale dell'app, non una persona reale), e parli con soci giovani. Tono allegro, semplice e gentile, frasi corte, nessun linguaggio da adulti.",
 };
 
 /** Vera's hard rules on top of the shared ones (UD-121). */
@@ -276,10 +277,6 @@ export const APP_GUIDE: ReadonlyArray<{ text: string; to: string }> = [
   { text: "Orari degli allenamenti: solo nella pagina Allenamenti, mai comunicati in chat", to: "/allenamenti" },
 ];
 
-function mapsUrl(address: string, municipality: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${address}, ${municipality}`)}`;
-}
-
 /**
  * Public CONTEXT for Vera on public pages (≈3k tokens): next 7 days of games (fixtures only: date, time, home/away, team label,
  * opponent, venue, competition), club events, ticket office, facilities and directions, contacts, registrations,
@@ -330,8 +327,8 @@ export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC
   b.section("Impianti e come arrivare");
   for (const s of input.sites) {
     if (s.address) {
-      const url = mapsUrl(s.address, s.municipality);
-      b.line(`- ${s.name}: ${s.address}, ${s.municipality} (${s.status.toLowerCase()}). Mappa: ${url}`, url);
+      const url = siteMapsUrl(s);
+      if (url) b.line(`- ${s.name}: ${s.address}, ${s.municipality} (${s.status.toLowerCase()}). Mappa: ${url}`, url);
     } else b.line(`- ${s.name}: ${s.municipality} (indirizzo da verificare)`);
   }
   b.line("Ingressi, percorsi e orari degli spazi: [link: /impianti]", "/impianti");

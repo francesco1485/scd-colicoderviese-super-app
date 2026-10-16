@@ -9,6 +9,8 @@ import {
   MODE_LABEL,
   MOVABLE,
   PRESETS,
+  RAIN_MOVE_NOTICE_TO,
+  TEAM_NOTICE_DAYS,
   ddmm,
   hhmm,
   longDay,
@@ -262,8 +264,9 @@ export function SimulazioneTab({
     <div className="grid gap-5">
       <SimulationNote>
         Prova dove giocare le gare in casa tra Colico e Dervio e aggiungi
-        ipotesi di uso dei campi. Prima di qualsiasi avviso al Comune di Dervio
-        la società valuta queste simulazioni (decisione dell'11 ottobre).
+        ipotesi di uso dei campi. La società valuta queste simulazioni prima di
+        decidere (11 ottobre); il Comune di Dervio è già informato con il
+        programma stagionale (16 ottobre).
       </SimulationNote>
 
       <section
@@ -382,7 +385,7 @@ export function SimulazioneTab({
               checked={model.lightsVerified}
               onChange={(e) => model.setLightsVerified(e.target.checked)}
             />{" "}
-            Luci di Dervio verificate
+            Luci di Dervio disponibili (Direzione, 16/10)
           </label>
           <label className="flex min-h-11 items-center gap-2">
             <input
@@ -414,20 +417,24 @@ export function SimulazioneTab({
             label={`${movedMatches.length === 1 ? "gara in casa giocata" : "gare in casa giocate"} a Dervio`}
           />
           <Kpi
-            tone={r.lateNotices ? "crit" : movedMatches.length ? "ok" : "plain"}
+            tone={r.lateNotices ? "warn" : movedMatches.length ? "ok" : "plain"}
             value={r.firstNotice ? ddmm(r.firstNotice) : "—"}
             label={
               r.firstNotice
                 ? r.lateNotices
-                  ? `primo avviso al Comune, ${r.lateNotices} già in ritardo`
-                  : "primo avviso al Comune (un mese prima)"
-                : "nessun avviso al Comune"
+                  ? `primo avviso alla squadra, ${r.lateNotices} già in ritardo`
+                  : `primo avviso alla squadra (${TEAM_NOTICE_DAYS} giorni prima)`
+                : "nessun avviso alla squadra"
             }
           />
           <Kpi
             tone={r.lightsNeeded ? "warn" : "plain"}
-            value={String(r.lightsNeeded)}
-            label="usi serali a Dervio con luci da verificare"
+            value={model.lightsVerified ? "Sì" : String(r.lightsNeeded)}
+            label={
+              model.lightsVerified
+                ? "luci di Dervio disponibili per le gare serali"
+                : "usi serali a Dervio con luci da verificare"
+            }
           />
           <Kpi
             tone={r.winterGrass ? "warn" : "plain"}
@@ -564,8 +571,11 @@ export function SimulazioneTab({
             scelto.
           </li>
           <li>
-            Ogni uso di Dervio richiede l'avviso al Comune almeno un mese prima.
-            La Prima Squadra resta sempre a Colico.
+            Il Comune di Dervio è già informato con il programma stagionale:
+            nessun avviso gara per gara. La squadra che gioca a Dervio è
+            avvisata {TEAM_NOTICE_DAYS} giorni prima; se piove e la gara torna a
+            Colico, avviso solo a {RAIN_MOVE_NOTICE_TO}. La Prima Squadra resta
+            sempre a Colico.
           </li>
           <li>
             «Solo i conflitti» sposta a Dervio, dalla data scelta, la gara

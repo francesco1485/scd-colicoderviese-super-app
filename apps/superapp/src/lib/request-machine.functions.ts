@@ -30,6 +30,7 @@ import {
   type RequestNotice,
   type RequestRow,
 } from "./request-machine";
+import { r138Live } from "./registry-live.server";
 import { serverSupabase } from "./supabase.server";
 
 type DbError = { code?: string; message: string } | null;
@@ -64,14 +65,17 @@ export interface RequestsDesk {
   error: string | null;
   /** Server clock when the board was read: days left are counted from it (no client clock drift). */
   serverNow: number;
+  /** r138 live on the database (verified here, server side): only then the direttori sportivi confirm (UD-154). */
+  r138Live: boolean;
 }
 
 export const getRequestsDesk = createServerFn({ method: "GET" }).handler(async (): Promise<RequestsDesk> => {
   const { s, roles, org, sb } = await context();
   const gate = workAreaView("richieste", { preview: stagingPreviewEnabled(process.env, import.meta.env.PROD), sessionRoles: roles });
   const canEdit = Boolean(roles && org && ["DIRECTION", "SECRETARIAT", "REGISTRATION"].includes(org.role));
-  const base: RequestsDesk = { gate, connected: false, ready: false, canEdit: false, rows: [], notices: [], error: null, serverNow: Date.now() };
+  const base: RequestsDesk = { gate, connected: false, ready: false, canEdit: false, rows: [], notices: [], error: null, serverNow: Date.now(), r138Live: false };
   if (gate.view !== "page" || !sb || !org || !s.user) return base;
+  base.r138Live = await r138Live(sb);
   const orgId = org.organizationId;
   const exp = await sb.rpc("scd_requests_expire", { p_organization_id: orgId });
   if (machineMissing(exp.error)) return { ...base, connected: true, canEdit };
@@ -95,7 +99,9 @@ export type MyConfirmations =
 
 export const getMyConfirmations = createServerFn({ method: "GET" }).handler(async (): Promise<MyConfirmations> => {
   const { roles, org, sb } = await context();
-  if (!roles || !hasRequestRole(roles)) return { state: "none" };
+  // Nobody with no possible part is probed; a direttore sportivo counts only once r138 is verified live.
+  if (!roles || !hasRequestRole(roles, true)) return { state: "none" };
+  if (!hasRequestRole(roles, false) && !(sb && org && (await r138Live(sb)))) return { state: "none" };
   if (!sb || !org) return { state: "off" };
   const orgId = org.organizationId;
   const exp = await sb.rpc("scd_requests_expire", { p_organization_id: orgId });

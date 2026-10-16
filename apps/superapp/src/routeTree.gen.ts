@@ -32,6 +32,7 @@ import { Route as InstallaRouteImport } from './routes/installa'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as LaMiaScdRouteImport } from './routes/la-mia-scd'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
+import { Route as NutrizionistaRouteImport } from './routes/nutrizionista'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PulminiRouteImport } from './routes/pulmini'
@@ -78,7 +79,10 @@ import { Route as GestionaleCodaRouteImport } from './routes/gestionale.coda'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
 import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister'
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
+import { Route as GestionalePlanningRouteImport } from './routes/gestionale.planning'
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
+import { Route as GestionaleRichiesteRouteImport } from './routes/gestionale.richieste'
+import { Route as GestionaleStrutturaRouteImport } from './routes/gestionale.struttura'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as LaMiaScdCampioneRouteImport } from './routes/la-mia-scd_.campione'
 import { Route as LedwallPlayerRouteImport } from './routes/ledwall.player'
@@ -233,6 +237,11 @@ const LaMiaScdRoute = LaMiaScdRouteImport.update({
 const MagazzinoRoute = MagazzinoRouteImport.update({
   id: '/magazzino',
   path: '/magazzino',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NutrizionistaRoute = NutrizionistaRouteImport.update({
+  id: '/nutrizionista',
+  path: '/nutrizionista',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerRoute = PartnerRouteImport.update({
@@ -468,9 +477,24 @@ const GestionaleOrganigrammaRoute = GestionaleOrganigrammaRouteImport.update({
   path: '/gestionale/organigramma',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionalePlanningRoute = GestionalePlanningRouteImport.update({
+  id: '/gestionale/planning',
+  path: '/gestionale/planning',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionalePostaRoute = GestionalePostaRouteImport.update({
   id: '/gestionale/posta',
   path: '/gestionale/posta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestionaleRichiesteRoute = GestionaleRichiesteRouteImport.update({
+  id: '/gestionale/richieste',
+  path: '/gestionale/richieste',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestionaleStrutturaRoute = GestionaleStrutturaRouteImport.update({
+  id: '/gestionale/struttura',
+  path: '/gestionale/struttura',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestionaleImpiantiRoute = GestionaleImpiantiRouteImport.update({
@@ -706,6 +730,7 @@ export interface FileRoutesByFullPath {
   '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
+  '/nutrizionista': typeof NutrizionistaRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
@@ -746,7 +771,10 @@ export interface FileRoutesByFullPath {
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
@@ -818,6 +846,7 @@ export interface FileRoutesByTo {
   '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
+  '/nutrizionista': typeof NutrizionistaRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
@@ -858,7 +887,10 @@ export interface FileRoutesByTo {
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
@@ -930,6 +962,7 @@ export interface FileRoutesById {
   '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
+  '/nutrizionista': typeof NutrizionistaRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
@@ -970,7 +1003,10 @@ export interface FileRoutesById {
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd_/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
@@ -1044,6 +1080,7 @@ export interface FileRouteTypes {
     | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
+    | '/nutrizionista'
     | '/partner'
     | '/privacy'
     | '/pulmini'
@@ -1084,7 +1121,10 @@ export interface FileRouteTypes {
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
+    | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/richieste'
+    | '/gestionale/struttura'
     | '/gestionale/impianti'
     | '/la-mia-scd/campione'
     | '/ledwall/player'
@@ -1156,6 +1196,7 @@ export interface FileRouteTypes {
     | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
+    | '/nutrizionista'
     | '/partner'
     | '/privacy'
     | '/pulmini'
@@ -1196,7 +1237,10 @@ export interface FileRouteTypes {
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
+    | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/richieste'
+    | '/gestionale/struttura'
     | '/la-mia-scd/campione'
     | '/ledwall/player'
     | '/quadro/rotazione-campi'
@@ -1267,6 +1311,7 @@ export interface FileRouteTypes {
     | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
+    | '/nutrizionista'
     | '/partner'
     | '/privacy'
     | '/pulmini'
@@ -1307,7 +1352,10 @@ export interface FileRouteTypes {
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/organigramma'
+    | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/richieste'
+    | '/gestionale/struttura'
     | '/gestionale_/impianti'
     | '/la-mia-scd_/campione'
     | '/ledwall/player'
@@ -1380,6 +1428,7 @@ export interface RootRouteChildren {
   KitRoute: typeof KitRoute
   LaMiaScdRoute: typeof LaMiaScdRoute
   MagazzinoRoute: typeof MagazzinoRoute
+  NutrizionistaRoute: typeof NutrizionistaRoute
   PartnerRoute: typeof PartnerRoute
   PrivacyRoute: typeof PrivacyRoute
   PulminiRoute: typeof PulminiRoute
@@ -1420,7 +1469,10 @@ export interface RootRouteChildren {
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
+  GestionalePlanningRoute: typeof GestionalePlanningRoute
   GestionalePostaRoute: typeof GestionalePostaRoute
+  GestionaleRichiesteRoute: typeof GestionaleRichiesteRoute
+  GestionaleStrutturaRoute: typeof GestionaleStrutturaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   LaMiaScdCampioneRoute: typeof LaMiaScdCampioneRoute
   LedwallPlayerRoute: typeof LedwallPlayerRoute
@@ -1624,6 +1676,13 @@ declare module '@tanstack/react-router' {
       path: '/magazzino'
       fullPath: '/magazzino'
       preLoaderRoute: typeof MagazzinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nutrizionista': {
+      id: '/nutrizionista'
+      path: '/nutrizionista'
+      fullPath: '/nutrizionista'
+      preLoaderRoute: typeof NutrizionistaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner': {
@@ -1948,11 +2007,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleOrganigrammaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/planning': {
+      id: '/gestionale/planning'
+      path: '/gestionale/planning'
+      fullPath: '/gestionale/planning'
+      preLoaderRoute: typeof GestionalePlanningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/posta': {
       id: '/gestionale/posta'
       path: '/gestionale/posta'
       fullPath: '/gestionale/posta'
       preLoaderRoute: typeof GestionalePostaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/richieste': {
+      id: '/gestionale/richieste'
+      path: '/gestionale/richieste'
+      fullPath: '/gestionale/richieste'
+      preLoaderRoute: typeof GestionaleRichiesteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/struttura': {
+      id: '/gestionale/struttura'
+      path: '/gestionale/struttura'
+      fullPath: '/gestionale/struttura'
+      preLoaderRoute: typeof GestionaleStrutturaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestionale_/impianti': {
@@ -2283,6 +2363,7 @@ const rootRouteChildren: RootRouteChildren = {
   KitRoute: KitRoute,
   LaMiaScdRoute: LaMiaScdRoute,
   MagazzinoRoute: MagazzinoRoute,
+  NutrizionistaRoute: NutrizionistaRoute,
   PartnerRoute: PartnerRoute,
   PrivacyRoute: PrivacyRoute,
   PulminiRoute: PulminiRoute,
@@ -2323,7 +2404,10 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
+  GestionalePlanningRoute: GestionalePlanningRoute,
   GestionalePostaRoute: GestionalePostaRoute,
+  GestionaleRichiesteRoute: GestionaleRichiesteRoute,
+  GestionaleStrutturaRoute: GestionaleStrutturaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   LaMiaScdCampioneRoute: LaMiaScdCampioneRoute,
   LedwallPlayerRoute: LedwallPlayerRoute,

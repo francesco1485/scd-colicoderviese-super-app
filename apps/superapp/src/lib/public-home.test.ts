@@ -44,8 +44,8 @@ const PUBLIC_HOME_FILES = [
   "src/routes/index.tsx",
   "src/components/home/PublicHome.tsx",
   "src/components/home/HomePractical.tsx",
-  "src/components/home/HomeMatchday.tsx",
-  "src/components/home/HomeBoard.tsx",
+  "src/components/home/HomeLobby.tsx",
+  "src/lib/home-week-board.ts",
   "src/components/home/HomePromo.tsx",
   "src/lib/home-board.ts",
   "src/components/home/WinConfetti.tsx",
@@ -88,30 +88,54 @@ describe("public home v5", () => {
       );
     }
     const home = code("src/components/home/PublicHome.tsx");
-    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + UD-132 Matchday: the games of the next 7 days.
-    expect(home).toMatch(/<HomeMatchday calendar=\{calendar\}/);
-    const week = code("src/components/home/HomeMatchday.tsx");
-    expect(week).toMatch(
-      /weekMatches\(calendar\.events, calendar\.groups, today, null\)/,
-    );
-    expect(week).toContain('data-testid="home-matchday"');
-    expect(week).toContain("Nessuna gara nei prossimi 7 giorni.");
-    // Opponent crest only from the verified registry: no neutral shield, no invented crest.
-    expect(week).toMatch(/const \{ src, label \} = crestFor\(name\);\s*if \(!src\) return null;/);
-    expect(week).not.toMatch(/OpponentCrest|publicTeamCrest|team-crest/);
-    // Filters are real buttons with aria-pressed.
-    expect(week).toMatch(/<button[\s\S]{0,80}type="button"[\s\S]{0,40}aria-pressed=\{on\}/);
+    // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + 15/10 22:04 Eurobet rebuild: the week of every
+    // team as event cards, right after the chips and the one static match banner.
+    expect(home).toMatch(/<HomeLobby calendar=\{calendar\}/);
+    const lobby = code("src/components/home/HomeLobby.tsx");
+    expect(lobby).toMatch(/weekBoardEvents\(calendar\.events, today\)/);
+    expect(lobby).toContain('data-testid="home-lobby"');
+    expect(lobby).toContain("Nessuna gara nei prossimi 7 giorni");
+    expect(lobby).not.toMatch(/publicTeamCrest|team-crest/);
+    // 16/10 14:46 "via di mezzo": slim strip of the week's games with a separate "In corso" box, affiliation and FIGC
+    // membership first with a small "registrati", Oggi in campo, Servizi e club, Dal club; the calendar is a small side
+    // tool (month on desktop, week on phone) with the countdown to the next home game.
+    for (const id of ["home-ticker", "home-live-box", "bar-calendario", "bar-allenamenti", "home-profile", "home-countdown", "home-join", "home-training", "home-services", "home-month", "home-week"])
+      expect(lobby).toContain(`data-testid="${id}"`);
+    expect(lobby).not.toMatch(/data-testid="home-(board|tabs|feed|inside|video|highlights)"/);
+    // Allenamenti are for members: the bar opens the access screen first.
+    expect(lobby).toMatch(/to="\/accedi" search=\{loginSearch\("\/allenamenti"\)\}/);
+    // The three marks are transparent and never on a white plate; no photo of the pitch or the centre on the home.
+    expect(lobby).toContain("CLUB_CREDENTIALS.map");
+    expect(lobby).toContain("drop-shadow(0_0_1px_rgb(255_255_255/0.95))");
+    expect(lobby).not.toMatch(/aerea|aerial|centro-sportivo\.(webp|jpg)/i);
+    // 16/10 17:28 «slide organizzate con agente a supporto tutto il giorno»: the organized slides live in HomeSlides.
+    expect(lobby).not.toMatch(/HeroArt|SkyJolly|PersonaAvatar|Pixellot/i);
+    const slides = code("src/components/home/HomeSlides.tsx");
+    expect(lobby).toContain("<HomeSlides slots={slots} />");
+    expect(slides).toContain('data-testid="home-news"');
+    // Avatar bases are members-area prototypes (UD-102): never on the public home until approved.
+    expect(slides).not.toMatch(/AVATAR_BASES|avatar\/bases/);
+    expect(slides).toMatch(/to="\/accedi" search=\{loginSearch\("\/la-mia-scd\/campione"\)\}/);
+    expect(slides).toContain("prefers-reduced-motion: reduce");
+    expect(slides).not.toMatch(/Pixellot|dirette/i);
+    // The three official marks live in the top bar, CR Lombardia and Monza linked.
+    const chrome = code("src/components/SiteChrome.tsx");
+    expect(chrome).toContain('data-testid="header-credentials"');
+    // Never on a white plate (16/10 15:05): the marks sit on the blue bar, transparent, with a light halo.
+    const creds = chrome.slice(chrome.indexOf("function HeaderCredentials"), chrome.indexOf("export function SiteHeader"));
+    expect(creds).not.toMatch(/\bbg-white\b/);
+    expect(creds).toContain("drop-shadow(0_0_1px_rgb(255_255_255/0.95))");
+    expect(chrome).toContain('"https://www.crlombardia.it/"');
+    expect(chrome).toContain('"https://www.acmonza.com/en/insieme-monza-dettaglio/mission/"');
   });
 
-  it("VR-009 board order (15/10 07:04, UD-134 09:18): board top, Mondo Colico, week, results; no stories, no partner band", () => {
+  it("home order (15/10 07:04, UD-134 09:18, new idea 21:35): notices, communication, lobby, results; no stories, no partner band", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
       "<ClubNoticeCard",
-      "<HomeBoard",
-      "<Vetrina ",
-      "<HomeMatchday",
+      "<HomeLobby",
       "<WeekendResults",
     ];
     const at = order.map((t) => body.indexOf(t));
@@ -133,7 +157,9 @@ describe("public home v5", () => {
       "<SponsorSpotsHome",
     ])
       expect(body, gone).not.toContain(gone);
-    expect(home).toMatch(/export function Vetrina\(/);
+    // UD-152 (15/10 13:54): no vetrina / "In evidenza" on any home.
+    expect(home).not.toMatch(/<Vetrina[\s/>]|In evidenza/);
+    expect(code("src/components/home/MemberHome.tsx")).not.toMatch(/<Vetrina[\s/>]|In vetrina/);
     // Dead code removed (PC audit 15/10, item 8): no news block, no carousel, no unused news fetch on the home.
     expect(home).not.toMatch(/HomeNewsBlock|NewsItem/);
     expect(code("src/routes/index.tsx")).not.toMatch(/getHomeNews/);
@@ -238,7 +264,7 @@ describe("public home v5", () => {
     expect(chat).not.toMatch(/crovi-cameo|CroviActor|cameoLine/);
   });
 
-  it("UD-116: the footer is reduced (logo, contacts, social, install, legal links, federal credits) and has no link index", () => {
+  it("UD-116 + light footer (16/10 05:59): reduced footer (logo, contacts, app + social, credits sentence, legal links), no link index", () => {
     const chrome = code("src/components/SiteChrome.tsx");
     const footer = chrome.slice(chrome.indexOf("export function SiteFooter"));
     expect(footer).not.toMatch(/LINK_GROUPS|Tutto sul club|footer-group-/);
@@ -254,7 +280,7 @@ describe("public home v5", () => {
       /openCookiePrefs/,
       /to="\/safeguarding"/,
       /href="\/elimina-account"/,
-      /<ClubCredentials variant="list"/,
+      /\{CREDENTIALS_SENTENCE\}/,
     ])
       expect(footer).toMatch(must);
   });
