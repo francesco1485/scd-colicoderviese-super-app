@@ -22,7 +22,7 @@ export const SECTION_META: Readonly<Record<GivingSection, { title: string; rail:
     title: "Tesoreria · Fondo Solidale",
     rail: "tesoreria",
     path: "/tesoreria/fondo-solidale",
-    description: "Domande riservate, decisioni con quota ridotta, scadenze, entrate e uscite del Fondo e rendiconto. ISEE e nomi solo per chi è abilitato.",
+    description: "Domande riservate, decisioni del comitato sulla quota (ridotta o coperta), scadenze, entrate e uscite del Fondo e rendiconto. Fascia ISEE e nomi solo per chi è abilitato.",
   },
   donazioni: {
     title: "Tesoreria · Donazioni",
@@ -51,18 +51,29 @@ export function givingHead(section: GivingSection) {
 
 const sectionLabel = (s: GivingSection) => SECTIONS.find((x) => x.code === s)?.label ?? s;
 
+/** Frame override for a hub that reuses a section page (the Fondo Solidale hub at /fondo). */
+export interface ShellOverride {
+  title: string;
+  path: string;
+  rail: string;
+  /** Rendered above the page content (hub tabs). */
+  top?: ReactNode;
+}
+
 export function GivingShell({
   gate,
   highlights,
   canWrite,
+  shell,
   children,
 }: {
   gate: GivingGate;
   highlights?: readonly StripItem[];
   canWrite: boolean;
+  shell?: ShellOverride | undefined;
   children: ReactNode;
 }) {
-  const m = SECTION_META[gate.section];
+  const m = shell ? { ...SECTION_META[gate.section], title: shell.title, path: shell.path, rail: shell.rail } : SECTION_META[gate.section];
   const status =
     gate.state === "open" ? (canWrite ? <Chip tone="ok">Modifiche salvate nel database del club</Chip> : <Chip tone="info">Sola lettura (livello «Vede»)</Chip>)
     : gate.state === "not-active" ? <Chip tone="warn">{NOT_ACTIVE_TITLE}</Chip>
@@ -71,11 +82,12 @@ export function GivingShell({
     <InteriorShell title={m.title} path={m.path} activeAreaId={m.rail} roles={RAIL_ROLES} roleLabel={gate.preview ? "Anteprima staging" : "Area di lavoro"} {...(highlights ? { highlights } : {})}>
       <div className="flex flex-col gap-3 lg:gap-[18px]" data-giving-section={gate.section} data-gate={gate.state}>
         {gate.preview && <StagingBanner />}
+        {shell?.top}
         <p className="m-0 flex flex-wrap items-center gap-2 text-[14px] leading-snug text-[var(--in-sub)]">
           {status}
           <span className="min-w-0">Abilitazione per persona: «{sectionLabel(gate.section)}». L'app non incassa e non paga.</span>
         </p>
-        <GateNotice gate={gate} />
+        <GateNotice gate={gate} path={m.path} />
         {children}
       </div>
     </InteriorShell>
@@ -83,9 +95,9 @@ export function GivingShell({
 }
 
 /** Plain-language state of the page when it is not open. */
-export function GateNotice({ gate }: { gate: GivingGate }) {
+export function GateNotice({ gate, path }: { gate: GivingGate; path?: string }) {
   if (gate.state === "open") return null;
-  const m = SECTION_META[gate.section];
+  const m = { ...SECTION_META[gate.section], ...(path ? { path } : {}) };
   const box = "flex items-start gap-3 rounded-xl border px-4 py-3 text-[15px] leading-snug";
   if (gate.state === "not-active")
     return (

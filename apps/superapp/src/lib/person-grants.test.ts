@@ -37,7 +37,7 @@ import { KNOWN_POSITIONS, ROLE_POSITIONS } from "./session";
 
 const repo = (p: string) => fileURLToPath(new URL(`../../../../${p}`, import.meta.url));
 const SQL = readFileSync(repo("supabase/migrations/20261014_r100_person_grants.sql"), "utf8");
-/** r101 (UD-113) recreates scd_section_catalog() with the r100 entries unchanged plus the new sections. */
+/** r101 (UD-113, corrected 16/10/2026) recreates scd_section_catalog() with the live entries (r100 + r136) unchanged plus the new sections. */
 const SQL101 = readFileSync(repo("supabase/migrations/20261014_r101_fondo_adotta.sql"), "utf8");
 /** r136 (Infermeria and Nutrizionista) recreates it again with every r101 entry unchanged plus "nutrizione". */
 const SQL136 = readFileSync(repo("supabase/migrations/20261016_r136_infermeria_nutrizione.sql"), "utf8");
@@ -126,11 +126,16 @@ describe("migration r100 stays in sync with the catalogue", () => {
     expect(r136).toEqual(SECTIONS.filter((s) => !R101_SECTIONS.includes(s.code)).map(asSql));
   });
 
-  it("r101 keeps every r100 entry identical and only appends the UD-113 sections", () => {
+  it("r101 keeps every live entry (r100 + r136 nutrizione) identical and only appends the UD-113 sections", () => {
     const r100 = literal("cat") as unknown[];
+    const r136 = literal("cat", SQL136) as unknown[];
     const r101 = literal("cat", SQL101) as Array<{ code: string }>;
-    expect(r101.slice(0, r100.length)).toEqual(r100);
-    expect(r101.slice(r100.length).map((x) => x.code)).toEqual(R101_SECTIONS);
+    // Applying r101 after r136 must never drop "nutrizione" (correction C1, Francesco 16/10/2026).
+    expect(r101.slice(0, r136.length)).toEqual(r136);
+    expect(r101.map((x) => x.code)).toContain("nutrizione");
+    expect(r101.slice(r136.length).map((x) => x.code)).toEqual(R101_SECTIONS);
+    const byCode = (a: { code: string }, b: { code: string }) => a.code.localeCompare(b.code);
+    expect([...r101].sort(byCode)).toEqual(SECTIONS.map(asSql).sort(byCode));
     expect(SECTIONS.filter((s) => ![...R101_SECTIONS, ...R136_SECTIONS].includes(s.code)).map(asSql)).toEqual(r100);
   });
 

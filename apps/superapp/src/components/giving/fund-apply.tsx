@@ -3,13 +3,14 @@
  *   - "family": a signed-in parent/guardian applies for one of their own children (list from scd_my_family);
  *   - "office": the Fund office records an application received on paper or by e-mail (free beneficiary label and the
  *     Gestionale fee code).
- * ISEE is optional here and stays confidential: only the Direzione and people granted «Fondo Solidale» see it.
+ * ISEE only as a band (non presentato / sotto soglia / sopra soglia), never the value (r101 C2, Francesco 16/10/2026):
+ * the committee checks the attestation in person. The Fund covers only the membership fee (r101 C3).
  */
 import { useServerFn } from "@tanstack/react-start";
 import { Lock } from "lucide-react";
 import { useState, type FormEvent, type ReactNode } from "react";
 
-import { SIBLING_LABEL, SIBLING_OPTIONS, type SiblingDiscount } from "@/lib/giving";
+import { FUND_SCOPE_TEXT, ISEE_BANDS, ISEE_BAND_LABEL, SIBLING_LABEL, SIBLING_OPTIONS, type IseeBand, type SiblingDiscount } from "@/lib/giving";
 import { fundSubmitApplication, type ActionResult } from "@/lib/giving.functions";
 import type { FamilyMember } from "@/lib/roster.functions";
 
@@ -43,16 +44,15 @@ export function FundApplicationForm({
 }) {
   const send = useServerFn(fundSubmitApplication);
   const kids = children.filter((m) => m.relationship !== "SELF" && m.minor !== false);
-  const [f, setF] = useState({ child: kids[0]?.personId ?? "", label: "", applicant: "", email: "", phone: "", fee: "", isee: "", iseeExp: "", docs: "", note: "" });
+  const [f, setF] = useState({ child: kids[0]?.personId ?? "", label: "", applicant: "", email: "", phone: "", fee: "", iseeExp: "", docs: "", note: "" });
+  const [band, setBand] = useState<IseeBand>("NON_PRESENTATO");
   const [sib, setSib] = useState<SiblingDiscount>("DA_VERIFICARE");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<ActionResult | null>(null);
-  const isee = f.isee.trim() ? Number(f.isee.replace(",", ".")) : null;
   const problem =
     f.applicant.trim().length < 2 ? "Scrivi il nome di chi fa domanda." :
     mode === "family" && !f.child ? "Scegli per chi fai domanda." :
-    mode === "office" && f.label.trim().length < 2 && !f.child ? "Indica per chi è la domanda." :
-    isee !== null && !(Number.isFinite(isee) && isee >= 0) ? "Valore ISEE non valido." : null;
+    mode === "office" && f.label.trim().length < 2 && !f.child ? "Indica per chi è la domanda." : null;
   const [tried, setTried] = useState(false);
 
   async function submit(e: FormEvent) {
@@ -71,8 +71,8 @@ export function FundApplicationForm({
         contactEmail: f.email,
         contactPhone: f.phone,
         feeSourceRecordId: f.fee,
-        iseeValue: isee,
-        iseeExpiresOn: f.iseeExp || null,
+        iseeBand: band,
+        iseeExpiresOn: band === "NON_PRESENTATO" ? null : f.iseeExp || null,
         documentsRef: f.docs,
         householdNote: f.note,
         siblingDiscount: sib,
@@ -90,7 +90,8 @@ export function FundApplicationForm({
 
   return (
     <form onSubmit={submit} noValidate className="space-y-4" data-testid={`fund-apply-${mode}`}>
-      <p className="m-0 flex items-start gap-2 text-sm"><Lock className="mt-0.5 size-4 flex-none" aria-hidden="true" />La domanda è riservata: la vedono solo la Direzione e chi la Direzione ha abilitato al Fondo Solidale.</p>
+      <p className="m-0 flex items-start gap-2 text-sm"><Lock className="mt-0.5 size-4 flex-none" aria-hidden="true" />La domanda è riservata: la vedono solo il comitato del Fondo e chi la Direzione ha abilitato al Fondo Solidale.</p>
+      <p className="m-0 text-sm" data-testid="fund-scope">{FUND_SCOPE_TEXT}</p>
       {mode === "family" ? (
         kids.length > 0 ? (
           <Labelled cls={labelCls} t="Per chi fai domanda">
@@ -113,8 +114,12 @@ export function FundApplicationForm({
         <Labelled cls={labelCls} t="Telefono"><input className={inputCls} value={f.phone} maxLength={30} onChange={(e) => setF({ ...f, phone: e.target.value })} autoComplete="tel" /></Labelled>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        <Labelled cls={labelCls} t="ISEE (facoltativo, riservato)"><input className={inputCls} inputMode="decimal" value={f.isee} onChange={(e) => setF({ ...f, isee: e.target.value })} /></Labelled>
-        <Labelled cls={labelCls} t="Scadenza dell'attestazione ISEE"><input className={inputCls} type="date" value={f.iseeExp} onChange={(e) => setF({ ...f, iseeExp: e.target.value })} /></Labelled>
+        <Labelled cls={labelCls} t="ISEE (facoltativo)" hint="Solo la fascia, mai il valore: l'attestazione la vede il comitato in segreteria.">
+          <select className={inputCls} value={band} onChange={(e) => setBand(e.target.value as IseeBand)} data-testid="fund-isee-band">
+            {ISEE_BANDS.map((b) => <option key={b} value={b}>{ISEE_BAND_LABEL[b]}</option>)}
+          </select>
+        </Labelled>
+        <Labelled cls={labelCls} t="Scadenza dell'attestazione ISEE"><input className={inputCls} type="date" value={f.iseeExp} disabled={band === "NON_PRESENTATO"} onChange={(e) => setF({ ...f, iseeExp: e.target.value })} /></Labelled>
       </div>
       <Labelled cls={labelCls} t="Sconto fratelli" hint="Fondo e sconto fratelli non sono cumulabili.">
         <select className={inputCls} value={sib} onChange={(e) => setSib(e.target.value as SiblingDiscount)}>

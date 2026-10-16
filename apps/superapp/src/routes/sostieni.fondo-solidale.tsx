@@ -6,7 +6,7 @@ import { NotActiveNote, btnSun } from "@/components/giving/public";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls, inputCls } from "@/components/ui-kit";
 import { CLUB_PROFILE } from "@/lib/club-profile";
-import { FONDO_PUBLIC_TEXT, TEXT_PENDING, euro, itDay } from "@/lib/giving";
+import { FONDO_PUBLIC_TEXT, FUND_FISCAL_NOTE, TEXT_PENDING, euro, itDay } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
 import { getMyFamilyForFund } from "@/lib/roster.functions";
 import { pageHead, SHARE_PAGES } from "@/lib/share";
@@ -39,7 +39,7 @@ function FondoPage() {
   return (
     <main>
       <PageHero eyebrow="Fondo Solidale" title={<>Nessun ragazzo resta fuori <span className="text-accent">per la quota</span></>} clamp={false} action={<ShareButton page={SHARE_PAGES.fondoSolidale} />}>
-        Il Fondo Solidale della S.C.D. ColicoDerviese. Domande, ISEE e nomi restano riservati alla Direzione.
+        Il Fondo Solidale della S.C.D. ColicoDerviese copre solo la quota associativa, ridotta o per intero. Domande, fasce ISEE e nomi restano riservati al comitato del Fondo.
       </PageHero>
       <section className={`${heroOverlapCls} mx-auto grid max-w-6xl gap-4 px-4 md:grid-cols-2`}>
         {BLOCKS.map((b) => {
@@ -78,7 +78,8 @@ function FondoPage() {
           <a href={`mailto:${CLUB_PROFILE.contacts.email}?subject=${encodeURIComponent("Donazione al Fondo Solidale")}`} className={`${btnSun} mt-4`}>
             <Mail className="size-4" aria-hidden="true" /> Scrivi alla Tesoreria
           </a>
-          <p className="mt-3 text-xs opacity-75">Aziende: <Link to="/sponsor" hash="proposta" className="underline">sponsor dedicato al Fondo</Link>.</p>
+          <p className="mt-3 text-xs opacity-75" data-testid="fondo-fiscale">{FUND_FISCAL_NOTE.text}</p>
+          <p className="mt-2 text-xs opacity-75">Aziende: <Link to="/sponsor" hash="proposta" className="underline">sponsor dedicato al Fondo</Link>.</p>
         </article>
         <article className="card-premium p-6" data-testid="fondo-domanda">
           <p className="eyebrow">Fai domanda</p>

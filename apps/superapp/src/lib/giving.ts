@@ -12,8 +12,10 @@
  * - donor visibility on every donation: "nome pubblico" / "anonimo in pubblico" / "completamente anonimo" (then no
  *   personal data at all and no receipt); no amount per person is public without consent; aggregated amounts are
  *   public only with at least MIN_PUBLIC_CONTRIBUTIONS contributions or everybody's consent;
- * - Fondo Solidale: ISEE and names only for the Direzione and people granted the section; Fondo and sibling discount
- *   are never cumulative;
+ * - Fondo Solidale (corrected 16/10/2026, Francesco): ISEE only as a band (never the value), names only for people
+ *   granted the section; the Fund covers ONLY the membership fee (reduced or waived); a committee of three Consiglio
+ *   Direttivo members decides, with a second signature only above DUAL_APPROVAL_OVER_DEFAULT; Fondo and sibling
+ *   discount are never cumulative; fiscal notes are INFERRED and "da verificare", never a deductibility promise;
  * - medicines: only sealed and not expired; opened or expired medicines are never accepted;
  * - proposals are never public until staff publish a staff-written text without contacts;
  * - no amount, IBAN or text is invented: the public Fondo text comes from the Direzione (FONDO_PUBLIC_TEXT).
@@ -180,17 +182,60 @@ export const PROPOSAL_STATUS_LABEL: Readonly<Record<ProposalStatus, string>> = {
   SPAM: "Spam",
 };
 
-export const FUND_STATUSES = ["INVIATA", "IN_ESAME", "INTEGRAZIONE", "APPROVATA", "RESPINTA", "RITIRATA", "SCADUTA"] as const;
+export const FUND_STATUSES = ["INVIATA", "IN_ESAME", "INTEGRAZIONE", "SECONDA_FIRMA", "APPROVATA", "RESPINTA", "RITIRATA", "SCADUTA"] as const;
 export type FundStatus = (typeof FUND_STATUSES)[number];
 export const FUND_STATUS_LABEL: Readonly<Record<FundStatus, string>> = {
   INVIATA: "Arrivata",
   IN_ESAME: "In esame",
   INTEGRAZIONE: "Documenti da integrare",
+  SECONDA_FIRMA: "Attende la seconda firma",
   APPROVATA: "Approvata",
   RESPINTA: "Non accolta",
   RITIRATA: "Ritirata",
   SCADUTA: "Scaduta",
 };
+
+/** ISEE only as a band, never the value (r101 C2). The threshold is the Direzione's and is not written in the app. */
+export const ISEE_BANDS = ["NON_PRESENTATO", "SOTTO_SOGLIA", "SOPRA_SOGLIA"] as const;
+export type IseeBand = (typeof ISEE_BANDS)[number];
+export const ISEE_BAND_LABEL: Readonly<Record<IseeBand, string>> = {
+  NON_PRESENTATO: "ISEE non presentato",
+  SOTTO_SOGLIA: "ISEE sotto la soglia del Fondo",
+  SOPRA_SOGLIA: "ISEE sopra la soglia del Fondo",
+};
+
+/** «Fondo solo quota» (r101 C3): the only benefit is on the membership fee. */
+export type FundBenefit = "QUOTA_RIDOTTA" | "QUOTA_COPERTA";
+export const BENEFIT_LABEL: Readonly<Record<FundBenefit, string>> = {
+  QUOTA_RIDOTTA: "Quota ridotta",
+  QUOTA_COPERTA: "Quota coperta per intero",
+};
+/** What the Fund never pays (Francesco 16/10/2026 «fondo solo quota»). */
+export const FUND_NOT_COVERED = ["kit", "pulmini", "camp", "tornei", "visite mediche"] as const;
+export const FUND_SCOPE_TEXT = "Il Fondo copre solo la quota associativa, ridotta o per intero. Non copre kit, pulmini, camp, tornei né visite mediche.";
+
+/** Same rule as the benefit column of scd_fund_applications. */
+export function benefitOf(baseFee: number | null, reducedFee: number | null): FundBenefit | null {
+  if (baseFee === null || reducedFee === null) return null;
+  return reducedFee === 0 ? "QUOTA_COPERTA" : "QUOTA_RIDOTTA";
+}
+
+/** Second signature only above this reduction (r101 C5, Francesco «serve sopra i 10 mila»). */
+export const DUAL_APPROVAL_OVER_DEFAULT = 10000;
+/** Same test as scd_fund_decide: strictly above the threshold. */
+export function needsSecondSignature(baseFee: number, reducedFee: number, over: number = DUAL_APPROVAL_OVER_DEFAULT): boolean {
+  return cents(baseFee - reducedFee) > cents(over);
+}
+export const COMMITTEE_SEATS = 3;
+
+/**
+ * Fiscal note for donors (r101 C6). No accountant: the club manages it. INFERRED, to be checked, never a promise.
+ */
+export const FUND_FISCAL_NOTE = {
+  status: "INFERRED",
+  text: "Agevolazioni fiscali per chi dona: da verificare caso per caso. Il club non promette detrazioni o deduzioni.",
+  source: "Riferimento da verificare: art. 15, comma 1, lettera i-ter, TUIR (erogazioni liberali alle società sportive dilettantistiche).",
+} as const;
 
 export const SIBLING_OPTIONS = ["DA_VERIFICARE", "NESSUNO", "PRESENTE", "PRESENTE_RINUNCIA"] as const;
 export type SiblingDiscount = (typeof SIBLING_OPTIONS)[number];
@@ -225,7 +270,8 @@ export const CHANNEL_LABEL: Readonly<Record<Channel, string>> = {
   ALTRO: "Altro",
 };
 
-export const MOVEMENT_SOURCES = ["DONAZIONE", "EVENTO", "SPONSOR_DEDICATO", "ALTRA_ENTRATA", "QUOTA_COPERTA", "ALTRA_USCITA"] as const;
+/** «Fondo solo quota»: the only outgoing is QUOTA_COPERTA (a reduced or waived fee of an approved application). */
+export const MOVEMENT_SOURCES = ["DONAZIONE", "EVENTO", "SPONSOR_DEDICATO", "ALTRA_ENTRATA", "QUOTA_COPERTA"] as const;
 export type MovementSource = (typeof MOVEMENT_SOURCES)[number];
 export const MOVEMENT_SOURCE_LABEL: Readonly<Record<MovementSource, string>> = {
   DONAZIONE: "Donazione",
@@ -233,12 +279,11 @@ export const MOVEMENT_SOURCE_LABEL: Readonly<Record<MovementSource, string>> = {
   SPONSOR_DEDICATO: "Sponsor dedicato",
   ALTRA_ENTRATA: "Altra entrata",
   QUOTA_COPERTA: "Quota coperta",
-  ALTRA_USCITA: "Altra uscita",
 };
 /** Sources the Fund office types by hand (donations enter by themselves when the treasury records them). */
-export const MANUAL_SOURCES: readonly MovementSource[] = ["EVENTO", "SPONSOR_DEDICATO", "ALTRA_ENTRATA", "QUOTA_COPERTA", "ALTRA_USCITA"];
+export const MANUAL_SOURCES: readonly MovementSource[] = ["EVENTO", "SPONSOR_DEDICATO", "ALTRA_ENTRATA", "QUOTA_COPERTA"];
 export function movementDirection(s: MovementSource): "ENTRATA" | "USCITA" {
-  return s === "QUOTA_COPERTA" || s === "ALTRA_USCITA" ? "USCITA" : "ENTRATA";
+  return s === "QUOTA_COPERTA" ? "USCITA" : "ENTRATA";
 }
 
 /* ------------------------------------------------------------------ status changes */
@@ -249,8 +294,9 @@ export type TransitionKind = "FUND_APPLICATION" | "DONATION" | "ADOPT_ITEM" | "I
 export const TRANSITIONS: Readonly<Record<TransitionKind, Readonly<Record<string, readonly string[]>>>> = {
   FUND_APPLICATION: {
     INVIATA: ["IN_ESAME", "RITIRATA"],
-    IN_ESAME: ["INTEGRAZIONE", "APPROVATA", "RESPINTA", "RITIRATA"],
+    IN_ESAME: ["INTEGRAZIONE", "SECONDA_FIRMA", "APPROVATA", "RESPINTA", "RITIRATA"],
     INTEGRAZIONE: ["IN_ESAME", "RITIRATA", "SCADUTA"],
+    SECONDA_FIRMA: ["APPROVATA", "RESPINTA", "IN_ESAME", "RITIRATA"],
     APPROVATA: ["SCADUTA"],
   },
   DONATION: { PROMESSA: ["RICEVUTA", "ANNULLATA"], RICEVUTA: ["ANNULLATA"] },
@@ -573,6 +619,29 @@ export function decisionProblem(d: DecisionInput): string | null {
   return null;
 }
 
+/**
+ * Second signature (same checks as scd_fund_decide from SECONDA_FIRMA): a different committee member, the same amounts
+ * and the same sibling choice as the first signature.
+ */
+export function secondSignatureProblem(
+  app: { status: FundStatus; firstApprovedByMe: boolean; baseFee: number | null; reducedFee: number | null; siblingDiscount: SiblingDiscount },
+  d: DecisionInput,
+): string | null {
+  if (app.status !== "SECONDA_FIRMA" || d.decision !== "APPROVATA") return null;
+  if (app.firstApprovedByMe) return "Hai già firmato tu: serve la firma di un altro membro del comitato.";
+  if (d.baseFee !== app.baseFee || d.reducedFee !== app.reducedFee || d.siblingDiscount !== app.siblingDiscount)
+    return "La seconda firma conferma gli stessi importi della prima. Per cambiarli, rimanda la domanda in esame.";
+  return null;
+}
+
+/** What a committee decision leads to, for the confirmation line under the form. */
+export function decisionOutcome(status: FundStatus, d: Pick<DecisionInput, "decision" | "baseFee" | "reducedFee">, over: number): "APPROVATA" | "SECONDA_FIRMA" | "RESPINTA" | null {
+  if (d.decision === "RESPINTA") return "RESPINTA";
+  if (d.baseFee === null || d.reducedFee === null) return null;
+  if (status === "SECONDA_FIRMA") return "APPROVATA";
+  return needsSecondSignature(d.baseFee, d.reducedFee, over) ? "SECONDA_FIRMA" : "APPROVATA";
+}
+
 /** What the office still has to do in the Gestionale after an approval (UD-082: the fee lives there). */
 export function gestionaleTodo(a: { status: FundStatus; siblingDiscount: SiblingDiscount; feeFundInSheet: boolean | null }): string | null {
   if (a.status !== "APPROVATA") return null;
@@ -807,7 +876,9 @@ export interface FundApplication {
   contactEmail: string | null;
   contactPhone: string | null;
   feeSourceRecordId: string | null;
-  iseeValue: number | null;
+  iseeBand: IseeBand;
+  iseeChecked: boolean;
+  iseeCheckedOn: string | null;
   iseeExpiresOn: string | null;
   documentsRef: string | null;
   householdNote: string;
@@ -819,7 +890,12 @@ export interface FundApplication {
   decisionReason: string | null;
   baseFee: number | null;
   reducedFee: number | null;
+  benefit: FundBenefit | null;
   validUntil: string | null;
+  dualRequired: boolean;
+  firstApprovedAt: string | null;
+  firstApprovedByMe: boolean;
+  secondApprovedAt: string | null;
   covered: number;
   feeFamilyRule: string | null;
   feeFundInSheet: boolean | null;
@@ -833,9 +909,29 @@ export interface FundMovement extends MovementLike {
   ledgerRef: string | null;
   voidReason: string | null;
 }
+export interface CommitteeSeat {
+  seat: number;
+  filled: boolean;
+  mine: boolean;
+  /** Only for the Direzione (who assigns the seats); null for everybody else. */
+  personId: string | null;
+}
+export interface CommitteeCandidate {
+  personId: string;
+  name: string;
+  roleLabel: string;
+}
 export interface FundBoard {
   canWrite: boolean;
   canApprove: boolean;
+  /** The caller holds a committee seat (only then can they decide). */
+  isCommittee: boolean;
+  /** Direzione: assigns the three seats. */
+  canAssignCommittee: boolean;
+  dualApprovalOver: number;
+  committee: CommitteeSeat[];
+  /** Consiglio Direttivo members from the organigramma: only for the Direzione. */
+  committeeCandidates: CommitteeCandidate[];
   applications: FundApplication[];
   movements: FundMovement[];
   publicTotals: boolean;
@@ -847,6 +943,18 @@ export function parseFundBoard(v: unknown): FundBoard | null {
   return {
     canWrite: bool(r["canWrite"]),
     canApprove: bool(r["canApprove"]),
+    isCommittee: bool(r["isCommittee"]),
+    canAssignCommittee: bool(r["canAssignCommittee"]),
+    dualApprovalOver: num(r["dualApprovalOver"]) ?? DUAL_APPROVAL_OVER_DEFAULT,
+    committee: Array.from({ length: COMMITTEE_SEATS }, (_, i) => {
+      const found = arr(r["committee"]).map(obj).find((c) => c !== null && num(c["seat"]) === i + 1);
+      return { seat: i + 1, filled: found ? bool(found["filled"]) : false, mine: found ? bool(found["mine"]) : false, personId: found ? str(found["personId"]) : null };
+    }),
+    committeeCandidates: arr(r["committeeCandidates"]).flatMap((x) => {
+      const c = obj(x);
+      const personId = c ? str(c["personId"]) : null;
+      return c && personId ? [{ personId, name: str(c["name"]) ?? "Nome da confermare", roleLabel: str(c["roleLabel"]) ?? "" }] : [];
+    }),
     publicTotals: bool(r["publicTotals"]),
     applications: arr(r["applications"]).flatMap((x) => {
       const a = obj(x);
@@ -861,7 +969,9 @@ export function parseFundBoard(v: unknown): FundBoard | null {
         contactEmail: str(a["contactEmail"]),
         contactPhone: str(a["contactPhone"]),
         feeSourceRecordId: str(a["feeSourceRecordId"]),
-        iseeValue: num(a["iseeValue"]),
+        iseeBand: oneOf(ISEE_BANDS, a["iseeBand"], "NON_PRESENTATO"),
+        iseeChecked: bool(a["iseeChecked"]),
+        iseeCheckedOn: str(a["iseeCheckedOn"]),
         iseeExpiresOn: str(a["iseeExpiresOn"]),
         documentsRef: str(a["documentsRef"]),
         householdNote: str(a["householdNote"]) ?? "",
@@ -873,7 +983,12 @@ export function parseFundBoard(v: unknown): FundBoard | null {
         decisionReason: str(a["decisionReason"]),
         baseFee: num(a["baseFee"]),
         reducedFee: num(a["reducedFee"]),
+        benefit: a["benefit"] === "QUOTA_COPERTA" || a["benefit"] === "QUOTA_RIDOTTA" ? a["benefit"] : null,
         validUntil: str(a["validUntil"]),
+        dualRequired: bool(a["dualRequired"]),
+        firstApprovedAt: str(a["firstApprovedAt"]),
+        firstApprovedByMe: bool(a["firstApprovedByMe"]),
+        secondApprovedAt: str(a["secondApprovedAt"]),
         covered: num(a["covered"]) ?? 0,
         feeFamilyRule: str(a["feeFamilyRule"]),
         feeFundInSheet: typeof a["feeFundInSheet"] === "boolean" ? a["feeFundInSheet"] : null,
@@ -905,6 +1020,7 @@ export function parseFundBoard(v: unknown): FundBoard | null {
 export interface FundReport {
   applications: Partial<Record<FundStatus, number>>;
   reductionDecided: number;
+  benefits: Partial<Record<FundBenefit, number>>;
   income: Partial<Record<MovementSource, number>>;
   outgoings: Partial<Record<MovementSource, number>>;
   asOf: string | null;
@@ -920,6 +1036,7 @@ export function parseFundReport(v: unknown): FundReport | null {
   return {
     applications: counts(r["applications"]) as Partial<Record<FundStatus, number>>,
     reductionDecided: num(r["reductionDecided"]) ?? 0,
+    benefits: counts(r["benefits"]) as Partial<Record<FundBenefit, number>>,
     income: counts(r["income"]) as Partial<Record<MovementSource, number>>,
     outgoings: counts(r["outgoings"]) as Partial<Record<MovementSource, number>>,
     asOf: str(r["asOf"]),

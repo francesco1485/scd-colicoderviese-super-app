@@ -4,14 +4,21 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
+  DUAL_APPROVAL_OVER_DEFAULT,
   FONDO_PUBLIC_TEXT,
+  FUND_FISCAL_NOTE,
+  FUND_SCOPE_TEXT,
+  MANUAL_SOURCES,
+  MOVEMENT_SOURCES,
   MIN_PUBLIC_CONTRIBUTIONS,
   SOSTIENI_VETRINA_SLOT,
   TRANSITIONS,
   adoptionProgress,
   autoItemStatus,
+  benefitOf,
   canTransition,
   coverRoom,
+  decisionOutcome,
   decisionProblem,
   donorErrors,
   effectivePriceMode,
@@ -20,7 +27,10 @@ import {
   gestionaleTodo,
   hasContact,
   itemErrors,
+  movementDirection,
+  needsSecondSignature,
   offerRefusal,
+  parseFundBoard,
   parsePublic,
   parseSubmit,
   priceLine,
@@ -29,6 +39,7 @@ import {
   publishProblem,
   receiptPossible,
   reviewProblem,
+  secondSignatureProblem,
   unitPriceOf,
   type ItemDraft,
   type OfferInput,
@@ -74,6 +85,8 @@ function sqlLiteral(tag: string): unknown {
 describe("migration r101 (staged, mirrored by giving.ts)", () => {
   it("is written, not applied, and seeds nothing", () => {
     expect(SQL).toMatch(/STAGED: written, NOT applied/);
+    expect(SQL).toMatch(/NOT APPLIED — needs «applica r101»/);
+    for (const c of ["C1", "C2", "C3", "C4", "C5", "C6"]) expect(SQL, c).toMatch(new RegExp(`--\\s+${c} `));
     expect(SQL).not.toMatch(/insert into public\.scd_(adopt_items|donations|fund_applications|inkind_offers|improvement_proposals|fund_movements)[^;]*values\s*\('/i);
     expect(SQL).not.toMatch(/KOMPAN|SACO|FSP10300|PCW2003?21/);
     expect(SQL).not.toMatch(/dfnwzwutvnwiitiffwvr/);
@@ -85,7 +98,7 @@ describe("migration r101 (staged, mirrored by giving.ts)", () => {
 
   it("turns RLS on for every new table, with no direct policy and no table grant", () => {
     const tables = [...SQL.matchAll(/create table if not exists public\.(\w+)/g)].map((m) => m[1]!);
-    expect(tables.length).toBe(9);
+    expect(tables.length).toBe(10);
     for (const t of tables) expect(SQL).toContain(`alter table public.${t} enable row level security;`);
     expect(SQL).not.toMatch(/create policy/i);
     expect(SQL).not.toMatch(/grant (select|insert|update|delete)[^;]* on (table )?public\.scd_/i);
@@ -112,7 +125,7 @@ describe("migration r101 (staged, mirrored by giving.ts)", () => {
   });
 
   it("checks the section grant (r100 scd_can) in every back-office function", () => {
-    for (const fn of ["scd_fund_board", "scd_fund_decide", "scd_fund_record_movement", "scd_donation_record", "scd_donation_board", "scd_inkind_review", "scd_adopt_item_save", "scd_adopt_board", "scd_improvement_board", "scd_improvement_triage", "scd_improvement_publish"]) {
+    for (const fn of ["scd_fund_board", "scd_fund_decide", "scd_fund_check_isee", "scd_fund_record_movement", "scd_donation_record", "scd_donation_board", "scd_inkind_review", "scd_adopt_item_save", "scd_adopt_board", "scd_improvement_board", "scd_improvement_triage", "scd_improvement_publish"]) {
       const body = SQL.slice(SQL.indexOf(`function public.${fn}(`));
       expect(body.slice(0, body.indexOf("$$;")), fn).toMatch(/scd_giving_need\('(fondo-solidale|donazioni|adotta|proposte)'/);
     }
@@ -268,6 +281,38 @@ describe("proposte di miglioramento", () => {
   });
 });
 
+describe("Fondo Solidale corrections of 16/10/2026 in the migration", () => {
+  const body = (fn: string) => {
+    const b = SQL.slice(SQL.indexOf(`function public.${fn}(`));
+    return b.slice(0, b.indexOf("$$;"));
+  };
+  it("«fondo solo quota»: the only outgoing is a covered fee", () => {
+    expect(SQL).toMatch(/or \(direction = 'USCITA' and source = 'QUOTA_COPERTA'\)/);
+    expect(SQL).not.toMatch(/'ALTRA_USCITA'/);
+    expect(body("scd_fund_record_movement")).toMatch(/if p_source not in \('EVENTO','SPONSOR_DEDICATO','ALTRA_ENTRATA','QUOTA_COPERTA'\)/);
+    expect(SQL).toMatch(/when reduced_fee = 0 then 'QUOTA_COPERTA' else 'QUOTA_RIDOTTA'/);
+  });
+  it("double approval only above 10.000 €, by a different committee member with the same amounts", () => {
+    expect(SQL).toMatch(/dual_approval_over numeric\(10,2\) not null default 10000/);
+    expect(body("scd_fund_dual_over")).toMatch(/10000::numeric/);
+    const d = body("scd_fund_decide");
+    expect(d).toMatch(/\(p_base_fee - p_reduced_fee\) > v_over then 'SECONDA_FIRMA'/);
+    expect(d).toMatch(/v\.first_approved_by = v_uid/);
+    expect(d).toMatch(/same amounts as the first/);
+    expect(SQL).toMatch(/constraint scd_fund_dual_complete check/);
+    expect(DUAL_APPROVAL_OVER_DEFAULT).toBe(10000);
+  });
+  it("a committee of three Consiglio Direttivo members, assigned by the Direzione, decides", () => {
+    expect(SQL).toMatch(/seat smallint not null check \(seat between 1 and 3\)/);
+    const set = body("scd_fund_committee_set");
+    expect(set).toMatch(/scd_has_org_role\(p_organization_id, array\['DIRECTION'\]/);
+    expect(set).toMatch(/role_kind = 'ORGANO_SOCIETARIO'/);
+    for (const fn of ["scd_fund_decide", "scd_fund_check_isee"]) expect(body(fn), fn).toMatch(/scd_fund_is_committee\(p_organization_id\)/);
+    // No names in the repository: no insert of seats.
+    expect(SQL).not.toMatch(/insert into public\.scd_fund_committee[^;]*values\s*\('/i);
+  });
+});
+
 describe("Fondo Solidale", () => {
   const ok = { decision: "APPROVATA" as const, baseFee: 300, reducedFee: 150, siblingDiscount: "NESSUNO" as const, feeFamilyRule: null, reason: "ISEE sotto soglia" };
   it("never cumulates Fondo and sibling discount", () => {
@@ -312,6 +357,50 @@ describe("Fondo Solidale", () => {
   });
   it("public text comes only from the Direzione", () => {
     expect(FONDO_PUBLIC_TEXT).toBeNull();
+  });
+  it("covers only the membership fee: no other outgoing source", () => {
+    expect(MOVEMENT_SOURCES).not.toContain("ALTRA_USCITA");
+    expect(MOVEMENT_SOURCES.filter((s) => movementDirection(s) === "USCITA")).toEqual(["QUOTA_COPERTA"]);
+    expect(MANUAL_SOURCES.filter((s) => movementDirection(s) === "USCITA")).toEqual(["QUOTA_COPERTA"]);
+    expect(benefitOf(300, 0)).toBe("QUOTA_COPERTA");
+    expect(benefitOf(300, 120)).toBe("QUOTA_RIDOTTA");
+    expect(benefitOf(null, 0)).toBeNull();
+    expect(FUND_SCOPE_TEXT).toMatch(/solo la quota/);
+  });
+  it("needs a second signature only strictly above 10.000 €", () => {
+    expect(needsSecondSignature(10500, 500)).toBe(false);
+    expect(needsSecondSignature(10500, 499.99)).toBe(true);
+    expect(needsSecondSignature(300, 0)).toBe(false);
+    expect(decisionOutcome("IN_ESAME", { decision: "APPROVATA", baseFee: 12000, reducedFee: 1000 }, 10000)).toBe("SECONDA_FIRMA");
+    expect(decisionOutcome("IN_ESAME", { decision: "APPROVATA", baseFee: 300, reducedFee: 0 }, 10000)).toBe("APPROVATA");
+    expect(decisionOutcome("SECONDA_FIRMA", { decision: "APPROVATA", baseFee: 12000, reducedFee: 1000 }, 10000)).toBe("APPROVATA");
+    expect(decisionOutcome("IN_ESAME", { decision: "RESPINTA", baseFee: null, reducedFee: null }, 10000)).toBe("RESPINTA");
+  });
+  it("the second signature is another person and confirms the same amounts", () => {
+    const app = { status: "SECONDA_FIRMA" as const, firstApprovedByMe: false, baseFee: 12000, reducedFee: 1000, siblingDiscount: "NESSUNO" as const };
+    const same = { ...ok, baseFee: 12000, reducedFee: 1000 };
+    expect(secondSignatureProblem(app, same)).toBeNull();
+    expect(secondSignatureProblem({ ...app, firstApprovedByMe: true }, same)).toMatch(/altro membro/);
+    expect(secondSignatureProblem(app, { ...same, reducedFee: 500 })).toMatch(/stessi importi/);
+    expect(secondSignatureProblem({ ...app, status: "IN_ESAME" }, { ...same, reducedFee: 500 })).toBeNull();
+  });
+  it("reads the board with the band only and three seats without names", () => {
+    const b = parseFundBoard({ isCommittee: true, committee: [{ seat: 2, filled: true, mine: true }], applications: [{ id: "a", code: "FS-1", iseeBand: "SOTTO_SOGLIA", iseeValue: 9999, benefit: "QUOTA_COPERTA" }] })!;
+    expect(b.dualApprovalOver).toBe(10000);
+    expect(b.committee).toEqual([
+      { seat: 1, filled: false, mine: false, personId: null },
+      { seat: 2, filled: true, mine: true, personId: null },
+      { seat: 3, filled: false, mine: false, personId: null },
+    ]);
+    expect(b.applications[0]!.iseeBand).toBe("SOTTO_SOGLIA");
+    expect(Object.keys(b.applications[0]!)).not.toContain("iseeValue");
+    expect(parseFundBoard({ applications: [{ id: "a", iseeBand: "12345" }] })!.applications[0]!.iseeBand).toBe("NON_PRESENTATO");
+  });
+  it("fiscal note is INFERRED, to be checked, and promises nothing", () => {
+    expect(FUND_FISCAL_NOTE.status).toBe("INFERRED");
+    expect(FUND_FISCAL_NOTE.text).toMatch(/da verificare/);
+    expect(FUND_FISCAL_NOTE.text).toMatch(/non promette/);
+    expect(FUND_FISCAL_NOTE.text).not.toMatch(/\b(è|sono) (deducibil|detraibil)/i);
   });
 });
 

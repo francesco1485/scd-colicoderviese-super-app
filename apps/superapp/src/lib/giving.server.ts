@@ -71,8 +71,15 @@ export async function givingGate(input: {
 export function givingErrorText(error: { code?: string; message: string } | null | undefined): string {
   if (!error) return "Operazione non riuscita. Riprova tra poco.";
   const m = error.message;
+  if (/committee members only/.test(m)) return "Decide solo il comitato del Fondo (tre membri del Consiglio Direttivo).";
+  if (/another committee member/.test(m)) return "Serve la firma di un altro membro del comitato.";
+  if (/Direzione only/.test(m)) return "I posti del comitato li assegna la Direzione.";
   if (error.code === "42501") return /infermeria/.test(m) ? "Materiale sanitario: decide il responsabile dell'infermeria." : "Non sei abilitato a questa operazione: chiedi alla Direzione.";
   if (/double discount/.test(m)) return "Fondo e sconto fratelli non sono cumulabili.";
+  if (/same amounts as the first/.test(m)) return "La seconda firma conferma gli stessi importi della prima.";
+  if (/Consiglio Direttivo members only/.test(m)) return "Nel comitato vanno solo membri del Consiglio Direttivo (dall'organigramma).";
+  if (/already holds a seat/.test(m)) return "Questa persona ha già un posto nel comitato.";
+  if (/only membership fees/.test(m)) return "Il Fondo paga solo quote associative.";
   if (/medicines/.test(m)) return "Farmaci solo sigillati e non scaduti.";
   if (/more than the decided reduction/.test(m)) return "Supera la riduzione decisa per questa domanda.";
   if (/no receipt for a completely anonymous/.test(m)) return "Donazione completamente anonima: non si può rilasciare ricevuta.";

@@ -1,24 +1,32 @@
 /**
- * Gestionale Fondo Solidale (UD-113): confidential applications, review and decision with reduced fee, deadlines,
- * Fund income and outgoings, report. ISEE, names and contacts are shown only here and only to people the Direzione
- * enabled («Fondo Solidale»). Fondo and sibling discount are never cumulative (checked here and in the database).
- * The fee itself stays in the Gestionale (UD-082): after a decision the page says what to copy there.
+ * Gestionale Fondo Solidale (UD-113, corrected 16/10/2026): confidential applications, review, committee decision on
+ * the membership fee only (reduced or covered), second signature above the threshold, deadlines, Fund income and
+ * outgoings (covered fees only), report. ISEE only as a band; names and contacts are shown only here and only to
+ * people the Direzione enabled («Fondo Solidale»). Fondo and sibling discount are never cumulative (checked here and in
+ * the database). The fee itself stays in the Gestionale (UD-082): after a decision the page says what to copy there.
+ * Used by /tesoreria/fondo-solidale and by the Gestione tab of the /fondo hub (same gate, same data).
  */
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarClock, Check, Eye, Lock, Plus, RefreshCw, X } from "lucide-react";
+import { CalendarClock, Check, Eye, Lock, PenLine, Plus, RefreshCw, ShieldCheck, Users, X } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 
 import { FundApplicationForm } from "@/components/giving/fund-apply";
 import { Dialog } from "@/components/scd/Dialog";
 import { Chip, type ChipTone } from "@/components/scd/interior-ui";
 import {
+  BENEFIT_LABEL,
+  FUND_SCOPE_TEXT,
   FUND_STATUS_LABEL,
+  ISEE_BAND_LABEL,
   MANUAL_SOURCES,
   MOVEMENT_SOURCE_LABEL,
   SIBLING_LABEL,
   SIBLING_OPTIONS,
+  benefitOf,
   coverRoom,
+  decisionOutcome,
   decisionProblem,
+  secondSignatureProblem,
   euro,
   fundDeadlines,
   fundTotals,
@@ -33,20 +41,21 @@ import {
   type MovementSource,
   type SiblingDiscount,
 } from "@/lib/giving";
-import { fundDecide, fundRecordMovement, fundSetPublicTotals, fundSetStatus, fundVoidMovement, getFundBoard, type ActionResult } from "@/lib/giving.functions";
+import { fundCheckIsee, fundCommitteeSet, fundDecide, fundRecordMovement, fundSetPublicTotals, fundSetStatus, fundVoidMovement, getFundBoard, type ActionResult } from "@/lib/giving.functions";
 import type { GivingGate } from "@/lib/giving.server";
-import { EmptyRow, GivingShell, InField, Message, PrivacyNote, SectionCard, inArea, inBtn, inGhost, inInput, showsStructure } from "./backoffice";
+import { EmptyRow, GivingShell, InField, Message, PrivacyNote, SectionCard, inArea, inBtn, inGhost, inInput, showsStructure, type ShellOverride } from "./backoffice";
 
 const TONE: Readonly<Record<FundStatus, ChipTone>> = {
   INVIATA: "warn",
   IN_ESAME: "info",
   INTEGRAZIONE: "warn",
+  SECONDA_FIRMA: "warn",
   APPROVATA: "ok",
   RESPINTA: "mute",
   RITIRATA: "mute",
   SCADUTA: "mute",
 };
-const OPEN: ReadonlySet<FundStatus> = new Set(["INVIATA", "IN_ESAME", "INTEGRAZIONE"]);
+const OPEN: ReadonlySet<FundStatus> = new Set(["INVIATA", "IN_ESAME", "INTEGRAZIONE", "SECONDA_FIRMA"]);
 type Filter = "lavoro" | "approvate" | "chiuse";
 
 function romeToday(): string {
@@ -54,7 +63,7 @@ function romeToday(): string {
 }
 const toNum = (s: string): number | null => (s.trim() && Number.isFinite(Number(s.replace(",", "."))) ? Number(s.replace(",", ".")) : null);
 
-export function FundPage({ initial }: { initial: { gate: GivingGate; board: FundBoard | null; report: FundReport | null; error: string | null } }) {
+export function FundPage({ initial, shell }: { initial: { gate: GivingGate; board: FundBoard | null; report: FundReport | null; error: string | null }; shell?: ShellOverride }) {
   const [view, setView] = useState(initial);
   const reload = useServerFn(getFundBoard);
   const today = useMemo(romeToday, []);
@@ -62,6 +71,8 @@ export function FundPage({ initial }: { initial: { gate: GivingGate; board: Fund
   const open = gate.state === "open" && board !== null;
   const canWrite = open && board.canWrite;
   const canApprove = open && board.canApprove;
+  const isCommittee = open && board.isCommittee;
+  const dualOver = board?.dualApprovalOver ?? null;
   const apps = board?.applications ?? [];
   const [filter, setFilter] = useState<Filter>("lavoro");
   const [detail, setDetail] = useState<string | null>(null);
@@ -81,16 +92,17 @@ export function FundPage({ initial }: { initial: { gate: GivingGate; board: Fund
     setView(await reload({ data: {} }));
   }
 
-  if (!showsStructure(gate)) return <GivingShell gate={gate} canWrite={false}>{null}</GivingShell>;
+  if (!showsStructure(gate)) return <GivingShell gate={gate} canWrite={false} shell={shell}>{null}</GivingShell>;
 
   return (
     <GivingShell
       gate={gate}
       canWrite={canWrite}
+      shell={shell}
       highlights={[
         { value: open ? apps.filter((a) => OPEN.has(a.status)).length : null, label: "domande da lavorare" },
         { value: open ? deadlines.filter((d) => d.late).length : null, label: "scadenze superate" },
-        { value: open ? apps.filter((a) => a.status === "APPROVATA").length : null, label: "domande approvate" },
+        { value: open ? apps.filter((a) => a.status === "SECONDA_FIRMA").length : null, label: "attendono la seconda firma" },
       ]}
     >
       {view.error && <Message ok={false}>{view.error}</Message>}
@@ -100,7 +112,7 @@ export function FundPage({ initial }: { initial: { gate: GivingGate; board: Fund
           <SectionCard
             id="fondo-domande"
             title="Domande"
-            sub="Riservate: nomi, recapiti e ISEE li vede solo chi è abilitato al Fondo Solidale."
+            sub="Riservate: nomi, recapiti e fascia ISEE li vede solo chi è abilitato al Fondo Solidale. Il valore ISEE non si scrive mai."
             aside={
               <>
                 <button type="button" className={inGhost} onClick={() => refresh()} disabled={!open} aria-label="Aggiorna"><RefreshCw className="size-4" aria-hidden="true" /></button>
@@ -131,13 +143,15 @@ export function FundPage({ initial }: { initial: { gate: GivingGate; board: Fund
                 ))}
               </ul>
             )}
-            <PrivacyNote>Non condividere schermate di questa pagina. Le modifiche restano registrate (chi, quando, cosa) senza ISEE né nomi nello storico.</PrivacyNote>
+            <PrivacyNote>Non condividere schermate di questa pagina. Le modifiche restano registrate (chi, quando, cosa) senza fascia ISEE né nomi nello storico.</PrivacyNote>
           </SectionCard>
 
           <MovementsCard board={board} open={open} canWrite={canWrite} canApprove={canApprove} today={today} onDone={refresh} />
         </div>
 
         <div className="flex min-w-0 flex-col gap-[18px]">
+          <CommitteeCard board={board} open={open} onDone={refresh} />
+
           <SectionCard id="fondo-scadenze" title="Scadenze" sub="Esame delle domande e documenti da integrare.">
             {deadlines.length === 0 ? (
               <EmptyRow>{open ? "Nessuna scadenza aperta." : "—"}</EmptyRow>
@@ -173,13 +187,16 @@ export function FundPage({ initial }: { initial: { gate: GivingGate; board: Fund
           </div>
         </Dialog>
       )}
-      {current && <ApplicationDialog app={current} canWrite={canWrite} canApprove={canApprove} today={today} onClose={() => setDetail(null)} onDone={refresh} />}
+      {current && <ApplicationDialog app={current} canWrite={canWrite} canApprove={canApprove} isCommittee={isCommittee} dualOver={dualOver} today={today} onClose={() => setDetail(null)} onDone={refresh} />}
     </GivingShell>
   );
 }
 
-function ApplicationDialog({ app, canWrite, canApprove, today, onClose, onDone }: { app: FundApplication; canWrite: boolean; canApprove: boolean; today: string; onClose: () => void; onDone: (r: ActionResult) => Promise<void> }) {
+function ApplicationDialog({ app, canWrite, canApprove, isCommittee, dualOver, today, onClose, onDone }: { app: FundApplication; canWrite: boolean; canApprove: boolean; isCommittee: boolean; dualOver: number | null; today: string; onClose: () => void; onDone: (r: ActionResult) => Promise<void> }) {
   const setStatus = useServerFn(fundSetStatus);
+  const checkIsee = useServerFn(fundCheckIsee);
+  const [isee, setIsee] = useState({ band: (app.iseeBand === "SOPRA_SOGLIA" ? "SOPRA_SOGLIA" : "SOTTO_SOGLIA") as "SOTTO_SOGLIA" | "SOPRA_SOGLIA", expires: app.iseeExpiresOn ?? "" });
+  const canDecideHere = canApprove && isCommittee;
   const decide = useServerFn(fundDecide);
   const record = useServerFn(fundRecordMovement);
   const [st, setSt] = useState({ status: "", reviewDue: app.reviewDue ?? "", documentsDue: app.documentsDue ?? "", note: "" });
@@ -187,9 +204,14 @@ function ApplicationDialog({ app, canWrite, canApprove, today, onClose, onDone }
   const [cover, setCover] = useState({ amount: "", on: today });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const problem = decisionProblem({ decision: dec.decision, baseFee: toNum(dec.base), reducedFee: toNum(dec.reduced), siblingDiscount: dec.sib, feeFamilyRule: app.feeFamilyRule, reason: dec.reason });
+  const decInput = { decision: dec.decision, baseFee: toNum(dec.base), reducedFee: toNum(dec.reduced), siblingDiscount: dec.sib, feeFamilyRule: app.feeFamilyRule, reason: dec.reason };
+  const problem = decisionProblem(decInput) ?? secondSignatureProblem(app, decInput);
+  const outcome = dualOver === null ? null : decisionOutcome(app.status, decInput, dualOver);
+  const newBenefit = benefitOf(decInput.baseFee, decInput.reducedFee);
   const room = coverRoom(app);
-  const steps = nextStatuses("FUND_APPLICATION", app.status).filter((s) => s !== "APPROVATA" && s !== "RESPINTA") as FundStatus[];
+  const steps = nextStatuses("FUND_APPLICATION", app.status).filter((s) => s !== "APPROVATA" && s !== "RESPINTA" && s !== "SECONDA_FIRMA") as FundStatus[];
+  const canStep = app.status === "SECONDA_FIRMA" ? canDecideHere : canWrite;
+  const iseeOpen = app.status === "INVIATA" || app.status === "IN_ESAME" || app.status === "INTEGRAZIONE";
   const canDecide = nextStatuses("FUND_APPLICATION", app.status).includes("APPROVATA");
 
   async function run(p: Promise<ActionResult>) {
@@ -213,21 +235,39 @@ function ApplicationDialog({ app, canWrite, canApprove, today, onClose, onDone }
           <dt className="font-semibold">Per</dt><dd className="m-0">{app.beneficiaryLabel || "—"}</dd>
           <dt className="font-semibold">Chi chiede</dt><dd className="m-0">{app.applicantName}</dd>
           <dt className="font-semibold">Recapiti</dt><dd className="m-0 break-words">{[app.contactEmail, app.contactPhone].filter(Boolean).join(" · ") || "—"}</dd>
-          <dt className="font-semibold">ISEE</dt><dd className="m-0">{app.iseeValue !== null ? euro(app.iseeValue) : "—"}{app.iseeExpiresOn ? ` · scade ${itDay(app.iseeExpiresOn)}` : ""}</dd>
+          <dt className="font-semibold">ISEE</dt><dd className="m-0">{ISEE_BAND_LABEL[app.iseeBand]}{app.iseeChecked ? ` · verificata dal comitato il ${itDay(app.iseeCheckedOn)}` : app.iseeBand !== "NON_PRESENTATO" ? " · dichiarata, da verificare" : ""}{app.iseeExpiresOn ? ` · attestazione fino al ${itDay(app.iseeExpiresOn)}` : ""}</dd>
           <dt className="font-semibold">Documenti</dt><dd className="m-0 break-words">{app.documentsRef ?? "—"}</dd>
           <dt className="font-semibold">Quota Gestionale</dt><dd className="m-0">{app.feeSourceRecordId ?? "—"}{app.feeFamilyRule ? ` · regola: ${app.feeFamilyRule}` : ""}</dd>
           <dt className="font-semibold">Sconto fratelli</dt><dd className="m-0">{SIBLING_LABEL[app.siblingDiscount]}</dd>
           {app.householdNote && (<><dt className="font-semibold">Note</dt><dd className="m-0 whitespace-pre-wrap">{app.householdNote}</dd></>)}
-          {app.status === "APPROVATA" && (<><dt className="font-semibold">Decisione</dt><dd className="m-0">paga {euro(app.reducedFee)} invece di {euro(app.baseFee)} · coperti {euro(app.covered)}{app.validUntil ? ` · fino al ${itDay(app.validUntil)}` : ""}</dd></>)}
+          {app.status === "SECONDA_FIRMA" && (<><dt className="font-semibold">Prima firma</dt><dd className="m-0">{itDay(app.firstApprovedAt)}{app.firstApprovedByMe ? " (tua)" : ""} · paga {euro(app.reducedFee)} invece di {euro(app.baseFee)}: serve la seconda firma di un altro membro del comitato.</dd></>)}
+          {app.status === "APPROVATA" && (<><dt className="font-semibold">Decisione</dt><dd className="m-0">{app.benefit ? `${BENEFIT_LABEL[app.benefit]}: ` : ""}paga {euro(app.reducedFee)} invece di {euro(app.baseFee)} · coperti {euro(app.covered)}{app.validUntil ? ` · fino al ${itDay(app.validUntil)}` : ""}{app.dualRequired ? " · due firme" : ""}</dd></>)}
           {app.decisionReason && (<><dt className="font-semibold">Motivazione</dt><dd className="m-0">{app.decisionReason}</dd></>)}
         </dl>
+
+        {iseeOpen && (
+          <form className="space-y-3 rounded-xl border border-[var(--in-line)] p-3" data-testid="fund-isee-check" onSubmit={(e: FormEvent) => { e.preventDefault(); void run(checkIsee({ data: { id: app.id, band: isee.band, expiresOn: isee.expires || null } })); }}>
+            <b className="flex items-center gap-2"><ShieldCheck className="size-4" aria-hidden="true" />Verifica ISEE {isCommittee ? "" : "(solo il comitato)"}</b>
+            <p className="m-0 text-[14px] text-[var(--in-sub)]">Guarda l'attestazione e segna solo la fascia. Il valore non si scrive da nessuna parte.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <InField label="Fascia">
+                <select className={inInput} value={isee.band} onChange={(e) => setIsee({ ...isee, band: e.target.value as "SOTTO_SOGLIA" | "SOPRA_SOGLIA" })} disabled={!canWrite || !isCommittee}>
+                  <option value="SOTTO_SOGLIA">{ISEE_BAND_LABEL.SOTTO_SOGLIA}</option>
+                  <option value="SOPRA_SOGLIA">{ISEE_BAND_LABEL.SOPRA_SOGLIA}</option>
+                </select>
+              </InField>
+              <InField label="Attestazione valida fino al"><input type="date" className={inInput} value={isee.expires} onChange={(e) => setIsee({ ...isee, expires: e.target.value })} disabled={!canWrite || !isCommittee} /></InField>
+            </div>
+            <button type="submit" className={inGhost} disabled={!canWrite || !isCommittee || busy}>Segna come verificata</button>
+          </form>
+        )}
 
         {steps.length > 0 && (
           <form className="space-y-3 rounded-xl border border-[var(--in-line)] p-3" onSubmit={(e: FormEvent) => { e.preventDefault(); void run(setStatus({ data: { id: app.id, status: (st.status || null) as FundStatus | null, reviewDue: st.reviewDue || null, documentsDue: st.documentsDue || null, note: st.note } })); }}>
             <b className="block">Esame</b>
             <div className="grid gap-3 sm:grid-cols-2">
               <InField label="Passa a">
-                <select className={inInput} value={st.status} onChange={(e) => setSt({ ...st, status: e.target.value })} disabled={!canWrite}>
+                <select className={inInput} value={st.status} onChange={(e) => setSt({ ...st, status: e.target.value })} disabled={!canStep}>
                   <option value="">Lascia «{FUND_STATUS_LABEL[app.status]}»</option>
                   {steps.map((s) => <option key={s} value={s}>{FUND_STATUS_LABEL[s]}</option>)}
                 </select>
@@ -236,42 +276,49 @@ function ApplicationDialog({ app, canWrite, canApprove, today, onClose, onDone }
               {st.status === "INTEGRAZIONE" && <InField label="Documenti entro"><input type="date" className={inInput} value={st.documentsDue} onChange={(e) => setSt({ ...st, documentsDue: e.target.value })} disabled={!canWrite} /></InField>}
               <InField label="Nota per lo storico (senza dati personali)" className="sm:col-span-2"><input className={inInput} maxLength={200} value={st.note} onChange={(e) => setSt({ ...st, note: e.target.value })} disabled={!canWrite} /></InField>
             </div>
-            <button type="submit" className={inGhost} disabled={!canWrite || busy || (st.status === "INTEGRAZIONE" && !st.documentsDue)}>Salva esame</button>
+            {app.status === "SECONDA_FIRMA" && <p className="m-0 text-[13.5px] text-[var(--in-sub)]">Rimandarla in esame cancella la prima firma. Lo può fare solo il comitato.</p>}
+            <button type="submit" className={inGhost} disabled={!canStep || busy || (st.status === "INTEGRAZIONE" && !st.documentsDue)}>Salva esame</button>
           </form>
         )}
 
         {canDecide && (
           <form className="space-y-3 rounded-xl border border-[var(--in-line)] p-3" onSubmit={(e: FormEvent) => { e.preventDefault(); if (!problem) void run(decide({ data: { id: app.id, decision: dec.decision, baseFee: toNum(dec.base), reducedFee: toNum(dec.reduced), siblingDiscount: dec.sib, validUntil: dec.until || null, reason: dec.reason } })); }}>
-            <b className="block">Decisione {canApprove ? "" : "(serve il livello «Approva»)"}</b>
+            <b className="flex items-center gap-2"><PenLine className="size-4" aria-hidden="true" />{app.status === "SECONDA_FIRMA" ? "Seconda firma" : "Decisione del comitato"} {canDecideHere ? "" : isCommittee ? "(serve il livello «Approva»)" : "(decide solo il comitato del Fondo)"}</b>
+            <p className="m-0 text-[13.5px] text-[var(--in-sub)]">{FUND_SCOPE_TEXT} {dualOver !== null ? `Sopra ${euro(dualOver)} di riduzione servono due firme di membri diversi del comitato.` : ""}</p>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Decisione">
               {(["APPROVATA", "RESPINTA"] as const).map((d) => (
                 <label key={d} className={`${inGhost} cursor-pointer ${dec.decision === d ? "border-[var(--in-info)] bg-[var(--in-info-bg)]" : ""}`}>
-                  <input type="radio" className="sr-only" checked={dec.decision === d} onChange={() => setDec({ ...dec, decision: d })} disabled={!canApprove} />
+                  <input type="radio" className="sr-only" checked={dec.decision === d} onChange={() => setDec({ ...dec, decision: d })} disabled={!canDecideHere} />
                   {d === "APPROVATA" ? <Check className="size-4" aria-hidden="true" /> : <X className="size-4" aria-hidden="true" />}{FUND_STATUS_LABEL[d]}
                 </label>
               ))}
             </div>
             {dec.decision === "APPROVATA" && (
               <div className="grid gap-3 sm:grid-cols-2">
-                <InField label="Quota piena (€)"><input className={inInput} inputMode="decimal" value={dec.base} onChange={(e) => setDec({ ...dec, base: e.target.value })} disabled={!canApprove} /></InField>
-                <InField label="Quota ridotta che paga la famiglia (€)"><input className={inInput} inputMode="decimal" value={dec.reduced} onChange={(e) => setDec({ ...dec, reduced: e.target.value })} disabled={!canApprove} /></InField>
+                <InField label="Quota associativa piena (€)"><input className={inInput} inputMode="decimal" value={dec.base} onChange={(e) => setDec({ ...dec, base: e.target.value })} disabled={!canDecideHere} /></InField>
+                <InField label="Quota che paga la famiglia (€)" hint="0 = quota coperta per intero dal Fondo."><input className={inInput} inputMode="decimal" value={dec.reduced} onChange={(e) => setDec({ ...dec, reduced: e.target.value })} disabled={!canDecideHere} /></InField>
                 <InField label="Sconto fratelli" hint="Fondo e sconto fratelli non sono cumulabili." className="sm:col-span-2">
-                  <select className={inInput} value={dec.sib} onChange={(e) => setDec({ ...dec, sib: e.target.value as SiblingDiscount })} disabled={!canApprove}>
+                  <select className={inInput} value={dec.sib} onChange={(e) => setDec({ ...dec, sib: e.target.value as SiblingDiscount })} disabled={!canDecideHere}>
                     {SIBLING_OPTIONS.map((s) => <option key={s} value={s}>{SIBLING_LABEL[s]}</option>)}
                   </select>
                 </InField>
-                <InField label="Valida fino al"><input type="date" className={inInput} value={dec.until} onChange={(e) => setDec({ ...dec, until: e.target.value })} disabled={!canApprove} /></InField>
+                <InField label="Valida fino al"><input type="date" className={inInput} value={dec.until} onChange={(e) => setDec({ ...dec, until: e.target.value })} disabled={!canDecideHere} /></InField>
               </div>
             )}
-            <InField label="Motivazione"><textarea className={inArea} rows={2} maxLength={500} value={dec.reason} onChange={(e) => setDec({ ...dec, reason: e.target.value })} disabled={!canApprove} /></InField>
+            <InField label="Motivazione (senza ISEE né dati di salute)"><textarea className={inArea} rows={2} maxLength={500} value={dec.reason} onChange={(e) => setDec({ ...dec, reason: e.target.value })} disabled={!canDecideHere} /></InField>
             {problem && dec.reason.trim().length >= 3 && <p role="alert" className="m-0 text-[14px] font-semibold text-[var(--in-crit)]">{problem}</p>}
-            <button type="submit" className={inBtn} disabled={!canApprove || busy || problem !== null}>Registra decisione</button>
+            {!problem && outcome && (
+              <p className="m-0 text-[14px]" data-testid="fund-outcome">
+                {outcome === "RESPINTA" ? "La domanda sarà chiusa come non accolta." : outcome === "SECONDA_FIRMA" ? "Riduzione sopra la soglia: la tua è la prima firma, poi serve un altro membro del comitato." : `Sarà approvata${newBenefit ? ` (${BENEFIT_LABEL[newBenefit].toLowerCase()})` : ""}.`}
+              </p>
+            )}
+            <button type="submit" className={inBtn} disabled={!canDecideHere || busy || problem !== null}>{app.status === "SECONDA_FIRMA" ? "Firma anche tu" : "Registra decisione"}</button>
           </form>
         )}
 
         {app.status === "APPROVATA" && (
           <form className="space-y-3 rounded-xl border border-[var(--in-line)] p-3" onSubmit={(e: FormEvent) => { e.preventDefault(); const a = toNum(cover.amount); if (a && a <= room) void run(record({ data: { season: "2026/27", source: "QUOTA_COPERTA", amount: a, occurredOn: cover.on, description: `Quota coperta ${app.code}`, applicationId: app.id, ledgerRef: "" } })); }}>
-            <b className="block">Quota coperta dal Fondo</b>
+            <b className="block">Quota coperta dal Fondo (unica uscita possibile)</b>
             <p className="m-0 text-[14px] text-[var(--in-sub)]">Ancora copribile: {euro(room)}.</p>
             <div className="grid gap-3 sm:grid-cols-2">
               <InField label="Importo (€)"><input className={inInput} inputMode="decimal" value={cover.amount} onChange={(e) => setCover({ ...cover, amount: e.target.value })} disabled={!canWrite || room <= 0} /></InField>
@@ -294,7 +341,7 @@ function MovementsCard({ board, open, canWrite, canApprove, today, onDone }: { b
   const [err, setErr] = useState<string | null>(null);
   const movements = board?.movements ?? [];
   const totals = fundTotals(movements);
-  const manual = MANUAL_SOURCES.filter((s) => s !== "QUOTA_COPERTA");
+  const manual = MANUAL_SOURCES.filter((s) => movementDirection(s) === "ENTRATA");
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -320,7 +367,7 @@ function MovementsCard({ board, open, canWrite, canApprove, today, onDone }: { b
   }
 
   return (
-    <SectionCard id="fondo-movimenti" title="Entrate e uscite del Fondo" sub="Donazioni al Fondo entrano da sole quando la Tesoreria le registra; qui eventi, sponsor dedicati e altre voci.">
+    <SectionCard id="fondo-movimenti" title="Entrate e uscite del Fondo" sub="Le donazioni al Fondo entrano da sole quando la Tesoreria le registra; qui eventi, sponsor dedicati e altre entrate. L'unica uscita è la quota coperta, dalla scheda della domanda.">
       <dl className="m-0 grid grid-cols-3 gap-2 px-4 pb-3 sm:px-[18px]">
         {[["Entrate", totals.income], ["Uscite", totals.outgoings], ["Saldo", totals.balance]].map(([l, v]) => (
           <div key={l as string} className="rounded-xl bg-[var(--in-info-bg)] px-3 py-2.5">
@@ -344,9 +391,9 @@ function MovementsCard({ board, open, canWrite, canApprove, today, onDone }: { b
         </ul>
       )}
       <form onSubmit={submit} className="grid gap-3 border-t border-[var(--in-line)] px-4 py-4 sm:grid-cols-2 sm:px-[18px]">
-        <InField label="Voce">
+        <InField label="Entrata">
           <select className={inInput} value={f.source} onChange={(e) => setF({ ...f, source: e.target.value as MovementSource })} disabled={!canWrite}>
-            {manual.map((s) => <option key={s} value={s}>{movementDirection(s) === "ENTRATA" ? "Entrata" : "Uscita"} · {MOVEMENT_SOURCE_LABEL[s]}</option>)}
+            {manual.map((s) => <option key={s} value={s}>{MOVEMENT_SOURCE_LABEL[s]}</option>)}
           </select>
         </InField>
         <InField label="Importo (€)"><input className={inInput} inputMode="decimal" value={f.amount} onChange={(e) => setF({ ...f, amount: e.target.value })} disabled={!canWrite} /></InField>
@@ -354,7 +401,7 @@ function MovementsCard({ board, open, canWrite, canApprove, today, onDone }: { b
         <InField label="Riferimento prima nota (facoltativo)"><input className={inInput} maxLength={80} value={f.ledger} onChange={(e) => setF({ ...f, ledger: e.target.value })} disabled={!canWrite} /></InField>
         <InField label="Descrizione (es. «Cena di Natale»)" className="sm:col-span-2"><input className={inInput} maxLength={200} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} disabled={!canWrite} /></InField>
         <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
-          <button type="submit" className={inBtn} disabled={!canWrite || busy}>Registra movimento</button>
+          <button type="submit" className={inBtn} disabled={!canWrite || busy}>Registra entrata</button>
           {err && <span role="alert" className="text-[14px] font-semibold text-[var(--in-crit)]">{err}</span>}
         </div>
       </form>
@@ -367,13 +414,14 @@ function ReportCard({ report, totals, open, canApprove, publicTotals, onDone }: 
   const [busy, setBusy] = useState(false);
   const counts = report?.applications ?? {};
   return (
-    <SectionCard id="fondo-rendiconto" title="Rendiconto della stagione" sub="Solo numeri aggregati, senza nomi né ISEE: si può condividere con il Consiglio.">
+    <SectionCard id="fondo-rendiconto" title="Rendiconto della stagione" sub="Solo numeri aggregati, senza nomi né fasce ISEE: si può condividere con il Consiglio.">
       <dl className="m-0 space-y-1.5 px-4 pb-3 text-[14.5px] sm:px-[18px]">
         <div className="flex justify-between gap-3"><dt>Domande arrivate</dt><dd className="m-0 font-semibold">{open ? Object.values(counts).reduce((s, n) => s + (n ?? 0), 0) : "—"}</dd></div>
         <div className="flex justify-between gap-3"><dt>Approvate</dt><dd className="m-0 font-semibold">{open ? counts.APPROVATA ?? 0 : "—"}</dd></div>
+        <div className="flex justify-between gap-3"><dt>Quote coperte per intero · ridotte</dt><dd className="m-0 font-semibold">{open ? `${report?.benefits.QUOTA_COPERTA ?? 0} · ${report?.benefits.QUOTA_RIDOTTA ?? 0}` : "—"}</dd></div>
         <div className="flex justify-between gap-3"><dt>Riduzioni decise</dt><dd className="m-0 font-semibold">{open ? euro(report?.reductionDecided ?? 0) : "—"}</dd></div>
         <div className="flex justify-between gap-3"><dt>Entrate</dt><dd className="m-0 font-semibold">{open ? euro(totals.income) : "—"}</dd></div>
-        <div className="flex justify-between gap-3"><dt>Uscite (quote coperte e altro)</dt><dd className="m-0 font-semibold">{open ? euro(totals.outgoings) : "—"}</dd></div>
+        <div className="flex justify-between gap-3"><dt>Uscite (solo quote coperte)</dt><dd className="m-0 font-semibold">{open ? euro(totals.outgoings) : "—"}</dd></div>
       </dl>
       <div className="flex flex-wrap items-center gap-3 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
         <span className="min-w-0 flex-1 text-[14px]">Totali in pagina pubblica: <b>{publicTotals ? "visibili" : "nascosti"}</b></span>
@@ -381,6 +429,56 @@ function ReportCard({ report, totals, open, canApprove, publicTotals, onDone }: 
           {publicTotals ? "Nascondi" : "Mostra"}
         </button>
       </div>
+    </SectionCard>
+  );
+}
+
+/** The committee (r101 C4): three Consiglio Direttivo members, seats assigned by the Direzione. No names unless Direzione. */
+function CommitteeCard({ board, open, onDone }: { board: FundBoard | null; open: boolean; onDone: (r: ActionResult) => Promise<void> }) {
+  const assign = useServerFn(fundCommitteeSet);
+  const [busy, setBusy] = useState<number | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const seats = board?.committee ?? [1, 2, 3].map((seat) => ({ seat, filled: false, mine: false, personId: null }));
+  const canAssign = open && (board?.canAssignCommittee ?? false);
+  const candidates = board?.committeeCandidates ?? [];
+  const nameOf = (id: string | null) => candidates.find((c) => c.personId === id)?.name ?? "Membro assegnato";
+
+  async function change(seat: number, personId: string) {
+    setBusy(seat);
+    setErr(null);
+    try {
+      const r = await assign({ data: { seat, personId: personId || null } });
+      if (!r.ok) setErr(r.message);
+      else await onDone(r);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <SectionCard id="fondo-comitato" title="Comitato del Fondo" sub="Tre membri del Consiglio Direttivo, scelti dalla Direzione. Decide uno; sopra la soglia firmano in due.">
+      <ul className="m-0 list-none p-0" data-testid="fund-committee">
+        {seats.map((s) => (
+          <li key={s.seat} className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-[var(--in-line)] px-4 py-2.5 text-[14.5px] sm:px-[18px]">
+            <Users className="size-4 flex-none text-[var(--in-sub)]" aria-hidden="true" />
+            <span className="min-w-0 flex-1">
+              <b>Posto {s.seat}</b> · {!open ? "da assegnare" : s.filled ? (canAssign ? nameOf(s.personId) : s.mine ? "sei tu" : "assegnato") : "libero"}
+            </span>
+            {s.mine && <Chip tone="ok">Tu</Chip>}
+            {canAssign && (
+              <label className="w-full sm:w-auto">
+                <span className="sr-only">Chi occupa il posto {s.seat}</span>
+                <select className={`${inInput} sm:w-[220px]`} value={s.personId ?? ""} disabled={busy !== null} onChange={(e) => void change(s.seat, e.target.value)}>
+                  <option value="">Posto libero</option>
+                  {candidates.map((c) => <option key={c.personId} value={c.personId}>{c.name}{c.roleLabel ? ` · ${c.roleLabel}` : ""}</option>)}
+                </select>
+              </label>
+            )}
+          </li>
+        ))}
+      </ul>
+      {err && <Message ok={false}>{err}</Message>}
+      <PrivacyNote>{canAssign && candidates.length === 0 ? "Nessun membro del Consiglio Direttivo nell'organigramma: aggiungilo prima da Organigramma." : "Nel comitato entra solo chi ha un ruolo del Consiglio Direttivo nell'organigramma."}</PrivacyNote>
     </SectionCard>
   );
 }

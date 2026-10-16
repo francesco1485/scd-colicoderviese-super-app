@@ -19,6 +19,7 @@ import {
   DONATION_PURPOSES,
   FUND_STATUSES,
   HANDOVERS,
+  ISEE_BANDS,
   ITEM_CATEGORIES,
   ITEM_STATUSES,
   MANUAL_SOURCES,
@@ -304,7 +305,7 @@ const FundAppIn = z.object({
   contactEmail: text(120),
   contactPhone: text(30),
   feeSourceRecordId: text(60),
-  iseeValue: money,
+  iseeBand: z.enum(ISEE_BANDS),
   iseeExpiresOn: day.nullable(),
   documentsRef: text(200),
   householdNote: text(1000),
@@ -329,7 +330,7 @@ export const fundSubmitApplication = createServerFn({ method: "POST" })
       p_contact_email: data.contactEmail,
       p_contact_phone: data.contactPhone,
       p_fee_source_record_id: data.feeSourceRecordId,
-      p_isee_value: data.iseeValue,
+      p_isee_band: data.iseeBand,
       p_isee_expires_on: data.iseeExpiresOn,
       p_documents_ref: data.documentsRef,
       p_household_note: data.householdNote,
@@ -338,6 +339,22 @@ export const fundSubmitApplication = createServerFn({ method: "POST" })
     if (error) return { ok: false, message: givingErrorText(error) };
     return { ok: true, message: `Domanda registrata (riferimento ${String(code)}). Resta riservata alla Direzione.`, ref: typeof code === "string" ? code : null };
   });
+
+/** The committee has seen the ISEE attestation: confirms the band (never a value). */
+export const fundCheckIsee = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; band: "SOTTO_SOGLIA" | "SOPRA_SOGLIA"; expiresOn: string | null }) =>
+    z.object({ id: uuid, band: z.enum(["SOTTO_SOGLIA", "SOPRA_SOGLIA"]), expiresOn: day.nullable() }).parse(d),
+  )
+  .handler(({ data }) =>
+    act("fondo-solidale", "scd_fund_check_isee", (o) => ({ p_organization_id: o, p_application_id: data.id, p_band: data.band, p_expires_on: data.expiresOn }), "Fascia ISEE verificata."),
+  );
+
+/** Direzione: assigns (or empties) one of the three committee seats. The database checks Direzione and Consiglio. */
+export const fundCommitteeSet = createServerFn({ method: "POST" })
+  .inputValidator((d: { seat: number; personId: string | null }) => z.object({ seat: z.number().int().min(1).max(3), personId: uuid.nullable() }).parse(d))
+  .handler(({ data }) =>
+    act("fondo-solidale", "scd_fund_committee_set", (o) => ({ p_organization_id: o, p_seat: data.seat, p_person_id: data.personId }), data.personId ? "Posto del comitato assegnato." : "Posto del comitato liberato."),
+  );
 
 export const fundSetStatus = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string; status: string | null; reviewDue: string | null; documentsDue: string | null; note: string }) =>

@@ -1,14 +1,38 @@
 -- r101: Fondo Solidale, "Adotta un oggetto", donations (money and goods) and improvement proposals
 -- (Direzione 2026-10-14, UD-113). STAGED: written, NOT applied.
--- Apply only after the Direzione's explicit OK ("serve l'OK della Direzione per applicare r101"). Requires r100
--- (scd_person_grants, scd_can, scd_section_catalog) already applied.
+-- NOT APPLIED — needs «applica r101» (Francesco). Only on SCD PULSE, never on the other Supabase project.
+-- Requires on SCD PULSE (ndevtxxijbcnskgysdit), checked with SELECT on 16/10/2026: r100 (scd_person_grants, scd_can,
+-- scd_section_catalog), r136 (section "nutrizione") and r138 (scd_section_platform already lists fondo-solidale,
+-- adotta, donazioni, proposte) applied; no scd_fund_* / scd_giving_* / scd_donations* object exists yet.
+--
+-- CORRECTIONS of 16/10/2026 (Francesco, DG, 15:44-15:57: «Sì, correggi», «fondo solo quota», «tre persone consiglio
+-- direttivo», «serve sopra i 10 mila», «commercialista non ce facciamo noi»), made in place because r101 was never applied:
+--   C1 section catalogue = the LIVE catalogue (r100 + r136 "nutrizione") + the four UD-113 sections: applying r101
+--      no longer drops "nutrizione";
+--   C2 ISEE only as a band: isee_value removed; isee_band ('NON_PRESENTATO','SOTTO_SOGLIA','SOPRA_SOGLIA') declared by
+--      the family, isee_checked_by / isee_checked_on set when the committee has seen the attestation
+--      (scd_fund_check_isee); the board returns only the band; the ISEE threshold is the Direzione's and is not stored here;
+--   C3 «fondo solo quota»: the Fund pays out ONLY the membership fee (quota ridotta / quota coperta = reduced or
+--      waived fee of an approved application); the outgoing source ALTRA_USCITA is gone, no kit, minibus, camps,
+--      tournaments or medical visits;
+--   C4 committee of three Consiglio Direttivo members (scd_fund_committee, seats 1-3), assigned in the app by the
+--      Direzione; a seat needs an active ORGANO_SOCIETARIO role in the organigramma; no names in this file; only a
+--      committee member with the APPROVE grant decides;
+--   C5 double approval ONLY above 10.000 €: scd_giving_settings.dual_approval_over (default 10000); a reduction above
+--      it goes to SECONDA_FIRMA and needs a second, different committee member with the same amounts; below it one
+--      committee decision is enough;
+--   C6 fiscal side managed by the club (no accountant): nothing here promises tax deductibility; the app labels any
+--      fiscal note INFERRED, "da verificare", with its legal source.
+--
+-- Apply only after the Direzione's explicit OK ("serve l'OK della Direzione per applicare r101").
 --
 -- What it adds (additive only, no existing table or row is changed, no row is inserted):
 --   * four sections in the catalogue (config/scd-sections.v1.json): fondo-solidale (sensitive), adotta,
---     donazioni (sensitive), proposte; scd_section_catalog() is recreated with every r100 entry identical;
---   * Fondo Solidale: applications with confidential review (ISEE, names and contacts readable ONLY through
---     functions that check scd_can('fondo-solidale', ...)), decision with reduced fee, deadlines, Fund income
---     (donations, events, dedicated sponsors), outgoings (fees covered) and an aggregated report;
+--     donazioni (sensitive), proposte; scd_section_catalog() is recreated with every live entry (r100 + r136) identical;
+--   * Fondo Solidale: applications with confidential review (ISEE band, names and contacts readable ONLY through
+--     functions that check scd_can('fondo-solidale', ...)), committee decision with reduced or waived fee (second
+--     signature above the threshold), deadlines, Fund income (donations, events, dedicated sponsors), outgoings (fees
+--     covered, nothing else) and an aggregated report;
 --     no double discount: an approved application must declare that no sibling discount applies or that the family
 --     gives it up, checked by a table constraint AND against the Gestionale copy (scd_fee_positions.family_rule);
 --   * "Adotta un oggetto": catalogue of things the club needs (category, supplier, product code and link, club photo,
@@ -24,7 +48,7 @@
 --     only when at least 3 contributions are behind them or every contributor consented;
 --   * improvement proposals from anyone (signed in or not), optionally anonymous, with "posso contribuire";
 --     staff triage; never public until staff publish a text written by staff and free of contacts;
---   * audit of every change in scd_giving_events (statuses and codes only: never ISEE, names or contacts).
+--   * audit of every change in scd_giving_events (statuses and codes only: never ISEE band, names or contacts).
 --
 -- Access: tables have RLS on and NO policy (nobody reads or writes them directly); everything goes through the
 -- SECURITY DEFINER functions below, which check scd_can (r100) for the back office and are rate limited for the
@@ -32,7 +56,7 @@
 -- apps/superapp/src/lib/person-grants.test.ts; the pure rules are mirrored in apps/superapp/src/lib/giving.ts and
 -- pinned by apps/superapp/src/lib/giving.test.ts.
 
--- 1. Section catalogue: r100 entries unchanged, UD-113 sections appended.
+-- 1. Section catalogue: the live entries (r100 + r136 "nutrizione") unchanged, UD-113 sections appended (C1).
 create or replace function public.scd_section_catalog()
 returns table (code text, levels text[], perimeters text[], base boolean, hard_blocked boolean, direction_only boolean, sensitive boolean)
 language sql
@@ -80,6 +104,7 @@ as $$
   {"code":"accessi","levels":["READ"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true},
   {"code":"posta-collega","levels":[],"perimeters":[],"base":false,"hard_blocked":false,"direction_only":true,"sensitive":true},
   {"code":"partner","levels":["READ","WRITE"],"perimeters":["SELF"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":false},
+  {"code":"nutrizione","levels":["READ","WRITE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true},
   {"code":"fondo-solidale","levels":["READ","WRITE","APPROVE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true},
   {"code":"adotta","levels":["READ","WRITE","APPROVE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":false},
   {"code":"donazioni","levels":["READ","WRITE","APPROVE"],"perimeters":["ALL"],"base":false,"hard_blocked":false,"direction_only":false,"sensitive":true},
@@ -126,7 +151,7 @@ returns boolean language sql immutable set search_path to 'public' as $$
   select exists (
     select 1 from jsonb_each($tr$
 {
-  "FUND_APPLICATION": {"INVIATA":["IN_ESAME","RITIRATA"],"IN_ESAME":["INTEGRAZIONE","APPROVATA","RESPINTA","RITIRATA"],"INTEGRAZIONE":["IN_ESAME","RITIRATA","SCADUTA"],"APPROVATA":["SCADUTA"]},
+  "FUND_APPLICATION": {"INVIATA":["IN_ESAME","RITIRATA"],"IN_ESAME":["INTEGRAZIONE","SECONDA_FIRMA","APPROVATA","RESPINTA","RITIRATA"],"INTEGRAZIONE":["IN_ESAME","RITIRATA","SCADUTA"],"SECONDA_FIRMA":["APPROVATA","RESPINTA","IN_ESAME","RITIRATA"],"APPROVATA":["SCADUTA"]},
   "DONATION": {"PROMESSA":["RICEVUTA","ANNULLATA"],"RICEVUTA":["ANNULLATA"]},
   "ADOPT_ITEM": {"BOZZA":["DA_ADOTTARE","RITIRATO"],"DA_ADOTTARE":["IN_RACCOLTA","ADOTTATO","RITIRATO","BOZZA"],"IN_RACCOLTA":["ADOTTATO","DA_ADOTTARE","RITIRATO"],"ADOTTATO":["CONSEGNATO","IN_RACCOLTA"]},
   "INKIND_OFFER": {"NUOVA":["INFO_RICHIESTE","ACCETTATA","RIFIUTATA","ANNULLATA"],"INFO_RICHIESTE":["ACCETTATA","RIFIUTATA","ANNULLATA"],"ACCETTATA":["RICEVUTA","RIFIUTATA","ANNULLATA"],"RICEVUTA":["INVENTARIATA"]},
@@ -142,10 +167,36 @@ $$;
 create table if not exists public.scd_giving_settings (
   organization_id uuid primary key references public.scd_organizations(id) on delete cascade,
   fund_public_totals boolean not null default false,
+  -- C5: a Fund decision whose reduction is above this amount needs a second committee signature (Francesco 16/10/2026
+  -- «serve sopra i 10 mila»). Absent row = the same default (scd_fund_dual_over).
+  dual_approval_over numeric(10,2) not null default 10000 check (dual_approval_over > 0),
   updated_by uuid references auth.users(id) on delete set null,
   updated_at timestamptz not null default now()
 );
-comment on table public.scd_giving_settings is 'UD-113: Direzione switches (public aggregated Fund totals). Off until the Direzione decides.';
+comment on table public.scd_giving_settings is 'UD-113: Direzione switches (public aggregated Fund totals, second-signature threshold). Totals off until the Direzione decides.';
+
+-- C4: the Fondo Solidale committee, three seats held by members of the Consiglio Direttivo, assigned in the app by the
+-- Direzione (scd_fund_committee_set). Person ids only: names stay in the club registry, never in this file.
+create table if not exists public.scd_fund_committee (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.scd_organizations(id) on delete cascade,
+  seat smallint not null check (seat between 1 and 3),
+  person_id uuid not null references public.scd_people(id) on delete cascade,
+  assigned_by uuid references auth.users(id) on delete set null,
+  assigned_at timestamptz not null default now(),
+  ended_at timestamptz,
+  ended_by uuid references auth.users(id) on delete set null,
+  constraint scd_fund_committee_end_after check (ended_at is null or ended_at >= assigned_at)
+);
+create unique index if not exists scd_fund_committee_one_per_seat_idx
+  on public.scd_fund_committee(organization_id, seat) where ended_at is null;
+create unique index if not exists scd_fund_committee_one_seat_per_person_idx
+  on public.scd_fund_committee(organization_id, person_id) where ended_at is null;
+create index if not exists scd_fund_committee_person_idx on public.scd_fund_committee(person_id);
+create index if not exists scd_fund_committee_assigned_by_idx on public.scd_fund_committee(assigned_by);
+create index if not exists scd_fund_committee_ended_by_idx on public.scd_fund_committee(ended_by);
+comment on table public.scd_fund_committee is
+  'UD-113 C4: three Consiglio Direttivo members decide on Fondo Solidale applications. Seats assigned by the Direzione; rows are ended, never deleted.';
 
 create table if not exists public.scd_fund_applications (
   id uuid primary key default gen_random_uuid(),
@@ -159,12 +210,15 @@ create table if not exists public.scd_fund_applications (
   contact_email text check (contact_email is null or char_length(contact_email) <= 120),
   contact_phone text check (contact_phone is null or char_length(contact_phone) <= 30),
   fee_source_record_id text check (fee_source_record_id is null or char_length(fee_source_record_id) <= 60),
-  isee_value numeric(10,2) check (isee_value is null or isee_value >= 0),
+  -- C2: ISEE only as a band, never the value. The family declares it; the committee checks the attestation.
+  isee_band text not null default 'NON_PRESENTATO' check (isee_band in ('NON_PRESENTATO','SOTTO_SOGLIA','SOPRA_SOGLIA')),
+  isee_checked_by uuid references auth.users(id) on delete set null,
+  isee_checked_on date,
   isee_expires_on date,
   documents_ref text check (documents_ref is null or char_length(documents_ref) <= 200),
   household_note text not null default '' check (char_length(household_note) <= 1000),
   sibling_discount text not null default 'DA_VERIFICARE' check (sibling_discount in ('DA_VERIFICARE','NESSUNO','PRESENTE','PRESENTE_RINUNCIA')),
-  status text not null default 'INVIATA' check (status in ('INVIATA','IN_ESAME','INTEGRAZIONE','APPROVATA','RESPINTA','RITIRATA','SCADUTA')),
+  status text not null default 'INVIATA' check (status in ('INVIATA','IN_ESAME','INTEGRAZIONE','SECONDA_FIRMA','APPROVATA','RESPINTA','RITIRATA','SCADUTA')),
   submitted_at timestamptz not null default now(),
   review_due date,
   documents_due date,
@@ -173,16 +227,30 @@ create table if not exists public.scd_fund_applications (
   decision_reason text check (decision_reason is null or char_length(decision_reason) <= 500),
   base_fee numeric(10,2) check (base_fee is null or base_fee >= 0),
   reduced_fee numeric(10,2) check (reduced_fee is null or reduced_fee >= 0),
+  -- C3 «fondo solo quota»: the only benefit is on the membership fee, reduced or fully covered (waived).
+  benefit text generated always as (
+    case when base_fee is null or reduced_fee is null then null
+         when reduced_fee = 0 then 'QUOTA_COPERTA' else 'QUOTA_RIDOTTA' end) stored,
   valid_until date,
+  -- C5: first and (above the threshold) second committee signature.
+  dual_required boolean not null default false,
+  first_approved_by uuid references auth.users(id) on delete set null,
+  first_approved_at timestamptz,
+  second_approved_by uuid references auth.users(id) on delete set null,
+  second_approved_at timestamptz,
   updated_at timestamptz not null default now(),
   unique (organization_id, code),
   -- No double discount: an approved application never sits on top of the sibling discount.
   constraint scd_fund_no_double_discount check (status <> 'APPROVATA' or sibling_discount in ('NESSUNO','PRESENTE_RINUNCIA')),
   constraint scd_fund_decision_shape check (
-    status <> 'APPROVATA'
-    or (base_fee is not null and reduced_fee is not null and reduced_fee <= base_fee and decided_at is not null
+    status not in ('APPROVATA','SECONDA_FIRMA')
+    or (base_fee is not null and base_fee > 0 and reduced_fee is not null and reduced_fee <= base_fee and first_approved_at is not null
         and char_length(coalesce(decision_reason, '')) >= 3)),
-  constraint scd_fund_rejection_reason check (status <> 'RESPINTA' or char_length(coalesce(decision_reason, '')) >= 3)
+  constraint scd_fund_approved_decided check (status <> 'APPROVATA' or decided_at is not null),
+  constraint scd_fund_second_signature_waits check (status <> 'SECONDA_FIRMA' or (dual_required and second_approved_at is null)),
+  constraint scd_fund_dual_complete check (status <> 'APPROVATA' or not dual_required or second_approved_at is not null),
+  constraint scd_fund_rejection_reason check (status <> 'RESPINTA' or char_length(coalesce(decision_reason, '')) >= 3),
+  constraint scd_fund_isee_check_shape check (isee_checked_on is null or isee_band in ('SOTTO_SOGLIA','SOPRA_SOGLIA'))
 );
 create unique index if not exists scd_fund_one_approved_person_idx
   on public.scd_fund_applications(organization_id, season, beneficiary_person_id)
@@ -194,8 +262,11 @@ create index if not exists scd_fund_applications_status_idx on public.scd_fund_a
 create index if not exists scd_fund_applications_beneficiary_idx on public.scd_fund_applications(beneficiary_person_id);
 create index if not exists scd_fund_applications_submitted_by_idx on public.scd_fund_applications(submitted_by);
 create index if not exists scd_fund_applications_decided_by_idx on public.scd_fund_applications(decided_by);
+create index if not exists scd_fund_applications_isee_checked_by_idx on public.scd_fund_applications(isee_checked_by);
+create index if not exists scd_fund_applications_first_approved_by_idx on public.scd_fund_applications(first_approved_by);
+create index if not exists scd_fund_applications_second_approved_by_idx on public.scd_fund_applications(second_approved_by);
 comment on table public.scd_fund_applications is
-  'UD-113 Fondo Solidale applications. CONFIDENTIAL: ISEE, names and contacts are readable only through functions that check scd_can(''fondo-solidale''). The fee itself stays in the Gestionale (UD-082): the decision says how much the family pays.';
+  'UD-113 Fondo Solidale applications. CONFIDENTIAL: ISEE band (never the value), names and contacts are readable only through functions that check scd_can(''fondo-solidale''). The Fund covers only the membership fee; the fee itself stays in the Gestionale (UD-082): the decision says how much the family pays.';
 
 create table if not exists public.scd_adopt_items (
   id uuid primary key default gen_random_uuid(),
@@ -303,7 +374,8 @@ create table if not exists public.scd_fund_movements (
   organization_id uuid not null references public.scd_organizations(id) on delete cascade,
   season text not null default '2026/27' check (season ~ '^\d{4}/\d{2}$'),
   direction text not null check (direction in ('ENTRATA','USCITA')),
-  source text not null check (source in ('DONAZIONE','EVENTO','SPONSOR_DEDICATO','ALTRA_ENTRATA','QUOTA_COPERTA','ALTRA_USCITA')),
+  -- C3 «fondo solo quota»: the only outgoing is a covered fee (reduced or waived) of an approved application.
+  source text not null check (source in ('DONAZIONE','EVENTO','SPONSOR_DEDICATO','ALTRA_ENTRATA','QUOTA_COPERTA')),
   amount numeric(10,2) not null check (amount > 0),
   occurred_on date not null,
   description text not null default '' check (char_length(description) <= 200),
@@ -317,7 +389,7 @@ create table if not exists public.scd_fund_movements (
   void_reason text check (void_reason is null or char_length(void_reason) <= 300),
   constraint scd_fund_movement_direction check (
     (direction = 'ENTRATA' and source in ('DONAZIONE','EVENTO','SPONSOR_DEDICATO','ALTRA_ENTRATA'))
-    or (direction = 'USCITA' and source in ('QUOTA_COPERTA','ALTRA_USCITA'))),
+    or (direction = 'USCITA' and source = 'QUOTA_COPERTA')),
   constraint scd_fund_movement_links check (
     (source = 'DONAZIONE') = (donation_id is not null)
     and (source = 'QUOTA_COPERTA') = (application_id is not null)),
@@ -329,7 +401,7 @@ create index if not exists scd_fund_movements_season_idx on public.scd_fund_move
 create index if not exists scd_fund_movements_application_idx on public.scd_fund_movements(application_id);
 create index if not exists scd_fund_movements_recorded_by_idx on public.scd_fund_movements(recorded_by);
 create index if not exists scd_fund_movements_voided_by_idx on public.scd_fund_movements(voided_by);
-comment on table public.scd_fund_movements is 'UD-113 Fondo Solidale income and outgoings. Never deleted: a wrong row is voided with a reason.';
+comment on table public.scd_fund_movements is 'UD-113 Fondo Solidale income and outgoings (outgoings: covered membership fees only). Never deleted: a wrong row is voided with a reason.';
 
 create table if not exists public.scd_inkind_offers (
   id uuid primary key default gen_random_uuid(),
@@ -426,7 +498,7 @@ comment on table public.scd_improvement_proposals is 'UD-113 "Proponi un miglior
 create table if not exists public.scd_giving_events (
   id bigint generated always as identity primary key,
   organization_id uuid not null references public.scd_organizations(id) on delete cascade,
-  entity text not null check (entity in ('FUND_APPLICATION','FUND_MOVEMENT','DONATION','ADOPT_ITEM','ADOPT_UNIT','INKIND_OFFER','PROPOSAL','SETTINGS')),
+  entity text not null check (entity in ('FUND_APPLICATION','FUND_MOVEMENT','FUND_COMMITTEE','DONATION','ADOPT_ITEM','ADOPT_UNIT','INKIND_OFFER','PROPOSAL','SETTINGS')),
   entity_id uuid,
   entity_code text,
   action text not null check (char_length(action) <= 40),
@@ -436,9 +508,10 @@ create table if not exists public.scd_giving_events (
 );
 create index if not exists scd_giving_events_entity_idx on public.scd_giving_events(organization_id, entity, entity_id, at desc);
 create index if not exists scd_giving_events_actor_idx on public.scd_giving_events(actor);
-comment on table public.scd_giving_events is 'UD-113 audit: statuses, codes and amounts recorded by staff. Never ISEE, names or contacts.';
+comment on table public.scd_giving_events is 'UD-113 audit: statuses, codes and amounts recorded by staff. Never ISEE band, names or contacts.';
 
 alter table public.scd_giving_settings enable row level security;
+alter table public.scd_fund_committee enable row level security;
 alter table public.scd_fund_applications enable row level security;
 alter table public.scd_adopt_items enable row level security;
 alter table public.scd_donations enable row level security;
@@ -447,7 +520,7 @@ alter table public.scd_fund_movements enable row level security;
 alter table public.scd_inkind_offers enable row level security;
 alter table public.scd_improvement_proposals enable row level security;
 alter table public.scd_giving_events enable row level security;
-revoke all on table public.scd_giving_settings, public.scd_fund_applications, public.scd_adopt_items, public.scd_donations,
+revoke all on table public.scd_giving_settings, public.scd_fund_committee, public.scd_fund_applications, public.scd_adopt_items, public.scd_donations,
   public.scd_adopt_units, public.scd_fund_movements, public.scd_inkind_offers, public.scd_improvement_proposals,
   public.scd_giving_events from anon, authenticated;
 
@@ -495,6 +568,23 @@ begin
     perform public.scd_giving_log(v.organization_id, 'ADOPT_ITEM', v.id, v.code, 'AUTO_STATUS', jsonb_build_object('from', v.status, 'to', v_next));
   end if;
 end;
+$$;
+
+-- C5: the second-signature threshold of an organisation (default 10.000 €).
+create or replace function public.scd_fund_dual_over(p_organization_id uuid)
+returns numeric language sql stable security definer set search_path to 'public' as $$
+  select coalesce((select s.dual_approval_over from public.scd_giving_settings s where s.organization_id = p_organization_id), 10000::numeric);
+$$;
+
+-- C4: true when the caller is linked (verified link) to a person holding an active committee seat.
+create or replace function public.scd_fund_is_committee(p_organization_id uuid)
+returns boolean language sql stable security definer set search_path to 'public' as $$
+  select (select auth.uid()) is not null and exists (
+    select 1
+    from public.scd_fund_committee c
+    join public.scd_identity_links l on l.person_id = c.person_id and l.organization_id = c.organization_id
+    where c.organization_id = p_organization_id and c.ended_at is null
+      and l.user_id = (select auth.uid()) and l.link_state in ('AUTO_VERIFIED','VERIFIED_BY_STAFF'));
 $$;
 
 -- 5. Public reads (anon and signed in): published items with honest progress, published proposals, campaign counts
@@ -721,11 +811,57 @@ end;
 $$;
 
 -- 7. Fondo Solidale (section fondo-solidale).
+-- C4: committee seats (Direzione only). A seat is held by a person with an active ORGANO_SOCIETARIO role in the
+-- organigramma (Consiglio Direttivo); p_person_id null empties the seat. Returns the number of filled seats.
+create or replace function public.scd_fund_committee_set(p_organization_id uuid, p_seat integer, p_person_id uuid)
+returns integer
+language plpgsql
+volatile
+security definer
+set search_path to 'public'
+as $$
+declare
+  v_old public.scd_fund_committee%rowtype;
+  v_id uuid;
+begin
+  if (select auth.uid()) is null or not public.scd_has_org_role(p_organization_id, array['DIRECTION']::public.scd_role[]) then
+    raise exception 'fund committee: Direzione only' using errcode = '42501';
+  end if;
+  if p_seat is null or p_seat not between 1 and 3 then raise exception 'seat 1-3' using errcode = '22023'; end if;
+  if p_person_id is not null and not exists (
+       select 1 from public.scd_structure_roles r
+       where r.organization_id = p_organization_id and r.person_id = p_person_id and r.active
+         and r.role_kind = 'ORGANO_SOCIETARIO' and (r.valid_to is null or r.valid_to >= current_date)) then
+    raise exception 'fund committee: Consiglio Direttivo members only' using errcode = '22023';
+  end if;
+  select * into v_old from public.scd_fund_committee
+  where organization_id = p_organization_id and seat = p_seat and ended_at is null for update;
+  if found and v_old.person_id is not distinct from p_person_id then
+    return (select count(*) from public.scd_fund_committee where organization_id = p_organization_id and ended_at is null);
+  end if;
+  if found then
+    update public.scd_fund_committee set ended_at = now(), ended_by = (select auth.uid()) where id = v_old.id;
+  end if;
+  if p_person_id is not null then
+    if exists (select 1 from public.scd_fund_committee where organization_id = p_organization_id and person_id = p_person_id and ended_at is null) then
+      raise exception 'fund committee: this person already holds a seat' using errcode = '22023';
+    end if;
+    insert into public.scd_fund_committee (organization_id, seat, person_id, assigned_by)
+    values (p_organization_id, p_seat, p_person_id, (select auth.uid()))
+    returning id into v_id;
+  end if;
+  perform public.scd_giving_log(p_organization_id, 'FUND_COMMITTEE', coalesce(v_id, v_old.id), null,
+    case when p_person_id is null then 'SEAT_EMPTIED' else 'SEAT_ASSIGNED' end, jsonb_build_object('seat', p_seat));
+  return (select count(*) from public.scd_fund_committee where organization_id = p_organization_id and ended_at is null);
+end;
+$$;
+
 -- Application: the Fund office records it (WRITE), or a parent/guardian signed in applies for their own child.
+-- C2: the ISEE is given only as a band (NON_PRESENTATO / SOTTO_SOGLIA / SOPRA_SOGLIA), never as a value.
 create or replace function public.scd_fund_submit_application(
   p_organization_id uuid, p_season text, p_beneficiary_person_id uuid, p_beneficiary_label text,
   p_applicant_name text, p_contact_email text, p_contact_phone text, p_fee_source_record_id text,
-  p_isee_value numeric, p_isee_expires_on date, p_documents_ref text, p_household_note text, p_sibling_discount text
+  p_isee_band text, p_isee_expires_on date, p_documents_ref text, p_household_note text, p_sibling_discount text
 )
 returns text
 language plpgsql
@@ -739,6 +875,7 @@ declare
   v_id uuid;
   v_code text := public.scd_giving_code('FS');
   v_name text := regexp_replace(trim(coalesce(p_applicant_name, '')), '\s+', ' ', 'g');
+  v_band text := coalesce(p_isee_band, 'NON_PRESENTATO');
 begin
   if (select auth.uid()) is null then raise exception 'sign in' using errcode = '42501'; end if;
   v_guardian := p_beneficiary_person_id is not null and exists (
@@ -748,7 +885,8 @@ begin
     where child.person_id = p_beneficiary_person_id);
   if not v_office and not v_guardian then raise exception 'fund: office or guardian only' using errcode = '42501'; end if;
   if coalesce(p_season, '') !~ '^\d{4}/\d{2}$' or char_length(v_name) not between 2 and 120
-     or coalesce(p_sibling_discount, 'DA_VERIFICARE') not in ('DA_VERIFICARE','NESSUNO','PRESENTE','PRESENTE_RINUNCIA') then
+     or coalesce(p_sibling_discount, 'DA_VERIFICARE') not in ('DA_VERIFICARE','NESSUNO','PRESENTE','PRESENTE_RINUNCIA')
+     or v_band not in ('NON_PRESENTATO','SOTTO_SOGLIA','SOPRA_SOGLIA') then
     raise exception 'invalid application' using errcode = '22023';
   end if;
   if p_beneficiary_person_id is not null and not exists (
@@ -756,12 +894,12 @@ begin
     raise exception 'person not found' using errcode = 'P0002';
   end if;
   insert into public.scd_fund_applications (organization_id, code, season, beneficiary_person_id, submitted_by, applicant_name,
-    beneficiary_label, contact_email, contact_phone, fee_source_record_id, isee_value, isee_expires_on, documents_ref,
+    beneficiary_label, contact_email, contact_phone, fee_source_record_id, isee_band, isee_expires_on, documents_ref,
     household_note, sibling_discount, status)
   values (p_organization_id, v_code, p_season, p_beneficiary_person_id, (select auth.uid()), v_name,
     left(trim(coalesce(p_beneficiary_label, '')), 120), nullif(lower(trim(coalesce(p_contact_email, ''))), ''),
     nullif(trim(coalesce(p_contact_phone, '')), ''), nullif(trim(coalesce(p_fee_source_record_id, '')), ''),
-    p_isee_value, p_isee_expires_on, nullif(trim(coalesce(p_documents_ref, '')), ''),
+    v_band, case when v_band = 'NON_PRESENTATO' then null else p_isee_expires_on end, nullif(trim(coalesce(p_documents_ref, '')), ''),
     left(trim(coalesce(p_household_note, '')), 1000), coalesce(p_sibling_discount, 'DA_VERIFICARE'), 'INVIATA')
   returning id into v_id;
   perform public.scd_giving_log(p_organization_id, 'FUND_APPLICATION', v_id, v_code, 'SUBMIT',
@@ -770,8 +908,33 @@ begin
 end;
 $$;
 
+-- C2: the committee has seen the ISEE attestation: it confirms (or corrects) the band. The value is never typed in.
+create or replace function public.scd_fund_check_isee(p_organization_id uuid, p_application_id uuid, p_band text, p_expires_on date)
+returns void
+language plpgsql
+volatile
+security definer
+set search_path to 'public'
+as $$
+declare v public.scd_fund_applications%rowtype;
+begin
+  perform public.scd_giving_need('fondo-solidale', 'WRITE', p_organization_id);
+  if not public.scd_fund_is_committee(p_organization_id) then raise exception 'fund: committee members only' using errcode = '42501'; end if;
+  if coalesce(p_band, '') not in ('SOTTO_SOGLIA','SOPRA_SOGLIA') then raise exception 'isee band: SOTTO_SOGLIA or SOPRA_SOGLIA' using errcode = '22023'; end if;
+  select * into v from public.scd_fund_applications where id = p_application_id and organization_id = p_organization_id for update;
+  if not found then raise exception 'application not found' using errcode = 'P0002'; end if;
+  if v.status not in ('INVIATA','IN_ESAME','INTEGRAZIONE') then raise exception 'isee check only while the application is open' using errcode = '22023'; end if;
+  update public.scd_fund_applications set isee_band = p_band, isee_checked_by = (select auth.uid()), isee_checked_on = current_date,
+    isee_expires_on = coalesce(p_expires_on, isee_expires_on), updated_at = now()
+  where id = v.id;
+  -- Audit without the band: who and when only.
+  perform public.scd_giving_log(p_organization_id, 'FUND_APPLICATION', v.id, v.code, 'ISEE_CHECKED', '{}'::jsonb);
+end;
+$$;
+
 -- Review steps that are not the decision: IN_ESAME, INTEGRAZIONE (with documents deadline), RITIRATA, SCADUTA;
--- and the review deadline.
+-- and the review deadline. Leaving SECONDA_FIRMA (back to IN_ESAME, or RITIRATA) is a committee act and clears the
+-- first signature.
 create or replace function public.scd_fund_set_status(
   p_organization_id uuid, p_application_id uuid, p_status text, p_review_due date, p_documents_due date, p_note text
 )
@@ -783,19 +946,32 @@ set search_path to 'public'
 as $$
 declare
   v public.scd_fund_applications%rowtype;
+  v_reset boolean;
 begin
   perform public.scd_giving_need('fondo-solidale', 'WRITE', p_organization_id);
   select * into v from public.scd_fund_applications where id = p_application_id and organization_id = p_organization_id for update;
   if not found then raise exception 'application not found' using errcode = 'P0002'; end if;
-  if p_status in ('APPROVATA','RESPINTA') then raise exception 'use scd_fund_decide' using errcode = '22023'; end if;
+  if p_status in ('APPROVATA','RESPINTA','SECONDA_FIRMA') then raise exception 'use scd_fund_decide' using errcode = '22023'; end if;
   if p_status is not null and p_status <> v.status and not public.scd_giving_transition_ok('FUND_APPLICATION', v.status, p_status) then
     raise exception 'transition % -> % not allowed', v.status, p_status using errcode = '22023';
+  end if;
+  v_reset := v.status = 'SECONDA_FIRMA' and p_status is not null and p_status <> v.status;
+  if v_reset and not (public.scd_fund_is_committee(p_organization_id)
+                      and coalesce(public.scd_can('fondo-solidale', 'APPROVE', p_organization_id), false)) then
+    raise exception 'fund: committee members only' using errcode = '42501';
   end if;
   if p_status = 'INTEGRAZIONE' and p_documents_due is null then raise exception 'documents deadline needed' using errcode = '22023'; end if;
   update public.scd_fund_applications set
     status = coalesce(p_status, status),
     review_due = coalesce(p_review_due, review_due),
     documents_due = case when coalesce(p_status, status) = 'INTEGRAZIONE' then coalesce(p_documents_due, documents_due) else documents_due end,
+    base_fee = case when v_reset then null else base_fee end,
+    reduced_fee = case when v_reset then null else reduced_fee end,
+    valid_until = case when v_reset then null else valid_until end,
+    decision_reason = case when v_reset then null else decision_reason end,
+    dual_required = case when v_reset then false else dual_required end,
+    first_approved_by = case when v_reset then null else first_approved_by end,
+    first_approved_at = case when v_reset then null else first_approved_at end,
     updated_at = now()
   where id = v.id;
   perform public.scd_giving_log(p_organization_id, 'FUND_APPLICATION', v.id, v.code, 'STATUS',
@@ -804,7 +980,9 @@ begin
 end;
 $$;
 
--- The decision (APPROVE level): approve with the reduced fee, or reject with a reason.
+-- The decision (APPROVE level AND a committee seat, C4): approve with the reduced or waived fee (C3), or reject with a
+-- reason. One committee decision is enough up to the threshold; above it (C5) the first approval moves the application
+-- to SECONDA_FIRMA and a DIFFERENT committee member confirms the same amounts.
 -- No double discount: approval needs sibling_discount NESSUNO or PRESENTE_RINUNCIA (the family gives up the sibling
 -- discount, which the office removes in the Gestionale), and the Gestionale copy must not show a sibling discount on
 -- the linked fee position unless the family gave it up.
@@ -824,14 +1002,20 @@ declare
   v_sib text := coalesce(p_sibling_discount, 'DA_VERIFICARE');
   v_rule text;
   v_fund_in_sheet boolean;
+  v_uid uuid := (select auth.uid());
+  v_over numeric := public.scd_fund_dual_over(p_organization_id);
+  v_second boolean;
+  v_to text;
 begin
   perform public.scd_giving_need('fondo-solidale', 'APPROVE', p_organization_id);
+  if not public.scd_fund_is_committee(p_organization_id) then raise exception 'fund: committee members only' using errcode = '42501'; end if;
   select * into v from public.scd_fund_applications where id = p_application_id and organization_id = p_organization_id for update;
   if not found then raise exception 'application not found' using errcode = 'P0002'; end if;
   if p_decision not in ('APPROVATA','RESPINTA') or not public.scd_giving_transition_ok('FUND_APPLICATION', v.status, p_decision) then
     raise exception 'decision % not allowed from %', p_decision, v.status using errcode = '22023';
   end if;
   if char_length(v_reason) < 3 then raise exception 'reason needed' using errcode = '22023'; end if;
+  v_second := v.status = 'SECONDA_FIRMA';
 
   if p_decision = 'APPROVATA' then
     if p_base_fee is null or p_reduced_fee is null or p_base_fee <= 0 or p_reduced_fee < 0 or p_reduced_fee > p_base_fee then
@@ -848,29 +1032,49 @@ begin
         raise exception 'double discount: the Gestionale shows a sibling discount on this fee' using errcode = '22023';
       end if;
     end if;
+    if v_second then
+      if v.first_approved_by is null or v.first_approved_by = v_uid then
+        raise exception 'second signature: another committee member' using errcode = '42501';
+      end if;
+      if p_base_fee <> v.base_fee or p_reduced_fee <> v.reduced_fee or v_sib <> v.sibling_discount then
+        raise exception 'second signature: same amounts as the first' using errcode = '22023';
+      end if;
+    end if;
   end if;
 
+  v_to := case
+    when p_decision = 'RESPINTA' then 'RESPINTA'
+    when not v_second and (p_base_fee - p_reduced_fee) > v_over then 'SECONDA_FIRMA'
+    else 'APPROVATA' end;
+
   update public.scd_fund_applications set
-    status = p_decision,
+    status = v_to,
     sibling_discount = case when p_decision = 'APPROVATA' then v_sib else sibling_discount end,
     base_fee = case when p_decision = 'APPROVATA' then p_base_fee end,
     reduced_fee = case when p_decision = 'APPROVATA' then p_reduced_fee end,
-    valid_until = case when p_decision = 'APPROVATA' then p_valid_until end,
+    valid_until = case when p_decision = 'APPROVATA' then coalesce(p_valid_until, case when v_second then v.valid_until end) end,
     decision_reason = left(v_reason, 500),
-    decided_at = now(), decided_by = (select auth.uid()), updated_at = now()
+    dual_required = case when p_decision = 'APPROVATA' then v_second or v_to = 'SECONDA_FIRMA' else false end,
+    first_approved_by = case when p_decision = 'APPROVATA' and not v_second then v_uid when p_decision = 'APPROVATA' then first_approved_by end,
+    first_approved_at = case when p_decision = 'APPROVATA' and not v_second then now() when p_decision = 'APPROVATA' then first_approved_at end,
+    second_approved_by = case when v_second and v_to = 'APPROVATA' then v_uid end,
+    second_approved_at = case when v_second and v_to = 'APPROVATA' then now() end,
+    decided_at = case when v_to = 'SECONDA_FIRMA' then null else now() end,
+    decided_by = case when v_to = 'SECONDA_FIRMA' then null else v_uid end,
+    updated_at = now()
   where id = v.id;
-  perform public.scd_giving_log(p_organization_id, 'FUND_APPLICATION', v.id, v.code, 'DECIDE',
-    jsonb_build_object('from', v.status, 'to', p_decision, 'covered', case when p_decision = 'APPROVATA' then p_base_fee - p_reduced_fee end,
-                       'sibling_discount', v_sib));
-  return jsonb_build_object('code', v.code, 'status', p_decision,
+  perform public.scd_giving_log(p_organization_id, 'FUND_APPLICATION', v.id, v.code, case when v_to = 'SECONDA_FIRMA' then 'FIRST_SIGNATURE' else 'DECIDE' end,
+    jsonb_build_object('from', v.status, 'to', v_to, 'covered', case when p_decision = 'APPROVATA' then p_base_fee - p_reduced_fee end,
+                       'sibling_discount', v_sib, 'second_signature', v_second));
+  return jsonb_build_object('code', v.code, 'status', v_to,
     'gestionale_todo', case
-      when p_decision = 'APPROVATA' and v_sib = 'PRESENTE_RINUNCIA' then 'Togliere lo sconto fratelli e segnare il Fondo nel Gestionale'
-      when p_decision = 'APPROVATA' and not coalesce(v_fund_in_sheet, false) then 'Segnare il Fondo nel Gestionale'
+      when v_to = 'APPROVATA' and v_sib = 'PRESENTE_RINUNCIA' then 'Togliere lo sconto fratelli e segnare il Fondo nel Gestionale'
+      when v_to = 'APPROVATA' and not coalesce(v_fund_in_sheet, false) then 'Segnare il Fondo nel Gestionale'
       else null end);
 end;
 $$;
 
--- Fund income (events, dedicated sponsors, other) and outgoings (fees covered, other). Donations to the Fund enter
+-- Fund income (events, dedicated sponsors, other) and outgoings (C3: covered fees ONLY). Donations to the Fund enter
 -- automatically when the treasury records them (scd_donation_record).
 create or replace function public.scd_fund_record_movement(
   p_organization_id uuid, p_season text, p_source text, p_amount numeric, p_occurred_on date, p_description text,
@@ -889,16 +1093,17 @@ declare
   v_covered numeric;
 begin
   perform public.scd_giving_need('fondo-solidale', 'WRITE', p_organization_id);
-  if p_source not in ('EVENTO','SPONSOR_DEDICATO','ALTRA_ENTRATA','QUOTA_COPERTA','ALTRA_USCITA') then
-    raise exception 'source not allowed here' using errcode = '22023';
+  if p_source not in ('EVENTO','SPONSOR_DEDICATO','ALTRA_ENTRATA','QUOTA_COPERTA') then
+    raise exception 'source not allowed here: the Fund pays out only membership fees' using errcode = '22023';
   end if;
   if p_amount is null or p_amount <= 0 or p_occurred_on is null or coalesce(p_season, '') !~ '^\d{4}/\d{2}$' then
     raise exception 'invalid movement' using errcode = '22023';
   end if;
-  v_dir := case when p_source in ('QUOTA_COPERTA','ALTRA_USCITA') then 'USCITA' else 'ENTRATA' end;
+  v_dir := case when p_source = 'QUOTA_COPERTA' then 'USCITA' else 'ENTRATA' end;
   if p_source = 'QUOTA_COPERTA' then
     select * into v_app from public.scd_fund_applications where id = p_application_id and organization_id = p_organization_id;
     if not found or v_app.status <> 'APPROVATA' then raise exception 'fee covered only for an approved application' using errcode = '22023'; end if;
+    if v_app.season <> p_season then raise exception 'fee covered only in the season of the decision' using errcode = '22023'; end if;
     select coalesce(sum(amount), 0) into v_covered from public.scd_fund_movements
       where application_id = v_app.id and voided_at is null;
     if v_covered + p_amount > v_app.base_fee - v_app.reduced_fee then
@@ -936,7 +1141,8 @@ begin
 end;
 $$;
 
--- Everything the Fund page needs (READ). Confidential: names, contacts and ISEE are here and nowhere else.
+-- Everything the Fund page needs (READ). Confidential: names, contacts and the ISEE BAND are here and nowhere else
+-- (C2: no ISEE value exists). Committee seats as filled / mine; who holds them only for the Direzione.
 create or replace function public.scd_fund_board(p_organization_id uuid, p_season text)
 returns jsonb
 language plpgsql
@@ -944,20 +1150,44 @@ stable
 security definer
 set search_path to 'public'
 as $$
+declare v_uid uuid := (select auth.uid());
 begin
   perform public.scd_giving_need('fondo-solidale', 'READ', p_organization_id);
   return jsonb_build_object(
     'season', p_season,
     'canWrite', coalesce(public.scd_can('fondo-solidale', 'WRITE', p_organization_id), false),
     'canApprove', coalesce(public.scd_can('fondo-solidale', 'APPROVE', p_organization_id), false),
+    'isCommittee', public.scd_fund_is_committee(p_organization_id),
+    'canAssignCommittee', public.scd_has_org_role(p_organization_id, array['DIRECTION']::public.scd_role[]),
+    'dualApprovalOver', public.scd_fund_dual_over(p_organization_id),
+    -- Seat holders and candidates (Consiglio Direttivo, from the organigramma) only for the Direzione, who assigns them.
+    'committeeCandidates', case when public.scd_has_org_role(p_organization_id, array['DIRECTION']::public.scd_role[]) then coalesce((
+        select jsonb_agg(jsonb_build_object('personId', p.id,
+                 'name', coalesce(nullif(trim(p.display_name), ''), trim(coalesce(p.first_name, '') || ' ' || coalesce(p.last_name, ''))),
+                 'roleLabel', r.role_label) order by r.role_label, p.id)
+        from public.scd_structure_roles r join public.scd_people p on p.id = r.person_id
+        where r.organization_id = p_organization_id and r.active and r.role_kind = 'ORGANO_SOCIETARIO'
+          and (r.valid_to is null or r.valid_to >= current_date)), '[]'::jsonb) else '[]'::jsonb end,
+    'committee', (select jsonb_agg(jsonb_build_object(
+        'seat', s.n,
+        'filled', c.id is not null,
+        'personId', case when public.scd_has_org_role(p_organization_id, array['DIRECTION']::public.scd_role[]) then c.person_id end,
+        'mine', c.id is not null and exists (select 1 from public.scd_identity_links l where l.person_id = c.person_id
+                  and l.organization_id = c.organization_id and l.user_id = v_uid and l.link_state in ('AUTO_VERIFIED','VERIFIED_BY_STAFF')))
+      order by s.n)
+      from generate_series(1, 3) s(n)
+      left join public.scd_fund_committee c on c.organization_id = p_organization_id and c.seat = s.n and c.ended_at is null),
     'applications', coalesce((select jsonb_agg(jsonb_build_object(
         'id', a.id, 'code', a.code, 'status', a.status, 'applicantName', a.applicant_name, 'beneficiaryLabel', a.beneficiary_label,
         'beneficiaryPersonId', a.beneficiary_person_id, 'contactEmail', a.contact_email, 'contactPhone', a.contact_phone,
-        'feeSourceRecordId', a.fee_source_record_id, 'iseeValue', a.isee_value, 'iseeExpiresOn', a.isee_expires_on,
+        'feeSourceRecordId', a.fee_source_record_id, 'iseeBand', a.isee_band, 'iseeChecked', a.isee_checked_on is not null,
+        'iseeCheckedOn', a.isee_checked_on, 'iseeExpiresOn', a.isee_expires_on,
         'documentsRef', a.documents_ref, 'householdNote', a.household_note, 'siblingDiscount', a.sibling_discount,
         'submittedAt', a.submitted_at, 'reviewDue', a.review_due, 'documentsDue', a.documents_due,
         'decidedAt', a.decided_at, 'decisionReason', a.decision_reason, 'baseFee', a.base_fee, 'reducedFee', a.reduced_fee,
-        'validUntil', a.valid_until,
+        'benefit', a.benefit, 'validUntil', a.valid_until,
+        'dualRequired', a.dual_required, 'firstApprovedAt', a.first_approved_at, 'firstApprovedByMe', a.first_approved_by = v_uid,
+        'secondApprovedAt', a.second_approved_at,
         'covered', (select coalesce(sum(m.amount), 0) from public.scd_fund_movements m where m.application_id = a.id and m.voided_at is null),
         'feeFamilyRule', f.family_rule, 'feeFundInSheet', f.fund_benefit)
       order by a.submitted_at desc)
@@ -978,7 +1208,7 @@ begin
 end;
 $$;
 
--- Aggregated report (READ): counts and totals only, no names, no ISEE.
+-- Aggregated report (READ): counts and totals only, no names, no ISEE band.
 create or replace function public.scd_fund_report(p_organization_id uuid, p_season text)
 returns jsonb
 language plpgsql
@@ -996,6 +1226,9 @@ begin
           where organization_id = p_organization_id and season = p_season group by status) s),
       'reductionDecided', (select coalesce(sum(base_fee - reduced_fee), 0) from public.scd_fund_applications
           where organization_id = p_organization_id and season = p_season and status = 'APPROVATA'),
+      'benefits', (select coalesce(jsonb_object_agg(benefit, n), '{}'::jsonb) from (
+          select benefit, count(*) as n from public.scd_fund_applications
+          where organization_id = p_organization_id and season = p_season and status = 'APPROVATA' group by benefit) b),
       'income', (select coalesce(jsonb_object_agg(source, total), '{}'::jsonb) from (
           select source, sum(amount) as total from public.scd_fund_movements
           where organization_id = p_organization_id and season = p_season and voided_at is null and direction = 'ENTRATA' group by source) i),
@@ -1472,8 +1705,12 @@ revoke all on function public.scd_giving_public() from public;
 revoke all on function public.scd_adopt_pledge(uuid, integer, text, text, text, text, text, boolean, numeric) from public;
 revoke all on function public.scd_inkind_offer_submit(text, uuid, text, integer, text, text, boolean, date, boolean, boolean, text, text, text, text, text, text, text) from public;
 revoke all on function public.scd_improvement_submit(text, text, text, boolean, text, text[]) from public;
-revoke all on function public.scd_fund_submit_application(uuid, text, uuid, text, text, text, text, text, numeric, date, text, text, text) from public, anon;
+revoke all on function public.scd_fund_submit_application(uuid, text, uuid, text, text, text, text, text, text, date, text, text, text) from public, anon;
 revoke all on function public.scd_fund_set_status(uuid, uuid, text, date, date, text) from public, anon;
+revoke all on function public.scd_fund_dual_over(uuid) from public, anon, authenticated;
+revoke all on function public.scd_fund_is_committee(uuid) from public, anon, authenticated;
+revoke all on function public.scd_fund_committee_set(uuid, integer, uuid) from public, anon;
+revoke all on function public.scd_fund_check_isee(uuid, uuid, text, date) from public, anon;
 revoke all on function public.scd_fund_decide(uuid, uuid, text, numeric, numeric, text, date, text) from public, anon;
 revoke all on function public.scd_fund_record_movement(uuid, text, text, numeric, date, text, uuid, text) from public, anon;
 revoke all on function public.scd_fund_void_movement(uuid, uuid, text) from public, anon;
@@ -1501,8 +1738,10 @@ grant execute on function public.scd_improvement_submit(text, text, text, boolea
 grant execute on function public.scd_giving_has_contact(text) to authenticated;
 grant execute on function public.scd_giving_transition_ok(text, text, text) to authenticated;
 grant execute on function public.scd_adopt_effective_price_mode(text, date, date) to authenticated;
-grant execute on function public.scd_fund_submit_application(uuid, text, uuid, text, text, text, text, text, numeric, date, text, text, text) to authenticated;
+grant execute on function public.scd_fund_submit_application(uuid, text, uuid, text, text, text, text, text, text, date, text, text, text) to authenticated;
 grant execute on function public.scd_fund_set_status(uuid, uuid, text, date, date, text) to authenticated;
+grant execute on function public.scd_fund_committee_set(uuid, integer, uuid) to authenticated;
+grant execute on function public.scd_fund_check_isee(uuid, uuid, text, date) to authenticated;
 grant execute on function public.scd_fund_decide(uuid, uuid, text, numeric, numeric, text, date, text) to authenticated;
 grant execute on function public.scd_fund_record_movement(uuid, text, text, numeric, date, text, uuid, text) to authenticated;
 grant execute on function public.scd_fund_void_movement(uuid, uuid, text) to authenticated;

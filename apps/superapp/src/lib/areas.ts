@@ -189,6 +189,8 @@ const EXPLICIT_HREF: Readonly<Record<string, string>> = {
   // UD-115: ready but not linked from the home; the page shows the initiative only once the Direzione publishes it.
   "lotteria-dello-sport": "/eventi/lotteria-dello-sport",
   sponsor: "/sponsor",
+  // Fondo Solidale hub (Francesco 16/10/2026 «piattaforma a sé»): its own gate (r101 givingGate + r100 grant), not workAreaView.
+  fondo: "/fondo",
   gestionale: "/gestionale",
   quadro: "/quadro",
   mappa: "/gestionale/mappa",
