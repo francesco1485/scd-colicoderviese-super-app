@@ -89,8 +89,30 @@ describe("public assistant (Iride, UD-121)", () => {
     expect(body.model).toBe("claude-haiku-5-5");
     expect(body.system).toContain("CONTESTO:");
     expect(body.messages[0]!.content).toContain("Quando gioca la prima squadra?");
+    // Haiku 5.5: no sampling parameters (400), thinking off so max_tokens goes to the answer.
+    const raw = body as unknown as Record<string, unknown>;
+    expect(raw).not.toHaveProperty("temperature");
+    expect(raw).not.toHaveProperty("top_p");
+    expect(raw).not.toHaveProperty("top_k");
+    expect(raw["thinking"]).toEqual({ type: "disabled" });
+    expect(raw["output_config"]).toEqual({ effort: "low" });
     expect(r).toEqual({ text: "Scrivi a sportclubcolico@gmail.com o a [contatto rimosso]", mood: "success", links: [{ label: "Contatti", to: "/contatti" }], ai: true, persona: "vera", area: null });
     expect(t.rules).not.toHaveBeenCalled();
+  });
+
+  it("logs only the sanitized API error type and excerpt on a 400, never user text or key", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    const errBody = { type: "error", error: { type: "invalid_request_error", message: `temperature: bad value for ${KEY}\n${"x".repeat(400)}` } };
+    const t = pub(ON, vi.fn(async () => new Response(JSON.stringify(errBody), { status: 400, headers: { "content-type": "application/json" } })), "segreto-utente-123");
+    const r = await t.run();
+    expect(r).toMatchObject({ text: RULES.text, ai: false });
+    const line = info.mock.calls.map((c) => String(c[0])).find((l) => l.startsWith("[assistant] fallback"));
+    info.mockRestore();
+    expect(line).toContain("reason=http status=400 errType=invalid_request_error errMsg=");
+    expect(line).toContain("[redacted]");
+    expect(line).not.toContain("sk-ant-");
+    expect(line).not.toContain("segreto-utente-123");
+    expect(line!.length).toBeLessThan(400);
   });
 
   it("falls back to the rules engine on an HTTP error (quota, overload)", async () => {

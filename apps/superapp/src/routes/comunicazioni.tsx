@@ -38,6 +38,7 @@ import {
 import { romeParts } from "@/lib/home-week";
 import { freshnessLabel } from "@/lib/public-snapshots";
 import { getTrainingQuadro } from "@/lib/quadro.functions";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /*
  * Public page: annata crests stay internal (Direzione, 13/10/2026); team rows use the master's team colour.
@@ -72,24 +73,7 @@ export const Route = createFileRoute("/comunicazioni")({
       clock: now?.time ?? "00:00",
     };
   },
-  head: () => ({
-    meta: [
-      { title: "Comunicazioni — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "Notizie, avvisi e aggiornamenti della S.C.D. ColicoDerviese: calendario gare, eventi e social del club.",
-      },
-      {
-        property: "og:title",
-        content: "Comunicazioni — S.C.D. ColicoDerviese",
-      },
-      {
-        property: "og:description",
-        content: "Tutte le notizie, gli aggiornamenti e i contenuti del club.",
-      },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.comunicazioni),
   component: Comunicazioni,
 });
 

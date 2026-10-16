@@ -7,6 +7,7 @@ import { TicketRules } from "@/components/scd/TicketRules";
 import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
 import { siteMapsUrl } from "@/lib/maps-link";
 import { romeDay } from "@/lib/public-window";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /** Schematic plan of Colico sent by the Direzione on 13/10/2026 (FACILITY_PLAN in config/scd-assets.v1.json). */
 const PIANTA_COLICO = "/media/scd/pianta-colico-2026.webp";
@@ -19,17 +20,7 @@ export const Route = createFileRoute("/impianti")({
     const cal = loadCalendar();
     return { today, nextHome: nextHomeMatchText(cal.groups, cal.events, today) };
   },
-  head: () => ({
-    meta: [
-      { title: "I nostri campi — Impianti S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content: "Mappa dei centri sportivi di Colico e Dervio: campi, spogliatoi, servizi, orari, ingresso per il pubblico e biglietteria.",
-      },
-      { property: "og:title", content: "I nostri campi — S.C.D. ColicoDerviese" },
-      { property: "og:description", content: "Dove si gioca, da dove si entra, quando è aperto." },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.impianti),
   component: ImpiantiPage,
 });
 

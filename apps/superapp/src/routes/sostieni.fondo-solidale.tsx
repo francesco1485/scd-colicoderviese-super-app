@@ -9,7 +9,7 @@ import { CLUB_PROFILE } from "@/lib/club-profile";
 import { FONDO_PUBLIC_TEXT, TEXT_PENDING, euro, itDay } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
 import { getMyFamilyForFund } from "@/lib/roster.functions";
-import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { pageHead, SHARE_PAGES } from "@/lib/share";
 
 /**
  * Fondo Solidale, public page (UD-113). The texts are the Direzione's (FONDO_PUBLIC_TEXT): until they arrive every block
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/sostieni/fondo-solidale")({
     const [pub, family] = await Promise.all([getGivingPublic(), getMyFamilyForFund()]);
     return { pub, family };
   },
-  head: () => ({ meta: pageMeta(SHARE_PAGES.fondoSolidale) }),
+  head: () => pageHead(SHARE_PAGES.fondoSolidale),
   component: FondoPage,
 });
 

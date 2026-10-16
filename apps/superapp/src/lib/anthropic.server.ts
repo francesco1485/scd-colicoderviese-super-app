@@ -18,7 +18,7 @@ export function anthropicApiKey(env: Readonly<Record<string, string | undefined>
 
 export type ClaudeOutcome =
   | { ok: true; text: string; inputTokens: number | null; outputTokens: number | null }
-  | { ok: false; reason: "http"; status: number }
+  | { ok: false; reason: "http"; status: number; errorType?: string; errorMessage?: string }
   | { ok: false; reason: "timeout" | "network" | "empty" };
 
 export interface ClaudeCall {
@@ -26,10 +26,54 @@ export interface ClaudeCall {
   system: string;
   user: string;
   maxTokens: number;
-  temperature?: number;
+  /** Haiku 5.5 effort level; thinking is disabled, which the API allows at `high` or below. */
+  effort?: "low" | "medium" | "high";
   timeoutMs: number;
   fetchImpl?: FetchLike;
   model?: string;
+}
+
+/** Longest error excerpt kept in logs. */
+export const ERROR_EXCERPT_MAX = 160;
+
+/** Safe one-line excerpt of an API error message: no keys, no newlines, capped. */
+export function safeErrorExcerpt(message: unknown): string | undefined {
+  if (typeof message !== "string") return undefined;
+  const clean = message
+    .replace(/sk-ant-[A-Za-z0-9_-]*/g, "[redacted]")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!clean) return undefined;
+  return clean.length > ERROR_EXCERPT_MAX ? `${clean.slice(0, ERROR_EXCERPT_MAX - 1)}…` : clean;
+}
+
+/** Only the type and a sanitized excerpt of the error JSON; never the raw body. */
+async function readApiError(res: Response): Promise<{ errorType?: string; errorMessage?: string }> {
+  try {
+    const j = (await res.json()) as { error?: { type?: unknown; message?: unknown } };
+    const t = j?.error?.type;
+    const errorType = typeof t === "string" && /^[a-z_]{1,64}$/.test(t) ? t : undefined;
+    const errorMessage = safeErrorExcerpt(j?.error?.message);
+    return { ...(errorType ? { errorType } : {}), ...(errorMessage ? { errorMessage } : {}) };
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Request body for claude-haiku-5-5 (platform.claude.com/docs/en/models/haiku-5-5/migration-guide):
+ * no temperature/top_p/top_k (non-default values return 400), thinking disabled so that
+ * max_tokens is spent on the answer, effort low (thinking may be disabled only at high or below).
+ */
+export function claudeRequestBody(c: Pick<ClaudeCall, "system" | "user" | "maxTokens" | "model" | "effort">) {
+  return {
+    model: c.model ?? CLAUDE_MODEL,
+    max_tokens: c.maxTokens,
+    thinking: { type: "disabled" as const },
+    output_config: { effort: c.effort ?? "low" },
+    system: c.system,
+    messages: [{ role: "user" as const, content: c.user }],
+  };
 }
 
 export async function callClaude(c: ClaudeCall): Promise<ClaudeOutcome> {
@@ -43,16 +87,10 @@ export async function callClaude(c: ClaudeCall): Promise<ClaudeOutcome> {
         "x-api-key": c.apiKey,
         "anthropic-version": ANTHROPIC_VERSION,
       },
-      body: JSON.stringify({
-        model: c.model ?? CLAUDE_MODEL,
-        max_tokens: c.maxTokens,
-        temperature: c.temperature ?? 0,
-        system: c.system,
-        messages: [{ role: "user", content: c.user }],
-      }),
+      body: JSON.stringify(claudeRequestBody(c)),
       signal: ctrl.signal,
     });
-    if (!res.ok) return { ok: false, reason: "http", status: res.status };
+    if (!res.ok) return { ok: false, reason: "http", status: res.status, ...(await readApiError(res)) };
     const data = (await res.json()) as {
       content?: Array<{ type: string; text?: string }>;
       usage?: { input_tokens?: number; output_tokens?: number };

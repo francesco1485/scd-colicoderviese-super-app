@@ -19,6 +19,7 @@ import {
 import { romeParts } from "@/lib/home-week";
 import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
 import { BoardMenuButton } from "@/components/scd/BoardMenuButton";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /*
  * Public page "Calendario live" (board VR-009 screen 2, Francesco 15/10/2026): hero with the lake photo, the official
@@ -56,16 +57,7 @@ export const Route = createFileRoute("/calendario")({
     const trainingSlots = cal.audience === "member" ? (await getTrainingQuadro()).quadro.slots : [];
     return { ...cal, trainingSlots, access: accessState(session), serverNow: Date.now() };
   },
-  head: () => ({
-    meta: [
-      { title: "Calendario 2026/27 — S.C.D. ColicoDerviese" },
-      { name: "description", content: "Le gare SCD di ieri, oggi, domani e della settimana: casa e trasferta, stagione 2026/27. Dati da riconfermare in caso di variazioni." },
-      { property: "og:title", content: "Calendario 2026/27 — S.C.D. ColicoDerviese" },
-      { property: "og:description", content: "Le gare SCD della stagione 2026/27 per giorno, settimana, mese e squadra." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.calendario),
   component: Calendario,
 });
 

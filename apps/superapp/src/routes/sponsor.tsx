@@ -10,7 +10,7 @@ import { SponsorProcess } from "@/components/SponsorProcess";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS } from "@/lib/catalog";
 import { romeDay } from "@/lib/public-window";
-import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { pageHead, SHARE_PAGES } from "@/lib/share";
 import { parsePackageParam } from "@/lib/sponsor-packages";
 
 export const Route = createFileRoute("/sponsor")({
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/sponsor")({
   },
   // Rome day of the server for the Volto sponsor presence: rendered on the server, reused on hydration.
   loader: () => ({ day: romeDay(Date.now()) }),
-  head: () => ({ meta: pageMeta(SHARE_PAGES.sponsor) }),
+  head: () => pageHead(SHARE_PAGES.sponsor),
   component: Sponsor,
 });
 

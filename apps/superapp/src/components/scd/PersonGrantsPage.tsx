@@ -34,6 +34,7 @@ import {
   grantProblem,
   grantsToSave,
   isGrantable,
+  offeredPerimeters,
   pendingProposals,
   willSee,
   type CopyPlan,
@@ -361,7 +362,8 @@ function SectionRow({
   }
   const on = Boolean(row?.on);
   const proposal = on && row && !row.confirmed;
-  const minorBlocked = minor === true && !s.perimeters.includes("SELF");
+  const offered = offeredPerimeters(s);
+  const minorBlocked = minor === true && !offered.includes("SELF");
   const toggle = () => {
     if (on) onChange(null);
     else onChange({ ...defaultRow(s, target), on: true });
@@ -422,7 +424,7 @@ function SectionRow({
                 onChange={(e) => onChange({ ...row, perimeter: e.target.value as Perimeter, teamIds: [], site: null, confirmed: true, origin: row.origin === "saved" ? "saved" : "manual" })}
                 className={`${inputCls} h-11 font-normal`}
               >
-                {s.perimeters.map((p) => (
+                {(row.perimeter && !offered.includes(row.perimeter) ? [...offered, row.perimeter] : offered).map((p) => (
                   <option key={p} value={p} disabled={minor === true && p !== "SELF"}>{PERIMETER_LABEL[p]} — {lowerFirst(PERIMETER_HINT[p].replace(/\.$/, ""))}</option>
                 ))}
               </select>

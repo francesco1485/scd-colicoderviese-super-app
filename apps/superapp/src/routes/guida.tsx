@@ -3,6 +3,7 @@ import { BellRing, Brain, CalendarDays, ClipboardCheck, ClipboardList, FileText,
 import type { ReactNode } from "react";
 
 import { CastDirectory } from "@/components/scd/CastDirectory";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * "Come funziona": quick guide for the launch, public so families can read it before signing in.
@@ -10,12 +11,7 @@ import { CastDirectory } from "@/components/scd/CastDirectory";
  * config/superapp-audiences.v1.json (UD-078). No personal data.
  */
 export const Route = createFileRoute("/guida")({
-  head: () => ({
-    meta: [
-      { title: "Come funziona l'app | S.C.D. ColicoDerviese" },
-      { name: "description", content: "Guida rapida all'app della S.C.D. ColicoDerviese per tifosi, soci, famiglie, atleti, mister e segreteria: accesso, convocazioni e presa visione, notifiche, certificati e distinta." },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.guida),
   component: Guida,
 });
 

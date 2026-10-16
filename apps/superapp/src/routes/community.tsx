@@ -11,6 +11,7 @@ import {
 import type { ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * Tifosi (ex "Community"): the old wall, polls and quiz placeholders are gone. Every entry here opens a feature that
@@ -18,17 +19,7 @@ import { ClubCrestOfficial } from "@/components/SiteChrome";
  * review (r91) and team pages to follow. No contests with money, no fake content.
  */
 export const Route = createFileRoute("/community")({
-  head: () => ({
-    meta: [
-      { title: "Tifosi — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "La parte dei tifosi della S.C.D. ColicoDerviese: segui le squadre, pubblica, vota la Top 11 e gioca al Fantacalcio SCD.",
-      },
-      { property: "og:title", content: "Tifosi — S.C.D. ColicoDerviese" },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.community),
   component: Tifosi,
 });
 

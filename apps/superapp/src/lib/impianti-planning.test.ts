@@ -33,6 +33,7 @@ import {
 } from "./impianti-planning";
 import { QUADRO_SNAPSHOT } from "./quadro-data.server";
 import {
+  DERVIO_LIGHTS_OK,
   bookingToItem,
   groupByDay,
   homeMatches,
@@ -168,6 +169,13 @@ describe("(a) one request: pitch zone + changing rooms + lights", () => {
     expect(l.recommended).toBe(true);
     expect(l.window).toEqual([m("17:00"), m("18:00")]);
     expect(lightsAdvice(draft({ start: "19:00", lights: true })).window).toEqual([m("19:00"), m("20:00")]);
+  });
+
+  it("says Dervio lights are available (DG 2026-10-16 «luci Dervio ok»), never 'da verificare'", () => {
+    const note = lightsAdvice(draft({ pitch: "DV", start: "19:00", lights: true })).note;
+    expect(note).toMatch(/Luci di Dervio disponibili/);
+    expect(note).not.toMatch(/da verificare/);
+    expect(DERVIO_LIGHTS_OK).toBe(true);
   });
 
   it("lists every resource of the request in order", () => {

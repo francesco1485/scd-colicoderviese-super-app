@@ -905,7 +905,8 @@ export function ColicoTab({
         </Card>
         <SimulationNote>
           L&apos;11 ottobre la società ha deciso di valutare le rotazioni con
-          simulazioni prima di qualsiasi avviso al Comune di Dervio.
+          simulazioni; il Comune di Dervio è già informato con il programma
+          stagionale.
         </SimulationNote>
       </div>
     </div>

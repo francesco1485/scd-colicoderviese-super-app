@@ -4,13 +4,13 @@ import { NotActiveNote, ProposalForm } from "@/components/giving/public";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { getGivingPublic } from "@/lib/giving.functions";
-import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { SHARE_PAGES, pageHead } from "@/lib/share";
 import { useSession } from "@/lib/use-session";
 
 /** Proponi un miglioramento (UD-113): anyone, signed in or not, optionally anonymous. Never public until staff publish. */
 export const Route = createFileRoute("/sostieni/proponi")({
   loader: () => getGivingPublic(),
-  head: () => ({ meta: pageMeta(SHARE_PAGES.proponi) }),
+  head: () => pageHead(SHARE_PAGES.proponi),
   component: ProponiPage,
 });
 

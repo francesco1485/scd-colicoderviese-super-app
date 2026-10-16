@@ -8,6 +8,7 @@ import {
 import { getSiteNews } from "@/lib/news.functions";
 import { getPressReview } from "@/lib/press.functions";
 import { timeAgo } from "@/lib/social";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * Rassegna stampa (UD-094, moved off the home by UD-110): the press list lives here, the home keeps only the compact
@@ -23,20 +24,7 @@ export const Route = createFileRoute("/rassegna-stampa")({
     ]);
     return { press, site, now: Date.now() };
   },
-  head: () => ({
-    meta: [
-      { title: "Rassegna stampa · Dicono di noi — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "Rassegna stampa della S.C.D. ColicoDerviese: i titoli delle testate che parlano della società, di Colico e di Dervio, con il link all'articolo originale.",
-      },
-      {
-        property: "og:title",
-        content: "Dicono di noi — S.C.D. ColicoDerviese",
-      },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.rassegnaStampa),
   component: RassegnaStampaPage,
 });
 
