@@ -27,7 +27,7 @@ export function SponsorBand() {
       data-testid="sponsor-band"
       className="fixed inset-x-0 bottom-[calc(60px+env(safe-area-inset-bottom))] z-[39] flex h-[30px] items-center overflow-hidden border-t border-[#e3eaf4] bg-[#f7f9fc] lg:bottom-0 lg:left-[240px] lg:h-[46px] lg:bg-white lg:shadow-[0_-4px_16px_-8px_rgb(11_42_91/0.2)]"
     >
-      <span className="relative z-[1] ml-2 flex h-[20px] shrink-0 items-center rounded-full bg-[#1556c4] px-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-white shadow-[4px_0_10px_6px_#f7f9fc] lg:ml-4 lg:h-[26px] lg:px-3.5 lg:text-[12px] lg:shadow-[6px_0_12px_8px_#fff]">
+      <span className="relative z-[1] ml-2 flex h-[20px] shrink-0 items-center rounded-full bg-[#13254d] px-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-white shadow-[4px_0_10px_6px_#f7f9fc] lg:ml-4 lg:h-[26px] lg:px-3.5 lg:text-[12px] lg:shadow-[6px_0_12px_8px_#fff]">
         Sponsor
       </span>
       <div className="uv-marquee flex w-max items-center gap-3 pl-4 [--logo-k:0.78] lg:gap-5 lg:pl-6 lg:[--logo-k:1]" style={{ animationDuration: "140s" }}>

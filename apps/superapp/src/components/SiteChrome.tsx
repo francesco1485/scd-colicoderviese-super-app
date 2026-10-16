@@ -348,7 +348,7 @@ export function SiteHeader() {
   const board = isBoardRoute(pathname);
   return (
     <header
-      className={`scd-pub sticky top-0 z-40 h-[var(--pub-header-h)] scd-metal-line bg-[linear-gradient(100deg,#1c3366_0%,#162a57_55%,#13254d_100%)] font-text text-white shadow-[0_4px_14px_-6px_rgb(11_42_91/0.45)] ${board ? "hidden lg:block" : ""}`}
+      className={`scd-pub sticky top-0 z-40 h-[var(--pub-header-h)] scd-metal-line scd-band font-text text-white shadow-[0_4px_14px_-6px_rgb(11_42_91/0.45)] ${board ? "hidden lg:block" : ""}`}
       data-site-header
     >
       <div className="flex h-full items-center gap-2 pl-3 pr-3 lg:gap-6 lg:pl-0 lg:pr-6">
@@ -401,12 +401,12 @@ export function SideNav() {
   const row = (active: boolean) =>
     `scd-focus group relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-[15px] transition-colors duration-150 ${
       active
-        ? "bg-[#ffd82a] font-bold text-[#0b2f6b]"
+        ? "scd-gold font-bold"
         : "font-semibold text-[#dbe7f7] hover:bg-white/10 hover:text-white"
     }`;
   return (
     <aside
-      className="sticky top-[var(--pub-header-h)] hidden h-[calc(100dvh-var(--pub-header-h)-46px)] self-start overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#0f45a6_0%,#0b3a8c_55%,#082f74_100%)] px-3 pb-6 pt-4 text-white [scrollbar-color:rgb(255_255_255/0.25)_transparent] [scrollbar-width:thin] lg:block"
+      className="sticky top-[var(--pub-header-h)] hidden h-[calc(100dvh-var(--pub-header-h)-46px)] self-start overflow-y-auto overscroll-contain scd-band-v px-3 pb-6 pt-4 text-white [scrollbar-color:rgb(255_255_255/0.25)_transparent] [scrollbar-width:thin] lg:block"
       data-testid="side-nav"
     >
       <nav aria-label="Sezioni del club">
@@ -436,7 +436,7 @@ export function SideNav() {
       </nav>
       {areas.length > 0 && (
         <nav aria-label="Le tue aree di lavoro" className="mt-4 border-t border-white/12 pt-3" data-testid="side-work-areas">
-          <p className="m-0 px-3 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#ffd82a]">Le tue aree</p>
+          <p className="m-0 px-3 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#ffd84a]">Le tue aree</p>
           <ul className="m-0 grid list-none gap-0.5 p-0">
             {areas.map(({ entry, link }) => {
               const Icon = AREA_ICON[entry.icon];
@@ -462,7 +462,7 @@ export function SideNav() {
           <Link
             to="/accedi"
             search={loginSearch(pathname) as never}
-            className="scd-focus flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffd82a] px-4 text-[15px] font-bold text-[#0b2f6b] transition-[filter] duration-150 hover:brightness-95"
+            className="scd-focus flex min-h-11 items-center justify-center gap-2 scd-gold rounded-full px-4 text-[15px] font-bold transition-[filter] duration-150"
           >
             <LogIn className="size-[18px]" strokeWidth={2.2} aria-hidden="true" />
             Entra o registrati
@@ -887,7 +887,7 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center gap-2">
             <Link
               to="/installa"
-              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 rounded-[10px] bg-[#ffd600] px-4 font-extrabold text-[#061a3d] transition-[filter] duration-150 hover:brightness-95"
+              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 scd-gold rounded-[10px] px-4 font-extrabold transition-[filter] duration-150 hover:brightness-95"
               data-testid="footer-install"
             >
               <Download className="size-4" aria-hidden="true" />

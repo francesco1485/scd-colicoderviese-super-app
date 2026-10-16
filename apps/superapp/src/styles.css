@@ -84,8 +84,8 @@
 :root {
   --radius: 0.9rem;
   /* Palette dalle tavole approvate (stemma ufficiale: blu #0861AB, azzurro #1B95D3, giallo #FFD600). */
-  --scd-navy: #022d66;
-  --scd-navy-2: #01224f;
+  --scd-navy: #13254d;
+  --scd-navy-2: #0f1d3d;
   --scd-blue: #0457af;
   --scd-sky: #1b95d3;
   --scd-yellow: #ffd82a;
@@ -117,7 +117,7 @@
   --input: oklch(0.9 0.02 253);
   --ring: oklch(0.84 0.17 92);
   --lake: #0457af;
-  --lake-deep: #022d66;
+  --lake-deep: #13254d;
   --sun: #ffd82a;
   --sun-soft: oklch(0.93 0.11 96);
 
@@ -981,3 +981,46 @@ html.uv-big .sa-shell { zoom: 1.12; }
 }
 @keyframes scd-metal-run { from { background-position: 100% 0 } to { background-position: -100% 0 } }
 @media (prefers-reduced-motion: reduce) { .scd-metal-line::after { animation: none; } }
+
+/* ---------------------------------------------------------------------------------------------------------------
+ * SCD METAL — definitive palette (Francesco 16/10/2026 16:48 «un colore uguale e un po' più metallico, in modo
+ * definitivo»). One navy everywhere, brushed like metal; gold as polished metal on what you touch; silver edges.
+ *   navy      #13254d (bands, header, sidebar)    deep  #0f1d3d    light sheen  #2a4a8a
+ *   blue      var(--scd-blue) #0457af (links, kickers)              sky  #7fd0ff (glow only)
+ *   gold      #ffd84a → #e0ab17 (buttons, active item)              silver #b8c5dd → #ffffff (edges)
+ * --------------------------------------------------------------------------------------------------------------- */
+.scd-band {
+  background-color: #13254d;
+  background-image:
+    linear-gradient(180deg, rgb(255 255 255 / 0.07) 0%, rgb(255 255 255 / 0) 45%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.022) 0 1px, transparent 1px 3px),
+    linear-gradient(100deg, #223f7c 0%, #16295a 34%, #1f3a72 52%, #13254d 72%, #0f1d3d 100%);
+}
+.scd-band-v {
+  background-color: #13254d;
+  background-image:
+    linear-gradient(90deg, rgb(255 255 255 / 0.05) 0%, rgb(255 255 255 / 0) 30%),
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.02) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #1c3366 0%, #16295a 45%, #13254d 75%, #0f1d3d 100%);
+  box-shadow: inset -1px 0 0 rgb(184 197 221 / 0.35);
+}
+.scd-gold {
+  background-color: #ffd84a;
+  background-image: linear-gradient(180deg, #fff3b0 0%, #ffd84a 42%, #e0ab17 56%, #ffe27a 100%);
+  color: #1a1300;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75), inset 0 0 0 1px rgb(176 128 0 / 0.45), 0 4px 12px -6px rgb(201 150 0 / 0.7);
+}
+.scd-gold:hover { filter: brightness(1.04) saturate(1.05); }
+.scd-silver-edge { position: relative; }
+.scd-silver-edge::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, #8ea2c6 0%, #ffffff 22%, #b8c5dd 50%, #ffffff 78%, #8ea2c6 100%);
+}
+/* The yellow action button of the header becomes polished gold too. */
+.scd-action {
+  background-color: #ffd84a;
+  background-image: linear-gradient(180deg, #fff3b0 0%, #ffd84a 42%, #e0ab17 56%, #ffe27a 100%);
+  color: #1a1300;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.75), inset 0 0 0 1px rgb(176 128 0 / 0.45);
+}
+.scd-action:hover { background-color: #ffd84a; filter: brightness(1.04); }

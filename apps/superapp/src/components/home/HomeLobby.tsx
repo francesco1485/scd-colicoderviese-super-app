@@ -40,9 +40,8 @@ type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 const WRAP = "mx-auto w-full max-w-[1240px] px-4 lg:px-8";
 /** White card with a thin metallic top edge (design system "via di mezzo"). */
 const CARD =
-  "relative overflow-hidden rounded-[12px] border border-[#d6deeb] bg-white shadow-[0_6px_18px_-14px_rgb(20_38_77/0.55)] before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-[linear-gradient(90deg,#9fb0cf,#ffffff,#9fb0cf)] before:content-['']";
-const GOLD =
-  "bg-[linear-gradient(180deg,#fff1a6_0%,#ffd23f_46%,#d9a514_54%,#ffe27a_100%)] text-[#1a1300] shadow-[inset_0_0_0_1px_rgb(201_150_0/0.35),0_4px_12px_-6px_rgb(201_150_0/0.7)]";
+  "relative overflow-hidden rounded-[12px] border border-[#d6deeb] bg-white shadow-[0_6px_18px_-14px_rgb(20_38_77/0.55)] before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-[linear-gradient(90deg,#8ea2c6,#ffffff_22%,#b8c5dd_50%,#ffffff_78%,#8ea2c6)] before:content-['']";
+const GOLD = "scd-gold";
 const LABEL = "font-display text-[11px] font-bold uppercase tracking-[0.1em] lg:text-[12px]";
 const KIT_FULL = "/media/kit/kit-2026-27-blu.webp";
 
@@ -175,10 +174,10 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
     return `${it.team} ${it.text}`;
   };
   return (
-    <section aria-label="Partite della settimana" className="bg-[#0f1d3d] text-white" data-testid="home-ticker">
+    <section aria-label="Partite della settimana" className="scd-band border-b border-[#b8c5dd]/25 text-white lg:-mr-12 2xl:mr-0" data-testid="home-ticker">
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-stretch lg:flex-nowrap">
         <div
-          className={`${first ? "flex" : "hidden lg:flex"} min-h-11 w-full items-center gap-2 border-b border-white/10 bg-[#13254d] px-4 lg:w-auto lg:border-b-0 lg:border-r lg:px-5`}
+          className={`${first ? "flex" : "hidden lg:flex"} min-h-11 w-full items-center gap-2 border-b border-white/10 bg-black/20 px-4 lg:w-auto lg:border-b-0 lg:border-r lg:px-5`}
           data-testid="home-live-box"
         >
           <span aria-hidden="true" className={`size-2 rounded-full ${first ? "scd-live-dot bg-[#ff4d5e]" : "bg-[#5d6f94]"}`} />
@@ -246,10 +245,11 @@ function ClubAffiliation() {
   return (
     <section
       aria-labelledby="home-club-t"
-      className="relative overflow-hidden bg-[radial-gradient(90%_140%_at_90%_0%,#2f6fdc_0%,#173168_50%,#0f1d3d_100%)] text-white"
+      className="scd-band relative overflow-hidden text-white lg:-mr-12 2xl:mr-0"
       data-testid="home-profile"
     >
-      <span aria-hidden="true" className="absolute inset-0 bg-[repeating-linear-gradient(115deg,rgb(255_255_255/0.035)_0_2px,transparent_2px_20px)]" />
+      <span aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(60%_120%_at_88%_0%,rgb(127_208_255/0.22),transparent_70%)]" />
+      <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[2px] bg-[linear-gradient(90deg,#8ea2c6,#ffffff_22%,#b8c5dd_50%,#ffffff_78%,#8ea2c6)]" />
       <div className={`${WRAP} relative grid gap-4 py-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-8 lg:py-8`}>
         <div className="flex items-center gap-4 lg:gap-8">
           <ClubCrestOfficial size={92} className="shrink-0 drop-shadow-[0_10px_20px_rgb(0_0_0/0.45)] lg:hidden" />
@@ -311,7 +311,7 @@ function TodayOnPitch({ day, today, nowMs }: { day: PublicTrainingDay | null; to
         id="home-training-t"
         sub={`${label} · Centro sportivo di Colico`}
         action={
-          <Link to="/accedi" search={loginSearch("/allenamenti")} className="scd-focus inline-flex min-h-11 items-center gap-1 rounded-md font-display text-[14px] font-semibold text-[#1d6fe0]" data-testid="bar-allenamenti" aria-label="Tutti gli allenamenti: per i soci, accedi">
+          <Link to="/accedi" search={loginSearch("/allenamenti")} className="scd-focus inline-flex min-h-11 items-center gap-1 rounded-md font-display text-[14px] font-semibold text-[#0457af]" data-testid="bar-allenamenti" aria-label="Tutti gli allenamenti: per i soci, accedi">
             Tutti
             <ChevronRight className="size-4" aria-hidden="true" />
           </Link>
@@ -361,10 +361,10 @@ function TodayOnPitch({ day, today, nowMs }: { day: PublicTrainingDay | null; to
 function ServiceCard({ to, search, art, kicker, title, text, cta, testid }: { to: string; search?: object; art: ReactNode; kicker: string; title: string; text: string; cta: string; testid: string }) {
   return (
     <li className="min-w-0">
-      <Link to={to as never} search={search as never} className={`${CARD} scd-focus flex h-full flex-col hover:border-[#1d6fe0]`} data-testid={testid}>
+      <Link to={to as never} search={search as never} className={`${CARD} scd-focus flex h-full flex-col hover:border-[#0457af]`} data-testid={testid}>
         <span className="relative block h-[112px] overflow-hidden lg:h-[124px]">{art}</span>
         <span className="flex flex-1 flex-col gap-1 p-3.5">
-          <span className={`${LABEL} text-[#1d6fe0]`}>{kicker}</span>
+          <span className={`${LABEL} text-[#0457af]`}>{kicker}</span>
           <span className="font-display text-[17px] font-bold leading-tight text-[#14264d]">{title}</span>
           <span className="text-[13px] leading-snug text-[#52627f]">{text}</span>
           <span className={`mt-auto inline-flex w-fit items-center gap-1 rounded-[8px] px-3 py-1.5 font-display text-[14px] font-semibold ${GOLD}`}>
@@ -420,7 +420,7 @@ function Services() {
           text="Per gli atleti iscritti. Il posto lo conferma la segreteria."
           cta="Scopri"
           art={
-            <span className="absolute inset-0 bg-[linear-gradient(135deg,#13254d,#1d6fe0)]">
+            <span className="absolute inset-0 bg-[linear-gradient(135deg,#13254d,#0457af)]">
               <Bus className="absolute left-1/2 top-[38%] size-12 -translate-x-1/2 -translate-y-1/2 text-[#ffd23f]" strokeWidth={1.6} aria-hidden="true" />
               <span className="absolute inset-x-2 bottom-2 flex flex-wrap justify-center gap-1">
                 {PULMINO_ZONES.map((z) => (
@@ -441,7 +441,7 @@ function Services() {
           text="Soprannome, numero e la divisa del club."
           cta="Inizia"
           art={
-            <span className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_30%_30%,#7fd0ff,#1d6fe0_45%,#13254d)]">
+            <span className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_30%_30%,#7fd0ff,#0457af_45%,#13254d)]">
               <span className="grid place-items-center gap-1 text-center font-display text-[24px] font-bold uppercase leading-[0.9] text-white lg:text-[28px]">
                 <UserRound className="size-7" aria-hidden="true" />
                 <span>
@@ -511,8 +511,8 @@ function MonthCard({ events, today, nowMs, groups }: { events: readonly PublicEv
         </Link>
       </div>
       {next && (
-        <Link to="/calendario" search={{ annata: next.e.group, vista: "settimana" }} className={`${CARD} scd-focus grid gap-1 p-4 hover:border-[#1d6fe0]`} data-testid="home-countdown">
-          <span className={`${LABEL} text-[#1d6fe0]`}>Prossima gara in casa</span>
+        <Link to="/calendario" search={{ annata: next.e.group, vista: "settimana" }} className={`${CARD} scd-focus grid gap-1 p-4 hover:border-[#0457af]`} data-testid="home-countdown">
+          <span className={`${LABEL} text-[#0457af]`}>Prossima gara in casa</span>
           <span className="font-display text-[22px] font-bold leading-none text-[#14264d]">{countdownLabel(next.at - nowMs)}</span>
           <span className="text-[13px] text-[#52627f]">
             {groupShort(ng, next.e.category)}
@@ -548,7 +548,7 @@ function WeekDays({ events, today }: { events: readonly PublicEvent[]; today: st
           );
         })}
       </ol>
-      <Link to="/calendario" className="scd-focus flex min-h-11 flex-col items-center justify-center border-l border-[#e3e9f3] px-2 font-display text-[11px] font-semibold text-[#1d6fe0]">
+      <Link to="/calendario" className="scd-focus flex min-h-11 flex-col items-center justify-center border-l border-[#e3e9f3] px-2 font-display text-[11px] font-semibold text-[#0457af]">
         <CalendarDays className="size-5" aria-hidden="true" />
         Mese
       </Link>
@@ -569,7 +569,7 @@ function PostMedia({ s }: { s: VetrinaSlot }) {
     );
   if (v.kind === "portrait")
     return (
-      <span className="grid aspect-[16/10] w-full place-items-center bg-[linear-gradient(150deg,#1d6fe0,#13254d)]">
+      <span className="grid aspect-[16/10] w-full place-items-center bg-[linear-gradient(150deg,#0457af,#13254d)]">
         <img src={v.src} alt={v.alt} loading="lazy" decoding="async" className="size-[100px] rounded-full object-cover ring-4 ring-white/70" />
       </span>
     );
@@ -591,13 +591,13 @@ function News({ slots }: { slots: readonly VetrinaSlot[] }) {
       <ul className="m-0 grid list-none gap-3 p-0 lg:grid-cols-3 lg:gap-4">
         {slots.map((s) => (
           <li key={s.id}>
-            <Link to={s.href as never} search={s.search as never} {...(s.hash ? { hash: s.hash } : {})} className={`${CARD} scd-focus grid h-full hover:border-[#1d6fe0]`} data-slot={s.id}>
+            <Link to={s.href as never} search={s.search as never} {...(s.hash ? { hash: s.hash } : {})} className={`${CARD} scd-focus grid h-full hover:border-[#0457af]`} data-slot={s.id}>
               <PostMedia s={s} />
               <span className="grid gap-1 p-3.5">
-                <span className={`${LABEL} text-[#1d6fe0]`}>{s.kicker}</span>
+                <span className={`${LABEL} text-[#0457af]`}>{s.kicker}</span>
                 <span className="font-display text-[17px] font-bold leading-tight text-[#14264d]">{s.title}</span>
                 <span className="line-clamp-3 text-[13.5px] leading-snug text-[#52627f]">{s.text}</span>
-                <span className="mt-1 inline-flex items-center gap-1 font-display text-[14px] font-semibold text-[#1d6fe0]">
+                <span className="mt-1 inline-flex items-center gap-1 font-display text-[14px] font-semibold text-[#0457af]">
                   {s.cta}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </span>
