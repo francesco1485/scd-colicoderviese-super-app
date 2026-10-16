@@ -99,6 +99,7 @@ export const POSITION_RANK: Readonly<Record<string, number>> = {
   "responsabile-struttura-colico": 3,
   "responsabile-struttura-dervio": 3,
   "responsabile-infermeria": 3,
+  nutrizionista: 3,
   "responsabile-tornei": 3,
   "responsabile-magazzino": 3,
   "responsabile-club-house": 3,
