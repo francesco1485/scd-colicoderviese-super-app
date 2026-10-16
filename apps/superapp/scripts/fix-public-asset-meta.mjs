@@ -1,5 +1,5 @@
 // Runs after `vite build`: realigns Nitro's public asset sizes with the files on disk (see lib/public-asset-meta.mjs).
-import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -14,11 +14,17 @@ if (!existsSync(index)) {
   process.exit(0);
 }
 
-const { source, fixed } = patchPublicAssetMeta(readFileSync(index, "utf8"), (relPath) => {
+const { source, fixed, matched } = patchPublicAssetMeta(readFileSync(index, "utf8"), (relPath) => {
   const file = resolve(serverDir, relPath);
   if (!existsSync(file)) return null;
   return { buffer: readFileSync(file), mtime: statSync(file).mtime };
 });
 
-if (fixed.length > 0) writeFileSync(index, source);
+if (matched.length === 0 || (existsSync(resolve(root, ".output/public/sw.js")) && !matched.includes("/sw.js"))) {
+  console.warn("[public-asset-meta] WARNING: Nitro public asset table not recognised (format changed?): sw.js may be served truncated");
+}
+if (fixed.length > 0) {
+  writeFileSync(`${index}.tmp`, source);
+  renameSync(`${index}.tmp`, index);
+}
 console.log(`[public-asset-meta] ${fixed.length} file(s) realigned${fixed.length ? `: ${fixed.join(", ")}` : ""}`);

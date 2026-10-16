@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && node scripts/fix-public-asset-meta.mjs",
-    "build:node": "NITRO_PRESET=node-server vite build",
+    "build:node": "NITRO_PRESET=node-server vite build && node scripts/fix-public-asset-meta.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "test:bundle": "vitest run src/lib/client-bundle.test.ts",

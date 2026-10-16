@@ -16,21 +16,23 @@ export function nitroEtag(buffer) {
   return `"${buffer.length.toString(16)}-${hash}"`;
 }
 
-const ENTRY = /("(\/[^"]+)": \{\s*"type": "[^"]*",\s*"etag": )"\\"[^"]*\\""(,\s*"mtime": )"[^"]*"(,\s*"size": )(\d+)(,\s*"path": "([^"]+)")/g;
+const ENTRY = /("(\/[^"]+)": \{\s*"type": "[^"]*",\s*"etag": )"\\"[^"]*\\""(,\s*"mtime": )"[^"]*"(,\s*"size": )(\d+(?:e\d+)?)(,\s*"path": "([^"]+)")/g;
 
 /**
  * @param {string} source content of .output/server/index.mjs
  * @param {(relPath: string) => { buffer: Buffer, mtime: Date } | null} readFile reads a public file by the "path" of the entry
- * @returns {{ source: string, fixed: string[] }}
+ * @returns {{ source: string, fixed: string[], matched: string[] }}
  */
 export function patchPublicAssetMeta(source, readFile) {
   const fixed = [];
+  const matched = [];
   const out = source.replace(ENTRY, (all, head, route, mtimeKey, sizeKey, size, pathPart, relPath) => {
+    matched.push(route);
     const file = readFile(relPath);
     if (!file || file.buffer.length === Number(size)) return all;
     fixed.push(`${route} ${size} -> ${file.buffer.length}`);
     const etag = JSON.stringify(nitroEtag(file.buffer));
     return `${head}${etag}${mtimeKey}"${file.mtime.toISOString()}"${sizeKey}${file.buffer.length}${pathPart}`;
   });
-  return { source: out, fixed };
+  return { source: out, fixed, matched };
 }

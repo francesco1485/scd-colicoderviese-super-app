@@ -923,3 +923,9 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - /top11: «Come funziona» in 4 passi al posto del vuoto; premi solo se esistono.
 - /squadre da non collegati: variante di UD-100 — solo categoria, campionato verificato, annate e link alle gare; resta tra le pagine solo soci (no-store, noindex). /crea e /la-mia-scd da non collegati: pagina di iscrizione JoinClub (porta solo a /registrati e /accedi).
 - Revisioni indipendenti scd-revisore + scd-sicurezza sull'integrazione 320b47a: PASS × 2.
+
+## 2026-10-17 — PWA installabile: sw.js non più troncato (PR #171)
+
+- Causa: sul sito live /sw.js arrivava troncato (23436 su 23956 byte, misurato 17/10 00:05): Nitro (node-server) registra size/etag dei file pubblici prima che vite-plugin-pwa completi sw.js e serve la Content-Length vecchia. Il browser rifiutava il service worker («ServiceWorker script evaluation failed») e non offriva «Installa app».
+- Misura: `scripts/fix-public-asset-meta.mjs` dopo `vite build` (anche `build:node`) riallinea size, etag e mtime in `.output/server/index.mjs` (accetta le dimensioni esponenziali 2e3; avviso se la tabella non è riconosciuta; scrittura atomica). Test: `src/lib/public-asset-meta.test.ts`.
+- Dopo il deploy: verificare che la Content-Length di /sw.js sia uguale alla dimensione reale e che Chrome offra «Installa app».

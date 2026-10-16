@@ -34,6 +34,14 @@ describe("patchPublicAssetMeta", () => {
 
   it("leaves missing files untouched", () => {
     const src = entry("/gone.js", 10, "a-x");
-    expect(patchPublicAssetMeta(src, () => null)).toEqual({ source: src, fixed: [] });
+    expect(patchPublicAssetMeta(src, () => null)).toEqual({ source: src, fixed: [], matched: ["/gone.js"] });
+  });
+
+  it("reads sizes Nitro writes in exponent form (2e3)", () => {
+    const src = entry("/sw.js", 0, "7d0-x").replace('"size": 0', '"size": 2e3');
+    const big = Buffer.from("y".repeat(2100));
+    const { source, fixed } = patchPublicAssetMeta(src, () => ({ buffer: big, mtime: new Date(0) }));
+    expect(fixed).toEqual(["/sw.js 2e3 -> 2100"]);
+    expect(source).toContain('"size": 2100');
   });
 });
