@@ -2081,6 +2081,59 @@
           "LOG_APPEND_ONLY_RLS_NO_POLICIES_ACCESS_ONLY_VIA_SECURITY_DEFINER"
         ],
         "imported_at": "2026-10-15"
+      },
+      {
+        "id": "SCD_SALUTE",
+        "kind": "INTERNAL_WORKFLOW",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "APPLIED_R136",
+        "approval": "Francesco 16/10/2026 07:04 'Applica r136', then 'Senza infortuni per ora': applied by the main session; injuries register deferred until the consent design (UD-043, UD-047)",
+        "title": "Infermeria and Nutrizionista (DG 15/10/2026 14:33; 16/10 06:23 'a pieno regime'): certificate expiry board (read-only), first-aid kits and AED/BLSD per site; nutrition guidance by age group and consultation requests. Injuries register deferred (UD-043 consent design)",
+        "endpoint": "Supabase SCD PULSE SECURITY DEFINER functions scd_health_staff, scd_infermeria_*, scd_nutrition_* (no direct table access)",
+        "authority_domains": [
+          "HEALTH_STAFF_OPERATIONS",
+          "FIRST_AID_EQUIPMENT",
+          "NUTRITION_GENERAL_GUIDANCE"
+        ],
+        "storage": "supabase/migrations/20261016_r136_infermeria_nutrizione.sql (APPLIED on SCD PULSE 16/10/2026; catalogue = live r100 + nutrizione, r101 must carry nutrizione when applied): scd_first_aid_kits, scd_aed_devices with RLS on and no policies; nutrition requests go to scd_proposals (r79) through scd_proposal_ingest as RISERVATO with title 'Richiesta consulenza nutrizionista · <squadra>' only, and scd_proposal_queue is recreated identical to r79 except area 'nutrizione' excluded (never in the office queue); section 'nutrizione' appended to scd_section_catalog; position 'nutrizionista' appended to scd_access_admin_guard; helpers scd_health_staff / scd_health_short_name not executable by API roles",
+        "consumers": [
+          "SCD_SUPABASE.scd_first_aid_kits",
+          "SCD_SUPABASE.scd_aed_devices",
+          "SCD_SUPABASE.scd_proposals (area nutrizione, RISERVATO, excluded from scd_proposal_queue)",
+          "SCD_SUPABASE.scd_athletes.medical_certificate_* (read-only)",
+          "apps/superapp/src/lib/health-areas.ts",
+          "apps/superapp/src/lib/infermeria.functions.ts",
+          "apps/superapp/src/lib/nutrizionista.functions.ts",
+          "apps/superapp/src/components/scd/InfermeriaBoard.tsx",
+          "apps/superapp/src/routes/infermeria.tsx",
+          "apps/superapp/src/routes/nutrizionista.tsx"
+        ],
+        "routes": [
+          "/infermeria",
+          "/nutrizionista"
+        ],
+        "rules": [
+          "PAGE_OPENS_FOR_POSITION_RESPONSABILE_INFERMERIA_OR_DIREZIONE_ONLY_R100_GRANTS_HONOURED_BY_DB_BUT_DO_NOT_OPEN_THE_PAGE_GAP_ACCESS_R100",
+          "R100_GRANTS_COUNT_ONLY_THROUGH_VERIFIED_IDENTITY_LINKS",
+          "INJURIES_REGISTER_DEFERRED_UNTIL_CONSENT_DESIGN_UD_043_NO_MINORS_HEALTH_DATA",
+          "NO_FREE_TEXT_NO_DIAGNOSIS_SYMPTOM_OR_THERAPY",
+          "NAMES_FIRST_NAME_PLUS_SURNAME_INITIAL",
+          "CERTIFICATE_BOARD_ONE_ROW_PER_ATHLETE",
+          "OWN_SITE_GRANT_SEES_KITS_AND_AED_OF_ITS_SITE_NEVER_CERTIFICATES",
+          "NUTRITION_REQUESTS_RISERVATO_NEVER_IN_THE_OFFICE_QUEUE_THE_NUTRITIONIST_CALLS_THE_PARENT_BACK",
+          "UNKNOWN_NEVER_ZERO_DENIED_ERROR_AND_NOT_APPLIED_ARE_DISTINCT_STATES",
+          "HEALTH_DATA_NEVER_IN_LOGS_PUBLIC_PAGES_OR_WORK_QUEUE_TITLES",
+          "DATABASE_ERRORS_NEVER_SHOWN_FIXED_ITALIAN_SENTENCES",
+          "FAMILIES_SEE_ONLY_GENERAL_GUIDANCE_FOR_THEIR_OWN_CIRCLE_SCD_MY_FAMILY",
+          "CONSULTATION_REQUEST_ONLY_FOR_OWN_CIRCLE_ONE_OPEN_PER_PERSON_THREE_PER_DAY",
+          "NO_PERSONAL_PLANS_NO_DIETS_GUIDANCE_PASSES_ERA_GUARD_PLUS_THERAPY_WORDS",
+          "UNTIL_R136_APPLIED_SECTIONS_SAY_FUNZIONE_IN_PREPARAZIONE"
+        ],
+        "engines": {
+          "TEMPO": "staff sanitario and Segreteria stop chasing certificates, kit and AED checks on paper; measured by expired/missing certificates and overdue kits/AED visible on the KPI strip and time-to-take of nutrition requests (scd_proposal_events CREATED to TAKE)",
+          "PERSONE": "families get age-group guidance and a consultation path without exposing health data; measured by nutrition requests received and closed per month"
+        },
+        "imported_at": "2026-10-16"
       }
     ],
     "conflict_resolution": [

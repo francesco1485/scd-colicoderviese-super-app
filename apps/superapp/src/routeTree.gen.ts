@@ -32,6 +32,7 @@ import { Route as InstallaRouteImport } from './routes/installa'
 import { Route as KitRouteImport } from './routes/kit'
 import { Route as LaMiaScdRouteImport } from './routes/la-mia-scd'
 import { Route as MagazzinoRouteImport } from './routes/magazzino'
+import { Route as NutrizionistaRouteImport } from './routes/nutrizionista'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PulminiRouteImport } from './routes/pulmini'
@@ -233,6 +234,11 @@ const LaMiaScdRoute = LaMiaScdRouteImport.update({
 const MagazzinoRoute = MagazzinoRouteImport.update({
   id: '/magazzino',
   path: '/magazzino',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NutrizionistaRoute = NutrizionistaRouteImport.update({
+  id: '/nutrizionista',
+  path: '/nutrizionista',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerRoute = PartnerRouteImport.update({
@@ -706,6 +712,7 @@ export interface FileRoutesByFullPath {
   '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
+  '/nutrizionista': typeof NutrizionistaRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
@@ -818,6 +825,7 @@ export interface FileRoutesByTo {
   '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
+  '/nutrizionista': typeof NutrizionistaRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
@@ -930,6 +938,7 @@ export interface FileRoutesById {
   '/kit': typeof KitRoute
   '/la-mia-scd': typeof LaMiaScdRoute
   '/magazzino': typeof MagazzinoRoute
+  '/nutrizionista': typeof NutrizionistaRoute
   '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/pulmini': typeof PulminiRoute
@@ -1044,6 +1053,7 @@ export interface FileRouteTypes {
     | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
+    | '/nutrizionista'
     | '/partner'
     | '/privacy'
     | '/pulmini'
@@ -1156,6 +1166,7 @@ export interface FileRouteTypes {
     | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
+    | '/nutrizionista'
     | '/partner'
     | '/privacy'
     | '/pulmini'
@@ -1267,6 +1278,7 @@ export interface FileRouteTypes {
     | '/kit'
     | '/la-mia-scd'
     | '/magazzino'
+    | '/nutrizionista'
     | '/partner'
     | '/privacy'
     | '/pulmini'
@@ -1380,6 +1392,7 @@ export interface RootRouteChildren {
   KitRoute: typeof KitRoute
   LaMiaScdRoute: typeof LaMiaScdRoute
   MagazzinoRoute: typeof MagazzinoRoute
+  NutrizionistaRoute: typeof NutrizionistaRoute
   PartnerRoute: typeof PartnerRoute
   PrivacyRoute: typeof PrivacyRoute
   PulminiRoute: typeof PulminiRoute
@@ -1624,6 +1637,13 @@ declare module '@tanstack/react-router' {
       path: '/magazzino'
       fullPath: '/magazzino'
       preLoaderRoute: typeof MagazzinoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nutrizionista': {
+      id: '/nutrizionista'
+      path: '/nutrizionista'
+      fullPath: '/nutrizionista'
+      preLoaderRoute: typeof NutrizionistaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner': {
@@ -2283,6 +2303,7 @@ const rootRouteChildren: RootRouteChildren = {
   KitRoute: KitRoute,
   LaMiaScdRoute: LaMiaScdRoute,
   MagazzinoRoute: MagazzinoRoute,
+  NutrizionistaRoute: NutrizionistaRoute,
   PartnerRoute: PartnerRoute,
   PrivacyRoute: PrivacyRoute,
   PulminiRoute: PulminiRoute,

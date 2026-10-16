@@ -68,7 +68,7 @@ describe("public chrome: signed-in family", () => {
     expect(ids(roles)).toEqual([
       "calendario",
       "tornei",
-      "infermeria",
+      "nutrizionista",
       "famiglia",
       "sponsor",
     ]);
@@ -81,7 +81,6 @@ describe("public chrome: signed-in family", () => {
     expect(ids(sessionPositions(base))).toEqual([
       "calendario",
       "tornei",
-      "infermeria",
       "sponsor",
     ]);
   });
@@ -136,7 +135,6 @@ describe("public chrome: staff and Direzione", () => {
     expect(ids(sessionPositions(s))).toEqual([
       "calendario",
       "tornei",
-      "infermeria",
       "sponsor",
       "partner",
     ]);
