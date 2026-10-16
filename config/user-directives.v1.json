@@ -3816,8 +3816,8 @@
           "«applica r139» for the migration (r139 applied on SCD PULSE 16/10/2026 17:53)",
           "Make scenario Tally -> scd_request_ingest (service role) to be created after the form",
           "placement of the public links on /tornei, /sponsor, /partner, /fornitori, /impianti, /contatti (pages of the CLOUD chat)",
-        "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
-        "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour (contact retention periods DECIDED ~19:20 «12 mesi», job r140 applied 20:03)"
+          "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
+          "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour (contact retention periods DECIDED ~19:20 «12 mesi», job r140 applied 20:03)"
         ]
       }
     },
@@ -3951,6 +3951,63 @@
         "implementationStatus": "IMPLEMENTED_PENDING_PUBLISH",
         "implementation": "apps/superapp/src/lib/home-promos.ts, apps/superapp/src/components/home/HomeBordoCampo.tsx"
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "22:40",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-165",
+      "name": "CHARACTERS_IN_APP_SURPRISE_MOMENTS",
+      "sourceQuoteFragments": [
+        "ma io lo devo fare succedere nella web app e nella piattaforma per ingolosire gli sponsor e ogni tanto far divertire chi ce sopra a lavorare o a giocare",
+        "devono comparire tutti Iride è dentro il gestionale a supporto , Sky esce ogni tanto quando si fanno eventi o su goal o festa o altro capendo se ce un bambino o un adulto",
+        "crovi deve far sorridere e creare atmosfere gioiose anche parlando in modo goffo e con molta dialettica del nod e del posto lui è milanese di nascita e molto stile meneghino"
+      ],
+      "normalizedCommand": {
+        "rule": "All characters appear in the web app and the gestionale as occasional surprise moments (breakout/talking), to attract sponsors and to make staff and players smile.",
+        "cast": {
+          "Iride": "inside the gestionale as support assistant (UD-155 rules: says she is an AI).",
+          "Sky": "comes out occasionally on events, goals, parties and celebrations; tone adapts to child or adult audience; adult playful voice.",
+          "Crovi": "brings joy and smiles; clumsy, funny speech with northern and local expressions; born in Milan, Milanese (meneghino) style; never vulgar or offensive."
+        },
+        "audienceDetection": "PROPOSED: from the signed-in profile type (minor athlete / parent / adult staff); unknown visitor = family-friendly tone. Never camera, face or voice analysis.",
+        "guards": [
+          "rare and skippable with one tap",
+          "sound only after a user tap",
+          "respect prefers-reduced-motion",
+          "sponsor moments only with active contracts",
+          "no data collected from minors"
+        ]
+      },
+      "supersedes": "UD-151 'Sky never in the app' — now Sky is allowed in the app for surprise moments only; pages stay without Sky otherwise.",
+      "status": "RECORDED"
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "22:47",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-166",
+      "name": "LEDWALL_SKY_SPONSOR_INTRO_AND_GOAL_CELEBRATION",
+      "sourceQuoteFragments": [
+        "sky a rotazione dal ledwole esce e presenta lo sponsor e poi parte lo spondor sul ledwlae , poi puo fare srtiel goale e esulta per far vedere la divisa con un possible sponsor sopra"
+      ],
+      "normalizedCommand": {
+        "rule": "LED wall playlist (10 m x 1 m): in rotation Sky breaks out of the LED, introduces the sponsor, then the sponsor spot plays; Sky can also kick at goal and celebrate, showing the kit with a sponsor on it.",
+        "sequence": [
+          "Sky breakout intro (2-3 s)",
+          "Sky presents sponsor name/logo",
+          "sponsor spot (official sponsor asset)",
+          "optional: Sky shot on goal + celebration showing the kit with a sponsor slot"
+        ],
+        "guards": [
+          "only sponsors with an active contract; unsold kit slot shown as 'spazio disponibile' in sales demos only, never as a fake sponsor",
+          "official logos and kit only",
+          "no audio on LED unless the venue system and Francesco approve"
+        ]
+      },
+      "status": "RECORDED"
     }
   ],
   "completionGate": {
