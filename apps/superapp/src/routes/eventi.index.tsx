@@ -19,6 +19,7 @@ import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { KIND_LABEL, longDay, type PublicLottery } from "@/lib/lottery";
 import { getPublicLottery } from "@/lib/lottery.functions";
 import { romeDay } from "@/lib/public-window";
+import { hasContent } from "@/lib/has-content";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 import { TOURNAMENT_STATUS_LABEL, type TournamentEdition } from "@/lib/tournaments";
 
@@ -81,24 +82,20 @@ function Eventi() {
             )}
           </section>
 
-          {/* Always rendered: the home "Iniziative" tile lands on #iniziative (15/10/2026), never on nothing. */}
+          {/* Rendered only with something to show ("pagine piene", Francesco 16/10/2026 23:08): no empty block. */}
+          {(hasContent(initiatives) || lottery) && (
           <section id="iniziative" aria-labelledby="eventi-iniziative-t" className="scroll-mt-20" data-testid="eventi-iniziative">
             <MetalHeading id="eventi-iniziative-t" sub="Proposte del club e dei suoi amici, per un periodo limitato">
               Iniziative
             </MetalHeading>
-            {initiatives.length > 0 || lottery ? (
-              <ul className={`${METAL_CARD} m-0 list-none px-4 pb-1 pt-2 lg:px-5`}>
-                {lottery && <LotteryRow lottery={lottery} />}
-                {initiatives.map((i) => (
-                  <InitiativeRow key={i.id} item={i} />
-                ))}
-              </ul>
-            ) : (
-              <p className={`${METAL_CARD} m-0 px-4 py-4 text-[15px] font-semibold text-[#14264d] lg:px-5`} data-testid="eventi-iniziative-empty">
-                Nessuna iniziativa in corso.
-              </p>
-            )}
+            <ul className={`${METAL_CARD} m-0 list-none px-4 pb-1 pt-2 lg:px-5`}>
+              {lottery && <LotteryRow lottery={lottery} />}
+              {initiatives.map((i) => (
+                <InitiativeRow key={i.id} item={i} />
+              ))}
+            </ul>
           </section>
+          )}
 
           <section id="club" aria-labelledby="eventi-club-t" className="scroll-mt-20" data-testid="eventi-club">
             <MetalHeading id="eventi-club-t" sub="Open day, serate e feste della società">

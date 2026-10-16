@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ImagePlus, Info, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { JoinClubScreen } from "@/components/scd/JoinClub";
 import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_EVENTS } from "@/lib/club-events";
@@ -61,12 +62,15 @@ const inputCls =
 
 function CreaRoute() {
   const { session, social, groups } = Route.useLoaderData();
+  // Visitors: what an account opens and the two real actions, never an almost empty lock (Francesco 16/10/2026 23:08).
   if (!session.user)
     return (
-      <Gate
-        title="Entra per pubblicare"
-        text="I post li scrivono la Direzione e lo staff abilitato. Entra con il tuo account: se hai un ruolo, qui trovi il modulo."
-        cta={{ to: "/entra", label: "Accedi" }}
+      <JoinClubScreen
+        screen="crea"
+        kicker="Crea con il club"
+        title="Entra e partecipa"
+        intro="Post, foto e notizie della tua squadra li pubblicano la Direzione e lo staff abilitato. Con un account segui tutto il club e, se hai un ruolo, qui trovi il modulo per scrivere."
+        next="/crea"
       />
     );
   if (!social.canPost)

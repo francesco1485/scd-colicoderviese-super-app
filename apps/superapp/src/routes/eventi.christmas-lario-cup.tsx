@@ -267,6 +267,11 @@ function ChristmasLarioCup() {
           </div>
         </Sec>
 
+        {phase === "pre" ? (
+          <p id="live" className="m-0 mt-10 scroll-mt-20 text-[15px] font-semibold text-[#cfdcf5]" data-testid="clc-live-line">
+            {T.liveTitle} · {T.liveHead.pre}
+          </p>
+        ) : (
         <Sec id="live" kicker={T.liveKicker} title={T.liveTitle}>
           <div className="overflow-hidden rounded-[24px] bg-white text-[var(--scd-ink)]">
             <div className="flex items-center justify-between gap-[10px] bg-[var(--uv-night)] px-[18px] py-4 text-white">
@@ -286,6 +291,7 @@ function ChristmasLarioCup() {
             </p>
           </div>
         </Sec>
+        )}
 
         <Sec
           id="villaggio"

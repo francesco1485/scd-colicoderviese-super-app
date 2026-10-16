@@ -70,7 +70,7 @@ describe("eventi, tornei e comunità in SCD METAL (source)", () => {
   });
 
   it("/eventi keeps every existing entry and link", () => {
-    for (const id of ["eventi-clc", "eventi-iniziative", "eventi-iniziative-empty", "eventi-lotteria", "eventi-initiative-"])
+    for (const id of ["eventi-clc", "eventi-iniziative", "eventi-lotteria", "eventi-initiative-"])
       expect(eventi).toContain(id);
     expect(eventi).toContain('id="iniziative"');
     expect(eventi).toContain("{lottery && <LotteryRow"); // lotteria only when published (UD-115/UD-132)
