@@ -31,8 +31,8 @@ const acc = (o: Partial<Account>): Account => ({
 });
 
 describe("access admin", () => {
-  it("keeps assignable positions equal to the database list (r65, extended in r76, r87 and r136)", () => {
-    const sql = readFileSync(fileURLToPath(new URL("../../../../supabase/migrations/20261016_r136_infermeria_nutrizione.sql", import.meta.url)), "utf8");
+  it("keeps assignable positions equal to the database list (r65, extended in r76, r87, r136 and r138)", () => {
+    const sql = readFileSync(fileURLToPath(new URL("../../../../supabase/migrations/20261016_r138_position_catalog.sql", import.meta.url)), "utf8");
     const m = /assignable text\[\] := array\[([^\]]+)\]/.exec(sql);
     expect(m).not.toBeNull();
     const fromSql = (m?.[1] ?? "").match(/'([a-z-]+)'/g)?.map((s) => s.slice(1, -1)) ?? [];
@@ -47,6 +47,16 @@ describe("access admin", () => {
     };
     expect(body("20261016_r136_infermeria_nutrizione.sql")).not.toBe("");
     expect(body("20261016_r136_infermeria_nutrizione.sql")).toBe(body("20261012_r87_auto_moderation.sql"));
+  });
+
+  it("r138 recreates the r136 guard unchanged except for the two direttori sportivi", () => {
+    const guard = (file: string) => {
+      const sql = readFileSync(fileURLToPath(new URL(`../../../../supabase/migrations/${file}`, import.meta.url)), "utf8");
+      return /create or replace function public\.scd_access_admin_guard\([\s\S]*?\n\$\$;/.exec(sql)?.[0] ?? "";
+    };
+    const r138 = guard("20261016_r138_position_catalog.sql");
+    expect(r138).not.toBe("");
+    expect(r138.replace(",\n    'direttore-sportivo-agonistica','direttore-sportivo-generale'", "")).toBe(guard("20261016_r136_infermeria_nutrizione.sql"));
   });
 
   it("labels and groups every assignable position exactly once", () => {

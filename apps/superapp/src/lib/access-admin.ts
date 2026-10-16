@@ -61,6 +61,8 @@ export const POSITION_LABEL: Readonly<Record<string, string>> = {
   dirigenza: "Dirigenza (acquisti)",
   "responsabile-attivita-base": "Responsabile attività di base",
   "coordinatore-attivita-sportiva": "Coordinatore attività sportiva",
+  "direttore-sportivo-agonistica": "Direttore sportivo agonistica",
+  "direttore-sportivo-generale": "Direttore sportivo generale",
   "dirigente-annata": "Dirigente di annata",
   mister: "Mister",
   "responsabile-trasporti": "Responsabile trasporti (pulmini)",
@@ -98,6 +100,8 @@ export const POSITION_GROUPS: ReadonlyArray<{
       "dirigente-annata",
       "coordinatore-attivita-sportiva",
       "responsabile-attivita-base",
+      "direttore-sportivo-agonistica",
+      "direttore-sportivo-generale",
     ],
   },
   {

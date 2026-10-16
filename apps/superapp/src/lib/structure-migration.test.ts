@@ -21,6 +21,11 @@ const body = sql
   .split("\n")
   .filter((line) => !line.trimStart().startsWith("--"))
   .join("\n");
+// r138 (STAGED) recreates scd_structure_reader_site with the two direttori sportivi: the mirror follows the latest file.
+const r138 = read("../../../../supabase/migrations/20261016_r138_position_catalog.sql")
+  .split("\n")
+  .filter((line) => !line.trimStart().startsWith("--"))
+  .join("\n");
 const quoted = (s: string) => [...s.matchAll(/'([A-Za-z_-]+)'/g)].map((m) => m[1]);
 const checkList = (col: string) => quoted(body.match(new RegExp(`${col} text not null[^,]*?check \\(${col} in \\(([^)]*)\\)`))?.[1] ?? "");
 
@@ -91,8 +96,17 @@ describe("r135 structure activities (applied)", () => {
     expect(checkList("status")).toEqual([...STRUCTURE_STATUSES]);
   });
 
-  it("reads per site with the same roles and positions as lib/structure-activities.ts (UD-156)", () => {
-    const fn = body.match(/function public\.scd_structure_reader_site[\s\S]*?\$\$;/)?.[0] ?? "";
+  it("r138 recreates the r135 reader identical except the two direttori sportivi appended to each site", () => {
+    const pick = (src: string) => src.match(/create or replace function public\.scd_structure_reader_site[\s\S]*?\$\$;/)?.[0] ?? "";
+    const before = pick(body);
+    const after = pick(r138);
+    expect(after).not.toBe("");
+    expect(after.replaceAll(",'direttore-sportivo-agonistica','direttore-sportivo-generale'", "")).toBe(before);
+    expect(after.split("'direttore-sportivo-agonistica','direttore-sportivo-generale'").length - 1).toBe(2);
+  });
+
+  it("reads per site with the same roles and positions as lib/structure-activities.ts (UD-156, r138)", () => {
+    const fn = r138.match(/function public\.scd_structure_reader_site[\s\S]*?\$\$;/)?.[0] ?? "";
     const branch = (site: string) => fn.match(new RegExp(`when '${site}' then([\\s\\S]*?)(?=when '|else false)`))?.[1] ?? "";
     for (const site of STRUCTURE_SITES) {
       const b = branch(site);

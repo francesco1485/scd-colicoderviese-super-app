@@ -28,7 +28,9 @@ export const SHIFT_KINDS: readonly StructureKind[] = ["TURNO_VOLONTARIO", "APERT
  * Who may read r135, per site (mirror of scd_structure_reader_site in the SQL, kept equal by a test).
  * The roles read every site. COLICO: the positions of the registry area "struttura". DERVIO: only the positions
  * Francesco named (UD-156, 16/10/2026 06:57 "Dervio decido io e responsabile attività di base e coordinatore attività
- * sportiva e presidente e segreteria sempre informata"); the Segreteria reads through its role.
+ * sportiva e presidente e segreteria sempre informata"), plus the two direttori sportivi (Francesco 16/10/2026 13:32,
+ * migration r138 STAGED: until it is applied the database still answers with the r135 list, which wins); the
+ * Segreteria reads through its role.
  */
 export const STRUCTURE_READER_ROLES = ["DIRECTION", "SECRETARIAT"] as const;
 export const STRUCTURE_READER_POSITIONS_BY_SITE = {
@@ -42,8 +44,18 @@ export const STRUCTURE_READER_POSITIONS_BY_SITE = {
     "responsabile-struttura-dervio",
     "responsabile-campi",
     "responsabile-club-house",
+    "direttore-sportivo-agonistica",
+    "direttore-sportivo-generale",
   ],
-  DERVIO: ["presidente", "direttore-generale", "coordinatore-attivita-sportiva", "responsabile-attivita-base"],
+  // r138 (STAGED, Francesco 16/10/2026 13:32): the two direttori sportivi read Dervio and therefore Colico too.
+  DERVIO: [
+    "presidente",
+    "direttore-generale",
+    "coordinatore-attivita-sportiva",
+    "responsabile-attivita-base",
+    "direttore-sportivo-agonistica",
+    "direttore-sportivo-generale",
+  ],
 } as const satisfies Record<StructureSite, readonly string[]>;
 /** Positions that read at least one site (the "any site" gate scd_structure_reader and the registry area). */
 export const STRUCTURE_READER_POSITIONS: readonly string[] = [

@@ -3,7 +3,9 @@ import { CalendarClock, CircleAlert, CircleCheck, CircleHelp, ExternalLink, Shie
 import { useMemo } from "react";
 
 import { Card, Chip, SourceLine, useRomeNow, type ChipTone } from "@/components/scd/interior-ui";
+import { PositionCatalogCard } from "@/components/scd/PositionCatalogCard";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
+import { getPositionCatalog, type PositionCatalogView } from "@/lib/position-catalog.functions";
 import { getSgsStatus, type OrganigrammaData } from "@/lib/sgs-quality.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import {
@@ -28,17 +30,21 @@ import { italianDate } from "@/lib/work-areas";
 /**
  * Organigramma e 3° livello SGS (UD-024): what the FIGC SGS quality system asks for the chosen
  * level, role by role and team by team, with deadlines. Rules are public (C.U. n.18 SGS, Manuale
- * 2026); the club status is private and comes from the server without names. Read-only.
+ * 2026); the club status is private and comes from the server without names. Read-only, except the
+ * "Catalogo ruoli" (r138): every position ready to be filled and "Crea ruolo nuovo" for Presidente / DG.
  */
+type OrganigrammaPageData = OrganigrammaData & { catalog: PositionCatalogView | null };
+
 export const Route = createFileRoute("/gestionale/organigramma")({
   validateSearch: (s: Record<string, unknown>): { livello?: Level } => {
     const n = Number(s["livello"]);
     return Number.isInteger(n) && n >= 1 && n <= 5 ? { livello: n as Level } : {};
   },
-  loader: async (): Promise<OrganigrammaData> => {
+  loader: async (): Promise<OrganigrammaPageData> => {
     const gate = await getWorkAreaGate({ data: { area: "organigramma" } });
-    if (gate.view !== "page") return { gate, status: emptyStatus(), level: SGS_RULES.targetLevel as Level, statusConfigured: false };
-    return { gate, ...(await getSgsStatus()) };
+    if (gate.view !== "page") return { gate, status: emptyStatus(), level: SGS_RULES.targetLevel as Level, statusConfigured: false, catalog: null };
+    const [sgs, catalog] = await Promise.all([getSgsStatus(), getPositionCatalog()]);
+    return { gate, ...sgs, catalog };
   },
   head: ({ loaderData }) => workAreaHead("organigramma", loaderData?.gate),
   component: OrganigrammaRoute,
@@ -63,7 +69,7 @@ const AREA_LABEL: Readonly<Record<string, string>> = {
   infrastrutture: "Infrastrutture",
 };
 
-function OrganigrammaPage({ data }: { data: OrganigrammaData }) {
+function OrganigrammaPage({ data }: { data: OrganigrammaPageData }) {
   const { livello } = Route.useSearch();
   const navigate = useNavigate({ from: "/gestionale/organigramma" });
   const now = useRomeNow();
@@ -128,6 +134,7 @@ function OrganigrammaPage({ data }: { data: OrganigrammaData }) {
               <DeadlinesCard list={deadlines} id="org-scadenze-mobile" />
             </div>
             <RolesCard rows={roles} level={level} />
+            {data.catalog && <PositionCatalogCard view={data.catalog} />}
             <TeamsCard rows={coaching.teams} categories={coaching.categories} risk={coaching.unclassifiedRisk} level={level} configured={data.statusConfigured} />
             <CriteriaCard rows={criteria} level={level} />
           </div>

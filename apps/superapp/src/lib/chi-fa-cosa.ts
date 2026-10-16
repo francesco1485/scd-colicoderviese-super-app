@@ -8,7 +8,7 @@
  * people are resolved elsewhere from the gestionale registry (positions and person grants), never from addresses
  * found in a mail (UD-141 limits). Only adult positions with a club role can be returned: never families, athletes
  * (minors), partners or external people. Positions Francesco named that the registry does not have yet
- * (e.g. fisioterapista, direttori sportivi) are reported as missing and never used as recipients (fail closed).
+ * (e.g. fisioterapista) are reported as missing and never used as recipients (fail closed).
  *
  * Users: Iride staff alerts (UD-155), the Google Calendar agent (UD-141) and the request machine (UD-154).
  * Who holds a responsibility is decided in the gestionale by the Direttore Generale and the Presidente (UD-159),
@@ -90,6 +90,8 @@ export const POSITION_RANK: Readonly<Record<string, number>> = {
   "direttore-generale": 1,
   "coordinatore-attivita-sportiva": 2,
   "responsabile-attivita-base": 2,
+  "direttore-sportivo-agonistica": 2,
+  "direttore-sportivo-generale": 2,
   dirigenza: 3,
   segreteria: 3,
   tesoreria: 3,
@@ -139,13 +141,16 @@ export { REQUEST_WATCHERS };
 /**
  * UD-156 (Francesco 16/10/2026 06:57 "Dervio decido io e responsabile attività di base e coordinatore attività
  * sportiva e presidente e segreteria sempre informata"): always told of anything that touches Dervio.
- * Same positions as the Dervio readers of r135 (feat/pc-attivita-struttura) plus the Segreteria.
+ * Same positions as the Dervio readers of r135, extended by r138 with the two direttori sportivi, plus the Segreteria.
  */
 export const DERVIO_ALWAYS: readonly string[] = [
   "presidente",
   "direttore-generale",
   "coordinatore-attivita-sportiva",
   "responsabile-attivita-base",
+  // Francesco (DG) 16/10/2026 13:32: the two direttori sportivi see Dervio too (r138 adds them to the r135 readers).
+  "direttore-sportivo-agonistica",
+  "direttore-sportivo-generale",
   "segreteria",
 ];
 

@@ -37,6 +37,9 @@ export const KNOWN_POSITIONS: readonly string[] = [
   "dirigenza",
   "responsabile-attivita-base",
   "coordinatore-attivita-sportiva",
+  // Francesco (DG) 16/10/2026 13:32: confirmers of UD-154 (U16/U15, Prima/U19) and Dervio readers (UD-156), r138.
+  "direttore-sportivo-agonistica",
+  "direttore-sportivo-generale",
   "dirigente-annata",
   "mister",
   "responsabile-trasporti",

@@ -244,14 +244,21 @@ describe("UD-141 hierarchy", () => {
     }
   });
 
-  it("group without its confirmer: Direzione, presidente and DG (VERIFIED 16/10: DG confirms as Direzione); below waits", () => {
-    const missingGroups = REQUEST_CONFIRMERS.filter((c) => !positionExists(c.position)).flatMap((c) => c.groups);
-    expect(missingGroups.length).toBeGreaterThan(0);
-    for (const k of missingGroups) {
-      for (const rp of [["direzione"], ["presidente"], ["direttore-generale"]])
-        expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: k, requesterPositions: rp }).status, `${k} ${rp}`).toBe("CONFERMATA");
-      for (const rp of [["coordinatore-attivita-sportiva"], ["responsabile-attivita-base"], ["mister"], ["segreteria"]])
-        expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: k, requesterPositions: rp }).status, `${k} ${rp}`).toBe("DA_CONFERMARE");
+  it("direttori sportivi confirm their groups (Francesco 16/10/2026 13:32, r138); Direzione above, staff below waits", () => {
+    // Every confirmer position exists now: the Direzione fallback is no longer needed for any group.
+    expect(REQUEST_CONFIRMERS.filter((c) => !positionExists(c.position))).toEqual([]);
+    const cases: Array<[string, string]> = [
+      ["u16", "direttore-sportivo-agonistica"],
+      ["u15", "direttore-sportivo-agonistica"],
+      ["prima", "direttore-sportivo-generale"],
+      ["u19", "direttore-sportivo-generale"],
+    ];
+    for (const [k, ds] of cases) {
+      const route = (rp: string[]) => routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: k, requesterPositions: rp });
+      expect(route([ds]).approvers, k).toEqual([ds]);
+      expect(route([ds]).missingPositions, k).toEqual([]);
+      for (const rp of [["direzione"], ["presidente"], ["direttore-generale"], [ds]]) expect(route(rp).status, `${k} ${rp}`).toBe("CONFERMATA");
+      for (const rp of [["mister"], ["dirigente-annata"], ["segreteria"]]) expect(route(rp).status, `${k} ${rp}`).toBe("DA_CONFERMARE");
     }
   });
 

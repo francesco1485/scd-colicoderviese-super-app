@@ -75,11 +75,15 @@ describe("who confirms (Francesco 15/10 15:17)", () => {
   });
 
   it("never uses positions missing from the registry (only the Direzione confirms for those groups)", () => {
-    expect(missingConfirmerPositions().map((r) => r.position).sort()).toEqual(["direttore-sportivo-agonistica", "direttore-sportivo-generale"]);
+    // Francesco 16/10/2026 13:32: both direttori sportivi exist (r138 makes them assignable and confirmers).
+    expect(missingConfirmerPositions()).toEqual([]);
     expect(dbConfirmerPositions("pulcini")).toEqual(["responsabile-attivita-base"]);
-    expect(dbConfirmerPositions("u15")).toEqual([]);
+    expect(dbConfirmerPositions("u15")).toEqual(["direttore-sportivo-agonistica"]);
+    expect(dbConfirmerPositions("prima")).toEqual(["direttore-sportivo-generale"]);
     expect(dbConfirmerPositions("x")).toBeNull();
-    expect(confirmerLine("u15")).toMatch(/Direzione/);
+    expect(confirmerLine("u15")).toBe("Conferma: Direttore Sportivo Agonistica (o la Direzione)");
+    expect(mayConfirm(new Set(["direttore-sportivo-agonistica"]), "u15")).toBe(true);
+    expect(mayConfirm(new Set(["direttore-sportivo-agonistica"]), "prima")).toBe(false);
     expect(confirmerLine("2014")).toMatch(/Responsabile Attività di Base/);
   });
 
