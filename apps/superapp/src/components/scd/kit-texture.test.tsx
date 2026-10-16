@@ -58,7 +58,8 @@ describe("kit 2026/27 texture on shared hero bands (Direzione 13/10/2026)", () =
     // Calendario live (board VR-009 screen 2): own hero with the lake photo plus the mountains-lake line art.
     expect(src("../../routes/calendario.tsx")).toContain('<KitTexture motif="mountains-lake" overlay />');
     expect(src("../../routes/societa.tsx")).toMatch(/<HallHero\s+motif="forte"/);
-    expect(src("../../routes/eventi.index.tsx")).toMatch(/<PageHero motif="mountains-lake"/);
+    // Eventi (16/10 SCD METAL): compact navy band, no hero art.
+    expect(src("../../routes/eventi.index.tsx")).toMatch(/<MetalPageHeader /);
     // Home (16/10 05:59): no hero art; the official kit render lives in the "Dal club" kit tile.
     expect(src("../home/HomeLobby.tsx")).not.toMatch(/HeroArt/);
     expect(src("../home/HomeLobby.tsx")).toContain("/media/kit/kit-2026-27-blu.webp");
