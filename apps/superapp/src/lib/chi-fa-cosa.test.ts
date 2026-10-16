@@ -6,7 +6,7 @@ import {
   CHI_FA_COSA_TOPICS,
   CONFIRMER_FALLBACK,
   DERVIO_ALWAYS,
-  DERVIO_EMERGENCY_STRUCTURE_PROPOSED,
+  DERVIO_EMERGENCY_STRUCTURE,
   DERVIO_EXCLUDED,
   NAMED_MISSING_POSITIONS,
   NEVER_RECIPIENTS,
@@ -38,7 +38,7 @@ describe("registry alignment", () => {
       ...REQUEST_WATCHERS,
       ...DERVIO_ALWAYS,
       ...DERVIO_EXCLUDED,
-      ...DERVIO_EMERGENCY_STRUCTURE_PROPOSED,
+      ...DERVIO_EMERGENCY_STRUCTURE,
       CONFIRMER_FALLBACK,
     ]);
     for (const rule of Object.values(CHI_FA_COSA_TABLE)) for (const e of rule.entries) used.add(e.position);
@@ -127,17 +127,18 @@ describe("UD-156 Dervio", () => {
     expect(positions(r)).not.toContain("presidente");
   });
 
-  it("Dervio facilities: DG decides, only the UD-156 set and the watchers, no structure position", () => {
+  it("Dervio facilities: Presidente and Consiglio Direttivo decide, UD-156 set informed, no structure position", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "DERVIO" });
-    expect(r.approvers).toEqual(["direttore-generale"]);
-    expect(positions(r).sort()).toEqual([...DERVIO_ALWAYS].sort());
+    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(positions(r).sort()).toEqual([...new Set([...DERVIO_ALWAYS, "direzione"])].sort());
     for (const p of DERVIO_EXCLUDED) expect(positions(r)).not.toContain(p);
     expect(find(r, "segreteria")!.reasons.join(" ")).toMatch(/UD-156/);
   });
 
-  it("Colico facilities: Colico structure decides, no Dervio structure", () => {
+  it("Colico facilities: Presidente and Consiglio Direttivo decide, Colico structure informed, no Dervio structure", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "COLICO" });
-    expect(r.approvers).toEqual(["responsabile-struttura-colico"]);
+    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(find(r, "responsabile-struttura-colico")!.duty).toBe("INFORM");
     expect(positions(r)).not.toContain("responsabile-struttura-dervio");
     expect(positions(r)).not.toContain("responsabile-attivita-base");
   });
@@ -146,7 +147,7 @@ describe("UD-156 Dervio", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "ENTRAMBE" });
     expect(positions(r)).toEqual(expect.arrayContaining([...DERVIO_ALWAYS]));
     for (const p of DERVIO_EXCLUDED) expect(positions(r)).not.toContain(p);
-    expect(r.approvers).toEqual(["direttore-generale"]);
+    expect(r.approvers).toEqual(["direzione", "presidente"]);
     expect(r.warnings.join(" ")).toMatch(/avvisati a parte/);
   });
 
@@ -243,7 +244,7 @@ describe("UD-141 hierarchy", () => {
     }
   });
 
-  it("group without its confirmer: Direzione, presidente and DG (INFERRED: DG is Direzione) confirm; below waits", () => {
+  it("group without its confirmer: Direzione, presidente and DG (VERIFIED 16/10: DG confirms as Direzione); below waits", () => {
     const missingGroups = REQUEST_CONFIRMERS.filter((c) => !positionExists(c.position)).flatMap((c) => c.groups);
     expect(missingGroups.length).toBeGreaterThan(0);
     for (const k of missingGroups) {
@@ -271,18 +272,19 @@ describe("UD-141 hierarchy", () => {
 });
 
 describe("sensitive topics", () => {
-  it("health: infermeria decides, no team staff even with a team, fisioterapista reported missing, no health details", () => {
+  it("health: Presidente and Consiglio Direttivo decide, infermeria informed, no team staff, fisioterapista missing", () => {
     const r = routeChiFaCosa({ topic: "salute", site: "COLICO", teamKey: "u15" });
-    expect(r.approvers).toEqual(["responsabile-infermeria"]);
+    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(find(r, "responsabile-infermeria")!.duty).toBe("INFORM");
     expect(positions(r)).not.toContain("mister");
     expect(positions(r)).not.toContain("dirigente-annata");
     expect(r.missingPositions.map((m) => m.position)).toContain("fisioterapista");
     expect(r.contentLimits.join(" ")).toMatch(/salute/);
   });
 
-  it("minors (organisational): presidente decides, no team staff, safeguarding reports stay in their own channel", () => {
+  it("minors (organisational): Presidente and Consiglio Direttivo decide, no team staff, safeguarding stays separate", () => {
     const r = routeChiFaCosa({ topic: "minori-organizzativo", site: "COLICO", teamKey: "pulcini" });
-    expect(r.approvers).toEqual(["presidente"]);
+    expect(r.approvers).toEqual(["direzione", "presidente"]);
     expect(positions(r)).not.toContain("mister");
     expect(r.missingPositions.map((m) => m.position)).toContain("responsabile-safeguarding");
     expect(r.contentLimits.join(" ")).toMatch(/canale Safeguarding/);
@@ -313,11 +315,11 @@ describe("emergency", () => {
     expect(r.contentLimits.join(" ")).toMatch(/112/);
   });
 
-  it("PROPOSED (needs Francesco's OK): emergenza at Dervio also tells the Dervio structure positions", () => {
+  it("emergenza at Dervio also tells the Dervio structure positions (Francesco 16/10/2026 11:58)", () => {
     const r = routeChiFaCosa({ topic: "emergenza", site: "DERVIO", teamKey: "u19" });
-    for (const p of DERVIO_EMERGENCY_STRUCTURE_PROPOSED) {
+    for (const p of DERVIO_EMERGENCY_STRUCTURE) {
       expect(positions(r), p).toContain(p);
-      expect(find(r, p)!.reasons.join(" ")).toMatch(/PROPOSTA/);
+      expect(find(r, p)!.reasons.join(" ")).toMatch(/Francesco 16\/10\/2026/);
     }
     expect(positions(r)).not.toContain("responsabile-campi");
     expect(positions(r)).not.toContain("responsabile-struttura-colico");
@@ -342,7 +344,16 @@ describe("other topics", () => {
     expect(routeChiFaCosa({ topic: "pagamenti", site: "COLICO" }).approvers).toEqual(["tesoreria"]);
     expect(routeChiFaCosa({ topic: "comunicazioni", site: "COLICO" }).approvers).toEqual(["segreteria"]);
     expect(routeChiFaCosa({ topic: "tornei", site: "COLICO" }).approvers).toEqual(["responsabile-tornei"]);
-    expect(routeChiFaCosa({ topic: "sponsor", site: "COLICO" }).approvers).toEqual(["presidente"]);
+    expect(routeChiFaCosa({ topic: "sponsor", site: "COLICO" }).approvers).toEqual(["direzione", "presidente"]);
+  });
+
+  it("board topics: only Presidente or Direzione confirm, the DG waits (Presidente decides too)", () => {
+    for (const topic of ["sponsor", "minori-organizzativo", "salute", "impianti"] as const) {
+      for (const rp of [["presidente"], ["direzione"]])
+        expect(routeChiFaCosa({ topic, site: "COLICO", requesterPositions: rp }).status, `${topic} ${rp}`).toBe("CONFERMATA");
+      for (const rp of [["direttore-generale"], ["responsabile-infermeria"], ["responsabile-struttura-colico"]])
+        expect(routeChiFaCosa({ topic, site: "COLICO", requesterPositions: rp }).status, `${topic} ${rp}`).toBe("DA_CONFERMARE");
+    }
   });
 
   it("recipients are ordered: deciders first, then preparers, then informed", () => {
