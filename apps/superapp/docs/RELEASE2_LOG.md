@@ -828,3 +828,8 @@ Francesco 16/10/2026 08:53 (UD-159) «le attività le decido nel gestionale io e
 - G03 Rotazione gare Dervio (`lib/dervio-rotation.ts`, eb680f1): solo logica pura e test; 1 gara a settimana dai più piccoli dal 24/10, luci ok, nota U16, inverno solo segnalato, pioggia ≥ 50% o ≥ 1 mm (decisa 12:04), FIGC e avversaria solo se si torna a Colico. Pagina richiesta alla chat cloud.
 - Orchestra (a67b01b): agenti, PIPELINE, registro comandi e tavola gestionali (solo documenti e istruzioni agenti; permessi degli agenti solo ridotti).
 - Controlli: scd-revisore PASS e scd-sicurezza PASS sul rilascio 641030b.
+
+## 16/10/2026 14:40 · Chat PC: catalogo ruoli r138 (STAGED, UD-161)
+- Francesco 13:32 (direttori sportivi agonistica e generale, lettori di Dervio), 13:35 (tutti i ruoli FIGC/RASD pronti per inserire il tesserato e «crea ruolo nuovo»), risposte D1 «Chi lo crea» (approva chi crea, sempre in audit), D2 «Sopra il coordinatore», D3 «Sì, crea gli accessi» (responsabile tutela minori solo nel canale Safeguarding, fisioterapista avvisi di salute senza dati di salute).
+- Migrazione r138 scritta e provata in PGlite, NON applicata: 85 ruoli vuoti con la qualifica del Portale Società LND (verificata in sola lettura alle 14:30, nessun nome), 24 qualifiche da allenatore come dato del tecnico, ruoli nuovi solo Presidente/DG; i quattro ruoli nuovi li assegna solo la Direzione.
+- Finché r138 non è attiva l'app non offre, non avvisa e non usa i quattro ruoli nuovi (controllo sul server, una volta per richiesta): le richieste U16/U15/Prima/U19 le conferma la Direzione.

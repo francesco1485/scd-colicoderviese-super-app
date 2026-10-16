@@ -79,6 +79,8 @@ export interface CatalogPosition {
   source: PositionSource;
   sourceUrl: string | null;
   sourceRef: string | null;
+  /** Qualifica used by the Portale Società LND (Organigramma) for this club; null = not used there. */
+  lndLabel: string | null;
   evidence: "VERIFIED" | "INFERRED" | "PROPOSED";
   requiresLicence: boolean;
   mandatoryForClub: boolean;
@@ -142,6 +144,7 @@ export function parsePosition(x: unknown, holdersKnown: boolean): CatalogPositio
     source,
     sourceUrl: url && url.startsWith("https://") ? url : null,
     sourceRef: str(x["sourceRef"]),
+    lndLabel: str(x["lndLabel"]),
     evidence,
     requiresLicence: x["requiresLicence"] === true,
     mandatoryForClub: x["mandatoryForClub"] === true,
@@ -199,7 +202,7 @@ export function holdersLabel(p: Pick<CatalogPosition, "holders" | "status">): st
 
 /* ------------------------------------------------------------------ new position (custom) */
 
-/** Same folding as scd_position_slug in r138: lower case, accents folded, non alphanumerics to "-", at most 50. */
+/** Same folding as scd_position_slug in r138: lower case, accents folded, non alphanumerics to "-", at most 50, no hyphen at the ends. */
 export function positionSlug(label: string): string {
   const from = "àáâäèéêëìíîïòóôöùúûüç'’";
   const to = "aaaaeeeeiiiioooouuuuc  ";
@@ -211,7 +214,8 @@ export function positionSlug(label: string): string {
     .join("")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 50);
+    .slice(0, 50)
+    .replace(/-+$/, "");
 }
 
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/;
@@ -264,3 +268,17 @@ export const CATALOG_WRITE_OFF = "Creazione non ancora attiva: la Direzione deve
 export const CATALOG_WRITE_DENIED = "Solo il Presidente o il Direttore generale creano e approvano i ruoli.";
 export const CATALOG_WRITE_FAILED = "Salvataggio non riuscito, riprova più tardi.";
 export const CATALOG_WRITE_NO_SESSION = "Accesso al registro non collegato al tuo profilo club.";
+
+/* ------------------------------------------------------------------ is r138 live? */
+
+/** Label sent to scd_position_slug (r138, executable by authenticated) and the answer only r138 gives. */
+export const R138_PROBE_LABEL = "Probe R138";
+export const R138_PROBE_ANSWER = "probe-r138";
+
+/**
+ * Answer of the r138 probe. Live only when the function answers exactly; missing function, any error or any other
+ * answer = not live (fail closed: r138 positions stay off and the UD-154 fallback holds).
+ */
+export function r138ProbeResult(data: unknown, error: unknown): boolean {
+  return !error && data === R138_PROBE_ANSWER;
+}

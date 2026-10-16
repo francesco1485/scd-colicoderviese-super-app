@@ -14,7 +14,9 @@ import {
   holdersLabel,
   parseCatalogBoard,
   parsePosition,
+  R138_PROBE_LABEL,
   positionSlug,
+  r138ProbeResult,
   validateCustomDraft,
   type CatalogPosition,
 } from "./position-catalog";
@@ -27,6 +29,7 @@ import {
   createOutcome,
   statusOutcome,
 } from "./position-catalog.functions";
+import { probeR138 } from "./registry-live.server";
 import { KNOWN_POSITIONS } from "./session";
 
 const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
@@ -106,7 +109,7 @@ describe("r138 migration (STAGED, applied only after 'applica r138')", () => {
   });
 
   it("seeds exactly the positions and qualifications of config/scd-position-catalog.v1.json", () => {
-    const keys = ["code", "label", "group", "roleKind", "appPosition", "source", "sourceUrl", "sourceRef", "evidence", "requiresLicence", "mandatoryForClub", "acceptsQualification"] as const;
+    const keys = ["code", "label", "group", "roleKind", "appPosition", "source", "sourceUrl", "sourceRef", "lndLabel", "evidence", "requiresLicence", "mandatoryForClub", "acceptsQualification"] as const;
     const pick = (p: Record<string, unknown>) => Object.fromEntries(keys.map((k) => [k, p[k]]));
     expect(literal("pos")).toEqual(catalog.positions.map(pick));
     expect(literal("qual")).toEqual(catalog.coachQualifications.map((q) => ({ code: q.code, label: q.label, legacy: q.legacy, sourceRef: q.sourceRef })));
@@ -135,7 +138,7 @@ describe("catalogue config (Francesco 16/10/2026 13:35)", () => {
   const positions = catalog.positions;
 
   it("lists organigram positions only: qualifications, lavoratore sportivo, RASD card and socio are attributes", () => {
-    expect(positions).toHaveLength(83);
+    expect(positions).toHaveLength(85);
     expect(catalog.coachQualifications).toHaveLength(24);
     expect(catalog.relationshipAttributes.sportWorker).toHaveLength(8);
     expect(catalog.relationshipAttributes.rasdCard).toHaveLength(5);
@@ -180,14 +183,34 @@ describe("catalogue config (Francesco 16/10/2026 13:35)", () => {
     }
     // Only coach-like positions take a qualification.
     expect(positions.filter((p) => p.acceptsQualification).map((p) => p.code).sort()).toEqual(
-      ["allenatore-in-seconda", "allenatore-responsabile", "allenatore-settore-giovanile", "collaboratore-tecnico", "responsabile-attivita-di-base", "responsabile-settore-giovanile", "responsabile-tecnico-settore-giovanile"].sort(),
+      ["allenatore-in-seconda", "allenatore-responsabile", "allenatore-settore-giovanile", "collaboratore-tecnico", "dirigente-allenatore", "dirigente-tecnico-prima-squadra", "responsabile-attivita-di-base", "responsabile-settore-giovanile", "responsabile-tecnico-settore-giovanile"].sort(),
     );
     expect(catalog.privacy).toMatch(/NO_PERSONAL_NAMES/);
   });
 
+  it("maps every qualifica of the Portale Società LND (Organigramma, VERIFIED 16/10/2026 14:30) to a VERIFIED position", () => {
+    const portal = ["Presidente", "Vice Presidente", "Consigliere", "Direttore Generale", "Cassiere", "Football Director", "Team Manager", "Dirigente", "Dirigente accompagnatore", "Dirigente-Allenatore", "Dirigente-Tecnico I Squadra", "Allenatore iscritto ALBO"];
+    const labels = positions.map((p) => p.lndLabel).filter((x): x is string => !!x);
+    expect([...new Set(labels)].sort()).toEqual([...portal].sort());
+    for (const p of positions.filter((x) => x.lndLabel)) expect(p.evidence, p.code).toBe("VERIFIED");
+    const by = (code: string) => positions.find((p) => p.code === code)!;
+    expect(by("tesoriere").lndLabel).toBe("Cassiere");
+    for (const ds of ["direttore-sportivo", "direttore-sportivo-agonistica", "direttore-sportivo-generale"]) expect(by(ds).lndLabel).toBe("Football Director");
+    expect(by("direttore-sportivo-agonistica").source).toBe("CLUB");
+    expect(by("allenatore-responsabile")).toMatchObject({ lndLabel: "Allenatore iscritto ALBO", acceptsQualification: true });
+    for (const d of ["dirigente-allenatore", "dirigente-tecnico-prima-squadra"])
+      expect(by(d)).toMatchObject({ group: "dirigenti", roleKind: "DIRIGENTE", acceptsQualification: true, source: "LND", sourceUrl: "https://iscrizioni.lnd.it", evidence: "VERIFIED" });
+    for (const code of ["team-manager", "direttore-generale", "tesoriere"]) expect(by(code)).toMatchObject({ evidence: "VERIFIED", sourceRef: "Portale Società LND – Organigramma" });
+    // Not used on the portal for this club: stay INFERRED.
+    for (const code of ["segretario", "delegato-sicurezza", "addetto-stampa"]) expect(by(code)).toMatchObject({ evidence: "INFERRED", lndLabel: null });
+    // D3: the two new access positions map one catalogue entry each.
+    expect(by("operatore-sanitario").appPosition).toBe("fisioterapista");
+    expect(by("responsabile-safeguarding").appPosition).toBe("responsabile-safeguarding");
+  });
+
   it("the repo fallback parses every position, ACTIVE with unknown holders (never zero)", () => {
     const repo = repoCatalog();
-    expect(repo).toHaveLength(83);
+    expect(repo).toHaveLength(85);
     expect(repo.every((p) => p.status === "ACTIVE" && p.holders === null)).toBe(true);
     expect(holdersLabel(repo[0]!)).toBe("da collegare");
   });
@@ -200,6 +223,9 @@ describe("custom positions", () => {
     expect(positionSlug("Responsabile dell'area è OK!")).toBe("responsabile-dell-area-e-ok");
     expect(positionSlug("!!!")).toBe("");
     expect(positionSlug("x".repeat(80))).toHaveLength(50);
+    // Review R3: a cut on a hyphen leaves no trailing hyphen (same as btrim(left(...,50),'-') in r138).
+    expect(positionSlug(`${"a".repeat(49)} bcd`)).toBe("a".repeat(49));
+    expect(BODY).toContain("select btrim(left(btrim(regexp_replace(");
   });
 
   it("validates the draft like scd_create_custom_position", () => {
@@ -269,6 +295,25 @@ describe("board parsing and labels", () => {
     expect(createState("not-applied", true)).toBe("not-applied");
     expect(createState("not-applied", null)).toBe("off");
     expect(createState("unavailable", true)).toBe("off");
+  });
+});
+
+describe("is r138 live? (review R1)", () => {
+  it("only the exact answer of scd_position_slug means live; anything else fails closed", () => {
+    expect(r138ProbeResult("probe-r138", null)).toBe(true);
+    expect(r138ProbeResult(null, { code: "PGRST202" })).toBe(false);
+    expect(r138ProbeResult("probe-r138", { code: "42501" })).toBe(false);
+    expect(r138ProbeResult("other", null)).toBe(false);
+    expect(positionSlug(R138_PROBE_LABEL)).toBe("probe-r138");
+  });
+
+  it("probeR138 asks the database once and never throws", async () => {
+    const ok = { rpc: vi.fn(async () => ({ data: "probe-r138", error: null })) };
+    expect(await probeR138(ok)).toBe(true);
+    expect(ok.rpc).toHaveBeenCalledWith("scd_position_slug", { p_label: "Probe R138" });
+    expect(await probeR138({ rpc: vi.fn(async () => ({ data: null, error: { code: "PGRST202" } })) })).toBe(false);
+    expect(await probeR138({ rpc: vi.fn(async () => { throw new Error("down"); }) })).toBe(false);
+    expect(await probeR138(null)).toBe(false);
   });
 });
 

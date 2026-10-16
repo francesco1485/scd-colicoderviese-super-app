@@ -37,9 +37,11 @@ export const KNOWN_POSITIONS: readonly string[] = [
   "dirigenza",
   "responsabile-attivita-base",
   "coordinatore-attivita-sportiva",
-  // Francesco (DG) 16/10/2026 13:32: confirmers of UD-154 (U16/U15, Prima/U19) and Dervio readers (UD-156), r138.
+  // r138 (STAGED, UD-161): exist only once r138 is live on the database, see R138_POSITIONS / positionLive.
   "direttore-sportivo-agonistica",
   "direttore-sportivo-generale",
+  "responsabile-safeguarding",
+  "fisioterapista",
   "dirigente-annata",
   "mister",
   "responsabile-trasporti",
@@ -67,6 +69,25 @@ export const KNOWN_POSITIONS: readonly string[] = [
   "atleta",
   "partner",
 ];
+
+/**
+ * Positions created by migration r138 (UD-161, Francesco 16/10/2026: 13:32 direttori sportivi; D3 "Sì, crea gli
+ * accessi" for the safeguarding lead and the physio). They are in KNOWN_POSITIONS (labels, scopes) but count as
+ * existing only when the server has verified that r138 is live (positionLive): until then the database refuses them
+ * (scd_access_admin_guard of r136) and the UD-154 fallback "decide la Direzione" holds. Fail closed: default false.
+ */
+export const R138_POSITIONS: readonly string[] = [
+  "direttore-sportivo-agonistica",
+  "direttore-sportivo-generale",
+  "responsabile-safeguarding",
+  "fisioterapista",
+];
+
+/** True when the position exists on the database: always for the older ones, r138 ones only when r138 is live. */
+export function positionLive(position: string, r138Live = false): boolean {
+  if (!KNOWN_POSITIONS.includes(position)) return false;
+  return r138Live || !R138_POSITIONS.includes(position);
+}
 
 /** Positions that a coarse role carries by itself. */
 export const ROLE_POSITIONS: Readonly<Record<DbRole, readonly string[]>> = {

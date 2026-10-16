@@ -137,7 +137,7 @@ const failsWith = (code, needle) => (e) => {
 // 1. Seed: every organisation gets every catalogue position, ACTIVE and EMPTY; 24 qualifications; nothing linked.
 {
   const n = CONFIG.positions.length;
-  assert.equal(n, 83);
+  assert.equal(n, 85);
   const counts = (await db.query(`select organization_id::text o, count(*)::int n, count(*) filter (where status = 'ACTIVE')::int a,
       count(*) filter (where is_custom)::int c from public.scd_position_catalog group by 1 order by 1`)).rows;
   assert.deepEqual(counts, [{ o: ORG, n, a: n, c: 0 }, { o: OTHER, n, a: n, c: 0 }]);
@@ -173,7 +173,8 @@ const BOARD = `select public.scd_position_catalog_board($1) b`;
 {
   const b = await one(PRES, BOARD, [ORG]);
   assert.equal(b.canCreate, true);
-  assert.equal(b.positions.length, 83);
+  assert.equal(b.positions.length, 85);
+  assert.equal(b.positions.find((x) => x.code === "tesoriere").lndLabel, "Cassiere");
   assert.ok(b.positions.every((x) => x.holders === 0 && x.status === "ACTIVE"));
   assert.ok(b.positions.every((x) => !("created_by" in x) && !("createdBy" in x)));
   assert.equal((await one(DG, BOARD, [ORG])).canCreate, true);
@@ -202,6 +203,10 @@ const CREATE = `select public.scd_create_custom_position($1, $2, $3, $4, $5) c`;
   assert.equal(audit[0].detail.code, code);
   assert.equal(await one(DG, CREATE, [ORG, "Responsabile Lotteria", "servizi", "STAFF", null]), "custom-responsabile-lotteria");
   assert.equal(await one(DG, CREATE, [ORG, "Addetto àccoglienza ospiti", "operativi", "STAFF", ""]), "custom-addetto-accoglienza-ospiti");
+  // Cut at 50 characters on a hyphen: no trailing hyphen in the code (review R3).
+  const long = `${"a".repeat(49)} bcd`;
+  assert.equal((await db.query(`select public.scd_position_slug($1) s`, [long])).rows[0].s, "a".repeat(49));
+  assert.equal(await one(DG, CREATE, [ORG, long, "operativi", "STAFF", null]), `custom-${"a".repeat(49)}`);
   for (const uid of [CONS, SEG, RAB, FAM, DSA, null])
     await assert.rejects(as(uid, CREATE, [ORG, "Ruolo di prova", "operativi", "STAFF", null]), failsWith("42501"), uid);
   await assert.rejects(as(PRES, CREATE, [OTHER, "Ruolo di prova", "operativi", "STAFF", null]), failsWith("42501"));
@@ -266,13 +271,13 @@ const STATUS = `select public.scd_set_position_status($1, $2, $3, $4) s`;
   // An existing holder keeps its row when only the qualification changes.
   await db.query(`update public.scd_structure_roles set qualification_code = 'allenatore-uefa-b' where id = $1`, [mister]);
   const actions = (await db.query(`select action from public.scd_access_audit order by id`)).rows.map((r) => r.action);
-  assert.deepEqual(actions, ["CREATE_POSITION", "CREATE_POSITION", "CREATE_POSITION", "POSITION_STATUS", "POSITION_STATUS", "POSITION_STATUS"]);
+  assert.deepEqual(actions, ["CREATE_POSITION", "CREATE_POSITION", "CREATE_POSITION", "CREATE_POSITION", "POSITION_STATUS", "POSITION_STATUS", "POSITION_STATUS"]);
 }
 
 // 7. Direttori sportivi: assignable, Dervio + Colico readers, confirmers of their groups.
 {
   const guardSql = R138.match(/create or replace function public\.scd_access_admin_guard\([\s\S]*?\n\$\$;/)[0];
-  assert.match(guardSql, /'direttore-sportivo-agonistica','direttore-sportivo-generale'\];/);
+  assert.match(guardSql, /'direttore-sportivo-agonistica','direttore-sportivo-generale','responsabile-safeguarding','fisioterapista'\];/);
   const reads = async (uid, site) => one(uid, `select public.scd_structure_reader_site($1, $2) r`, [ORG, site]);
   assert.equal(await reads(DSA, "DERVIO"), true);
   assert.equal(await reads(DSA, "COLICO"), true);
@@ -289,11 +294,16 @@ const STATUS = `select public.scd_set_position_status($1, $2, $3, $4) s`;
   assert.equal(await conf("boh"), null);
 }
 
-// 8. The access guard itself (recreated r136 text + 2 positions): Direzione assigns a DS; unknown positions refused.
+// 8. The access guard itself (recreated r136 text + 4 positions, Direzione only): unknown positions refused.
 {
   await db.exec(`insert into public.scd_memberships (organization_id, user_id, role) values ('${ORG}', '${U(9)}', 'STAFF')`);
   assert.equal(await one(PRES, `select public.scd_access_admin_guard($1, null, null, $2) g`, [ORG, ["direttore-sportivo-generale"]]), "DIRECTION");
-  assert.equal(await one(SEG, `select public.scd_access_admin_guard($1, null, null, $2) g`, [ORG, ["direttore-sportivo-agonistica"]]), "SECRETARIAT");
+  for (const p of ["direttore-sportivo-agonistica", "direttore-sportivo-generale", "responsabile-safeguarding", "fisioterapista"]) {
+    assert.equal(await one(PRES, `select public.scd_access_admin_guard($1, null, null, $2) g`, [ORG, [p]]), "DIRECTION", p);
+    // Review R2: only the Direzione assigns them.
+    await assert.rejects(as(SEG, `select public.scd_access_admin_guard($1, null, null, $2) g`, [ORG, [p]]), failsWith("42501", /office position/), p);
+  }
+  assert.equal(await one(SEG, `select public.scd_access_admin_guard($1, null, null, $2) g`, [ORG, ["autista"]]), "SECRETARIAT");
   await assert.rejects(as(PRES, `select public.scd_access_admin_guard($1, null, null, $2) g`, [ORG, ["direttore-sportivo"]]), failsWith("22023"));
   await assert.rejects(as(FAM, `select public.scd_access_admin_guard($1, null, null, $2) g`, [ORG, ["direttore-sportivo-generale"]]), failsWith("42501"));
 }

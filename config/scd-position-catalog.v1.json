@@ -19,7 +19,8 @@
     "Lavoratore sportivo (D.Lgs 36/2021), RASD card type (D6) and socio are attributes of the relationship/registration, not organigram positions: listed in relationshipAttributes, not seeded as positions.",
     "appPosition links a catalogue position to the access position of the app (session.ts KNOWN_POSITIONS). A catalogue position gives no access by itself: access stays with r100 person grants and memberships.",
     "Custom positions: code custom-<slug>, created only by the Presidente or the Direttore Generale (r111 scd_is_role_creator), status PROPOSED until the Direzione approves it (scd_set_position_status), audited in scd_access_audit.",
-    "Only ACTIVE positions can be assigned to a person (trigger on scd_structure_roles)."
+    "Only ACTIVE positions can be assigned to a person (trigger on scd_structure_roles).",
+    "lndLabel = the qualifica used by the Portale Società LND (Organigramma) for this club, VERIFIED 16/10/2026 14:30 read-only; null = not used on the portal for this club (e.g. segretario, delegato alla sicurezza, addetto stampa stay INFERRED)."
   ],
   "sourcesRead": {
     "FIGC_ST": "https://www.figc.it/media/255310/parte2_settore_tecnico_art_16a40__________agg-26-11-2024.pdf",
@@ -130,7 +131,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "delegato-rasd",
@@ -145,7 +147,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "presidente",
@@ -160,7 +163,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Presidente"
     },
     {
       "code": "vice-presidente",
@@ -175,7 +179,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Vice Presidente"
     },
     {
       "code": "consigliere",
@@ -190,7 +195,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Consigliere"
     },
     {
       "code": "commissario",
@@ -205,7 +211,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "amministratore-unico",
@@ -220,7 +227,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-rasd",
@@ -235,7 +243,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "proboviro",
@@ -250,7 +259,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "revisore",
@@ -265,7 +275,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "segretario",
@@ -280,22 +291,24 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "tesoriere",
-      "label": "Tesoriere",
+      "label": "Tesoriere (Cassiere)",
       "group": "direzione",
       "roleKind": "ORGANO_SOCIETARIO",
       "appPosition": "tesoreria",
       "appPositionEvidence": "INFERRED",
       "source": "LND",
-      "sourceUrl": "https://files.figc.it/view/acePublic/alias/contentid/1s5i1b2zydnpuhdxmyp/0/tit1_noif_art_da36a42_----------------aggiornato-al%20CU%20198A%20del%2027.04.2026.pdf",
-      "sourceRef": "NOIF art. 37 (generico)",
-      "evidence": "INFERRED",
+      "sourceUrl": "https://iscrizioni.lnd.it",
+      "sourceRef": "Portale Società LND – Organigramma",
+      "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Cassiere"
     },
     {
       "code": "direttore-generale",
@@ -305,12 +318,13 @@
       "appPosition": "direttore-generale",
       "appPositionEvidence": "VERIFIED",
       "source": "LND",
-      "sourceUrl": "https://files.figc.it/view/acePublic/alias/contentid/1s5i1b2zydnpuhdxmyp/0/tit1_noif_art_da36a42_----------------aggiornato-al%20CU%20198A%20del%2027.04.2026.pdf",
-      "sourceRef": "NOIF art. 37 (generico)",
-      "evidence": "INFERRED",
+      "sourceUrl": "https://iscrizioni.lnd.it",
+      "sourceRef": "Portale Società LND – Organigramma",
+      "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Direttore Generale"
     },
     {
       "code": "dirigente",
@@ -325,7 +339,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Dirigente"
     },
     {
       "code": "dirigente-accompagnatore",
@@ -340,7 +355,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Dirigente accompagnatore"
     },
     {
       "code": "dirigente-addetto-ufficiali-gara",
@@ -355,7 +371,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "assistente-arbitro-parte",
@@ -370,7 +387,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "dirigente-in-panchina",
@@ -385,7 +403,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "direttore-sportivo",
@@ -400,7 +419,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Football Director"
     },
     {
       "code": "collaboratore-gestione-sportiva",
@@ -415,7 +435,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "team-manager",
@@ -425,12 +446,13 @@
       "appPosition": null,
       "appPositionEvidence": null,
       "source": "LND",
-      "sourceUrl": null,
-      "sourceRef": null,
-      "evidence": "INFERRED",
+      "sourceUrl": "https://iscrizioni.lnd.it",
+      "sourceRef": "Portale Società LND – Organigramma",
+      "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Team Manager"
     },
     {
       "code": "responsabile-prima-squadra",
@@ -445,7 +467,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "coordinatore-attivita-sportiva",
@@ -460,7 +483,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "delegato-sicurezza",
@@ -475,7 +499,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "allenatore-responsabile",
@@ -490,7 +515,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": true,
-      "acceptsQualification": true
+      "acceptsQualification": true,
+      "lndLabel": "Allenatore iscritto ALBO"
     },
     {
       "code": "allenatore-in-seconda",
@@ -505,7 +531,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": true
+      "acceptsQualification": true,
+      "lndLabel": null
     },
     {
       "code": "preparatore-atletico",
@@ -520,7 +547,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "collaboratore-tecnico",
@@ -535,7 +563,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": true
+      "acceptsQualification": true,
+      "lndLabel": null
     },
     {
       "code": "match-analyst",
@@ -550,7 +579,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "osservatore",
@@ -565,7 +595,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "preparatore-motorio",
@@ -580,7 +611,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "medico-sociale",
@@ -595,22 +627,24 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "operatore-sanitario",
       "label": "Operatore sanitario ausiliario (fisioterapista/massaggiatore)",
       "group": "sanitari",
       "roleKind": "STAFF",
-      "appPosition": null,
-      "appPositionEvidence": null,
+      "appPosition": "fisioterapista",
+      "appPositionEvidence": "VERIFIED",
       "source": "FIGC",
       "sourceUrl": "https://www.figc.it/media/255310/parte2_settore_tecnico_art_16a40__________agg-26-11-2024.pdf",
       "sourceRef": "Reg. ST art. 31 c.5; NOIF art. 66 c.2bis lett. e",
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-sanitario",
@@ -625,7 +659,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "medico-settore-giovanile",
@@ -640,7 +675,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "psicologo",
@@ -655,7 +691,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "addetto-defibrillatore-blsd",
@@ -670,7 +707,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-settore-giovanile",
@@ -685,7 +723,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": true,
-      "acceptsQualification": true
+      "acceptsQualification": true,
+      "lndLabel": null
     },
     {
       "code": "dirigente-responsabile-settore-giovanile",
@@ -700,7 +739,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-tecnico-settore-giovanile",
@@ -715,7 +755,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": true
+      "acceptsQualification": true,
+      "lndLabel": null
     },
     {
       "code": "responsabile-organizzativo-settore-giovanile",
@@ -730,7 +771,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "segretario-settore-giovanile",
@@ -745,7 +787,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "referente-sistema-qualita",
@@ -760,7 +803,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "referente-club-affiliati",
@@ -775,7 +819,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-attivita-di-base",
@@ -790,7 +835,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": true
+      "acceptsQualification": true,
+      "lndLabel": null
     },
     {
       "code": "dirigente-responsabile-attivita-di-base",
@@ -805,7 +851,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "segretario-attivita-di-base",
@@ -820,7 +867,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "allenatore-settore-giovanile",
@@ -835,7 +883,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": true,
-      "acceptsQualification": true
+      "acceptsQualification": true,
+      "lndLabel": null
     },
     {
       "code": "responsabile-formazione-interna",
@@ -850,7 +899,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "coordinatore-attivita-educative",
@@ -865,7 +915,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "tutor-insegnante",
@@ -880,7 +931,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "referente-inclusione",
@@ -895,7 +947,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "referente-progetti-territorio",
@@ -910,7 +963,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-attivita-promozionali",
@@ -925,7 +979,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-gestionale-impianto",
@@ -940,22 +995,24 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-safeguarding",
       "label": "Responsabile contro abusi, violenze e discriminazioni (safeguarding)",
       "group": "safeguarding",
       "roleKind": "RESPONSABILE",
-      "appPosition": null,
-      "appPositionEvidence": null,
+      "appPosition": "responsabile-safeguarding",
+      "appPositionEvidence": "VERIFIED",
       "source": "FIGC",
       "sourceUrl": "https://www.figc.it/media/256277/regolamento-safeguarding-figc-aggiornato-al-10-dicembre-2024.pdf",
       "sourceRef": "Regolamento Safeguarding FIGC art. 10 c.7, art. 11",
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": true,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "delegato-tutela-minori",
@@ -970,7 +1027,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": true,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "addetto-stampa",
@@ -985,7 +1043,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "social-media-fotografo",
@@ -1000,7 +1059,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "speaker",
@@ -1015,7 +1075,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "magazziniere",
@@ -1030,7 +1091,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "autista-pulmino",
@@ -1045,7 +1107,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "volontario",
@@ -1060,7 +1123,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "addetto-pulizie",
@@ -1075,7 +1139,8 @@
       "evidence": "INFERRED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "raccattapalle-barelliere",
@@ -1090,7 +1155,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "direttore-sportivo-agonistica",
@@ -1105,7 +1171,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Football Director"
     },
     {
       "code": "direttore-sportivo-generale",
@@ -1120,7 +1187,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": "Football Director"
     },
     {
       "code": "responsabile-trasporti",
@@ -1135,7 +1203,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-campi",
@@ -1150,7 +1219,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-struttura-colico",
@@ -1165,7 +1235,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-struttura-dervio",
@@ -1180,7 +1251,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-club-house",
@@ -1195,7 +1267,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "addetto-biglietteria",
@@ -1210,7 +1283,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-magazzino",
@@ -1225,7 +1299,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-tornei",
@@ -1240,7 +1315,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-lavanderia",
@@ -1255,7 +1331,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "collaboratore-lavanderia-pulizia",
@@ -1270,7 +1347,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "segreteria-presenza",
@@ -1285,7 +1363,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "segreteria-remoto",
@@ -1300,7 +1379,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "responsabile-infermeria",
@@ -1315,7 +1395,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "nutrizionista",
@@ -1330,7 +1411,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "moderatore",
@@ -1345,7 +1427,8 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
     },
     {
       "code": "dirigente-collaboratore",
@@ -1360,7 +1443,40 @@
       "evidence": "VERIFIED",
       "requiresLicence": false,
       "mandatoryForClub": false,
-      "acceptsQualification": false
+      "acceptsQualification": false,
+      "lndLabel": null
+    },
+    {
+      "code": "dirigente-allenatore",
+      "label": "Dirigente-allenatore",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "LND",
+      "sourceUrl": "https://iscrizioni.lnd.it",
+      "sourceRef": "Portale Società LND – Organigramma",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": true,
+      "lndLabel": "Dirigente-Allenatore"
+    },
+    {
+      "code": "dirigente-tecnico-prima-squadra",
+      "label": "Dirigente-tecnico prima squadra",
+      "group": "dirigenti",
+      "roleKind": "DIRIGENTE",
+      "appPosition": null,
+      "appPositionEvidence": null,
+      "source": "LND",
+      "sourceUrl": "https://iscrizioni.lnd.it",
+      "sourceRef": "Portale Società LND – Organigramma",
+      "evidence": "VERIFIED",
+      "requiresLicence": false,
+      "mandatoryForClub": false,
+      "acceptsQualification": true,
+      "lndLabel": "Dirigente-Tecnico I Squadra"
     }
   ],
   "coachQualifications": [

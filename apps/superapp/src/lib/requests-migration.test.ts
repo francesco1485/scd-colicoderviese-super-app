@@ -68,7 +68,7 @@ describe("r133 request machine (staged, not applied)", () => {
     for (const b of branches) {
       const groups = [...b[1]!.matchAll(/'([^']+)'/g)].map((m) => m[1]!);
       const positions = [...b[2]!.matchAll(/'([^']+)'/g)].map((m) => m[1]!);
-      for (const g of groups) expect(dbConfirmerPositions(g), g).toEqual(positions);
+      for (const g of groups) expect(dbConfirmerPositions(g, true), g).toEqual(positions);
     }
     const all = branches.flatMap((b) => [...b[1]!.matchAll(/'([^']+)'/g)].map((m) => m[1]));
     expect(all.sort()).toEqual(REQUEST_CONFIRMERS.flatMap((r) => r.groups).sort());

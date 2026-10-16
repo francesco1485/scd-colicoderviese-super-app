@@ -163,6 +163,7 @@ function PositionRow({ p, canDecide, onDone }: { p: CatalogPosition; canDecide: 
               {p.sourceRef ? ` · ${p.sourceRef}` : ""}
             </>
           )}
+          {p.lndLabel && ` · Portale LND: «${p.lndLabel}»`}
           {p.evidence === "INFERRED" && " · da verificare"}
           {p.description && ` · ${p.description}`}
         </span>
@@ -256,8 +257,12 @@ function CustomPositionForm({ existing, onClose, onDone }: { existing: string[];
           maxLength={80}
           onChange={(e) => setD({ ...d, label: e.target.value })}
           placeholder="Es. Responsabile lotteria"
+          aria-describedby="org-catalogo-name-hint"
           required
         />
+        <span id="org-catalogo-name-hint" className="text-[13px] font-normal text-[var(--in-sub)]">
+          Solo il nome del ruolo, nessun nome di persona.
+        </span>
       </label>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-[14.5px] font-semibold">

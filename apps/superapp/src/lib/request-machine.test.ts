@@ -74,17 +74,26 @@ describe("who confirms (Francesco 15/10 15:17)", () => {
     expect(confirmerFor("u99")).toBeNull();
   });
 
-  it("never uses positions missing from the registry (only the Direzione confirms for those groups)", () => {
-    // Francesco 16/10/2026 13:32: both direttori sportivi exist (r138 makes them assignable and confirmers).
-    expect(missingConfirmerPositions()).toEqual([]);
+  it("r138 not live (default): the direttori sportivi do not exist, only the Direzione confirms their groups", () => {
+    expect(missingConfirmerPositions().map((r) => r.position).sort()).toEqual(["direttore-sportivo-agonistica", "direttore-sportivo-generale"]);
     expect(dbConfirmerPositions("pulcini")).toEqual(["responsabile-attivita-base"]);
-    expect(dbConfirmerPositions("u15")).toEqual(["direttore-sportivo-agonistica"]);
-    expect(dbConfirmerPositions("prima")).toEqual(["direttore-sportivo-generale"]);
+    expect(dbConfirmerPositions("u15")).toEqual([]);
     expect(dbConfirmerPositions("x")).toBeNull();
-    expect(confirmerLine("u15")).toBe("Conferma: Direttore Sportivo Agonistica (o la Direzione)");
-    expect(mayConfirm(new Set(["direttore-sportivo-agonistica"]), "u15")).toBe(true);
-    expect(mayConfirm(new Set(["direttore-sportivo-agonistica"]), "prima")).toBe(false);
+    expect(confirmerLine("u15")).toBe("Conferma: Direzione (ruolo non ancora attivo)");
+    expect(confirmerLine("u15")).not.toMatch(/Direttore Sportivo/);
+    expect(mayConfirm(new Set(["direttore-sportivo-agonistica"]), "u15")).toBe(false);
+    expect(hasRequestRole(new Set(["direttore-sportivo-generale"]))).toBe(false);
     expect(confirmerLine("2014")).toMatch(/Responsabile Attività di Base/);
+  });
+
+  it("r138 live (verified on the server): the direttori sportivi confirm their groups (UD-154, UD-161)", () => {
+    expect(missingConfirmerPositions(true)).toEqual([]);
+    expect(dbConfirmerPositions("u15", true)).toEqual(["direttore-sportivo-agonistica"]);
+    expect(dbConfirmerPositions("prima", true)).toEqual(["direttore-sportivo-generale"]);
+    expect(confirmerLine("u15", true)).toBe("Conferma: Direttore Sportivo Agonistica (o la Direzione)");
+    expect(mayConfirm(new Set(["direttore-sportivo-agonistica"]), "u15", true)).toBe(true);
+    expect(mayConfirm(new Set(["direttore-sportivo-agonistica"]), "prima", true)).toBe(false);
+    expect(hasRequestRole(new Set(["direttore-sportivo-generale"]), true)).toBe(true);
   });
 
   it("gives the UI the same answer as the database rules", () => {
