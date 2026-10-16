@@ -1,8 +1,8 @@
 {
  "schema": "scd-calendar-public-v3",
- "source_modified_at": "2026-10-16T13:59:12.240Z",
+ "source_modified_at": "2026-10-16T14:28:49.882Z",
  "source_file_id": "1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs",
- "source_sha256": "c370107633012bb82936b12ee0f83805e6dff96b851f37a172e10052e8226ef9",
+ "source_sha256": "4cd6cd56e03ef08489d4148a5dc7e09da02dc6a421ff99798849fb30e5e41d2c",
  "season": "2026/27",
  "snapshot_status": "COPIA_AUTOMATICA_DAL_MASTER",
  "groups": {
