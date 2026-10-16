@@ -21,7 +21,7 @@
 import { z } from "zod";
 
 import { POSITION_LABEL } from "./access-admin";
-import { REQUEST_TEAMS, confirmerFor, positionExists, teamLabel } from "./request-machine";
+import { REQUEST_TEAMS, REQUEST_WATCHERS, confirmerFor, positionExists, teamLabel } from "./request-machine";
 import { KNOWN_POSITIONS } from "./session";
 
 /* ------------------------------------------------------------------ vocabulary */
@@ -129,8 +129,11 @@ export function requesterRank(positions: readonly string[] | null | undefined): 
 
 /* ------------------------------------------------------------------ fixed rules */
 
-/** UD-141: the Direttore Generale is always informed of every request and every variation. */
-export const ALWAYS_INFORMED: readonly string[] = ["direttore-generale"];
+/**
+ * Always informed, now: the request machine's watchers (request-machine.ts REQUEST_WATCHERS, one list): the Direttore
+ * Generale (UD-141 "sempre il direttore generale") and the Coordinatore Attività Sportiva (UD-154: sees every request).
+ */
+export { REQUEST_WATCHERS };
 
 /**
  * UD-156 (Francesco 16/10/2026 06:57 "Dervio decido io e responsabile attività di base e coordinatore attività
@@ -337,17 +340,47 @@ export const CHI_FA_COSA_TABLE: Readonly<Record<ChiFaCosaTopic, TopicRule>> = {
   },
 };
 
-/** Structure positions per site (registry positions only). */
+/**
+ * Structure positions per site (registry positions only). DERVIO is empty: UD-156 keeps Dervio with the Direzione,
+ * the Segreteria and the DERVIO_ALWAYS positions; the other structure positions do not see Dervio.
+ */
 export const SITE_STRUCTURE: Readonly<Record<"COLICO" | "DERVIO", readonly string[]>> = {
   COLICO: ["responsabile-struttura-colico", "responsabile-struttura"],
-  DERVIO: ["responsabile-struttura-dervio", "responsabile-struttura"],
+  DERVIO: [],
 };
+
+/**
+ * UD-156: positions that do not see Dervio (same list as the r135 per-site readers rule). Removed from every route
+ * that touches Dervio (Dervio, both sites, unknown site), whatever the topic table says; emergenza excepted below.
+ */
+export const DERVIO_EXCLUDED: readonly string[] = [
+  "responsabile-struttura-dervio",
+  "responsabile-campi",
+  "responsabile-club-house",
+  "responsabile-struttura",
+  "responsabile-struttura-colico",
+];
+
+/**
+ * PROPOSED (needs Francesco's OK, not a recorded directive): in an EMERGENZA at Dervio the Dervio structure people
+ * are told too, because they may be on site. Only for topic "emergenza"; every other topic follows UD-156.
+ */
+export const DERVIO_EMERGENCY_STRUCTURE_PROPOSED: readonly string[] = [
+  "responsabile-struttura-dervio",
+  "responsabile-struttura",
+];
 
 /** Who decides a site question when the topic has no decider of its own (UD-156: Dervio decides the DG). */
 const SITE_DECIDER: Readonly<Record<"COLICO" | "DERVIO", string>> = {
   COLICO: "responsabile-struttura-colico",
   DERVIO: "direttore-generale",
 };
+
+/**
+ * INFERRED (UD-156 context: Francesco is the DG and part of the Direzione): when the Direzione fallback decides a
+ * group whose confirmer position does not exist yet, the Direttore Generale may confirm as Direzione.
+ */
+const FALLBACK_CONFIRM_RANK = 1;
 
 /** UD-154: until a group confirmer position exists, only the Direzione confirms that group. */
 export const CONFIRMER_FALLBACK = "direzione";
@@ -359,7 +392,11 @@ export const chiFaCosaInputSchema = z.object({
   /** null = site not known: Dervio rule applied (fail towards informing the Direzione), structure not added. */
   site: z.enum(CHI_FA_COSA_SITES).nullable(),
   teamKey: z.string().trim().min(1).max(40).nullable().optional(),
-  /** Positions of the AUTHENTICATED requester, resolved from the registry; null/empty = unknown -> da confermare. */
+  /**
+   * Positions of the requester. Callers MUST pass only `sessionRolesFrom()` (session.ts) of a VERIFIED session
+   * (memberships read server-side from the registry), never a role claimed in a mail, WhatsApp or form, never input
+   * from the browser. null/empty or strings that are not registry positions = unknown -> "da confermare".
+   */
   requesterPositions: z.array(z.string().max(60)).max(40).nullable().optional(),
 });
 export type ChiFaCosaInput = z.input<typeof chiFaCosaInputSchema>;
@@ -471,16 +508,29 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
     for (const s of sites) {
       const where = s === "COLICO" ? "Colico" : "Dervio";
       for (const p of SITE_STRUCTURE[s]) add(p, "INFORM", `struttura di ${where}`);
+      if (s === "DERVIO" && rule.immediate)
+        for (const p of DERVIO_EMERGENCY_STRUCTURE_PROPOSED)
+          add(p, "INFORM", "emergenza a Dervio (PROPOSTA, da confermare con Francesco)");
       if (!rule.entries.some((e) => e.duty === "DECIDE"))
         add(SITE_DECIDER[s], "DECIDE", s === "DERVIO" ? "decide su Dervio (UD-156)" : "decide sulla struttura di Colico");
     }
   }
   const touchesDervio = input.site === "DERVIO" || input.site === "ENTRAMBE" || input.site === null;
   if (input.site === null) warnings.push("Sede non indicata: avvisati come per Dervio (UD-156)");
-  if (touchesDervio) for (const p of DERVIO_ALWAYS) add(p, "INFORM", "Dervio: sempre informato (UD-156)");
+  if (touchesDervio) {
+    // UD-156: who does not see Dervio is not told about it (emergenza keeps only its own structure additions).
+    const keep = rule.immediate
+      ? new Set<string>([...SITE_STRUCTURE.COLICO, ...DERVIO_EMERGENCY_STRUCTURE_PROPOSED])
+      : new Set<string>();
+    let removed = false;
+    for (const p of DERVIO_EXCLUDED) if (!keep.has(p) && byPos.delete(p)) removed = true;
+    if (removed && input.site === "ENTRAMBE")
+      warnings.push("Colico e Dervio: i responsabili di struttura di Colico vanno avvisati a parte, solo per Colico (UD-156)");
+    for (const p of DERVIO_ALWAYS) add(p, "INFORM", "Dervio: sempre informato (UD-156)");
+  }
 
-  // UD-141: DG always.
-  for (const p of ALWAYS_INFORMED) add(p, "INFORM", "sempre informato (UD-141)");
+  // UD-141 / UD-154: DG and Coordinatore always, now.
+  for (const p of REQUEST_WATCHERS) add(p, "INFORM", "vede ogni richiesta (UD-141, UD-154)");
 
   for (const m of rule.missing)
     missing.set(m, {
@@ -492,7 +542,11 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
   // Hierarchy (UD-141).
   const approvers = [...byPos.entries()].filter(([, v]) => v.duty === "DECIDE").map(([p]) => p);
   const approverRank = approvers.length
-    ? Math.min(...approvers.map((p) => POSITION_RANK[p] ?? Number.POSITIVE_INFINITY))
+    ? Math.min(
+        ...approvers.map((p) =>
+          p === CONFIRMER_FALLBACK ? FALLBACK_CONFIRM_RANK : (POSITION_RANK[p] ?? Number.POSITIVE_INFINITY),
+        ),
+      )
     : POSITION_RANK["direttore-generale"]!;
   const rank = requesterRank(input.requesterPositions);
   let status: RoutingStatus;
@@ -502,13 +556,14 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
   if (rank === null && !rule.immediate)
     warnings.push("Richiedente senza ruolo riconosciuto nel registro: da confermare");
 
-  const nowAlways = new Set<string>([...ALWAYS_INFORMED, ...(touchesDervio ? DERVIO_ALWAYS : [])]);
+  const nowAlways = new Set<string>([...REQUEST_WATCHERS, ...(touchesDervio ? DERVIO_ALWAYS : [])]);
   const recipients: RoutedPosition[] = [...byPos.entries()]
     .map(([position, v]) => ({
       position,
       label: labelOf(position),
       duty: v.duty,
-      when: (status !== "DA_CONFERMARE" || v.duty === "DECIDE" || nowAlways.has(position)
+      // UD-141/UD-154: deciders and preparers (the Segreteria drafts and forwards) are told now, so are the watchers.
+      when: (status !== "DA_CONFERMARE" || v.duty !== "INFORM" || nowAlways.has(position)
         ? "NOW"
         : "AFTER_CONFIRMATION") as NoticeTime,
       reasons: v.reasons,

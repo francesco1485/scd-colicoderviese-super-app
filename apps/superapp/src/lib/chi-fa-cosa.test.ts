@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  ALWAYS_INFORMED,
   CHI_FA_COSA_SITES,
   CHI_FA_COSA_TABLE,
   CHI_FA_COSA_TOPICS,
   CONFIRMER_FALLBACK,
   DERVIO_ALWAYS,
+  DERVIO_EMERGENCY_STRUCTURE_PROPOSED,
+  DERVIO_EXCLUDED,
   NAMED_MISSING_POSITIONS,
   NEVER_RECIPIENTS,
   POSITION_RANK,
+  REQUEST_WATCHERS,
   ROUTABLE_POSITIONS,
   SITE_STRUCTURE,
   TOPIC_LABEL,
@@ -32,7 +34,13 @@ const ALL_TEAMS = [null, ...REQUEST_TEAMS.map((t) => t.key)];
 
 describe("registry alignment", () => {
   it("every position in the table, site structure and fixed sets is a routable registry position", () => {
-    const used = new Set<string>([...ALWAYS_INFORMED, ...DERVIO_ALWAYS, CONFIRMER_FALLBACK]);
+    const used = new Set<string>([
+      ...REQUEST_WATCHERS,
+      ...DERVIO_ALWAYS,
+      ...DERVIO_EXCLUDED,
+      ...DERVIO_EMERGENCY_STRUCTURE_PROPOSED,
+      CONFIRMER_FALLBACK,
+    ]);
     for (const rule of Object.values(CHI_FA_COSA_TABLE)) for (const e of rule.entries) used.add(e.position);
     for (const list of Object.values(SITE_STRUCTURE)) for (const p of list) used.add(p);
     for (const p of used) {
@@ -74,9 +82,13 @@ describe("invariants over every topic, site and team", () => {
         it(`${topic} · ${site ?? "sede ?"} · ${teamKey ?? "nessuna squadra"}`, () => {
           const r = routeChiFaCosa({ topic, site, teamKey });
           const ps = positions(r);
-          // UD-141: DG always, and always told now.
-          expect(ps).toContain("direttore-generale");
-          expect(find(r, "direttore-generale")!.when).toBe("NOW");
+          // UD-141 / UD-154: DG and Coordinatore always, and always told now.
+          for (const w of ["direttore-generale", "coordinatore-attivita-sportiva"]) {
+            expect(ps, w).toContain(w);
+            expect(find(r, w)!.when, w).toBe("NOW");
+          }
+          // UD-141/UD-154: who decides or prepares is told now.
+          for (const x of r.recipients) if (x.duty !== "INFORM") expect(x.when, x.position).toBe("NOW");
           // Only adult registry positions, never families, minors or external people, no duplicates.
           for (const p of ps) expect(isRoutablePosition(p), p).toBe(true);
           for (const p of NEVER_RECIPIENTS) expect(ps).not.toContain(p);
@@ -89,11 +101,14 @@ describe("invariants over every topic, site and team", () => {
             expect(JSON.stringify(x)).not.toMatch(/@|\+39|\d{6,}/);
           }
           // UD-156: anything touching Dervio (or an unknown site) informs the Dervio set now.
-          if (site !== "COLICO")
+          if (site !== "COLICO") {
             for (const p of DERVIO_ALWAYS) {
               expect(ps, p).toContain(p);
               expect(find(r, p)!.when, p).toBe("NOW");
             }
+            // UD-156: positions that do not see Dervio are never told about it (emergenza: see its own test).
+            if (topic !== "emergenza") for (const p of DERVIO_EXCLUDED) expect(ps, p).not.toContain(p);
+          }
           // Approvers are exactly the DECIDE recipients and are told now.
           expect(r.approvers).toEqual(r.recipients.filter((x) => x.duty === "DECIDE").map((x) => x.position).sort());
           for (const a of r.approvers) expect(find(r, a)!.when).toBe("NOW");
@@ -112,11 +127,11 @@ describe("UD-156 Dervio", () => {
     expect(positions(r)).not.toContain("presidente");
   });
 
-  it("Dervio facilities: DG decides, Dervio structure and the UD-156 set informed, Colico structure not", () => {
+  it("Dervio facilities: DG decides, only the UD-156 set and the watchers, no structure position", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "DERVIO" });
     expect(r.approvers).toEqual(["direttore-generale"]);
-    expect(positions(r)).toContain("responsabile-struttura-dervio");
-    expect(positions(r)).not.toContain("responsabile-struttura-colico");
+    expect(positions(r).sort()).toEqual([...DERVIO_ALWAYS].sort());
+    for (const p of DERVIO_EXCLUDED) expect(positions(r)).not.toContain(p);
     expect(find(r, "segreteria")!.reasons.join(" ")).toMatch(/UD-156/);
   });
 
@@ -127,9 +142,19 @@ describe("UD-156 Dervio", () => {
     expect(positions(r)).not.toContain("responsabile-attivita-base");
   });
 
-  it("both sites: both structures and the Dervio set", () => {
+  it("both sites: Dervio set, no structure position, warning to tell Colico structure separately", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "ENTRAMBE" });
-    expect(positions(r)).toEqual(expect.arrayContaining(["responsabile-struttura-colico", "responsabile-struttura-dervio", ...DERVIO_ALWAYS]));
+    expect(positions(r)).toEqual(expect.arrayContaining([...DERVIO_ALWAYS]));
+    for (const p of DERVIO_EXCLUDED) expect(positions(r)).not.toContain(p);
+    expect(r.approvers).toEqual(["direttore-generale"]);
+    expect(r.warnings.join(" ")).toMatch(/avvisati a parte/);
+  });
+
+  it("matches and trainings at Dervio do not tell responsabile campi", () => {
+    for (const topic of ["gara", "allenamenti"] as const) {
+      expect(positions(routeChiFaCosa({ topic, site: "COLICO", teamKey: "u15" })), topic).toContain("responsabile-campi");
+      expect(positions(routeChiFaCosa({ topic, site: "DERVIO", teamKey: "u15" })), topic).not.toContain("responsabile-campi");
+    }
   });
 
   it("unknown site: Dervio set informed with a warning, no structure guessed", () => {
@@ -196,8 +221,11 @@ describe("UD-141 hierarchy", () => {
   it("request from below waits for the superior; DG and approver now, the rest after acceptance", () => {
     const r = routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: "pulcini", requesterPositions: ["mister"] });
     expect(r.status).toBe("DA_CONFERMARE");
-    expect(notifyNow(r).sort()).toEqual(["direttore-generale", "responsabile-attivita-base"]);
-    expect(notifyAfterConfirmation(r)).toEqual(expect.arrayContaining(["segreteria", "mister", "dirigente-annata", "coordinatore-attivita-sportiva"]));
+    expect(notifyNow(r).sort()).toEqual(
+      ["coordinatore-attivita-sportiva", "direttore-generale", "responsabile-attivita-base", "segreteria"].sort(),
+    );
+    expect(find(r, "segreteria")!.duty).toBe("PREPARE");
+    expect(notifyAfterConfirmation(r).sort()).toEqual(["dirigente-annata", "mister", "responsabile-campi"]);
   });
 
   it("a requester with several positions counts with the highest", () => {
@@ -215,18 +243,30 @@ describe("UD-141 hierarchy", () => {
     }
   });
 
-  it("a mister cannot confirm what the Direzione must confirm for a group without its confirmer", () => {
-    const k = REQUEST_CONFIRMERS.find((c) => !positionExists(c.position))?.groups[0];
-    if (!k) return;
-    expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: k, requesterPositions: ["direttore-generale"] }).status).toBe("DA_CONFERMARE");
-    expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: k, requesterPositions: ["direzione"] }).status).toBe("CONFERMATA");
+  it("group without its confirmer: Direzione, presidente and DG (INFERRED: DG is Direzione) confirm; below waits", () => {
+    const missingGroups = REQUEST_CONFIRMERS.filter((c) => !positionExists(c.position)).flatMap((c) => c.groups);
+    expect(missingGroups.length).toBeGreaterThan(0);
+    for (const k of missingGroups) {
+      for (const rp of [["direzione"], ["presidente"], ["direttore-generale"]])
+        expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: k, requesterPositions: rp }).status, `${k} ${rp}`).toBe("CONFERMATA");
+      for (const rp of [["coordinatore-attivita-sportiva"], ["responsabile-attivita-base"], ["mister"], ["segreteria"]])
+        expect(routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: k, requesterPositions: rp }).status, `${k} ${rp}`).toBe("DA_CONFERMARE");
+    }
   });
 
-  it("on Dervio the UD-156 set is told now even while waiting", () => {
-    const r = routeChiFaCosa({ topic: "impianti", site: "DERVIO", requesterPositions: ["responsabile-struttura-dervio"] });
+  it("on Dervio the UD-156 set is told now even while waiting, team staff after acceptance", () => {
+    const r = routeChiFaCosa({ topic: "gara", site: "DERVIO", teamKey: "pulcini", requesterPositions: ["mister"] });
     expect(r.status).toBe("DA_CONFERMARE");
     for (const p of DERVIO_ALWAYS) expect(notifyNow(r)).toContain(p);
-    expect(notifyAfterConfirmation(r)).toContain("responsabile-struttura-dervio");
+    expect(notifyAfterConfirmation(r).sort()).toEqual(["dirigente-annata", "mister"]);
+  });
+
+  it("strings that are not registry positions degrade to da confermare (no role claimed from text)", () => {
+    for (const rp of [["Presidente"], ["PRESIDENTE"], ["presidente "], ["direttore_generale"], ["DG"], ["admin"], ["direzione;presidente"], [""]]) {
+      expect(requesterRank(rp), JSON.stringify(rp)).toBeNull();
+      const r = routeChiFaCosa({ topic: "gara", site: "COLICO", teamKey: "pulcini", requesterPositions: rp });
+      expect(r.status, JSON.stringify(rp)).toBe("DA_CONFERMARE");
+    }
   });
 });
 
@@ -263,12 +303,24 @@ describe("sensitive topics", () => {
 });
 
 describe("emergency", () => {
-  it("is immediate: everybody now, whoever asks, with 112 first and site structure", () => {
-    const r = routeChiFaCosa({ topic: "emergenza", site: "DERVIO", teamKey: "u19", requesterPositions: ["mister"] });
+  it("is immediate: everybody now, whoever asks, with 112 first", () => {
+    const r = routeChiFaCosa({ topic: "emergenza", site: "COLICO", teamKey: "u19", requesterPositions: ["mister"] });
     expect(r.status).toBe("IMMEDIATO");
     expect(notifyAfterConfirmation(r)).toEqual([]);
-    expect(positions(r)).toEqual(expect.arrayContaining(["presidente", "direttore-generale", "responsabile-struttura-dervio", "mister"]));
+    expect(positions(r)).toEqual(
+      expect.arrayContaining(["presidente", "direttore-generale", "responsabile-struttura-colico", "mister"]),
+    );
     expect(r.contentLimits.join(" ")).toMatch(/112/);
+  });
+
+  it("PROPOSED (needs Francesco's OK): emergenza at Dervio also tells the Dervio structure positions", () => {
+    const r = routeChiFaCosa({ topic: "emergenza", site: "DERVIO", teamKey: "u19" });
+    for (const p of DERVIO_EMERGENCY_STRUCTURE_PROPOSED) {
+      expect(positions(r), p).toContain(p);
+      expect(find(r, p)!.reasons.join(" ")).toMatch(/PROPOSTA/);
+    }
+    expect(positions(r)).not.toContain("responsabile-campi");
+    expect(positions(r)).not.toContain("responsabile-struttura-colico");
   });
 });
 

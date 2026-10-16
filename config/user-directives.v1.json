@@ -3464,6 +3464,39 @@
           "install_page": "/installa (Francesco 18:52): one-tap install, Iride card with avatar (file owned by the cloud chat, UD-139), vCard /iride.vcf, wa.me"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "06:56-06:57",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-156",
+      "name": "STRUCTURE_DERVIO_READERS_AND_SECRETARIAT_ALWAYS_INFORMED",
+      "sourceQuoteFragments": [
+        "Applica r135 (06:56)",
+        "Dervio decido io e responsabile attività di base e coordinatore attività sportiva e presidente e segreteria sempre informata (06:57)"
+      ],
+      "context": "Francesco (DG) 16/10/2026, chat PC, about /gestionale/struttura and the staged migration r135 (scd_structure_activities). 06:56 authorises applying r135; 06:57 restricts who governs the Dervio centre. The main session applies r135 after the per-site readers are committed.",
+      "normalizedCommand": {
+        "rule": "Activities and shifts of the DERVIO centre are read only by the Direzione (role DIRECTION, which includes Francesco as direttore-generale), the Segreteria (role SECRETARIAT) and the positions presidente, direttore-generale, coordinatore-attivita-sportiva, responsabile-attivita-base. COLICO keeps the readers of the registry area 'struttura'. Other structure positions (responsabile-struttura-dervio, responsabile-campi, responsabile-club-house, responsabile-struttura, responsabile-struttura-colico) do not see Dervio: the page shows the Dervio selector disabled with 'riservato', never 0 or '—'. Segreteria always informed: every future insert, change or cancellation of a Dervio row must notify the Segreteria in the app; r135 has no write path, so the rule is recorded in the migration header and RELEASE2_LOG and is implemented with the write function.",
+        "scope": "STRUCTURE_DERVIO",
+        "engines": "TEMPO (decisions on Dervio stay with the few people who take them, Segreteria informed without phone calls) and PERSONE (one clear owner per centre)",
+        "measure": "Dervio rows visible only to the allowed readers (PGlite test r135); once the write path exists: share of Dervio changes with a Segreteria notification (target 100%)",
+        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_APPLIED",
+        "constraints": [
+          "SQL public.scd_structure_reader_site(p_organization_id, p_site) is the single per-site check; scd_structure_reader is the any-site gate; scd_structure_week returns only rows of readable sites and the list readableSites",
+          "TS mirror STRUCTURE_READER_POSITIONS_BY_SITE in apps/superapp/src/lib/structure-activities.ts, kept equal by structure-migration.test.ts",
+          "the Segreteria notification is in-app only (no e-mail or message to third parties); a write function without it is refused in review",
+          "r135 APPLIED on SCD PULSE (ndevtxxijbcnskgysdit) on 16/10/2026 by the main session after 'Applica r135' (06:56); prerequisite and post-apply checks recorded in apps/superapp/docs/RELEASE2_LOG.md"
+        ],
+        "implementation": {
+          "migration": "supabase/migrations/20261016_r135_structure_activities.sql",
+          "pure_logic": "apps/superapp/src/lib/structure-activities.ts",
+          "server": "apps/superapp/src/lib/structure-activities.functions.ts",
+          "route": "/gestionale/struttura",
+          "test": "supabase/tests/r135_structure_activities.pglite.mjs"
+        }
+      }
     }
   ],
   "completionGate": {
