@@ -897,3 +897,9 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Scenario promemoria creato SPENTO: 8003125 «SCD · Iride · Promemoria DG» (ogni 6 ore quando acceso); si accende solo con OK di Francesco.
 - UD-164 → `APPLIED_TO_LIVE_7979437`; manifest: Iride live v4. Nessun messaggio WhatsApp inviato e nessuna esecuzione lanciata da Claude.
 - 18:45: promemoria 8003125 ACCESO dopo l'OK di Francesco («Sì, accendilo»). Il promemoria resta uno solo per richiesta; la soglia delle 48 ore è PROPOSED.
+
+## 2026-10-16 ~23:00 — chat cloud — pagine Partite, Eventi e Comunità, hub GROW (Francesco 21:38 «completare le piattaforme», 21:54 «altri colori»)
+- /calendario (Partite): stile METAL della home con «IN CASA» sole e «TRASFERTA» azzurro, settimana con pallini casa/trasferta, colonna destra Prossima in casa · Come arrivare · Rotazione campi (riservata, lucchetto); dati del calendario invariati.
+- /eventi, /eventi/christmas-lario-cup (solo testata), /community: testata compatta MetalPageHeader, un colore per tipo di evento (tornei sole, iniziative azzurro, club blu), comunità in Gioca · Segui · Partecipa; regole Top 11 e Fantacalcio dai testi esistenti; lotteria e Adotta invariate (UD-132).
+- /grow: hub interno GROW dietro lo stesso accesso di /crm (tolto il rinvio demo a /sponsor), copertura spot LED calcolata da sponsors.ts e sponsor-spots.ts (7 pronti, 30 da preparare), strumenti GROW con stato; /sponsor senza promesse di misurazione («Report in arrivo»).
+- Revisioni indipendenti scd-revisore + scd-sicurezza: PASS × 2 per ogni ramo (Eventi dopo correzione del testo sul Fantacalcio).
