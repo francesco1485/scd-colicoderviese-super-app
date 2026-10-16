@@ -12,6 +12,10 @@
  * - Each move needs: change-of-field request to LND/SGS, notice to the Comune di Dervio,
  *   notice to guests and referee.
  *
+ * Constraints already in `rotation.ts` are reused, not duplicated: lights after 17:00
+ * (`LIGHTS_AFTER_MIN`, issue `dv-lights`), winter on natural grass (`isWinterDay`, issue
+ * `dv-winter`), one month notice to the Comune (`NOTICE_DAYS`), Dervio surface (`PITCHES.DV`).
+ *
  * Engine: TEMPO (hours given back to Segreteria and Direzione: one computed plan and
  * checklist instead of manual tracking). Measured by: checklist items closed on time
  * (status "done" before due date) vs "overdue" per Dervio match.
@@ -20,7 +24,18 @@
  * Team names only, never names of athletes.
  */
 
-import { GROUP_LABEL, NOTICE_DAYS, daysBetween, minusDays } from "./rotation";
+import {
+  DEFAULT_DURATION,
+  GROUP_FORMAT,
+  GROUP_LABEL,
+  LIGHTS_AFTER_MIN,
+  NOTICE_DAYS,
+  PITCHES,
+  daysBetween,
+  isWinterDay,
+  minusDays,
+  toMinutes,
+} from "./rotation";
 
 /** Youth groups eligible for Dervio, youngest → oldest (calendar group ids, see `rotation.ts`). */
 export const DERVIO_AGE_ORDER = [
@@ -36,8 +51,17 @@ export const DERVIO_AGE_ORDER = [
 
 export type DervioGroup = (typeof DERVIO_AGE_ORDER)[number];
 
+/**
+ * Groups deliberately left out of the rotation with a visible reason.
+ * "esordienti" is a calendar group without a birth year: the annata must be verified
+ * on the Master Calendario before it can enter the age order.
+ */
+export const UNVERIFIED_YEAR_GROUPS: readonly string[] = ["esordienti"];
+
 /** First Dervio match day (Saturday). */
 export const DERVIO_START_DATE = "2026-10-24";
+
+export type PitchSurface = "grass" | "synthetic" | "unknown";
 
 /** A home match from the Master Calendario (only the fields the planner needs). */
 export interface DervioCandidate {
@@ -48,8 +72,38 @@ export interface DervioCandidate {
   date: string;
   /** Kick-off "HH:MM" if known. */
   time?: string | null;
+  /** End "HH:MM" if known; otherwise kick-off + default duration of the format. */
+  end?: string | null;
   /** True for home matches. Away matches are never eligible. */
   home: boolean;
+}
+
+/** Why a home match in the planning window cannot be the Dervio match. */
+export type ExclusionReason =
+  /** Ends after 17:00 at Dervio and the lights are not verified (`dv-lights` in `rotation.ts`). */
+  | "needs-lights"
+  /** December–February on natural grass and the winter policy is "skip" (`dv-winter`). */
+  | "winter-grass"
+  /** No kick-off time: the lights rule cannot be checked (fail-closed). */
+  | "kickoff-unknown"
+  /** Calendar group without a verified birth year (e.g. "esordienti"). */
+  | "group-year-unverified"
+  /** Not a youth group of the Dervio rotation (e.g. Prima Squadra). */
+  | "group-not-in-rotation";
+
+export const EXCLUSION_LABEL: Readonly<Record<ExclusionReason, string>> = {
+  "needs-lights": "Finisce dopo le 17:00: a Dervio servono le luci (da verificare)",
+  "winter-grass": "Inverno su erba naturale: Dervio chiuso",
+  "kickoff-unknown": "Orario non noto: luci non verificabili",
+  "group-year-unverified": "Annata da verificare sul Master Calendario",
+  "group-not-in-rotation": "Squadra fuori dalla rotazione Dervio",
+};
+
+export interface DervioExclusion {
+  matchId: string;
+  group: string;
+  date: string;
+  reason: ExclusionReason;
 }
 
 export interface DervioPick {
@@ -57,6 +111,10 @@ export interface DervioPick {
   group: DervioGroup;
   /** Team name for display (team names only). */
   label: string;
+  /** End of the match in minutes from midnight (calendar end or default duration), null if unknown. */
+  endMin: number | null;
+  /** December–February on natural grass: the ground must be checked (policy "flag"). */
+  winterGrass: boolean;
 }
 
 export interface DervioWeek {
@@ -66,22 +124,42 @@ export interface DervioWeek {
   weekEnd: string;
   pick: DervioPick | null;
   /** Why the week has no Dervio match. */
-  skipReason: "no-eligible-home-match" | null;
+  skipReason: "no-eligible-home-match" | "all-excluded" | null;
+  /** Home matches of the week that could not be picked, with the reason. */
+  excluded: DervioExclusion[];
 }
 
 export interface RotationOptions {
   /** First day that may host a Dervio match. Default {@link DERVIO_START_DATE}. */
   startDate?: string;
-  /** Last day to plan (inclusive). Default: day of the last eligible candidate. */
+  /** Last day to plan (inclusive). Default: day of the last home match considered. */
   endDate?: string;
   /**
    * Group that played the last Dervio match before `startDate` (to resume the rotation).
    * Default null: the rotation starts from the youngest group.
    */
   lastGroup?: DervioGroup | null;
+  /** Dervio lights verified: late matches allowed. Default false (as in `rotation.ts`). */
+  lightsVerified?: boolean;
+  /**
+   * Winter (Dec–Feb) on natural grass: "flag" keeps the match with `winterGrass: true`
+   * (default, same as the `dv-winter` warning in `rotation.ts`), "skip" excludes it.
+   */
+  winterPolicy?: "flag" | "skip";
 }
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** True for a real calendar day in ISO yyyy-mm-dd form. */
+export function isIsoDay(value: unknown): value is string {
+  if (typeof value !== "string" || !ISO_DAY.test(value)) return false;
+  const d = new Date(`${value}T12:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
+}
+
+function assertIsoDay(name: string, value: unknown): asserts value is string {
+  if (!isIsoDay(value)) throw new RangeError(`${name} must be an ISO day (yyyy-mm-dd)`);
+}
 
 /** Day of week of an ISO date, 0 = Monday … 6 = Sunday (timezone independent). */
 export function weekdayOf(iso: string): number {
@@ -99,13 +177,29 @@ export function isDervioGroup(group: string): group is DervioGroup {
   return (DERVIO_AGE_ORDER as readonly string[]).includes(group);
 }
 
+/** Pitch surface from the facility registry text (`PITCHES[...].surface`). */
+export function surfaceFromText(text: string | null | undefined): PitchSurface {
+  const t = (text ?? "").toLowerCase();
+  if (t.includes("sintetic")) return "synthetic";
+  if (t.includes("erba")) return "grass";
+  return "unknown";
+}
+
+/** Dervio pitch surface, from the facility registry (`PITCHES.DV.surface` = "erba naturale"). */
+export const DERVIO_SURFACE: PitchSurface = surfaceFromText(PITCHES.DV.surface);
+
 /** Sort key for a kick-off time; unknown times sort last within the day. */
 function timeKey(t: string | null | undefined): string {
   return t && /^\d{1,2}:\d{2}$/.test(t.trim()) ? t.trim().padStart(5, "0") : "99:99";
 }
 
-/** Eligible candidates: home, known Dervio group, valid date, inside [start, end]. */
-export function eligibleCandidates(
+const byDayAndTime = (a: DervioCandidate, b: DervioCandidate): number =>
+  a.date.localeCompare(b.date) ||
+  timeKey(a.time).localeCompare(timeKey(b.time)) ||
+  a.id.localeCompare(b.id);
+
+/** Home matches with a valid day inside [start, end], any group, sorted by day and time. */
+function homeInWindow(
   candidates: readonly DervioCandidate[],
   startDate: string,
   endDate?: string,
@@ -114,42 +208,78 @@ export function eligibleCandidates(
     .filter(
       (c) =>
         c.home &&
-        isDervioGroup(c.group) &&
-        ISO_DAY.test(c.date) &&
+        isIsoDay(c.date) &&
         c.date >= startDate &&
         (endDate === undefined || c.date <= endDate),
     )
-    .sort(
-      (a, b) =>
-        a.date.localeCompare(b.date) ||
-        timeKey(a.time).localeCompare(timeKey(b.time)) ||
-        a.id.localeCompare(b.id),
-    );
+    .sort(byDayAndTime);
+}
+
+/** Candidates of the Dervio groups: home, valid date, inside [start, end] (constraints not applied). */
+export function eligibleCandidates(
+  candidates: readonly DervioCandidate[],
+  startDate: string,
+  endDate?: string,
+): DervioCandidate[] {
+  return homeInWindow(candidates, startDate, endDate).filter((c) => isDervioGroup(c.group));
+}
+
+/** End of a match in minutes (calendar end, else kick-off + default duration), null if unknown. */
+export function matchEndMin(c: DervioCandidate): number | null {
+  const start = toMinutes(c.time ?? "");
+  if (start === null) return null;
+  const end = c.end ? toMinutes(c.end) : null;
+  if (end !== null && end > start) return end;
+  const format = GROUP_FORMAT[c.group];
+  return format ? start + DEFAULT_DURATION[format] : null;
+}
+
+/** Why a home match cannot be the Dervio match, or null if it can. */
+export function exclusionReason(
+  c: DervioCandidate,
+  options: Pick<RotationOptions, "lightsVerified" | "winterPolicy"> = {},
+): ExclusionReason | null {
+  if (UNVERIFIED_YEAR_GROUPS.includes(c.group)) return "group-year-unverified";
+  if (!isDervioGroup(c.group)) return "group-not-in-rotation";
+  if (options.winterPolicy === "skip" && DERVIO_SURFACE !== "synthetic" && isWinterDay(c.date))
+    return "winter-grass";
+  if (!options.lightsVerified) {
+    const end = matchEndMin(c);
+    if (end === null) return "kickoff-unknown";
+    if (end > LIGHTS_AFTER_MIN) return "needs-lights";
+  }
+  return null;
 }
 
 /**
  * Picks the Dervio match of each week (round robin over {@link DERVIO_AGE_ORDER}).
  *
  * In each week, starting from the group after the last one that played at Dervio
- * (the youngest at the start), the first group in cyclic age order that has an eligible
- * home match that week plays; if it has more than one, the earliest one. Weeks with no
- * eligible match are returned with `pick: null` and are skipped by the rotation.
+ * (the youngest at the start), the first group in cyclic age order that has an allowed
+ * home match that week plays; if it has more than one, the earliest one. Matches that
+ * need lights (or winter grass with policy "skip") are excluded with a visible reason and
+ * the next group in order is tried. Weeks with no allowed match are returned with
+ * `pick: null` and do not advance the rotation.
  */
 export function planDervioRotation(
   candidates: readonly DervioCandidate[],
   options: RotationOptions = {},
 ): DervioWeek[] {
   const startDate = options.startDate ?? DERVIO_START_DATE;
-  const eligible = eligibleCandidates(candidates, startDate, options.endDate);
-  const endDate = options.endDate ?? eligible.at(-1)?.date;
+  assertIsoDay("startDate", startDate);
+  if (options.endDate !== undefined) assertIsoDay("endDate", options.endDate);
+  const considered = homeInWindow(candidates, startDate, options.endDate);
+  const endDate = options.endDate ?? considered.at(-1)?.date;
   if (!endDate || endDate < startDate) return [];
 
-  const byWeek = new Map<string, DervioCandidate[]>();
-  for (const c of eligible) {
+  const byWeek = new Map<string, { allowed: DervioCandidate[]; excluded: DervioExclusion[] }>();
+  for (const c of considered) {
     const w = weekStartOf(c.date);
-    const list = byWeek.get(w);
-    if (list) list.push(c);
-    else byWeek.set(w, [c]);
+    const bucket = byWeek.get(w) ?? { allowed: [], excluded: [] };
+    byWeek.set(w, bucket);
+    const reason = exclusionReason(c, options);
+    if (reason) bucket.excluded.push({ matchId: c.id, group: c.group, date: c.date, reason });
+    else bucket.allowed.push(c);
   }
 
   const n = DERVIO_AGE_ORDER.length;
@@ -157,14 +287,20 @@ export function planDervioRotation(
     options.lastGroup != null ? (DERVIO_AGE_ORDER.indexOf(options.lastGroup) + 1) % n : 0;
   const weeks: DervioWeek[] = [];
   for (let w = weekStartOf(startDate); w <= endDate; w = addDays(w, 7)) {
-    const inWeek = byWeek.get(w) ?? [];
+    const bucket = byWeek.get(w) ?? { allowed: [], excluded: [] };
     let pick: DervioPick | null = null;
     for (let step = 0; step < n && !pick; step++) {
       const group = DERVIO_AGE_ORDER[(pointer + step) % n];
       if (group === undefined) continue;
-      const match = inWeek.find((c) => c.group === group);
+      const match = bucket.allowed.find((c) => c.group === group);
       if (match) {
-        pick = { match, group, label: GROUP_LABEL[group] ?? group };
+        pick = {
+          match,
+          group,
+          label: GROUP_LABEL[group] ?? group,
+          endMin: matchEndMin(match),
+          winterGrass: DERVIO_SURFACE !== "synthetic" && isWinterDay(match.date),
+        };
         pointer = (DERVIO_AGE_ORDER.indexOf(group) + 1) % n;
       }
     }
@@ -172,7 +308,12 @@ export function planDervioRotation(
       weekStart: w,
       weekEnd: addDays(w, 6),
       pick,
-      skipReason: pick ? null : "no-eligible-home-match",
+      skipReason: pick
+        ? null
+        : bucket.excluded.length > 0
+          ? "all-excluded"
+          : "no-eligible-home-match",
+      excluded: bucket.excluded,
     });
   }
   return weeks;
@@ -217,11 +358,10 @@ export interface ChecklistItem {
   status: ChecklistStatus;
 }
 
-export type PitchSurface = "grass" | "synthetic" | "unknown";
-
 /**
- * Lead days before the match. `null` = deadline not decided: the item still appears,
- * with status "no-deadline" (never a guessed date).
+ * Lead days before the match (integers, clamped to 0–{@link MAX_LEAD_DAYS}).
+ * `null` = deadline not decided: the item still appears, with status "no-deadline"
+ * (never a guessed date).
  */
 export interface ChecklistLeadDays {
   teamNotice: number;
@@ -246,6 +386,34 @@ export const DEFAULT_LEAD_DAYS: Readonly<ChecklistLeadDays> = {
   guestsRefereeNotice: null,
 };
 
+export const MAX_LEAD_DAYS = 60;
+
+/** Integer in [0, MAX_LEAD_DAYS]; non-finite values fall back to `fallback`. */
+function clampLead<T extends number | null>(value: unknown, fallback: T): number | T {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
+  return Math.min(MAX_LEAD_DAYS, Math.max(0, Math.round(value)));
+}
+
+/** Lead days with injected overrides, clamped to integers 0–60 (null stays "no deadline"). */
+export function resolveLeadDays(overrides: Partial<ChecklistLeadDays> = {}): ChecklistLeadDays {
+  const d = DEFAULT_LEAD_DAYS;
+  const req = (k: "teamNotice" | "allNotice" | "weatherCheck" | "weatherDecision"): number =>
+    clampLead(overrides[k], d[k]);
+  const opt = (k: "comuneNotice" | "lndSgsFieldChange" | "guestsRefereeNotice"): number | null => {
+    const v = overrides[k] === undefined ? d[k] : overrides[k];
+    return v === null ? null : clampLead(v, d[k]);
+  };
+  return {
+    teamNotice: req("teamNotice"),
+    allNotice: req("allNotice"),
+    weatherCheck: req("weatherCheck"),
+    weatherDecision: req("weatherDecision"),
+    comuneNotice: opt("comuneNotice"),
+    lndSgsFieldChange: opt("lndSgsFieldChange"),
+    guestsRefereeNotice: opt("guestsRefereeNotice"),
+  };
+}
+
 export interface ChecklistInput {
   /** Match day (ISO). */
   matchDate: string;
@@ -253,7 +421,7 @@ export interface ChecklistInput {
   today: string;
   /** Items already completed (from the gestionale). */
   done?: ReadonlySet<ChecklistItemId> | readonly ChecklistItemId[];
-  /** Dervio pitch surface. Unknown keeps the weather items (fail-safe). */
+  /** Pitch surface. Default {@link DERVIO_SURFACE}; unknown keeps the weather items (fail-safe). */
   surface?: PitchSurface;
   leadDays?: Partial<ChecklistLeadDays>;
 }
@@ -301,11 +469,13 @@ export function itemStatus(
   return "upcoming";
 }
 
-/** Checklist with due dates and statuses for one Dervio match. */
+/** Checklist with due dates and statuses for one Dervio match. Throws on invalid ISO days. */
 export function dervioChecklist(input: ChecklistInput): ChecklistItem[] {
-  const lead: ChecklistLeadDays = { ...DEFAULT_LEAD_DAYS, ...input.leadDays };
+  assertIsoDay("matchDate", input.matchDate);
+  assertIsoDay("today", input.today);
+  const lead = resolveLeadDays(input.leadDays);
   const done = new Set<ChecklistItemId>(input.done ?? []);
-  const grassOrUnknown = (input.surface ?? "grass") !== "synthetic";
+  const grassOrUnknown = (input.surface ?? DERVIO_SURFACE) !== "synthetic";
   const due = (days: number | null): string | null =>
     days === null ? null : minusDays(input.matchDate, days);
 
@@ -366,8 +536,8 @@ export interface RainForecast {
 }
 
 /**
- * Thresholds for "rain is forecast". PROPOSED defaults (not decided by the DG yet):
- * probability ≥ 50% or ≥ 1 mm.
+ * Thresholds for "rain is forecast" (clamped to 0–100). PROPOSED defaults (not decided
+ * by the DG yet): probability ≥ 50% or ≥ 1 mm.
  */
 export interface RainThresholds {
   minProbability: number;
@@ -399,18 +569,29 @@ export interface RainDecision {
   decideOn: string;
 }
 
+const clampThreshold = (v: number | undefined, fallback: number): number =>
+  typeof v === "number" && Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : fallback;
+
 /** Rain rule: forecast → "valuta cambio giorno" flag, decided the day before. */
 export function rainDecision(
   matchDate: string,
   forecast: RainForecast | null | undefined,
   options: {
+    /** Default {@link DERVIO_SURFACE}. */
     surface?: PitchSurface;
     thresholds?: Partial<RainThresholds>;
     leadDays?: Partial<Pick<ChecklistLeadDays, "weatherCheck" | "weatherDecision">>;
   } = {},
 ): RainDecision {
-  const lead = { ...DEFAULT_LEAD_DAYS, ...options.leadDays };
-  const t = { ...DEFAULT_RAIN_THRESHOLDS, ...options.thresholds };
+  assertIsoDay("matchDate", matchDate);
+  const lead = resolveLeadDays(options.leadDays);
+  const t: RainThresholds = {
+    minProbability: clampThreshold(
+      options.thresholds?.minProbability,
+      DEFAULT_RAIN_THRESHOLDS.minProbability,
+    ),
+    minMm: clampThreshold(options.thresholds?.minMm, DEFAULT_RAIN_THRESHOLDS.minMm),
+  };
   const base = {
     checkOn: minusDays(matchDate, lead.weatherCheck),
     decideOn: minusDays(matchDate, lead.weatherDecision),
@@ -421,7 +602,7 @@ export function rainDecision(
     ...base,
   });
 
-  if (options.surface === "synthetic") return make("non-erba");
+  if ((options.surface ?? DERVIO_SURFACE) === "synthetic") return make("non-erba");
   if (!forecast || forecast.date !== matchDate) return make("previsione-mancante");
 
   const p = forecast.precipitationProbability;
