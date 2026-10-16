@@ -143,6 +143,7 @@ function IntakePage({ data }: { data: IntakeDesk }) {
                 "«Decide presidente e consiglio direttivo» (16:39): affitto dei campi e visite ai centri li decidono il Presidente e il Consiglio Direttivo (in app: chi ha il ruolo Direzione).",
                 "«Preparo e inoltro» (16:55): su affitti e visite il DG prepara e inoltra. «Tengo anche Direzione» (17:00): come membro del Consiglio può decidere anche lui.",
                 "«Tutte e due gratis» (17:10): le visite ai centri non si pagano; gratis anche visite mediche, massaggi e nutrizione quando arriveranno.",
+                "«12 mesi» (~19:20): i recapiti di chi scrive dall'esterno si tengono 12 mesi dall'arrivo, 6 mesi dopo «Non accolta» o «Annullata», 12 mesi dopo «Chiusa»; la cancellazione automatica ogni notte parte quando Francesco approva il job.",
               ]}
             />
           </Card>
@@ -153,7 +154,6 @@ function IntakePage({ data }: { data: IntakeDesk }) {
                 "Chi decide gli altri tipi: tornei responsabile tornei, DG e Presidente; sponsor e convenzioni DG, Presidente e Consiglio; altro Segreteria, DG e Presidente.",
                 "Chi prepara e chi è informato per ogni tipo.",
                 "Sponsor e convenzioni: contratto e fattura, nessun link di pagamento. Tornei, affitti e altro: pagamento dopo «Accettata».",
-                "I recapiti hanno una scadenza (proposta: 6 o 12 mesi); la cancellazione automatica si attiva con un job da creare.",
                 "Al massimo 60 richieste all'ora dal modulo pubblico.",
               ]}
             />

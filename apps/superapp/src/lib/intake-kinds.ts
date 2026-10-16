@@ -68,8 +68,9 @@ export const INTAKE_SITE_LABEL: Readonly<Record<IntakeSite, string>> = { COLICO:
  * and, VERIFIED ~16:55, «Preparo e inoltro» (answer to: "Nell'app il Consiglio Direttivo corrisponde a chi ha il ruolo
  * «Direzione». Tu, come DG, su queste due richieste cosa fai?"): the DG is a preparer of these two kinds, and the
  * Consiglio Direttivo is the Direzione (position 'direzione' / role DIRECTION, as BOARD_POSITION in chi-fa-cosa.ts). PROPOSED, to be confirmed: the deciders of the other kinds, every
- * preparer/informed/owner list, the per-kind payment-link yes/no, the 60/hour ingest cap and the contact retention
- * periods. No threshold under which the DG decides alone: not decided, not implemented. VERIFIED ~17:00: «Tengo anche
+ * preparer/informed/owner list, the per-kind payment-link yes/no and the 60/hour ingest cap. VERIFIED ~19:20 «12 mesi»:
+ * contact retention 12 months from receipt, 6 after RIFIUTATA/ANNULLATA, 12 after CHIUSA (r139; daily purge job r140
+ * STAGED). No threshold under which the DG decides alone: not decided, not implemented. VERIFIED ~17:00: «Tengo anche
  * Direzione» (the DG keeps the role Direzione, so he can also decide rentals and visits as a Consiglio member) and
  * «No, senza pagamento» to "Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della
  * Tesoreria?" and, ~17:10, «Tutte e due gratis» to the clarified question (visit of a school or group to the centre vs
