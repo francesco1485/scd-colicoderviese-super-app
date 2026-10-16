@@ -24,6 +24,8 @@ export function SponsorLedwallLive() {
   const [inView, setInView] = useState(true);
   const [pageVisible, setPageVisible] = useState(true);
   const firstReadyAt = useRef(0);
+  const pausedRef = useRef(false);
+  pausedRef.current = paused;
   const box = useRef<HTMLElement>(null);
 
   // Pause while the page is hidden or the board is off screen: no video download nobody watches.
@@ -51,6 +53,8 @@ export function SponsorLedwallLive() {
     const set = () => {
       setStill(mq.matches);
       if (mq.matches) setFrozenAt((f) => f ?? Date.now());
+      // Reduced motion off again: forget the old freeze unless the visitor paused by hand.
+      else if (!pausedRef.current) setFrozenAt(null);
     };
     set();
     mq.addEventListener("change", set);

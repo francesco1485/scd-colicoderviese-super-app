@@ -22,6 +22,7 @@ import { loginSearch } from "@/components/scd/AccessMenu";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { useMinuteClock } from "@/lib/use-minute-clock";
+import { HomeBordoCampo } from "@/components/home/HomeBordoCampo";
 import { HomeSlides } from "@/components/home/HomeSlides";
 import { venueShort } from "@/components/home/HomeSections";
 import { groupShort } from "@/lib/board-data";
@@ -596,6 +597,9 @@ export function HomeLobby({
           <Services />
         </div>
         <MonthCard events={calendar.events} today={today} nowMs={nowMs} groups={calendar.groups} />
+      </div>
+      <div className={`${WRAP} pb-6 pt-5 lg:pb-10 lg:pt-7`}>
+        <HomeBordoCampo day={today} />
       </div>
     </div>
   );

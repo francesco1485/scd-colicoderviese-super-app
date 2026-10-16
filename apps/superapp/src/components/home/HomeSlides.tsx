@@ -15,11 +15,17 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { loginSearch } from "@/components/scd/AccessMenu";
 import { VERA_OPEN_EVENTS } from "@/lib/assistant-open";
 import { castPortraitSrc } from "@/lib/assistant-cast";
+import { TONES, toneAt, type Tone } from "@/components/home/tones";
 import type { VetrinaSlot } from "@/lib/vetrina";
 
 const KIT_FULL = "/media/kit/kit-2026-27-blu.webp";
 const ADVANCE_MS = 7000;
 const LABEL = "font-display text-[11px] font-bold uppercase tracking-[0.1em] lg:text-[12px]";
+
+/** Colour of slide i: avatar azzurro, Iride navy, then sole, navy, azzurro… (Francesco 21:54 «anche altri colori»). */
+export function slideTone(i: number): Tone {
+  return i === 0 ? "azzurro" : i === 1 ? "navy" : toneAt(i);
+}
 
 /** Next slide index, wrapping. */
 export function nextIndex(i: number, n: number, step = 1): number {
@@ -77,6 +83,7 @@ function Slide({
   action: ReactNode;
   id: string;
 }) {
+  const t = TONES[slideTone(index)];
   return (
     <li
       className="w-full shrink-0 snap-start snap-always"
@@ -85,14 +92,14 @@ function Slide({
       aria-label={`${index + 1} di ${total}: ${title}`}
       data-slide={id}
     >
-      <div className="scd-band grid h-full overflow-hidden rounded-[14px] text-white shadow-[0_10px_24px_-16px_rgb(15_29_61/0.8)] ring-1 ring-[#b8c5dd]/30 lg:grid-cols-[minmax(0,46%)_minmax(0,1fr)]">
-        <div className="relative aspect-[16/9] overflow-hidden bg-[radial-gradient(circle_at_60%_35%,rgb(127_208_255/0.35),transparent_65%)] lg:aspect-auto lg:min-h-[248px]">
+      <div data-tone={slideTone(index)} className={`${t.band} grid h-full overflow-hidden rounded-[14px] shadow-[0_10px_24px_-16px_rgb(15_29_61/0.8)] ring-1 ring-[#b8c5dd]/30 lg:grid-cols-[minmax(0,46%)_minmax(0,1fr)]`}>
+        <div className={`relative aspect-[16/9] overflow-hidden ${t.glow} lg:aspect-auto lg:min-h-[248px]`}>
           {media}
         </div>
         <div className="flex flex-col gap-1.5 p-4 lg:justify-center lg:gap-2 lg:p-7">
-          <span className={`${LABEL} text-[#ffd84a]`}>{kicker}</span>
+          <span className={`${LABEL} ${t.kicker}`}>{kicker}</span>
           <h3 className="m-0 font-display text-[22px] font-bold leading-[1.05] lg:text-[28px]">{title}</h3>
-          <p className="m-0 text-[14px] leading-snug text-[#dbe5f7] lg:text-[16px]">{text}</p>
+          <p className={`m-0 text-[14px] leading-snug ${t.body} lg:text-[16px]`}>{text}</p>
           <div className="mt-2">{action}</div>
         </div>
       </div>
@@ -100,7 +107,7 @@ function Slide({
   );
 }
 
-const CTA = "scd-gold scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-4 font-display text-[15px] font-semibold";
+const CTA_BASE = "scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-4 font-display text-[15px] font-semibold";
 
 export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
   const track = useRef<HTMLUListElement>(null);
@@ -133,7 +140,7 @@ export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
         </span>
       }
       action={
-        <Link to="/accedi" search={loginSearch("/la-mia-scd/campione")} className={CTA} data-testid="slide-avatar">
+        <Link to="/accedi" search={loginSearch("/la-mia-scd/campione")} className={`${TONES[slideTone(i)].cta} ${CTA_BASE}`} data-testid="slide-avatar">
           Crea il tuo avatar
           <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
@@ -159,7 +166,7 @@ export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
         </span>
       }
       action={
-        <button type="button" onClick={openAssistant} className={CTA} data-testid="slide-iride">
+        <button type="button" onClick={openAssistant} className={`${TONES[slideTone(i)].cta} ${CTA_BASE}`} data-testid="slide-iride">
           <MessageCircle className="size-4" aria-hidden="true" />
           Scrivi a Iride
         </button>
@@ -178,7 +185,7 @@ export function HomeSlides({ slots }: { slots: readonly VetrinaSlot[] }) {
         text={s.text}
         media={<PostMedia s={s} />}
         action={
-          <Link to={s.href as never} search={s.search as never} {...(s.hash ? { hash: s.hash } : {})} className={CTA} data-slot={s.id}>
+          <Link to={s.href as never} search={s.search as never} {...(s.hash ? { hash: s.hash } : {})} className={`${TONES[slideTone(i)].cta} ${CTA_BASE}`} data-slot={s.id}>
             {s.cta}
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
