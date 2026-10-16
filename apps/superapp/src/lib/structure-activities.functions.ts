@@ -1,12 +1,15 @@
 /**
- * "Attività in struttura" on the server (staged migration r135 NOT APPLIED).
+ * "Attività in struttura" on the server (migration r135, APPLIED on SCD PULSE 16/10/2026).
  *
  * The page gate is the shared work-area gate (registry area "struttura"). The quadro of the trainings comes from
  * getTrainingQuadro (server only, UD-100) and the home matches from the calendar snapshot. r135 is read with the
  * caller's own Supabase session (publishable key + cookies): scd_structure_week checks roles and positions by itself,
  * nothing here trusts the browser. Per site (UD-156): Dervio rows only for Direzione, Segreteria, presidente, DG,
- * coordinatore attività sportiva and responsabile attività di base; the answer says which sites the caller reads. Until r135 is applied every read fails closed: `ready: false`, the page says
- * "Funzione in preparazione: serve applicare r135" and the shift KPIs stay unknown, never zero. Nothing is written.
+ * coordinatore attività sportiva and responsabile attività di base; the answer says which sites the caller reads. Every
+ * read fails closed. Function not reachable (machineMissing): `ready: false`, offReason "unreachable", the page says
+ * "Registro non raggiungibile, riprova più tardi". No session or no club organization: `ready: false`, offReason
+ * "not-linked", the page says "Accesso al registro non collegato al tuo profilo club". A malformed answer is a read
+ * error (activities null). Shift KPIs stay unknown in every such case, never zero. Nothing is written.
  */
 import { createServerFn } from "@tanstack/react-start";
 
@@ -32,8 +35,10 @@ export interface StructureBoard {
   today: string;
   /** False without Supabase keys, session or organization (e.g. the staging preview). */
   connected: boolean;
-  /** False while r135 is not applied: activities is then null. */
+  /** False when the registry was not read (see offReason): activities is then null. */
   ready: boolean;
+  /** Why the registry was not read: "unreachable" (function missing on the database) or "not-linked" (no session or organization). */
+  offReason: StructureOffReason | null;
   activities: StructureActivity[] | null;
   /**
    * Sites whose r135 rows the caller reads (UD-156: Dervio only for Direzione, Segreteria, presidente, DG, coordinatore
@@ -50,7 +55,17 @@ export interface StructureBoard {
   calendarModifiedAt: string;
 }
 
-export const STRUCTURE_OFF = "Funzione in preparazione: serve applicare r135.";
+export type StructureOffReason = "unreachable" | "not-linked";
+
+export const STRUCTURE_UNREACHABLE = "Registro non raggiungibile, riprova più tardi";
+export const STRUCTURE_NOT_LINKED = "Accesso al registro non collegato al tuo profilo club";
+
+/** Notice of a board whose registry was not read; null when it was read (errors use the role="alert" message). */
+export function structureOffMessage(reason: StructureOffReason | null): string | null {
+  if (reason === "unreachable") return STRUCTURE_UNREACHABLE;
+  if (reason === "not-linked") return STRUCTURE_NOT_LINKED;
+  return null;
+}
 
 export const STRUCTURE_DENIED = "Lettura non riuscita: serve un accesso Direzione, Segreteria o responsabile della struttura.";
 export const STRUCTURE_READ_FAILED = "Lettura non riuscita, riprova più tardi";
@@ -74,6 +89,7 @@ export function emptyStructureBoard(gate: WorkAreaGate): StructureBoard {
     today: romeParts(new Date().toISOString())?.date ?? new Date().toISOString().slice(0, 10),
     connected: false,
     ready: false,
+    offReason: null,
     activities: null,
     readableSites: [],
     error: null,
@@ -110,14 +126,19 @@ export const getStructureBoard = createServerFn({ method: "GET" }).handler(async
       )
     : [];
   const sb = s.configured && s.user && org ? serverSupabase() : null;
-  if (!sb || !org) return { ...open, readableSites: mirror };
+  if (!sb || !org) return { ...open, offReason: "not-linked", readableSites: mirror };
   const win = structureWindow(base.today);
   const { data, error } = await sb.rpc("scd_structure_week", { p_organization_id: org.organizationId, p_from: win.from, p_to: win.to });
-  if (machineMissing(error)) return { ...open, connected: true, readableSites: mirror };
+  if (machineMissing(error)) return { ...open, connected: true, offReason: "unreachable", readableSites: mirror };
   if (error) {
     // 42501: the database says the caller reads no site; any other failure keeps the session rule.
     return { ...open, connected: true, ready: true, readableSites: error.code === "42501" ? [] : mirror, error: structureReadError(error) };
   }
   const read = parseStructureWeekResult(data);
+  // Malformed answer: unknown, never an empty week; the session rule keeps the sites, the page shows one alert.
+  if (read.activities === null) {
+    console.warn("[struttura] scd_structure_week: risposta non valida");
+    return { ...open, connected: true, ready: true, readableSites: mirror, error: STRUCTURE_READ_FAILED };
+  }
   return { ...open, connected: true, ready: true, activities: read.activities, readableSites: read.readableSites };
 });

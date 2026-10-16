@@ -3482,12 +3482,12 @@
         "scope": "STRUCTURE_DERVIO",
         "engines": "TEMPO (decisions on Dervio stay with the few people who take them, Segreteria informed without phone calls) and PERSONE (one clear owner per centre)",
         "measure": "Dervio rows visible only to the allowed readers (PGlite test r135); once the write path exists: share of Dervio changes with a Segreteria notification (target 100%)",
-        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_PENDING",
+        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_APPLIED",
         "constraints": [
           "SQL public.scd_structure_reader_site(p_organization_id, p_site) is the single per-site check; scd_structure_reader is the any-site gate; scd_structure_week returns only rows of readable sites and the list readableSites",
           "TS mirror STRUCTURE_READER_POSITIONS_BY_SITE in apps/superapp/src/lib/structure-activities.ts, kept equal by structure-migration.test.ts",
           "the Segreteria notification is in-app only (no e-mail or message to third parties); a write function without it is refused in review",
-          "r135 is applied only by the main session after this commit ('Applica r135', 06:56)"
+          "r135 APPLIED on SCD PULSE (ndevtxxijbcnskgysdit) on 16/10/2026 by the main session after 'Applica r135' (06:56); prerequisite and post-apply checks recorded in apps/superapp/docs/RELEASE2_LOG.md"
         ],
         "implementation": {
           "migration": "supabase/migrations/20261016_r135_structure_activities.sql",

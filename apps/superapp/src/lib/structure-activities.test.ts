@@ -288,9 +288,16 @@ describe("Dervio reserved (UD-156, Francesco 16/10/2026 06:57)", () => {
     };
     const r = parseStructureWeekResult(data);
     expect(r.readableSites).toEqual(["COLICO"]);
-    expect(r.activities.map((a) => a.site)).toEqual(["COLICO"]);
-    expect(parseStructureWeekResult([row("44444444-4444-4444-8444-444444444444", "COLICO")])).toEqual({ readableSites: [], activities: [] });
-    expect(parseStructureWeekResult(null)).toEqual({ readableSites: [], activities: [] });
-    expect(parseStructureWeekResult({ readableSites: ["DERVIO", "COLICO"], activities: "x" })).toEqual({ readableSites: ["COLICO", "DERVIO"], activities: [] });
+    expect(r.activities?.map((a) => a.site)).toEqual(["COLICO"]);
+    expect(parseStructureWeekResult({ readableSites: ["COLICO"], activities: [] })).toEqual({ readableSites: ["COLICO"], activities: [] });
+  });
+
+  it("parseStructureWeekResult reads a malformed answer as unknown (activities null), never as an empty week", () => {
+    const row = (id: string, site: string) => ({ ...act({ id }), site });
+    expect(parseStructureWeekResult([row("44444444-4444-4444-8444-444444444444", "COLICO")])).toEqual({ readableSites: [], activities: null });
+    expect(parseStructureWeekResult(null)).toEqual({ readableSites: [], activities: null });
+    expect(parseStructureWeekResult("x")).toEqual({ readableSites: [], activities: null });
+    expect(parseStructureWeekResult({ readableSites: ["DERVIO", "COLICO"], activities: "x" })).toEqual({ readableSites: [], activities: null });
+    expect(parseStructureWeekResult({ activities: [] })).toEqual({ readableSites: [], activities: null });
   });
 });

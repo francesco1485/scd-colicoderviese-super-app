@@ -21,7 +21,7 @@ import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead }
 import { roleLabel } from "@/lib/access";
 import { dateParts } from "@/lib/board-data";
 import { freshnessLabel } from "@/lib/public-snapshots";
-import { STRUCTURE_OFF, emptyStructureBoard, getStructureBoard, type StructureBoard } from "@/lib/structure-activities.functions";
+import { emptyStructureBoard, structureOffMessage, getStructureBoard, type StructureBoard } from "@/lib/structure-activities.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import {
   KIND_LABEL,
@@ -41,8 +41,10 @@ import {
 /**
  * Attività in struttura (Francesco 15/10/2026 14:33, 16/10/2026 06:23): the week of the centres of Colico and Dervio
  * besides official matches. Trainings (Quadro settimanale) and home matches (Master Calendario) already known are
- * shown as they are; shifts, openings, closings, evening activities and Club House evenings come from the staged
- * r135 and stay "in preparazione" until it is applied. Roles only, never names; no minors' data. Read-only.
+ * shown as they are; shifts, openings, closings, evening activities and Club House evenings come from r135 (applied
+ * on SCD PULSE 16/10/2026). When the registry is not read the page says why (not reachable, or access not linked to
+ * the club profile) and the shift KPIs stay unknown; a read error is announced by one role="alert" only. Roles only,
+ * never names; no minors' data. Read-only.
  * Desktop: VR-026 (KPI tiles, 7-day grid). Phone: VR-025 (site pills, week strip, day list with coloured bar).
  */
 export const Route = createFileRoute("/gestionale/struttura")({
@@ -121,10 +123,9 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
         <div role="status" className="flex items-start gap-3 rounded-2xl border border-[#f1dc7a] bg-[#fffbe6] px-4 py-3 sm:px-[18px]">
           <CircleAlert className="mt-0.5 size-5 flex-none text-[var(--in-warn)]" strokeWidth={2} aria-hidden="true" />
           <p className="m-0 text-[14.5px] leading-snug">
-            <b className="block text-[15.5px]">{STRUCTURE_OFF}</b>
-            Turni volontari, aperture, chiusure, attività serali e serate Club House compariranno qui quando la Direzione
-            attiverà il registro della struttura. Ora vedi solo allenamenti e gare in casa già noti.
-            {!data.connected && " In questa anteprima il database del club non è collegato."}
+            <b className="block text-[15.5px]">{structureOffMessage(data.offReason) ?? structureOffMessage("unreachable")}</b>
+            Turni volontari, aperture, chiusure, attività serali e serate Club House non sono stati letti. Ora vedi solo
+            allenamenti e gare in casa già noti.
           </p>
         </div>
       )}
@@ -136,8 +137,8 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
 
       <section aria-label="Numeri della settimana" className="grid grid-cols-3 gap-2 lg:gap-[18px]">
         <KpiTile icon={CalendarDays} value={week.kpi.activities} label="attività note in settimana" sub="allenamenti solo Colico" />
-        <KpiTile icon={Users} value={week.kpi.uncoveredShifts} label="turni scoperti" sub={notReady ? "da attivare (r135)" : "senza nessuno"} warn />
-        <KpiTile icon={Moon} value={week.kpi.clubHouseEvenings} label="serate Club House" sub={notReady ? "da attivare (r135)" : "in settimana"} />
+        <KpiTile icon={Users} value={week.kpi.uncoveredShifts} label="turni scoperti" sub={notReady ? "registro non letto" : "senza nessuno"} warn />
+        <KpiTile icon={Moon} value={week.kpi.clubHouseEvenings} label="serate Club House" sub={notReady ? "registro non letto" : "in settimana"} />
       </section>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -262,11 +263,11 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
           <Card id="str-turni" title="Turni e aperture" sub="Volontari, staff e tesserati in struttura: il responsabile è un ruolo, mai un nome.">
             <div className="px-4 pb-4 sm:px-[18px]">
               {data.ready && data.activities === null ? (
-                <EmptyState title="Turni non leggibili">{data.error ?? "Lettura non riuscita."} Nessun turno è mostrato al posto di quelli veri.</EmptyState>
+                <EmptyState title="Turni non leggibili">Nessun turno è mostrato al posto di quelli veri.</EmptyState>
               ) : notReady ? (
-                <EmptyState title="Nessun turno registrato">
-                  Il registro dei turni non è ancora attivo (migrazione r135 da applicare). Nessun turno è stato inventato:
-                  quando la Direzione lo attiva, qui compaiono turni volontari, aperture, chiusure e chi è di turno per ruolo.
+                <EmptyState title="Turni non letti">
+                  Il registro dei turni non è stato letto. Nessun turno è stato inventato:
+                  quando il registro risponde, qui compaiono turni volontari, aperture, chiusure e chi è di turno per ruolo.
                 </EmptyState>
               ) : (
                 <ShiftSummary items={week.sites.COLICO.concat(week.sites.DERVIO).flatMap((d) => d.items).filter((i) => i.source === "STRUTTURA")} />
@@ -331,7 +332,7 @@ function DayList({ items, site, notReady }: { items: WeekItem[]; site: Structure
           {site === "DERVIO"
             ? "Il quadro allenamenti copre solo i campi di Colico e a Dervio non ci sono gare in casa in calendario per questo giorno."
             : "Nessun allenamento o gara in casa per questo giorno."}
-          {notReady && " I turni compariranno con il registro della struttura (r135)."}
+          {notReady && " I turni del registro della struttura non sono stati letti."}
         </EmptyState>
       </div>
     );
@@ -422,7 +423,7 @@ function WeekSourceLine({ site, data }: { site: StructureSite; data: StructureBo
     <SourceLine>
       Allenamenti: Quadro settimanale (copia del {data.quadroUTC ? freshnessLabel(data.quadroUTC) : "—"}, solo campi di Colico) ·
       Gare in casa: Calendario FIGC/LND (copia del {freshnessLabel(data.calendarModifiedAt)}) · Turni e attività: registro
-      della struttura {data.ready ? "(r135)" : "da attivare (r135)"}.
+      della struttura {data.ready ? "(r135)" : "(r135, non letto)"}.
       {site === "DERVIO" && " Per Dervio il quadro non ha orari di allenamento."}
     </SourceLine>
   );

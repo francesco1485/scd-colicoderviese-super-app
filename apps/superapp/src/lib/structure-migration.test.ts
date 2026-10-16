@@ -24,10 +24,10 @@ const body = sql
 const quoted = (s: string) => [...s.matchAll(/'([A-Za-z_-]+)'/g)].map((m) => m[1]);
 const checkList = (col: string) => quoted(body.match(new RegExp(`${col} text not null[^,]*?check \\(${col} in \\(([^)]*)\\)`))?.[1] ?? "");
 
-describe("r135 structure activities (staged, not applied)", () => {
-  it("is staged behind 'applica r135', transactional, documents engines, measure and rollback", () => {
-    expect(sql).toMatch(/STAGED: NOT APPLIED/);
-    expect(sql).toContain('"applica r135"');
+describe("r135 structure activities (applied)", () => {
+  it("records the apply on SCD PULSE after 'Applica r135', is transactional, documents engines, measure and rollback", () => {
+    expect(sql).toMatch(/APPLIED on SCD PULSE/);
+    expect(sql).toMatch(/"Applica r135" \(06:56\)/);
     expect(sql).toMatch(/-- Rollback/);
     expect(sql).toMatch(/-- Engines: TEMPO/);
     expect(sql).toMatch(/Measure:/);

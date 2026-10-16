@@ -3,7 +3,7 @@
  * matches. Pure logic, no network: the week view merges three sources without copying them into a new register:
  *   - trainings of the Quadro settimanale (Colico fields only: the quadro has no Dervio rows);
  *   - home matches of the Master Calendario snapshot (club and opponent club names, no people);
- *   - activities and duty shifts of the staged table r135 (scd_structure_activities), read only once applied.
+ *   - activities and duty shifts of r135 (scd_structure_activities, applied on SCD PULSE 16/10/2026).
  * Unknown stays null ("—"), never zero: KPIs of the shifts are null until r135 answers.
  * No personal data: the responsible is a role id of the registry, never a person's name. Tested in
  * structure-activities.test.ts; the vocabularies mirror the r135 SQL (structure-migration.test.ts).
@@ -52,7 +52,7 @@ export const STRUCTURE_READER_POSITIONS: readonly string[] = [
 
 /**
  * Sites whose r135 rows a caller reads, from the coarse database roles of the club membership and the positions of
- * the session. Same rule as scd_structure_reader_site; used only while the database cannot answer (r135 not applied,
+ * the session. Same rule as scd_structure_reader_site; used only while the database cannot answer (function not reachable,
  * preview): when r135 answers, its readableSites wins.
  */
 export function structureReadableSites(dbRoles: readonly string[], positions: ReadonlySet<string>): StructureSite[] {
@@ -113,13 +113,16 @@ const text = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v
 
 /**
  * Answer of scd_structure_week: { readableSites, activities }. Rows of a site not in readableSites are dropped (the
- * database already filters them; this is a second lock). Anything malformed reads as "no site, no row".
+ * database already filters them; this is a second lock). A malformed envelope (not an object, readableSites or
+ * activities not an array) reads as "no site" and activities null: unknown, never an empty week.
  */
-export function parseStructureWeekResult(input: unknown): { readableSites: StructureSite[]; activities: StructureActivity[] } {
-  if (!input || typeof input !== "object" || Array.isArray(input)) return { readableSites: [], activities: [] };
+export function parseStructureWeekResult(input: unknown): { readableSites: StructureSite[]; activities: StructureActivity[] | null } {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return { readableSites: [], activities: null };
   const raw = (input as Record<string, unknown>)["readableSites"];
-  const readableSites = STRUCTURE_SITES.filter((s) => Array.isArray(raw) && raw.includes(s));
-  const activities = parseStructureActivities((input as Record<string, unknown>)["activities"]).filter((a) => readableSites.includes(a.site));
+  const rows = (input as Record<string, unknown>)["activities"];
+  if (!Array.isArray(raw) || !Array.isArray(rows)) return { readableSites: [], activities: null };
+  const readableSites = STRUCTURE_SITES.filter((s) => raw.includes(s));
+  const activities = parseStructureActivities(rows).filter((a) => readableSites.includes(a.site));
   return { readableSites, activities };
 }
 
@@ -246,7 +249,7 @@ const byTime = (a: WeekItem, b: WeekItem) =>
 
 /**
  * The week (Mon-Sun) of `today` moved by `offset`, per site and per day, with the KPIs.
- * `activities` is null while r135 is not applied or not readable: the shift KPIs stay unknown (null).
+ * `activities` is null while r135 is not reachable or not readable: the shift KPIs stay unknown (null).
  */
 export function buildStructureWeek(input: {
   today: string;

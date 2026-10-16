@@ -1,6 +1,22 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { STRUCTURE_DENIED, STRUCTURE_READ_FAILED, structureReadError } from "./structure-activities.functions";
+import {
+  STRUCTURE_DENIED,
+  STRUCTURE_NOT_LINKED,
+  STRUCTURE_READ_FAILED,
+  STRUCTURE_UNREACHABLE,
+  structureOffMessage,
+  structureReadError,
+} from "./structure-activities.functions";
+
+describe("structureOffMessage (registry not read, r135 applied)", () => {
+  it("says why the registry was not read and never asks to apply r135", () => {
+    expect(structureOffMessage("unreachable")).toBe("Registro non raggiungibile, riprova più tardi");
+    expect(structureOffMessage("not-linked")).toBe("Accesso al registro non collegato al tuo profilo club");
+    expect(structureOffMessage(null)).toBeNull();
+    for (const m of [STRUCTURE_UNREACHABLE, STRUCTURE_NOT_LINKED]) expect(m).not.toMatch(/applica|da attivare|in preparazione/i);
+  });
+});
 
 describe("structureReadError (r135 read failures)", () => {
   afterEach(() => vi.restoreAllMocks());
