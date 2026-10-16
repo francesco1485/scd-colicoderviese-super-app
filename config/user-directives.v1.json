@@ -3945,6 +3945,32 @@
       },
       "supersedes": "UD-151 'Sky never in the app' — now Sky is allowed in the app for surprise moments only; pages stay without Sky otherwise.",
       "status": "RECORDED"
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "22:47",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-166",
+      "name": "LEDWALL_SKY_SPONSOR_INTRO_AND_GOAL_CELEBRATION",
+      "sourceQuoteFragments": [
+        "sky a rotazione dal ledwole esce e presenta lo sponsor e poi parte lo spondor sul ledwlae , poi puo fare srtiel goale e esulta per far vedere la divisa con un possible sponsor sopra"
+      ],
+      "normalizedCommand": {
+        "rule": "LED wall playlist (10 m x 1 m): in rotation Sky breaks out of the LED, introduces the sponsor, then the sponsor spot plays; Sky can also kick at goal and celebrate, showing the kit with a sponsor on it.",
+        "sequence": [
+          "Sky breakout intro (2-3 s)",
+          "Sky presents sponsor name/logo",
+          "sponsor spot (official sponsor asset)",
+          "optional: Sky shot on goal + celebration showing the kit with a sponsor slot"
+        ],
+        "guards": [
+          "only sponsors with an active contract; unsold kit slot shown as 'spazio disponibile' in sales demos only, never as a fake sponsor",
+          "official logos and kit only",
+          "no audio on LED unless the venue system and Francesco approve"
+        ]
+      },
+      "status": "RECORDED"
     }
   ],
   "completionGate": {
