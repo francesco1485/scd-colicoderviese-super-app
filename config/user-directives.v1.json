@@ -3752,7 +3752,7 @@
     },
     {
       "sourceDate": "2026-10-16",
-      "sourceTime": "afternoon before 16:30 (exact time not recorded); 16:31; ~16:42",
+      "sourceTime": "afternoon before 16:30 (exact time not recorded); 16:31; ~16:42; ~17:40",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
       "id": "UD-164",
@@ -3762,9 +3762,10 @@
         "sì, semplifica",
         "WhatsApp",
         "ok Iride v4 (16:31)",
-        "Sì, accendi la copia (~16:42, test copies only)"
+        "Sì, accendi la copia (~16:42, test copies only)",
+        "Fine stagione (~17:40, answer to «per quanto tempo li teniamo?» about the requester's name and number in the requests data store)"
       ],
-      "context": "Francesco (DG) 16/10/2026, chat PC, after finding the friendly procedure of UD-154/UD-155 too difficult («troppo difficile questa procedura»). Design in claude.ai project work (PROPOSTA_CONFERMA_DG, chat PC working folder); prompt and blueprints recorded in automations/make/segreteria-ai/ (system-prompt.it.md v4, blueprint-v4.json, promemoria-dg-v4.json, prompt-diff-v3-v4.txt, test-v4-risultati.md). UD-163 is taken by branch feat/pc-vetrina-richieste, so this entry takes UD-164. Tests T1-T10 all PASS on the inactive copies 8000995 and 8001010 with test data stores and fake TESTIRIDE numbers, no real message or mail sent; both copies switched off afterwards (VERIFIED by the PC chat with scenarios_get). The live scenario 7979437 still runs v3 and was not touched.",
+      "context": "Francesco (DG) 16/10/2026, chat PC, after finding the friendly procedure of UD-154/UD-155 too difficult («troppo difficile questa procedura»). Design in claude.ai project work (PROPOSTA_CONFERMA_DG, chat PC working folder); prompt and blueprints recorded in automations/make/segreteria-ai/ (system-prompt.it.md v4, blueprint-v4.json, promemoria-dg-v4.json, prompt-diff-v3-v4.txt, test-v4-risultati.md). UD-163 is taken by branch feat/pc-vetrina-richieste, so this entry takes UD-164. Tests T1-T10 all PASS on the inactive copies 8000995 and 8001010 with test data stores and fake TESTIRIDE numbers, no real message or mail sent; both copies switched off afterwards (VERIFIED by the PC chat with scenarios_get). The live scenario 7979437 still runs v3 and was not touched. Review 16/10 evening (fixes on the same copies, run «R», T1-T15 PASS, both copies OFF again, VERIFIED with scenarios_get): «AM» prefix mandatory in free text (a parent's «Sì 2» stays a normal conversation; the bare number only from button ids), requester fields in the DG message limited and neutralised (newlines, AM-n → AM·n), mail subject cleaned, season-end retention in the reminder scenario, CANCELLA also deletes the sender's friendly requests and keeps only the verified role of a role contact.",
       "normalizedCommand": {
         "rule": "A friendly request reaching Iride is confirmed or refused only by the Direttore Generale, on WhatsApp from the club number. Iride collects only team (category), date and opponent (time and pitch are decided by the club and never asked), never confirms a friendly herself, and tells the requester the request went to the Direttore Generale. Make (not the AI) creates the code AM-nnnn and sends it to the DG with SÌ/NO buttons, or by internal [Iride] mail to the club inbox when the DG is outside the WhatsApp 24-hour window. Only a message from the number whose verified role in the Iride rubrica (data store 220276, field ruolo, written only by a person in Make) is DIRETTORE GENERALE can decide; the same SÌ/NO AM-code from any other number is logged IGNORATO with no reply and no change; a plain «sì» from anyone else stays a normal conversation. Iride then tells the requester the outcome (time and pitch from the Segreteria) and logs it in SCD_INTAKE_LOG.",
         "scope": "SECRETARIAT_FRIENDLIES_DG_CONFIRMATION",
@@ -3775,11 +3776,12 @@
           "v4 reaches the live scenario 7979437 only after Francesco's explicit OK with the diff shown; the 48-hour reminder scenario is created inactive and switched on only with his OK",
           "the DG number never appears in blueprints, repo, mails or reports: Make reads it from the rubrica (to = +{{67.key}})",
           "no names of minors: teams are categories; the requester is stored with first name only",
-          "prompt rule 8 rewritten (friendly as a separate rule) and rules 15-16 added; system-prompt.it.md and the Make module stay byte-identical"
+          "prompt rule 8 rewritten (friendly as a separate rule) and rules 15-16 added; system-prompt.it.md and the Make module stay byte-identical",
+          "the reminder/retention scenario never deletes the CONTATORE record and never writes test data to the real data store 221453"
         ],
         "proposed": [
           {
-            "text": "Data store 'SCD · Richieste in attesa DG' (221453) holds the requester's WhatsApp number and first name; decided records deleted 30 days after the decision. Retention rule not said by Francesco.",
+            "text": "Reminder threshold of 48 hours (one reminder mail per request still IN_ATTESA_DG after 48 hours): chosen in the design, not a Francesco quote.",
             "status": "PROPOSED"
           },
           {
@@ -3793,6 +3795,18 @@
           {
             "text": "INTAKE_LOG field 'AI:' aligned with the fixed Make text when the request goes to the DG (v4.1).",
             "status": "PROPOSED"
+          },
+          {
+            "text": "CANCELLA from a contact whose rubrica record has a verified ruolo (e.g. DIRETTORE GENERALE): the record keeps only ruolo and ultimo_contatto (needed for the 24-hour WhatsApp window), every other personal field is deleted and the reply says the role is managed by the Segreteria. Simplest safe option chosen in the review, not said by Francesco.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "Records still IN_ATTESA_DG at season end are not deleted by the retention route (only decided ones, as reviewed); whether to delete or close them too is for Francesco.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "v4.1: for the DIRETTORE GENERALE number, a fixed Make reply to a yes/no without code (test T8c: the AI said «nessuna richiesta in attesa» while one was open); keep the friendly team in Make, not only in the AI summary (test T2).",
+            "status": "PROPOSED"
           }
         ],
         "implementation": {
@@ -3804,6 +3818,11 @@
           ],
           "test_report": "automations/make/segreteria-ai/test-v4-risultati.md",
           "register": "SCD_INTAKE_LOG"
+        },
+        "retention": {
+          "text": "Friendly requests are kept until the end of the season they were created in: once decided (stato not IN_ATTESA_DG), the record with the requester's first name and WhatsApp number is deleted from 30 June (e.g. created 16/10/2026 → deleted from 30/06/2027). Implemented in the reminder scenario (route 2: SearchRecord codice starts with AM-, stato ≠ IN_ATTESA_DG, creato_il before the last 30 June → DeleteRecord, never the CONTATORE); the only value to change is the constant fine_stagione = 06-30 (module 4). On CANCELLA the sender's records in the requests data store are deleted too.",
+          "status": "VERIFIED",
+          "source": "Francesco 16/10/2026 ~17:40, question «per quanto tempo li teniamo?», answer «Fine stagione»"
         }
       }
     }

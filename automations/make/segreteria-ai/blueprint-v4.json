@@ -50,6 +50,14 @@
      {
       "name": "testo_norm",
       "value": "{{substring(trim(replace(replace(upper(trim(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; ifempty(1.messages[1].text.body; \"\"))))); \"/[ÌÍ]/g\"; \"I\"); \"/['’`.!,;:]+/g\"; \" \")); 0; 40)}}"
+     },
+     {
+      "name": "da_pulsante",
+      "value": "{{if(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; \"\")) != \"\"; true; false)}}"
+     },
+     {
+      "name": "analisi",
+      "value": "{{if(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; \"\")) != \"\"; replace(substring(trim(replace(replace(upper(trim(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; ifempty(1.messages[1].text.body; \"\"))))); \"/[ÌÍ]/g\"; \"I\"); \"/['’`.!,;:]+/g\"; \" \")); 0; 40); \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); replace(substring(trim(replace(replace(upper(trim(ifempty(1.messages[1].interactive.button_reply.id; ifempty(1.messages[1].button.payload; ifempty(1.messages[1].text.body; \"\"))))); \"/[ÌÍ]/g\"; \"I\"); \"/['’`.!,;:]+/g\"; \" \")); 0; 40); \"/^(SI|NO)(?:\\s+AM\\s?-?\\s?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"))}}"
      }
     ]
    }
@@ -64,15 +72,15 @@
     "variables": [
      {
       "name": "esito",
-      "value": "{{if((substring(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); 0; 3) = \"OK|\"); get(split(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); \"|\"); 2); \"\")}}"
+      "value": "{{if((substring(60.analisi; 0; 3) = \"OK|\"); get(split(60.analisi; \"|\"); 2); \"\")}}"
      },
      {
       "name": "codice",
-      "value": "{{if(if((substring(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); 0; 3) = \"OK|\"); ifempty(get(split(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); \"|\"); 3); \"\"); \"\") != \"\"; \"AM-\" + substring(toString(10000 + parseNumber(if((substring(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); 0; 3) = \"OK|\"); ifempty(get(split(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); \"|\"); 3); \"\"); \"\"))); 1; 5); \"\")}}"
+      "value": "{{if(if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") != \"\"; \"AM-\" + substring(toString(10000 + parseNumber(if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\"))); 1; 5); \"\")}}"
      },
      {
       "name": "rotta",
-      "value": "{{if((substring(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); 0; 3) = \"OK|\") & (ifempty(11.data.ruolo; \"\") = \"DIRETTORE GENERALE\") & (if((substring(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); 0; 3) = \"OK|\"); ifempty(get(split(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); \"|\"); 3); \"\"); \"\") != \"\" | (ifempty(1.messages[1].context.id; \"\") != \"\")); \"DG\"; if((substring(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); 0; 3) = \"OK|\") & if((substring(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); 0; 3) = \"OK|\"); ifempty(get(split(replace(60.testo_norm; \"/^(SI|NO)(?:\\s+(?:AM\\s?-?\\s?)?(\\d{1,4}))?$/\"; \"OK|$1|$2|\"); \"|\"); 3); \"\"); \"\") != \"\" & ifempty(11.data.ruolo; \"\") != \"DIRETTORE GENERALE\"; \"IGNORA\"; \"NORMALE\"))}}"
+      "value": "{{if((substring(60.analisi; 0; 3) = \"OK|\") & (ifempty(11.data.ruolo; \"\") = \"DIRETTORE GENERALE\") & (if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") != \"\" | (ifempty(1.messages[1].context.id; \"\") != \"\")); \"DG\"; if((substring(60.analisi; 0; 3) = \"OK|\") & if((substring(60.analisi; 0; 3) = \"OK|\"); ifempty(get(split(60.analisi; \"|\"); 3); \"\"); \"\") != \"\" & ifempty(11.data.ruolo; \"\") != \"DIRETTORE GENERALE\"; \"IGNORA\"; \"NORMALE\"))}}"
      }
     ]
    }
@@ -643,7 +651,7 @@
        "mapper": {
         "to": "+{{1.messages[1].from}}",
         "text": {
-         "body": "{{substring(if(30.amichevole_dg; \"Grazie\" + if(ifempty(first(split(trim(ifempty(8.presentazione.nome; ifempty(11.data.nome; 1.contacts[1].profile.name))); \" \")); \"-\") != \"-\"; \" \" + first(split(trim(ifempty(8.presentazione.nome; ifempty(11.data.nome; 1.contacts[1].profile.name))); \" \")); \"\") + \"! Ho passato la richiesta di amichevole \" + 8.amichevole.squadra + \" del \" + 8.amichevole.data + \" contro \" + 8.amichevole.avversario + \" al Direttore Generale: la risposta arriva qui appena decide ⚽ Orario e campo te li comunica poi la segreteria.\"; ifempty(8.risposta; \"Ciao, sono Iride 👋 l'assistente AI della segreteria S.C.D. ColicoDerviese. Ho ricevuto il tuo messaggio: la segreteria ti risponde al più presto. Se c'è un'emergenza chiama il 112.\")); 0; 4000)}}",
+         "body": "{{substring(if(30.amichevole_dg; \"Grazie\" + if(ifempty(first(split(trim(ifempty(8.presentazione.nome; ifempty(11.data.nome; 1.contacts[1].profile.name))); \" \")); \"-\") != \"-\"; \" \" + first(split(trim(ifempty(8.presentazione.nome; ifempty(11.data.nome; 1.contacts[1].profile.name))); \" \")); \"\") + \"! Ho passato la richiesta di amichevole \" + 8.amichevole.squadra + \" del \" + 8.amichevole.data + \" contro \" + 8.amichevole.avversario + \" al Direttore Generale: la risposta arriva qui appena decide ⚽ Orario e campo te li comunica poi la segreteria.\"; ifempty(8.risposta; \"Ciao, sono Iride 👋 l'assistente AI della segreteria S.C.D. ColicoDerviese. Ho ricevuto il tuo messaggio: la segreteria ti risponde al più presto. Se c'è un'emergenza chiama il 112.\")); 0; 4000)}}{{if(8.cancella = true & ifempty(11.data.ruolo; \"\") != \"\"; \" Il ruolo \" + 11.data.ruolo + \" resta registrato perché lo gestisce la Segreteria: nome e altri dati li ho cancellati.\"; \"\")}}",
          "preview_url": false
         },
         "type": "text",
@@ -740,7 +748,7 @@
           {
            "id": 14,
            "filter": {
-            "name": "Cancella su richiesta",
+            "name": "Cancella su richiesta (contatto senza ruolo)",
             "conditions": [
              [
               {
@@ -751,6 +759,11 @@
               {
                "a": "{{11.key}}",
                "o": "exist"
+              },
+              {
+               "a": "{{ifempty(11.data.ruolo; \"\")}}",
+               "o": "text:equal",
+               "b": ""
               }
              ]
             ]
@@ -763,6 +776,113 @@
            "metadata": {},
            "parameters": {
             "datastore": 220276
+           }
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 97,
+           "module": "datastore:AddRecord",
+           "version": 1,
+           "metadata": {},
+           "parameters": {
+            "datastore": 220276
+           },
+           "filter": {
+            "name": "Cancella da un contatto con ruolo: tieni solo il ruolo",
+            "conditions": [
+             [
+              {
+               "a": "{{8.cancella}}",
+               "b": "true",
+               "o": "boolean:equal"
+              },
+              {
+               "a": "{{11.key}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{ifempty(11.data.ruolo; \"\")}}",
+               "o": "text:notequal",
+               "b": ""
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "key": "{{1.messages[1].from}}",
+            "overwrite": true,
+            "data": {
+             "ruolo": "{{11.data.ruolo}}",
+             "ultimo_contatto": "{{now}}"
+            }
+           }
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 98,
+           "module": "datastore:SearchRecord",
+           "version": 1,
+           "metadata": {},
+           "parameters": {
+            "datastore": 221453,
+            "limit": 50
+           },
+           "filter": {
+            "name": "Cancella: anche le sue richieste di amichevole",
+            "conditions": [
+             [
+              {
+               "a": "{{8.cancella}}",
+               "b": "true",
+               "o": "boolean:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "filter": [
+             [
+              {
+               "a": "richiedente_key",
+               "o": "text:equal",
+               "b": "{{1.messages[1].from}}"
+              }
+             ]
+            ]
+           }
+          },
+          {
+           "id": 99,
+           "module": "datastore:DeleteRecord",
+           "version": 1,
+           "metadata": {},
+           "parameters": {
+            "datastore": 221453
+           },
+           "filter": {
+            "name": "Mai il CONTATORE",
+            "conditions": [
+             [
+              {
+               "a": "{{98.key}}",
+               "o": "text:notequal",
+               "b": "CONTATORE"
+              },
+              {
+               "a": "{{98.key}}",
+               "o": "exist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "key": "{{98.key}}"
            }
           }
          ]
@@ -899,7 +1019,7 @@
              },
              {
               "name": "testo_dg",
-              "value": "{{substring(\"Ciao, sono Iride (assistente AI) 👋 Richiesta di amichevole da confermare:\" + newline + \"• Squadra: \" + 8.amichevole.squadra + newline + \"• Avversario: \" + 8.amichevole.avversario + newline + \"• Data: \" + 8.amichevole.data + if(ifempty(8.amichevole.ora; \"\") != \"\"; \" ore \" + 8.amichevole.ora; \"\") + if(ifempty(8.amichevole.campo; \"\") != \"\"; \" · campo \" + 8.amichevole.campo; \"\") + newline + \"• Chiede: \" + ifempty(trim(ifempty(8.presentazione.nome; 11.data.nome) + \" \" + ifempty(8.presentazione.cognome; 11.data.cognome)); 1.contacts[1].profile.name) + \" (si presenta come \" + ifempty(8.presentazione.ruolo_dichiarato; ifempty(11.data.ruolo_dichiarato; \"-\")) + \", non verificato)\" + newline + \"• Settore (per info): \" + 30.settore + newline + newline + \"Codice \" + 65.codice + \". Tocca SÌ o NO, oppure scrivi SÌ \" + 65.codice + \" o NO \" + 65.codice + \".\"; 0; 1000)}}"
+              "value": "{{substring(\"Ciao, sono Iride (assistente AI) 👋 Richiesta di amichevole da confermare:\" + newline + \"• Squadra: \" + substring(replace(replace(trim(ifempty(8.amichevole.squadra; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 60) + newline + \"• Avversario: \" + substring(replace(replace(trim(ifempty(8.amichevole.avversario; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 80) + newline + \"• Data: \" + substring(replace(replace(trim(ifempty(8.amichevole.data; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 40) + if(ifempty(8.amichevole.ora; \"\") != \"\"; \" ore \" + substring(replace(replace(trim(ifempty(8.amichevole.ora; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 20); \"\") + if(ifempty(8.amichevole.campo; \"\") != \"\"; \" · campo \" + substring(replace(replace(trim(ifempty(8.amichevole.campo; \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 80); \"\") + newline + \"• Chiede: \" + substring(replace(replace(trim(ifempty(ifempty(trim(ifempty(8.presentazione.nome; 11.data.nome) + \" \" + ifempty(8.presentazione.cognome; 11.data.cognome)); 1.contacts[1].profile.name); \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 60) + \" (si presenta come \" + substring(replace(replace(trim(ifempty(ifempty(8.presentazione.ruolo_dichiarato; ifempty(11.data.ruolo_dichiarato; \"-\")); \"\")); \"/[\\r\\n]+/g\"; \" \"); \"/(^|[^A-Za-z0-9])[Aa][Mm]\\s?-?\\s?(\\d+)/g\"; \"$1AM·$2\"); 0; 60) + \", non verificato)\" + newline + \"• Settore (per info): \" + 30.settore + newline + newline + \"Codice \" + 65.codice + \". Tocca SÌ o NO, oppure scrivi SÌ \" + 65.codice + \" o NO \" + 65.codice + \".\"; 0; 1000)}}"
              }
             ]
            }
@@ -1025,7 +1145,7 @@
                   "to": [
                    "sportclubcolico@gmail.com"
                   ],
-                  "subject": "[Iride] Amichevole da confermare · {{65.codice}} · {{8.amichevole.squadra}} (WhatsApp al DG non riuscito)",
+                  "subject": "[Iride] Amichevole da confermare · {{65.codice}} · {{substring(replace(ifempty(8.amichevole.squadra; \"\"); \"/[\\r\\n]+/g\"; \" \"); 0; 60)}} (WhatsApp al DG non riuscito)",
                   "content": "<p><b>Invio WhatsApp al Direttore Generale non riuscito</b> per la richiesta <b>{{65.codice}}</b>.</p><p>Squadra: {{escapeHTML(8.amichevole.squadra)}} · Avversario: {{escapeHTML(8.amichevole.avversario)}} · Data: {{escapeHTML(8.amichevole.data)}}</p><p><b>Come confermare (solo il Direttore Generale):</b> dal telefono del DG scrivi su WhatsApp al numero della segreteria <b>SÌ {{65.codice}}</b> oppure <b>NO {{65.codice}}</b>. Iride risponde da sola a chi ha chiesto.</p>",
                   "bodyType": "rawHtml"
                  }
@@ -1071,7 +1191,7 @@
                 "to": [
                  "sportclubcolico@gmail.com"
                 ],
-                "subject": "[Iride] Amichevole da confermare · {{65.codice}} · {{8.amichevole.squadra}}",
+                "subject": "[Iride] Amichevole da confermare · {{65.codice}} · {{substring(replace(ifempty(8.amichevole.squadra; \"\"); \"/[\\r\\n]+/g\"; \" \"); 0; 60)}}",
                 "content": "<p><b>Amichevole da confermare</b> · codice <b>{{65.codice}}</b></p><p>Squadra: {{escapeHTML(8.amichevole.squadra)}} · Avversario: {{escapeHTML(8.amichevole.avversario)}} · Data: {{escapeHTML(8.amichevole.data)}}{{if(ifempty(8.amichevole.ora; \"\") != \"\"; \" · ore \" + escapeHTML(8.amichevole.ora); \"\")}}{{if(ifempty(8.amichevole.campo; \"\") != \"\"; \" · campo \" + escapeHTML(8.amichevole.campo); \"\")}}<br>Chiede: {{escapeHTML(ifempty(trim(ifempty(8.presentazione.nome; 11.data.nome) + \" \" + ifempty(8.presentazione.cognome; 11.data.cognome)); 1.contacts[1].profile.name))}} (si presenta come {{escapeHTML(ifempty(8.presentazione.ruolo_dichiarato; ifempty(11.data.ruolo_dichiarato; \"-\")))}}, non verificato)<br>Settore di riferimento (solo per informazione): {{escapeHTML(30.settore)}} · <b>conferma: Direttore Generale</b></p><p><b>Come confermare (solo il Direttore Generale):</b> dal telefono del DG scrivi su WhatsApp al numero della segreteria <b>SÌ {{65.codice}}</b> oppure <b>NO {{65.codice}}</b>. Iride risponde da sola a chi ha chiesto.</p><p style=\"color:#666\">Perché arriva in mail: {{if(ifempty(67.key; \"\") = \"\"; \"nella rubrica di Iride nessun numero ha il ruolo DIRETTORE GENERALE\"; \"il Direttore Generale non scrive a Iride da più di 23 ore e il modello WhatsApp non è ancora approvato da Meta\")}}. Se non risponde nessuno entro 48 ore arriva un promemoria. Nessun numero di telefono in questa mail.</p>",
                 "bodyType": "rawHtml"
                },

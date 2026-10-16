@@ -2479,7 +2479,7 @@
               "8000995",
               "8001010"
             ],
-            "requests_data_store": "221453 'SCD · Richieste in attesa DG' (only CONTATORE record; retention PROPOSED)"
+            "requests_data_store": "221453 'SCD · Richieste in attesa DG' (only CONTATORE record; retention VERIFIED «Fine stagione»: decided requests deleted from 30 June by the reminder scenario, UD-164)"
           }
         }
       }

@@ -1,70 +1,176 @@
 {
- "name": "SCD · Iride · Promemoria conferme DG (48 ore)",
+ "name": "SCD · Iride · Promemoria conferme DG (48 ore) e pulizia fine stagione",
  "flow": [
   {
-   "id": 1,
-   "module": "datastore:SearchRecord",
+   "id": 4,
+   "module": "util:SetVariables",
    "version": 1,
    "metadata": {},
-   "parameters": {
-    "datastore": 221453,
-    "limit": 20
-   },
+   "parameters": {},
    "mapper": {
-    "filter": [
-     [
-      {
-       "a": "stato",
-       "o": "text:equal",
-       "b": "IN_ATTESA_DG"
-      },
-      {
-       "a": "creato_il",
-       "o": "date:less",
-       "b": "{{addHours(now; -48)}}"
-      },
-      {
-       "a": "promemoria_inviato",
-       "o": "boolean:notequal",
-       "b": true
-      }
-     ]
+    "variables": [
+     {
+      "name": "fine_stagione",
+      "value": "06-30"
+     }
     ]
    }
   },
   {
-   "id": 2,
-   "module": "google-email:sendAnEmail",
-   "version": 4,
+   "id": 8,
+   "module": "util:SetVariables",
+   "version": 1,
    "metadata": {},
-   "parameters": {
-    "__IMTCONN__": 11936496
-   },
+   "parameters": {},
    "mapper": {
-    "to": [
-     "sportclubcolico@gmail.com"
-    ],
-    "subject": "[Iride] Promemoria · amichevole {{1.data.codice}} senza risposta del DG da 48 ore",
-    "content": "<p><b>Nessuna risposta del Direttore Generale da 48 ore</b> per l'amichevole <b>{{1.data.codice}}</b>.</p><p>Squadra: {{escapeHTML(1.data.squadra)}} · Avversario: {{escapeHTML(1.data.avversario)}} · Data: {{escapeHTML(1.data.data_gara)}}<br>Settore di riferimento (informativo): {{escapeHTML(1.data.settore)}} · richiesta {{1.data.request_id}} in SCD_INTAKE_LOG</p><p><b>Come chiudere:</b> dal telefono del DG scrivi su WhatsApp al numero della segreteria <b>SÌ {{1.data.codice}}</b> oppure <b>NO {{1.data.codice}}</b>. Iride risponde da sola a chi ha chiesto.</p><p style=\"color:#666\">Un solo promemoria per richiesta. Nessun numero di telefono in questa mail.</p>",
-    "bodyType": "rawHtml"
+    "variables": [
+     {
+      "name": "soglia_fine_stagione",
+      "value": "{{if(parseNumber(formatDate(now; \"MMDD\"; \"Europe/Rome\")) >= parseNumber(replace(4.fine_stagione; \"-\"; \"\")); parseDate(formatDate(now; \"YYYY\"; \"Europe/Rome\") + \"-\" + 4.fine_stagione; \"YYYY-MM-DD\"; \"Europe/Rome\"); parseDate(toString(parseNumber(formatDate(now; \"YYYY\"; \"Europe/Rome\")) - 1) + \"-\" + 4.fine_stagione; \"YYYY-MM-DD\"; \"Europe/Rome\"))}}"
+     }
+    ]
    }
   },
   {
-   "id": 3,
-   "module": "datastore:UpdateRecord",
+   "id": 5,
+   "module": "builtin:BasicRouter",
    "version": 1,
    "metadata": {},
-   "parameters": {
-    "datastore": 221453
-   },
-   "mapper": {
-    "key": "{{1.key}}",
-    "upsert": false,
-    "overwriteArrays": false,
-    "data": {
-     "promemoria_inviato": true
+   "mapper": null,
+   "routes": [
+    {
+     "flow": [
+      {
+       "id": 1,
+       "module": "datastore:SearchRecord",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "datastore": 221453,
+        "limit": 20
+       },
+       "mapper": {
+        "filter": [
+         [
+          {
+           "a": "stato",
+           "o": "text:equal",
+           "b": "IN_ATTESA_DG"
+          },
+          {
+           "a": "creato_il",
+           "o": "date:less",
+           "b": "{{addHours(now; -48)}}"
+          },
+          {
+           "a": "promemoria_inviato",
+           "o": "boolean:notequal",
+           "b": true
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "id": 2,
+       "module": "google-email:sendAnEmail",
+       "version": 4,
+       "metadata": {},
+       "parameters": {
+        "__IMTCONN__": 11936496
+       },
+       "mapper": {
+        "to": [
+         "sportclubcolico@gmail.com"
+        ],
+        "subject": "[Iride] Promemoria · amichevole {{1.data.codice}} senza risposta del DG da 48 ore",
+        "content": "<p><b>Nessuna risposta del Direttore Generale da 48 ore</b> per l'amichevole <b>{{1.data.codice}}</b>.</p><p>Squadra: {{escapeHTML(1.data.squadra)}} · Avversario: {{escapeHTML(1.data.avversario)}} · Data: {{escapeHTML(1.data.data_gara)}}<br>Settore di riferimento (informativo): {{escapeHTML(1.data.settore)}} · richiesta {{1.data.request_id}} in SCD_INTAKE_LOG</p><p><b>Come chiudere:</b> dal telefono del DG scrivi su WhatsApp al numero della segreteria <b>SÌ {{1.data.codice}}</b> oppure <b>NO {{1.data.codice}}</b>. Iride risponde da sola a chi ha chiesto.</p><p style=\"color:#666\">Un solo promemoria per richiesta. Nessun numero di telefono in questa mail.</p>",
+        "bodyType": "rawHtml"
+       }
+      },
+      {
+       "id": 3,
+       "module": "datastore:UpdateRecord",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "datastore": 221453
+       },
+       "mapper": {
+        "key": "{{1.key}}",
+        "upsert": false,
+        "overwriteArrays": false,
+        "data": {
+         "promemoria_inviato": true
+        }
+       }
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 6,
+       "module": "datastore:SearchRecord",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "datastore": 221453,
+        "limit": 100
+       },
+       "mapper": {
+        "filter": [
+         [
+          {
+           "a": "codice",
+           "o": "text:startwith",
+           "b": "AM-"
+          },
+          {
+           "a": "stato",
+           "o": "text:notequal",
+           "b": "IN_ATTESA_DG"
+          },
+          {
+           "a": "creato_il",
+           "o": "date:less",
+           "b": "{{8.soglia_fine_stagione}}"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "id": 7,
+       "module": "datastore:DeleteRecord",
+       "version": 1,
+       "metadata": {},
+       "parameters": {
+        "datastore": 221453
+       },
+       "filter": {
+        "name": "Mai il CONTATORE",
+        "conditions": [
+         [
+          {
+           "a": "{{6.key}}",
+           "o": "text:notequal",
+           "b": "CONTATORE"
+          },
+          {
+           "a": "{{6.key}}",
+           "o": "exist"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "key": "{{6.key}}"
+       }
+      }
+     ]
     }
-   }
+   ]
   }
  ],
  "metadata": {
