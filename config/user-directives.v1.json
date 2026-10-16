@@ -3375,6 +3375,31 @@
       }
     },
     {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "07:20",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-140",
+      "name": "PUBLIC_TRAINING_TIMETABLE_CLUBHOUSE_PULMINO",
+      "sourceQuoteFragments": [
+        "allenamenti visibili a tutti",
+        "Cerchiamo di rendere viva e accattivante anche la parte allenamenti perché è anche lì che possiamo fare cose visto che abbiamo la club haure aperta e anche servizio pulmino",
+        "Orari di tutte le squadre",
+        "Lun–Ven 17:00–21:00",
+        "Servizio e richiesta"
+      ],
+      "context": "Francesco 15/10/2026 (trainings visible to everyone) and 16/10/2026 07:18–07:20 (chat cloud), answers to three questions: what a visitor sees of the trainings, Club House hours, how the minibus is presented. Supersedes UD-100 only for the training timetable; rosters, team pages and member areas stay inside.",
+      "normalizedCommand": {
+        "rule": "The public home shows one training evening of every team at Colico (weekday, time, pitch, team label from the weekly quadro; no names, rosters, rooms, rotations or notes; 'fa fede l'avviso del mister'), the Club House open Monday–Friday 17:00–21:00 during trainings, and the minibus service with its four zones (Lago, Lecco, Valtellina, Chiavenna) and a 'Richiedi il posto' action that leads to sign-up. The /allenamenti page and the full quadro stay members-only.",
+        "appliesTo": [
+          "apps/superapp/src/lib/public-training.ts",
+          "apps/superapp/src/lib/quadro.functions.ts",
+          "apps/superapp/src/components/home/HomeLobby.tsx",
+          "apps/superapp/src/routes/index.tsx"
+        ]
+      }
+    },
+    {
       "sourceDate": "2026-10-15",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",

@@ -17,6 +17,7 @@ import type { PublicFeed } from "@/lib/club.types";
 import { weekendResults } from "@/lib/home-results";
 import { urgentNotices } from "@/lib/home-today";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
+import type { PublicTrainingDay } from "@/lib/public-training";
 
 import { HomeLobby } from "@/components/home/HomeLobby";
 import {
@@ -35,6 +36,7 @@ export function PublicHome({
   vetrina,
   feed = null,
   notice = null,
+  training = null,
   nowMs,
   today,
 }: {
@@ -45,6 +47,8 @@ export function PublicHome({
   feed?: PublicFeed | null;
   /** The one club communication of the day (getClubNotice), or null. */
   notice?: ClubNotice | null;
+  /** Public training evening (UD-140): timetable only, from getPublicTrainings. */
+  training?: PublicTrainingDay | null;
   nowMs: number;
   today: string;
 }) {
@@ -70,7 +74,7 @@ export function PublicHome({
       </h1>
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
-      <HomeLobby calendar={calendar} vetrina={vetrina} nowMs={nowMs} today={today} />
+      <HomeLobby calendar={calendar} vetrina={vetrina} training={training} nowMs={nowMs} today={today} />
       <WeekendResults rows={results} />
     </main>
   );

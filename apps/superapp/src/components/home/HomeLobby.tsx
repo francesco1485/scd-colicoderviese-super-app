@@ -5,13 +5,14 @@
  *      official marks live in the top bar (SiteChrome HeaderCredentials, 07:07).
  *   0. A slim bar on top: the next games scroll, Calendario and Allenamenti fixed on it (07:10: no big calendar).
  *      On the cover, the live countdown to the next home game.
- *   2. "In che anno sei nato?" — tap a birth year, see the team, its championship and next game, "Seguila: iscriviti".
+ *   2. "Stasera al campo" — trainings of every team at Colico (time, pitch), Club House open, minibus zones (UD-140).
+ *   2b. "In che anno sei nato?" — tap a birth year, see the team, its championship and next game, "Seguila: iscriviti".
  *   3. Dal club — three items of the day's palinsesto (lib/vetrina), static, never a carousel.
- * Data: public calendar only (no trainings, UD-100); opponent crests only from the verified registry; birth years only
+ * Data: public calendar; training timetable only (UD-140, no names or rosters); opponent crests only from the verified registry; birth years only
  * when the master declares them. No minor named, no mascot, no aerial photo of the pitch.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarDays, Dumbbell, Lock, UserPlus } from "lucide-react";
+import { ArrowRight, Bus, CalendarDays, Coffee, Dumbbell, Lock, UserPlus } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { loginSearch } from "@/components/scd/AccessMenu";
@@ -26,6 +27,7 @@ import { crestFor } from "@/lib/crests";
 import { homeTown } from "@/lib/home-matchday";
 import { weekBoardEvents, weekGroups } from "@/lib/home-week-board";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
+import { CLUB_HOUSE_HOURS, PULMINO_ZONES, type PublicTrainingDay } from "@/lib/public-training";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 
 type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
@@ -93,9 +95,9 @@ function ClubProfile({ events, groups, nowMs }: { events: readonly PublicEvent[]
         <span className="-mt-12 grid size-[96px] place-items-center rounded-full bg-white shadow-[0_6px_18px_-8px_rgb(11_42_91/0.5)] ring-4 ring-white">
           <ClubCrestOfficial size={74} />
         </span>
-        <h1 id="home-profile-t" className="m-0 mt-2 font-uv text-[34px] uppercase leading-none text-[#0b1e3a] lg:text-[42px]">
+        <h2 id="home-profile-t" className="m-0 mt-2 font-uv text-[34px] uppercase leading-none text-[#0b1e3a] lg:text-[42px]">
           S.C.D. ColicoDerviese
-        </h1>
+        </h2>
         <p className="m-0 mt-1.5 max-w-[42ch] text-[15px] leading-snug text-[#23406e]">
           Il calcio di Colico e Dervio, sull'Alto Lario: prima squadra, settore giovanile e scuola calcio.
         </p>
@@ -217,6 +219,90 @@ function nextHome(events: readonly PublicEvent[], nowMs: number): { e: PublicEve
     if (at > nowMs && (!best || at < best.at)) best = { e, at };
   }
   return best;
+}
+
+/* ------------------------------------------------ stasera al campo */
+
+const WD_LONG = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"] as const;
+
+/**
+ * "Stasera al campo" (Francesco 16/10 07:18 «rendere viva e accattivante anche la parte allenamenti… club house aperta e
+ * servizio pulmino»; UD-140): the training evening of every team at Colico with time and pitch, the Club House open
+ * Mon–Fri 17:00–21:00, the minibus service with its four zones. Timetable only; the coach's notice wins.
+ */
+function TrainingEvening({ day, today }: { day: PublicTrainingDay | null; today: string }) {
+  if (!day || day.rows.length === 0) return null;
+  const isToday = day.date === today;
+  const wd = WD_LONG[new Date(`${day.date}T12:00:00Z`).getUTCDay()]!;
+  const teams = new Set(day.rows.map((r) => r.teams)).size;
+  return (
+    <section aria-labelledby="home-training-t" className={`${PANEL} overflow-hidden`} data-testid="home-training">
+      <div className="relative bg-[linear-gradient(120deg,#2b8be8,#1556c4)] px-4 pb-4 pt-4 text-white lg:px-6">
+        <span aria-hidden="true" className="absolute inset-x-0 top-1/2 h-px bg-white/15" />
+        <span aria-hidden="true" className="absolute left-1/2 top-1/2 size-[120px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/15" />
+        <p className="relative m-0 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-[0.06em]">
+          <span aria-hidden="true" className="scd-live-dot size-1.5 rounded-full bg-[#ffd600]" />
+          Porte aperte
+        </p>
+        <h2 id="home-training-t" className="relative m-0 mt-2 font-uv text-[34px] uppercase leading-[0.92] lg:text-[42px]">
+          {isToday ? "Stasera al campo" : `${wd} al campo`}
+        </h2>
+        <p className="relative m-0 mt-1 text-[14.5px] text-white/85">
+          {teams === 1 ? "1 squadra" : `${teams} squadre`} in allenamento al centro sportivo di Colico. Vieni a vederci.
+        </p>
+      </div>
+      <ol className="m-0 list-none divide-y divide-[#eef2f8] p-0">
+        {day.rows.map((r) => (
+          <li key={r.id} className="grid grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 lg:px-6">
+            <span className="font-uv text-[22px] leading-none tabular-nums text-[#0b1e3a]">{r.time}</span>
+            <span className="min-w-0">
+              <span className="block truncate text-[15px] font-extrabold text-[#0b1e3a]">{r.teams}</span>
+              {r.end && <span className="block text-[12.5px] font-semibold text-[#4a5d7a]">fino alle {r.end}</span>}
+            </span>
+            <span className="rounded-[6px] bg-[#e8f0fd] px-2 py-1 text-[12px] font-extrabold text-[#0b3a8c]">{r.field}</span>
+          </li>
+        ))}
+      </ol>
+      <p className="m-0 px-4 pb-1 text-[12px] text-[#5a6b85] lg:px-6">Orari della settimana tipo: fa fede l'avviso del mister.</p>
+      <div className="grid gap-3 p-4 lg:grid-cols-2 lg:px-6 lg:pb-6">
+        <div className="flex items-start gap-3 rounded-[14px] bg-[#fff7cc] p-3.5" data-testid="home-clubhouse">
+          <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[#ffd600] text-[#061a3d]">
+            <Coffee className="size-[22px]" />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-[15.5px] font-extrabold text-[#0b1e3a]">Club House aperta</span>
+            <span className="block text-[13.5px] font-semibold text-[#5c4a00]">
+              {CLUB_HOUSE_HOURS.days} · {CLUB_HOUSE_HOURS.from}–{CLUB_HOUSE_HOURS.to}
+            </span>
+            <span className="mt-0.5 block text-[13px] leading-snug text-[#4a5d7a]">Guarda l'allenamento e fermati con gli altri genitori.</span>
+          </span>
+        </div>
+        <div className="grid gap-2.5 rounded-[14px] bg-[#eef3fb] p-3.5" data-testid="home-pulmino">
+          <div className="flex items-start gap-3">
+            <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-[#1556c4] text-white">
+              <Bus className="size-[22px]" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[15.5px] font-extrabold text-[#0b1e3a]">Servizio pulmino</span>
+              <span className="block text-[13px] leading-snug text-[#4a5d7a]">Agli allenamenti con i pulmini del club da quattro zone.</span>
+            </span>
+          </div>
+          <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0" aria-label="Zone servite dai pulmini">
+            {PULMINO_ZONES.map((z, i) => (
+              <li key={z.id} className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-white px-3 text-[13px] font-bold text-[#23406e] ring-1 ring-[#d6e2f3]">
+                <span aria-hidden="true" className="grid size-5 place-items-center rounded-full bg-[#1556c4] text-[11px] font-extrabold text-white">{i + 1}</span>
+                {z.label}
+              </li>
+            ))}
+          </ul>
+          <Link to="/registrati" className="scd-focus inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] bg-[#0b2a5b] text-[14px] font-bold text-white hover:bg-[#123a78]">
+            Richiedi il posto
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 /* -------------------------------------------- 2. in che anno sei nato? */
@@ -391,22 +477,35 @@ function News({ slots }: { slots: readonly VetrinaSlot[] }) {
 export function HomeLobby({
   calendar,
   vetrina,
+  training = null,
   nowMs: serverNow,
   today,
 }: {
   calendar: PublicCalendar;
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>> | undefined;
+  training?: PublicTrainingDay | null;
   nowMs: number;
   today: string;
 }) {
   const nowMs = useMinuteClock(serverNow);
   const week = useMemo(() => weekBoardEvents(calendar.events, today), [calendar.events, today]);
   // No mascot on the home: the Sky slot stays for the LED wall and the scuola calcio page.
-  const slots = (vetrina?.tutti ?? []).filter((x) => !x.id.startsWith("sky")).slice(0, 3);
+  const slots = useMemo(() => {
+    // One item per family (the two Christmas Lario Cup posters count once), no mascot.
+    const seen = new Set<string>();
+    return (vetrina?.tutti ?? []).filter((x) => {
+      const fam = x.id.split("-")[0]!;
+      // Pixellot stays private by default (manifest): no "dirette" promise on the public home.
+      if (x.id.startsWith("sky") || x.id.startsWith("dirette") || seen.has(fam)) return false;
+      seen.add(fam);
+      return true;
+    }).slice(0, 3);
+  }, [vetrina]);
   return (
     <div className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-6 pt-3 lg:max-w-[980px] lg:gap-8 lg:pt-5`} data-testid="home-lobby">
       <GamesBar events={week} groups={calendar.groups} />
       <ClubProfile events={calendar.events} groups={calendar.groups} nowMs={nowMs} />
+      <TrainingEvening day={training} today={today} />
       <YearFinder calendar={calendar} today={today} />
       <News slots={slots} />
     </div>

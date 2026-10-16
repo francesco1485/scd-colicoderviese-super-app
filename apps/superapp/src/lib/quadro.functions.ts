@@ -13,6 +13,7 @@ import { sessionView } from "./auth.functions";
 import { stagingPreviewEnabled } from "./impianti-access";
 import { isSignedInMember, NOT_AUTHORIZED, type NotAuthorized, type SessionLike } from "./public-access";
 import { EMPTY_QUADRO, type Quadro } from "./public-snapshots";
+import { publicTrainingDay, type PublicTrainingDay } from "./public-training";
 
 export type TrainingQuadroResult =
   | { authorized: true; quadro: Quadro; snapshot: QuadroSnapshot }
@@ -31,3 +32,15 @@ export const getTrainingQuadro = createServerFn({ method: "GET" }).handler(async
   const { loadQuadro, QUADRO_SNAPSHOT } = await import("./quadro-data.server");
   return { authorized: true, quadro: loadQuadro(), snapshot: QUADRO_SNAPSHOT };
 });
+
+/**
+ * Public training timetable (UD-140, Francesco 16/10/2026: «orari di tutte le squadre» visible to everyone): only
+ * weekday, time, pitch and team label of one evening — never the full quadro, rooms, rotations, names or notes.
+ */
+export const getPublicTrainings = createServerFn({ method: "GET" })
+  .inputValidator((d: { today: string }) => ({ today: /^\d{4}-\d{2}-\d{2}$/.test(d?.today ?? "") ? d.today : "" }))
+  .handler(async ({ data }): Promise<PublicTrainingDay | null> => {
+    if (!data.today) return null;
+    const { loadQuadro } = await import("./quadro-data.server");
+    return publicTrainingDay(loadQuadro().slots, data.today);
+  });

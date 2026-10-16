@@ -3,7 +3,7 @@
   "manifest": {
     "id": "scd-colicoderviese-system",
     "name": "SCD SYSTEM MANIFEST",
-    "version": "3.39.2",
+    "version": "3.39.3",
     "effective_at": "2026-10-15",
     "status": "BINDING",
     "language": "it-IT",
@@ -164,7 +164,7 @@
           "PUBLIC_LIMITED",
           "AUTHORIZED_USERS"
         ],
-        "purpose": "Calendario societario multi-squadra, multi-annata, multi-evento e personalizzato per ruolo/scope. Senza accesso (PUBLIC_LIMITED) solo le gare: data, ora, casa/fuori, campo, squadra, avversario; allenamenti, note, persone e stemmi d'annata solo per i soci collegati (UD-100).",
+        "purpose": "Calendario societario multi-squadra, multi-annata, multi-evento e personalizzato per ruolo/scope. Senza accesso (PUBLIC_LIMITED) le gare (data, ora, casa/fuori, campo, squadra, avversario) e, in Home, una serata di allenamenti con solo giorno, orario, campo e squadra (UD-140); quadro completo, note, persone e stemmi d'annata solo per i soci collegati (UD-100).",
         "visual_master": "CALENDARIO_LIVE_APPROVED_BOARD"
       },
       {
@@ -212,7 +212,7 @@
           "PUBLIC_LIMITED",
           "AUTHORIZED_USERS"
         ],
-        "purpose": "Comunicazioni Club e Social, avvisi urgenti, feed, newsletter e strumenti di pubblicazione autorizzati. La sezione Squadre e il quadro allenamenti sono visibili solo ai soci collegati (UD-100).",
+        "purpose": "Comunicazioni Club e Social, avvisi urgenti, feed, newsletter e strumenti di pubblicazione autorizzati. La sezione Squadre e il quadro allenamenti completo sono visibili solo ai soci collegati (UD-100); in Home la serata di allenamenti pubblica mostra solo orari, campi e squadre (UD-140).",
         "visual_master": "COMUNICAZIONI_APPROVED_BOARD"
       }
     ],
