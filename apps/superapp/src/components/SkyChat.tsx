@@ -201,10 +201,11 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(
-    () => endRef.current?.scrollIntoView({ block: "end" }),
-    [msgs, open],
-  );
+  // Block body on purpose: recent Chromium returns a Promise from scrollIntoView, and an effect that returns anything
+  // but a function makes React call it as a cleanup ("destroy is not a function"), crashing the page after a reply.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: "end" });
+  }, [msgs, open]);
 
   async function send(text?: string) {
     const message = (text ?? input).trim();
