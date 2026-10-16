@@ -96,18 +96,35 @@ describe("public home v5", () => {
     expect(lobby).toContain('data-testid="home-lobby"');
     expect(lobby).toContain("Nessuna gara nei prossimi 7 giorni");
     expect(lobby).not.toMatch(/publicTeamCrest|team-crest/);
-    // 16/10 07:05–07:10: few clear blocks — slim bar of the next games with Calendario and Allenamenti on it (no big
-    // calendar), the club with one "Iscriviti" and the countdown to the next home game, "In che anno sei nato?", Dal club.
-    for (const id of ["home-ticker", "bar-calendario", "bar-allenamenti", "home-profile", "home-countdown", "home-join", "home-years", "home-news"])
+    // 16/10 14:46 "via di mezzo": slim strip of the week's games with a separate "In corso" box, affiliation and FIGC
+    // membership first with a small "registrati", Oggi in campo, Servizi e club, Dal club; the calendar is a small side
+    // tool (month on desktop, week on phone) with the countdown to the next home game.
+    for (const id of ["home-ticker", "home-live-box", "bar-calendario", "bar-allenamenti", "home-profile", "home-countdown", "home-join", "home-training", "home-services", "home-month", "home-week"])
       expect(lobby).toContain(`data-testid="${id}"`);
     expect(lobby).not.toMatch(/data-testid="home-(board|tabs|feed|inside|video|highlights)"/);
     // Allenamenti are for members: the bar opens the access screen first.
     expect(lobby).toMatch(/to="\/accedi" search=\{loginSearch\("\/allenamenti"\)\}/);
-    expect(lobby).toContain('"/media/scd/lario-header.webp"');
-    expect(lobby).not.toMatch(/Carousel|slide|HeroArt|SkyJolly|PersonaAvatar|Pixellot/i);
+    // The three marks are transparent and never on a white plate; no photo of the pitch or the centre on the home.
+    expect(lobby).toContain("CLUB_CREDENTIALS.map");
+    expect(lobby).toContain("drop-shadow(0_0_1px_rgb(255_255_255/0.95))");
+    expect(lobby).not.toMatch(/aerea|aerial|centro-sportivo\.(webp|jpg)/i);
+    // 16/10 17:28 «slide organizzate con agente a supporto tutto il giorno»: the organized slides live in HomeSlides.
+    expect(lobby).not.toMatch(/HeroArt|SkyJolly|PersonaAvatar|Pixellot/i);
+    const slides = code("src/components/home/HomeSlides.tsx");
+    expect(lobby).toContain("<HomeSlides slots={slots} />");
+    expect(slides).toContain('data-testid="home-news"');
+    // Avatar bases are members-area prototypes (UD-102): never on the public home until approved.
+    expect(slides).not.toMatch(/AVATAR_BASES|avatar\/bases/);
+    expect(slides).toMatch(/to="\/accedi" search=\{loginSearch\("\/la-mia-scd\/campione"\)\}/);
+    expect(slides).toContain("prefers-reduced-motion: reduce");
+    expect(slides).not.toMatch(/Pixellot|dirette/i);
     // The three official marks live in the top bar, CR Lombardia and Monza linked.
     const chrome = code("src/components/SiteChrome.tsx");
     expect(chrome).toContain('data-testid="header-credentials"');
+    // Never on a white plate (16/10 15:05): the marks sit on the blue bar, transparent, with a light halo.
+    const creds = chrome.slice(chrome.indexOf("function HeaderCredentials"), chrome.indexOf("export function SiteHeader"));
+    expect(creds).not.toMatch(/\bbg-white\b/);
+    expect(creds).toContain("drop-shadow(0_0_1px_rgb(255_255_255/0.95))");
     expect(chrome).toContain('"https://www.crlombardia.it/"');
     expect(chrome).toContain('"https://www.acmonza.com/en/insieme-monza-dettaglio/mission/"');
   });

@@ -60,10 +60,11 @@
       "path": "assets/logo-lnd.png",
       "class": "FEDERATION_LOGO",
       "status": "LOCKED",
-      "git_blob_sha": "5a063f67de20ddac8baff201ff87f9695514b507",
-      "source": "SCD_INTERNAL_APPROVED",
+      "git_blob_sha": "a83cb8bb08dc599090b0452e58926b8788406cea",
+      "source": "OFFICIAL_FILE_PROVIDED_BY_DIRECTION_2026-10-16",
       "confidence": "HIGH",
-      "verified_at": "2026-10-01"
+      "verified_at": "2026-10-16",
+      "transform": "Transparent master from the official file sent by the Direzione on 16/10/2026 15:05: white background removed (Canva background removal, full-size cut matched locally), interior whites of the mark kept, trimmed; no redraw, no recolour. Rule: never shown on a white plate."
     },
     {
       "path": "assets/logo-lnd.webp",
@@ -78,10 +79,11 @@
       "path": "assets/logo-sgs.png",
       "class": "FEDERATION_LOGO",
       "status": "LOCKED",
-      "git_blob_sha": "9f21cc9ed59d758f922e747aef0f303fa4a0a17b",
-      "source": "SCD_INTERNAL_APPROVED",
+      "git_blob_sha": "223a15e0bc2d49a9480ddab7b7f4da479dbd57ed",
+      "source": "OFFICIAL_FILE_PROVIDED_BY_DIRECTION_2026-10-16",
       "confidence": "HIGH",
-      "verified_at": "2026-10-01"
+      "verified_at": "2026-10-16",
+      "transform": "Transparent master from the official file sent by the Direzione on 16/10/2026 15:05: white background removed (Canva background removal, full-size cut matched locally), interior whites of the mark kept, trimmed; no redraw, no recolour. Rule: never shown on a white plate."
     },
     {
       "path": "assets/logo-sgs.webp",
@@ -96,10 +98,11 @@
       "path": "assets/logo-monza.png",
       "class": "AFFILIATION_PARTNER_LOGO",
       "status": "LOCKED",
-      "git_blob_sha": "55a56a8fc31014bfdbff938971c4514de700cb55",
-      "source": "SCD_INTERNAL_APPROVED",
+      "git_blob_sha": "e1fbf54a2d7bab5297bbb6bce9bc4fa789719b2a",
+      "source": "OFFICIAL_FILE_PROVIDED_BY_DIRECTION_2026-10-16",
       "confidence": "HIGH",
-      "verified_at": "2026-10-01"
+      "verified_at": "2026-10-16",
+      "transform": "Transparent master from the official file sent by the Direzione on 16/10/2026 15:05: white background removed (Canva background removal, full-size cut matched locally), interior whites of the mark kept, trimmed; no redraw, no recolour. Rule: never shown on a white plate."
     },
     {
       "path": "assets/logo-monza.webp",
@@ -1844,9 +1847,9 @@
       "class": "OFFICIAL_AFFILIATION_LOGO",
       "status": "VERIFIED",
       "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
-      "git_blob_sha": "4bd87cc2a5fc13f81721549e77ad9ee03a2ba604",
+      "git_blob_sha": "b60dda6e048b29338a6c27444eecb4c898b4fd51",
       "derived_from": "assets/logo-sgs.png",
-      "transform": "trim to the alpha bounding box (source already transparent); 764x306 px, lossless WebP; no redraw, no recolour, no upscale",
+      "transform": "trim to the alpha bounding box (source already transparent); 754x304 px, lossless WebP; no redraw, no recolour, no upscale",
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
@@ -1854,9 +1857,9 @@
       "class": "OFFICIAL_AFFILIATION_LOGO",
       "status": "VERIFIED",
       "source": "display rendition of the official cut-out (marks never show taller than 34 CSS px)",
-      "git_blob_sha": "a3ba13c0c6ae8ce7b1afbc6f53b79db73ac92040",
+      "git_blob_sha": "89c2623fef137983fdcb604fc1a374c8faf6d6ec",
       "derived_from": "apps/superapp/public/media/affiliazioni/cut/figc-sgs-3-livello.webp",
-      "transform": "downscale to 240x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (B3, 2026-10-15)",
+      "transform": "downscale to 238x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (refreshed 2026-10-16 from the new transparent master)",
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
@@ -1874,9 +1877,9 @@
       "class": "OFFICIAL_AFFILIATION_LOGO",
       "status": "VERIFIED",
       "source": "display rendition of the official cut-out (marks never show taller than 34 CSS px)",
-      "git_blob_sha": "7e9d3ed4d90efe384a15ba2a207a74aae29eeada",
+      "git_blob_sha": "a31bbf4e4a1e69d61139279724bedb3142aeee2d",
       "derived_from": "apps/superapp/public/media/affiliazioni/cut/lnd.webp",
-      "transform": "downscale to 86x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (B3, 2026-10-15)",
+      "transform": "downscale to 86x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (refreshed 2026-10-16 from the new transparent master)",
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
@@ -1884,9 +1887,9 @@
       "class": "OFFICIAL_AFFILIATION_LOGO",
       "status": "VERIFIED",
       "source": "display rendition of the official file (Direzione 2026-10-13 15:31: cut-out, uniform logo boxes)",
-      "git_blob_sha": "6a8756ec8d8a34b25dbbf0d470c9822defd683cd",
+      "git_blob_sha": "92125817b1cb3a46f167d20981276a7b9cd8bf5e",
       "derived_from": "assets/logo-monza.png",
-      "transform": "trim to the alpha bounding box (source already transparent); 765x342 px, lossless WebP; no redraw, no recolour, no upscale",
+      "transform": "trim to the alpha bounding box (source already transparent); 425x190 px, lossless WebP; no redraw, no recolour, no upscale",
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
@@ -1894,9 +1897,9 @@
       "class": "OFFICIAL_AFFILIATION_LOGO",
       "status": "VERIFIED",
       "source": "display rendition of the official cut-out (marks never show taller than 34 CSS px)",
-      "git_blob_sha": "41504df86550459b68b81e280af965a4cf450386",
+      "git_blob_sha": "b50fa0e26b643f86a2c1e6fec1d25fc07561c34c",
       "derived_from": "apps/superapp/public/media/affiliazioni/cut/insieme-al-monza.webp",
-      "transform": "downscale to 215x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (B3, 2026-10-15)",
+      "transform": "downscale to 215x96 px (96 px high, about 3x of the 34 px display), lossless WebP with alpha; no redraw, no recolour, no upscale (refreshed 2026-10-16 from the new transparent master)",
       "vector_status": "RESEARCH_REAL_ASSET"
     },
     {
