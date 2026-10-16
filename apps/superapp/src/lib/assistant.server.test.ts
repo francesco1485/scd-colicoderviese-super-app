@@ -361,3 +361,32 @@ describe("Vera's chat opened with an area (UD-121: one chat, faces hand over)", 
     expect(r).toMatchObject({ persona: "vera", area: "volto-sponsor" });
   });
 });
+
+describe("answerPublic · club directions (B7)", () => {
+  it("answers \"come arrivo al campo?\" with the master's streets and Maps links, without the model or the context", async () => {
+    const f = vi.fn();
+    const t = pub(ON, f, "come arrivo al campo?");
+    const r = await t.run();
+    expect(f).not.toHaveBeenCalled();
+    expect(t.loadContext).not.toHaveBeenCalled();
+    expect(r.ai).toBe(false);
+    expect(r.text).toContain("Via Lido SNC");
+    expect(r.text).toContain("Via Guglielmo Marconi 1");
+    expect(r.links?.filter((l) => l.to.startsWith("https://www.google.com/maps/")).length).toBe(2);
+  });
+
+  it("safeguarding and distress still win over a directions question", async () => {
+    const f = vi.fn();
+    const t = pub(ON, f, "ho subito un abuso, come arrivo al campo?");
+    await t.run();
+    expect(t.rules).toHaveBeenCalled();
+    expect(f).not.toHaveBeenCalled();
+  });
+
+  it("contacts questions still reach the model", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Scrivi alla segreteria.","mood":"info","links":[]}'));
+    const t = pub(ON, f, "qual è l'indirizzo email della società?");
+    await t.run();
+    expect(f).toHaveBeenCalled();
+  });
+});

@@ -39,12 +39,41 @@ describe("club directions (B7)", () => {
     expect(isClubDirectionsQuestion(q)).toBe(true);
   });
 
-  it.each(["come arrivo al campo in trasferta?", "dove giochiamo contro il Lecco?", "quando gioca la U15?", "come mi iscrivo?"])(
+  it.each([
+    "come arrivo al campo in trasferta?",
+    "dove giochiamo contro il Lecco?",
+    "quando gioca la U15?",
+    "come mi iscrivo?",
+    "qual è l'indirizzo email della società?",
+    "indirizzo PEC del club",
+    "indirizzo della sede legale",
+    "indirizzo per spedire i documenti alla società",
+    "come vengo iscritto alla società?",
+    "a che ora arriva il pulmino?",
+    "quando arriva il kit?",
+    "arrivederci",
+    "dove gioca la U15 sabato?",
+    "il campo è chiuso oggi?",
+    "dove sono le maglie della società?",
+    "come arrivo al campo di Bellano per la partita?",
+    "come arrivo al campo di Bellano?",
+  ])(
     "leaves %j to the general assistant",
     (q) => {
       expect(isClubDirectionsQuestion(q)).toBe(false);
     },
   );
+
+  it("keeps home matches on our pitches", () => {
+    expect(isClubDirectionsQuestion("come arrivo al campo per la partita in casa?")).toBe(true);
+  });
+
+  it("rules engine: a generic \"dove\" points to Impianti and Calendario, not to our streets", async () => {
+    const reply = await skyRulesAnswer({ message: "dove gioca la U15 sabato?" });
+    expect(reply.links?.some((l) => l.to.startsWith("https://"))).toBe(false);
+    const enroll = await skyRulesAnswer({ message: "come vengo iscritto alla società?" });
+    expect(enroll.links?.some((l) => l.to === "/entra")).toBe(true);
+  });
 
   it("picks the town the family names, both otherwise", () => {
     expect(sitesForMessage("come arrivo a Dervio?").map((s) => s.id)).toEqual(["SED-DER"]);

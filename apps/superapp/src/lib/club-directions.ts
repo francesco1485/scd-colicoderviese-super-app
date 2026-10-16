@@ -8,8 +8,6 @@ import { FACILITIES, type FacilitiesContract } from "./facilities";
 import { siteMapsUrl } from "./maps-link";
 import type { SkyReply } from "./sky.functions";
 
-export { siteMapsUrl };
-
 /** The club's own sites, in the order families know them. */
 export const CLUB_SITE_IDS = ["SED-COL", "SED-DER"] as const;
 
@@ -40,20 +38,31 @@ function norm(text: string): string {
   return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
-const ASKS_WAY_RE = /\bcome (si |ci |posso |faccio a |devo )?(arriv|raggiung|veng)|\bindicazion|\bindirizz|\bdove (si trova|e|sono|siete|state|giocate)\b|\bstrada per\b|\bnavigator|\bmappa\b|\bmaps\b|\bportami\b/;
-const CLUB_PLACE_RE = /\bcamp[oi]\b|\bcentro sportivo\b|\bimpiant|\bstadio\b|\bspogliato|\bcolico\b|\bdervio\b|\bvostr[oi]\b|\bsede\b|\bsocieta\b|\bclub\b/;
-/** Away games and other towns: the model reads the venue from the fixtures, never our addresses. */
+const ASKS_WAY_RE = /\bcome (si |ci |posso |faccio a |devo )?(arriv|raggiung)|\bindicazion|\bindirizz|\bdove (si trova|e|sono)\b|\bstrada per\b|\bnavigator|\bmappa\b|\bmaps\b|\bportami\b/;
+/** A physical place of ours: "indirizzo" alone (e-mail, PEC, sede legale) is never enough. */
+const CLUB_PLACE_RE = /\bcamp[oi]\b|\bcentro sportivo\b|\bimpiant|\bstadio\b|\bspogliato|\bcolico\b|\bdervio\b/;
+/** Contacts, paperwork, registrations, buses: other answers, never our streets. */
+const OTHER_TOPIC_RE = /\be-?mail\b|\bmail\b|\bpec\b|\bposta\b|\btelefon|\blegale\b|\bsped|\bfattur|\biban\b|\biscri|\btessera|\bprova\b|\bprovino|\bpulmin|\bkit\b|\bmaglie?\b/;
+/** Away games: the model reads the venue from the fixtures, never our addresses. */
 const AWAY_RE = /\btrasfert|\bfuori casa\b|\bavversari|\bcontro\b|\bospiti\b/;
+/** A match without "in casa" may be away: left to the assistant, which has the fixtures. */
+const MATCH_RE = /\bpartit|\bgara\b|\bgare\b/;
+/** "campo di X" / "a X" naming a town that is not ours. */
+const OTHER_TOWN_RE = /\b(?:camp[oi]|centro sportivo|stadio) (?:di|a) (\p{L}+)/u;
 
 /**
  * True for a question about reaching the club's own pitches ("come arrivo al campo?", "indirizzo del centro sportivo
- * di Dervio"). Away games and questions without a place of ours stay with the general assistant.
+ * di Dervio"). Away games, other towns, contacts, registrations and questions without a place of ours stay with the
+ * general assistant.
  */
 export function isClubDirectionsQuestion(message: string): boolean {
   const m = norm(message);
-  if (!ASKS_WAY_RE.test(m)) return false;
-  if (AWAY_RE.test(m)) return false;
-  return CLUB_PLACE_RE.test(m) || /\bdove (siete|state|vi trovo|vi trovate)\b/.test(m);
+  if (OTHER_TOPIC_RE.test(m) || AWAY_RE.test(m)) return false;
+  if (MATCH_RE.test(m) && !/\bin casa\b/.test(m)) return false;
+  const town = OTHER_TOWN_RE.exec(m)?.[1];
+  if (town && town !== "colico" && town !== "dervio") return false;
+  if (/\bdove (siete|vi trovo|vi trovate)\b/.test(m)) return true;
+  return ASKS_WAY_RE.test(m) && CLUB_PLACE_RE.test(m);
 }
 
 /** Sites the message is about: only Colico, only Dervio, or both when it names neither (or both). */

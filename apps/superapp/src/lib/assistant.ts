@@ -277,8 +277,6 @@ export const APP_GUIDE: ReadonlyArray<{ text: string; to: string }> = [
   { text: "Orari degli allenamenti: solo nella pagina Allenamenti, mai comunicati in chat", to: "/allenamenti" },
 ];
 
-
-
 /**
  * Public CONTEXT for Vera on public pages (≈3k tokens): next 7 days of games (fixtures only: date, time, home/away, team label,
  * opponent, venue, competition), club events, ticket office, facilities and directions, contacts, registrations,

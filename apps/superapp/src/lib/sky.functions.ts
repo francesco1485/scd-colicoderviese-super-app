@@ -30,7 +30,7 @@ export const INTENTS: { id: string; re: RegExp }[] = [
   { id: "sponsor", re: /sponsor|partner|pubblicit|azienda/i },
   { id: "eventi", re: /event|torneo|festa|cena/i },
   { id: "shop", re: /shop|negozio|maglia|merch|acquist/i },
-  { id: "dove", re: /dove|indirizz|campo|mappa|arriv/i },
+  { id: "dove", re: /dove|indirizz|campo|mappa|arrivare|arrivo/i },
   { id: "squadre", re: /squadr|categori|annat|giovanil|scuola calcio/i },
   { id: "contatti", re: /contatt|email|telefon|segreteri|parla/i },
 ];
@@ -65,7 +65,7 @@ export async function skyRulesAnswer(data: { message: string }): Promise<SkyRepl
     // "Come arrivo al campo?" (B7): street and Maps link of Colico and Dervio from the facilities master, before the
     // match intents ("…per la gara?") so the family gets the way, not the calendar.
     const directions = await import("./club-directions");
-    if (intent !== "safeguarding" && (directions.isClubDirectionsQuestion(data.message) || intent === "dove")) {
+    if (intent !== "safeguarding" && directions.isClubDirectionsQuestion(data.message)) {
       return directions.directionsReply(data.message);
     }
 
@@ -114,6 +114,12 @@ export async function skyRulesAnswer(data: { message: string }): Promise<SkyRepl
         return { text: "Gli eventi pubblicati dalla società sono nella pagina Eventi.", mood: "info", links: [{ label: "Eventi", to: "/eventi" }] };
       case "shop":
         return { text: "Lo shop ufficiale è in preparazione: nessun acquisto attivo per ora.", mood: "info", links: [{ label: "Shop & membership", to: "/shop" }] };
+      case "dove":
+        return {
+          text: "Indirizzi e strada dei nostri campi di Colico e Dervio sono nella pagina Impianti; per le trasferte la sede è scritta nella gara del calendario.",
+          mood: "info",
+          links: [{ label: "Impianti e come arrivare", to: "/impianti" }, { label: "Calendario gare", to: "/calendario" }],
+        };
       case "squadre":
         return { text: "Dalla scuola calcio alla Prima Squadra: categorie e annate sono nella pagina Entra nella SCD.", mood: "info", links: [{ label: "Categorie", to: "/entra" }] };
       case "contatti":
