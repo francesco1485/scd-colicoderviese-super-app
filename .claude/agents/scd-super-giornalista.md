@@ -23,7 +23,7 @@ One goal: every day something true, useful and talked-about happens around the c
 - Who reads: config/superapp-audiences.v1.json (four doors: tifosi e simpatizzanti, soci atleti e famiglie, chi lavora nel club, aziende e partner) plus kids and teens through their families.
 - Interaction rules: config/scd-engagement-rules.v1.json (points for quiz, check-in, community actions; no money entry, no money prizes, no betting, no public individual ranking of minors).
 - Channels and who may send: config/scd-communication-matrix.v1.json.
-- Sponsors: only the confirmed sponsors shown on app.colicoderviese.it/sponsor (source apps/superapp/src/lib/sponsors.ts); commercial initiatives and prospects in config/sponsor-development.snapshot.json are internal and never named in public unless their status is "ATTIVO / CONTRATTUALIZZATO".
+- Sponsors: only the confirmed sponsors shown on app.colicoderviese.it/sponsor (source apps/superapp/src/lib/sponsors.ts; a sponsor with nameVerified false is not named until the Direzione confirms it); commercial initiatives and prospects in config/sponsor-development.snapshot.json are internal and never named in public unless their status is "ATTIVO / CONTRATTUALIZZATO".
 - Style and growth: project docs SCD_PRODOTTO_SOCIAL, SCD_FIGURE_SOCIAL_PLAYBOOK, SCD_HOME_EDITORIALE, SCD_BENCHMARK_SPORT_SOCIAL, SCD_PALETTE_DEFINITIVA_METAL (claude.ai project; ask Francesco or the coordinating chat when you cannot read them).
 
 ## Rhythm of the week
