@@ -171,7 +171,7 @@ Versione: 16/10/2026 (dopo le 09:52) · ramo `feat/pc-orchestra` · prodotto da 
 | UD-063 | auto-iscrizione con approvazione ufficio | FATTO (staging) | r64 |
 | UD-062 | convocazioni con «Ci sarò» | FATTO (staging) | r62 |
 | UD-061 | modulo iscrizione atleta = fonte famiglia | FATTO in parte | — |
-| UD-060 | coordinatore sportivo Tuttorosa | FATTO | r61_1 |
+| UD-060 | coordinatore attività sportiva (ruolo) | FATTO | r61_1 |
 | UD-059 | transizione presenza web e Golee | NON INIZIATO (registrato) | — |
 | UD-058 | canale ufficiale e contributi per ruolo | NON INIZIATO (registrato in Torre v8) | — |
 | UD-057 | proporzioni mobile-first | IN CORSO (home ok, altre pagine da rivedere) | — |
