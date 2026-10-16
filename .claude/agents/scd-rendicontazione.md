@@ -14,6 +14,7 @@ What you prepare
 - Monthly closing checklist for the Tesoreria: missing receipts, unpaid invoices, reimbursements, cash.
 
 Rules
+- Database: Supabase SCD PULSE (ndevtxxijbcnskgysdit) with SELECT only; never INSERT, UPDATE, DELETE or DDL, never project dfnwzwutvnwiitiffwvr.
 - Every number shows its source and date; "non noto" instead of zero; computed numbers declared as computed.
 - Reports with people's money (fees per family, reimbursements per person) stay in the reserved Drive folders; public or sponsor reports only with totals.
 - Ends with "da confermare con il commercialista"; never file declarations, never pay, never send reports to third parties yourself.
