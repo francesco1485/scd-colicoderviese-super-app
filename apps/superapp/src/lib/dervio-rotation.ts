@@ -9,12 +9,19 @@
  * - The team playing is notified 14 days before; everybody 3 days before, also on the club page.
  * - Weather check 3 days before; on grass, if rain is forecast, decide the day before
  *   whether to change day.
- * - Each move needs: change-of-field request to LND/SGS, notice to the Comune di Dervio,
- *   notice to guests and referee.
+ *
+ * DG decisions of 2026-10-16 11:52–11:54 (VERIFIED in chat):
+ * - «luci Dervio ok»: evening matches are eligible (`lightsVerified` defaults to true).
+ * - «u16 anticipa ma u16 già gioca di sabato a Colico»: when U16 Élite plays at Dervio the
+ *   checklist carries the note "anticipare orario U16 (sabato)" (no automatic change).
+ * - «inverno sì ma se piove no»: winter grass matches are kept (flag only); the rain rule decides.
+ * - «Comune lasciamo stare per ora»: the Comune was informed with the season programme, so no
+ *   weekly Comune item (only a note). FIGC (LND/SGS) and the opponent (+ referee) are notified
+ *   only when the rain rule moves the match back to Colico (conditional items).
  *
  * Constraints already in `rotation.ts` are reused, not duplicated: lights after 17:00
  * (`LIGHTS_AFTER_MIN`, issue `dv-lights`), winter on natural grass (`isWinterDay`, issue
- * `dv-winter`), one month notice to the Comune (`NOTICE_DAYS`), Dervio surface (`PITCHES.DV`).
+ * `dv-winter`), Dervio surface (`PITCHES.DV`).
  *
  * Engine: TEMPO (hours given back to Segreteria and Direzione: one computed plan and
  * checklist instead of manual tracking). Measured by: checklist items closed on time
@@ -29,7 +36,6 @@ import {
   GROUP_FORMAT,
   GROUP_LABEL,
   LIGHTS_AFTER_MIN,
-  NOTICE_DAYS,
   PITCHES,
   daysBetween,
   isWinterDay,
@@ -139,11 +145,14 @@ export interface RotationOptions {
    * Default null: the rotation starts from the youngest group.
    */
   lastGroup?: DervioGroup | null;
-  /** Dervio lights verified: late matches allowed. Default false (as in `rotation.ts`). */
+  /**
+   * Dervio lights verified: late matches allowed. Default true (DG 2026-10-16 «luci Dervio ok»);
+   * false applies the `dv-lights` rule of `rotation.ts` (no match ending after 17:00).
+   */
   lightsVerified?: boolean;
   /**
    * Winter (Dec–Feb) on natural grass: "flag" keeps the match with `winterGrass: true`
-   * (default, same as the `dv-winter` warning in `rotation.ts`), "skip" excludes it.
+   * (default, DG «inverno sì ma se piove no»: the rain rule decides), "skip" excludes it.
    */
   winterPolicy?: "flag" | "skip";
 }
@@ -243,7 +252,7 @@ export function exclusionReason(
   if (!isDervioGroup(c.group)) return "group-not-in-rotation";
   if (options.winterPolicy === "skip" && DERVIO_SURFACE !== "synthetic" && isWinterDay(c.date))
     return "winter-grass";
-  if (!options.lightsVerified) {
+  if (!(options.lightsVerified ?? true)) {
     const end = matchEndMin(c);
     if (end === null) return "kickoff-unknown";
     if (end > LIGHTS_AFTER_MIN) return "needs-lights";
@@ -333,9 +342,14 @@ export type ChecklistItemId =
   | "club-page"
   | "weather-check"
   | "weather-decision"
+  /** Conditional: only when the rain rule moves the match back to Colico. */
   | "lnd-sgs-field-change"
-  | "comune-notice"
-  | "guests-referee-notice";
+  /** Conditional: only when the rain rule moves the match back to Colico. */
+  | "opponent-referee-notice"
+  /** Note: only when U16 Élite plays at Dervio. */
+  | "u16-time-note"
+  /** Note: the Comune was informed with the season programme (no weekly notice). */
+  | "comune-season-note";
 
 export type ChecklistStatus =
   | "done"
@@ -343,37 +357,35 @@ export type ChecklistStatus =
   | "due-today"
   | "upcoming"
   | "no-deadline"
-  | "not-applicable";
+  | "not-applicable"
+  /** Notes: information for whoever reads the checklist, nothing is due. */
+  | "info";
+
+/** "task" = weekly action; "conditional" = only after a rain move; "note" = information. */
+export type ChecklistItemKind = "task" | "conditional" | "note";
 
 export interface ChecklistItem {
   id: ChecklistItemId;
+  kind: ChecklistItemKind;
   /** Italian label for the UI. */
   label: string;
   /** Who acts (role, never a person's name). */
   owner: "segreteria" | "responsabile-impianti" | "direzione";
-  /** Last useful day (ISO), null when no deadline is decided yet. */
+  /** Last useful day (ISO), null for notes. */
   dueDate: string | null;
   /** Days from `today` to `dueDate` (negative = late), null without deadline. */
   daysLeft: number | null;
   status: ChecklistStatus;
 }
 
-/**
- * Lead days before the match (integers, clamped to 0–{@link MAX_LEAD_DAYS}).
- * `null` = deadline not decided: the item still appears, with status "no-deadline"
- * (never a guessed date).
- */
+/** Lead days before the match (integers, clamped to 0–{@link MAX_LEAD_DAYS}). */
 export interface ChecklistLeadDays {
   teamNotice: number;
   allNotice: number;
   weatherCheck: number;
   weatherDecision: number;
-  /** Default {@link NOTICE_DAYS} (one month notice to the Comune, already used by `rotation.ts`). */
-  comuneNotice: number | null;
-  /** Not decided yet (open point for the Segreteria / LND rules). */
-  lndSgsFieldChange: number | null;
-  /** Not decided yet. */
-  guestsRefereeNotice: number | null;
+  /** FIGC (LND/SGS) and opponent + referee after a rain move: default the decision day (T-1). */
+  rainMoveNotice: number;
 }
 
 export const DEFAULT_LEAD_DAYS: Readonly<ChecklistLeadDays> = {
@@ -381,36 +393,26 @@ export const DEFAULT_LEAD_DAYS: Readonly<ChecklistLeadDays> = {
   allNotice: 3,
   weatherCheck: 3,
   weatherDecision: 1,
-  comuneNotice: NOTICE_DAYS,
-  lndSgsFieldChange: null,
-  guestsRefereeNotice: null,
+  rainMoveNotice: 1,
 };
 
 export const MAX_LEAD_DAYS = 60;
 
 /** Integer in [0, MAX_LEAD_DAYS]; non-finite values fall back to `fallback`. */
-function clampLead<T extends number | null>(value: unknown, fallback: T): number | T {
+function clampLead(value: unknown, fallback: number): number {
   if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
   return Math.min(MAX_LEAD_DAYS, Math.max(0, Math.round(value)));
 }
 
-/** Lead days with injected overrides, clamped to integers 0–60 (null stays "no deadline"). */
+/** Lead days with injected overrides, clamped to integers 0–60. */
 export function resolveLeadDays(overrides: Partial<ChecklistLeadDays> = {}): ChecklistLeadDays {
   const d = DEFAULT_LEAD_DAYS;
-  const req = (k: "teamNotice" | "allNotice" | "weatherCheck" | "weatherDecision"): number =>
-    clampLead(overrides[k], d[k]);
-  const opt = (k: "comuneNotice" | "lndSgsFieldChange" | "guestsRefereeNotice"): number | null => {
-    const v = overrides[k] === undefined ? d[k] : overrides[k];
-    return v === null ? null : clampLead(v, d[k]);
-  };
   return {
-    teamNotice: req("teamNotice"),
-    allNotice: req("allNotice"),
-    weatherCheck: req("weatherCheck"),
-    weatherDecision: req("weatherDecision"),
-    comuneNotice: opt("comuneNotice"),
-    lndSgsFieldChange: opt("lndSgsFieldChange"),
-    guestsRefereeNotice: opt("guestsRefereeNotice"),
+    teamNotice: clampLead(overrides.teamNotice, d.teamNotice),
+    allNotice: clampLead(overrides.allNotice, d.allNotice),
+    weatherCheck: clampLead(overrides.weatherCheck, d.weatherCheck),
+    weatherDecision: clampLead(overrides.weatherDecision, d.weatherDecision),
+    rainMoveNotice: clampLead(overrides.rainMoveNotice, d.rainMoveNotice),
   };
 }
 
@@ -419,39 +421,82 @@ export interface ChecklistInput {
   matchDate: string;
   /** Today (Europe/Rome calendar date, ISO), injected. */
   today: string;
+  /** Calendar group of the Dervio match (adds the U16 note for "u16"). */
+  group?: string;
   /** Items already completed (from the gestionale). */
   done?: ReadonlySet<ChecklistItemId> | readonly ChecklistItemId[];
   /** Pitch surface. Default {@link DERVIO_SURFACE}; unknown keeps the weather items (fail-safe). */
   surface?: PitchSurface;
+  /**
+   * Result of the rain rule for this match. When it says "valuta-cambio-giorno" the
+   * rain-move items (FIGC, opponent + referee) appear, to be ready for the T-1 decision.
+   */
+  rain?: RainDecision | null;
+  /** The Direzione decided to move the match back to Colico for bad weather. */
+  movedToColico?: boolean;
   leadDays?: Partial<ChecklistLeadDays>;
 }
 
 const ITEM_META: Readonly<
-  Record<ChecklistItemId, { label: string; owner: ChecklistItem["owner"] }>
+  Record<
+    ChecklistItemId,
+    { label: string; owner: ChecklistItem["owner"]; kind: ChecklistItemKind }
+  >
 > = {
-  "team-notice": { label: "Avviso alla squadra (14 giorni prima)", owner: "segreteria" },
-  "all-notice": { label: "Avviso a tutti (3 giorni prima)", owner: "segreteria" },
-  "club-page": { label: "Pubblicazione sulla pagina del club", owner: "segreteria" },
-  "weather-check": { label: "Controllo meteo (3 giorni prima)", owner: "responsabile-impianti" },
-  "weather-decision": {
-    label: "Meteo: decisione sul cambio giorno (giorno prima)",
-    owner: "direzione",
+  "team-notice": {
+    label: "Avviso alla squadra (14 giorni prima)",
+    owner: "segreteria",
+    kind: "task",
   },
-  "lnd-sgs-field-change": { label: "Richiesta cambio campo a LND/SGS", owner: "segreteria" },
-  "comune-notice": { label: "Avviso al Comune di Dervio", owner: "segreteria" },
-  "guests-referee-notice": { label: "Avviso a ospiti e arbitro", owner: "segreteria" },
+  "all-notice": { label: "Avviso a tutti (3 giorni prima)", owner: "segreteria", kind: "task" },
+  "club-page": {
+    label: "Pubblicazione sulla pagina del club",
+    owner: "segreteria",
+    kind: "task",
+  },
+  "weather-check": {
+    label: "Controllo meteo (3 giorni prima)",
+    owner: "responsabile-impianti",
+    kind: "task",
+  },
+  "weather-decision": {
+    label: "Meteo: decisione sullo spostamento (giorno prima)",
+    owner: "direzione",
+    kind: "task",
+  },
+  "lnd-sgs-field-change": {
+    label: "Maltempo, gara spostata a Colico: comunicazione del cambio campo a FIGC (LND/SGS)",
+    owner: "segreteria",
+    kind: "conditional",
+  },
+  "opponent-referee-notice": {
+    label: "Maltempo, gara spostata a Colico: avviso alla squadra avversaria e all'arbitro",
+    owner: "segreteria",
+    kind: "conditional",
+  },
+  "u16-time-note": {
+    label: "Anticipare orario U16 (sabato): di solito gioca il sabato a Colico",
+    owner: "direzione",
+    kind: "note",
+  },
+  "comune-season-note": {
+    label: "Comune di Dervio informato con il programma stagionale",
+    owner: "segreteria",
+    kind: "note",
+  },
 };
 
-/** Fixed display order. */
+/** Fixed display order (items not relevant for a match are left out). */
 export const CHECKLIST_ORDER: readonly ChecklistItemId[] = [
-  "comune-notice",
-  "lnd-sgs-field-change",
   "team-notice",
-  "guests-referee-notice",
   "weather-check",
   "all-notice",
   "club-page",
   "weather-decision",
+  "lnd-sgs-field-change",
+  "opponent-referee-notice",
+  "u16-time-note",
+  "comune-season-note",
 ];
 
 /** Status of one item from its due date, `today` and completion. */
@@ -469,6 +514,10 @@ export function itemStatus(
   return "upcoming";
 }
 
+/** True when the rain-move items must appear (move decided, or rain rule says to evaluate it). */
+export const rainMoveActive = (input: Pick<ChecklistInput, "rain" | "movedToColico">): boolean =>
+  input.movedToColico === true || input.rain?.evaluateDayChange === true;
+
 /** Checklist with due dates and statuses for one Dervio match. Throws on invalid ISO days. */
 export function dervioChecklist(input: ChecklistInput): ChecklistItem[] {
   assertIsoDay("matchDate", input.matchDate);
@@ -476,8 +525,7 @@ export function dervioChecklist(input: ChecklistInput): ChecklistItem[] {
   const lead = resolveLeadDays(input.leadDays);
   const done = new Set<ChecklistItemId>(input.done ?? []);
   const grassOrUnknown = (input.surface ?? DERVIO_SURFACE) !== "synthetic";
-  const due = (days: number | null): string | null =>
-    days === null ? null : minusDays(input.matchDate, days);
+  const due = (days: number): string => minusDays(input.matchDate, days);
 
   const dueById: Record<ChecklistItemId, string | null> = {
     "team-notice": due(lead.teamNotice),
@@ -485,22 +533,36 @@ export function dervioChecklist(input: ChecklistInput): ChecklistItem[] {
     "club-page": due(lead.allNotice),
     "weather-check": due(lead.weatherCheck),
     "weather-decision": due(lead.weatherDecision),
-    "lnd-sgs-field-change": due(lead.lndSgsFieldChange),
-    "comune-notice": due(lead.comuneNotice),
-    "guests-referee-notice": due(lead.guestsRefereeNotice),
+    "lnd-sgs-field-change": due(lead.rainMoveNotice),
+    "opponent-referee-notice": due(lead.rainMoveNotice),
+    "u16-time-note": null,
+    "comune-season-note": null,
+  };
+  const present = (id: ChecklistItemId): boolean => {
+    if (ITEM_META[id].kind === "conditional") return rainMoveActive(input);
+    if (id === "u16-time-note") return input.group === "u16";
+    return true;
   };
   const applicable = (id: ChecklistItemId): boolean =>
     id === "weather-decision" ? grassOrUnknown : true;
 
-  return CHECKLIST_ORDER.map((id) => {
+  return CHECKLIST_ORDER.filter(present).map((id) => {
+    const meta = ITEM_META[id];
     const dueDate = dueById[id];
+    const status: ChecklistStatus =
+      meta.kind === "note"
+        ? done.has(id)
+          ? "done"
+          : "info"
+        : itemStatus(dueDate, input.today, done.has(id), applicable(id));
     return {
       id,
-      label: ITEM_META[id].label,
-      owner: ITEM_META[id].owner,
+      kind: meta.kind,
+      label: meta.label,
+      owner: meta.owner,
       dueDate,
       daysLeft: dueDate === null ? null : daysBetween(input.today, dueDate),
-      status: itemStatus(dueDate, input.today, done.has(id), applicable(id)),
+      status,
     };
   });
 }
@@ -516,6 +578,7 @@ export function checklistSummary(
     upcoming: 0,
     "no-deadline": 0,
     "not-applicable": 0,
+    info: 0,
   };
   for (const i of items) out[i.status] += 1;
   return out;
@@ -550,7 +613,10 @@ export const DEFAULT_RAIN_THRESHOLDS: Readonly<RainThresholds> = {
 };
 
 export type RainVerdict =
-  /** Grass pitch and rain forecast: decide the day before whether to change day. */
+  /**
+   * Grass pitch and rain forecast: the day before, the Direzione decides whether to move
+   * the match (back to Colico). Winter alone never moves a match: only rain does.
+   */
   | "valuta-cambio-giorno"
   /** Forecast available and no rain over the thresholds. */
   | "nessuna-pioggia"
