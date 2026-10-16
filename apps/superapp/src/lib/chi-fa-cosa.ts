@@ -87,7 +87,8 @@ export function isRoutablePosition(p: string): boolean {
 export const POSITION_RANK: Readonly<Record<string, number>> = {
   presidente: 0,
   direzione: 0,
-  "direttore-generale": 1,
+  // Francesco 16/10/2026 13:31 «DG conferma tutto»: the Direttore Generale confirms on its own on every topic.
+  "direttore-generale": 0,
   "coordinatore-attivita-sportiva": 2,
   "responsabile-attivita-base": 2,
   dirigenza: 3,
@@ -192,10 +193,12 @@ const BASE_LIMITS: readonly string[] = [NO_NAMES_OF_MINORS, NO_COPY];
  * salute and impianti (Colico and Dervio) the deciders are the Presidente AND the Consiglio Direttivo. The registry
  * has no separate "consiglio-direttivo" position: the board is the role DIRECTION, whose position is 'direzione'
  * (session.ts ROLE_POSITIONS.DIRECTION; 'dirigenza' is the purchasing seat of the same role). So the Consiglio
- * Direttivo is routed as 'direzione'.
+ * Direttivo is routed as 'direzione'. Francesco 16/10/2026 13:31 «DG conferma tutto»: the Direttore Generale
+ * decides with them.
  */
 export const BOARD_POSITION = "direzione";
 const BOARD_DECIDERS: readonly Entry[] = [
+  { position: "direttore-generale", duty: "DECIDE", reason: "conferma tutto (Francesco 16/10/2026 13:31)" },
   { position: "presidente", duty: "DECIDE", reason: "decide con il Consiglio Direttivo (Francesco 16/10/2026)" },
   { position: BOARD_POSITION, duty: "DECIDE", reason: "Consiglio Direttivo: decide con il Presidente (Francesco 16/10/2026)" },
 ];
@@ -387,13 +390,6 @@ export const DERVIO_EMERGENCY_STRUCTURE: readonly string[] = [
   "responsabile-struttura",
 ];
 
-/**
- * VERIFIED (Francesco 16/10/2026 11:58 «ok DG conferma come direzione»): when the Direzione fallback decides a
- * group whose confirmer position does not exist yet, the Direttore Generale confirms as Direzione. Applied only when
- * 'direzione' is the sole decider (UD-154 fallback); where the Presidente decides too, the Presidente's rank counts.
- */
-const FALLBACK_CONFIRM_RANK = 1;
-
 /** UD-154: until a group confirmer position exists, only the Direzione confirms that group. */
 export const CONFIRMER_FALLBACK = "direzione";
 
@@ -552,11 +548,7 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
   // Hierarchy (UD-141).
   const approvers = [...byPos.entries()].filter(([, v]) => v.duty === "DECIDE").map(([p]) => p);
   const approverRank = approvers.length
-    ? Math.min(
-        ...approvers.map((p) =>
-          p === CONFIRMER_FALLBACK ? FALLBACK_CONFIRM_RANK : (POSITION_RANK[p] ?? Number.POSITIVE_INFINITY),
-        ),
-      )
+    ? Math.min(...approvers.map((p) => POSITION_RANK[p] ?? Number.POSITIVE_INFINITY))
     : POSITION_RANK["direttore-generale"]!;
   const rank = requesterRank(input.requesterPositions);
   let status: RoutingStatus;

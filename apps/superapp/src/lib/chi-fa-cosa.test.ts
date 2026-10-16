@@ -129,7 +129,7 @@ describe("UD-156 Dervio", () => {
 
   it("Dervio facilities: Presidente and Consiglio Direttivo decide, UD-156 set informed, no structure position", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "DERVIO" });
-    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(r.approvers).toEqual(["direttore-generale", "direzione", "presidente"]);
     expect(positions(r).sort()).toEqual([...new Set([...DERVIO_ALWAYS, "direzione"])].sort());
     for (const p of DERVIO_EXCLUDED) expect(positions(r)).not.toContain(p);
     expect(find(r, "segreteria")!.reasons.join(" ")).toMatch(/UD-156/);
@@ -137,7 +137,7 @@ describe("UD-156 Dervio", () => {
 
   it("Colico facilities: Presidente and Consiglio Direttivo decide, Colico structure informed, no Dervio structure", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "COLICO" });
-    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(r.approvers).toEqual(["direttore-generale", "direzione", "presidente"]);
     expect(find(r, "responsabile-struttura-colico")!.duty).toBe("INFORM");
     expect(positions(r)).not.toContain("responsabile-struttura-dervio");
     expect(positions(r)).not.toContain("responsabile-attivita-base");
@@ -147,7 +147,7 @@ describe("UD-156 Dervio", () => {
     const r = routeChiFaCosa({ topic: "impianti", site: "ENTRAMBE" });
     expect(positions(r)).toEqual(expect.arrayContaining([...DERVIO_ALWAYS]));
     for (const p of DERVIO_EXCLUDED) expect(positions(r)).not.toContain(p);
-    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(r.approvers).toEqual(["direttore-generale", "direzione", "presidente"]);
     expect(r.warnings.join(" ")).toMatch(/avvisati a parte/);
   });
 
@@ -244,7 +244,7 @@ describe("UD-141 hierarchy", () => {
     }
   });
 
-  it("group without its confirmer: Direzione, presidente and DG (VERIFIED 16/10: DG confirms as Direzione); below waits", () => {
+  it("group without its confirmer: Direzione, presidente and DG (Francesco 16/10/2026 13:31 «DG conferma tutto»); below waits", () => {
     const missingGroups = REQUEST_CONFIRMERS.filter((c) => !positionExists(c.position)).flatMap((c) => c.groups);
     expect(missingGroups.length).toBeGreaterThan(0);
     for (const k of missingGroups) {
@@ -274,7 +274,7 @@ describe("UD-141 hierarchy", () => {
 describe("sensitive topics", () => {
   it("health: Presidente and Consiglio Direttivo decide, infermeria informed, no team staff, fisioterapista missing", () => {
     const r = routeChiFaCosa({ topic: "salute", site: "COLICO", teamKey: "u15" });
-    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(r.approvers).toEqual(["direttore-generale", "direzione", "presidente"]);
     expect(find(r, "responsabile-infermeria")!.duty).toBe("INFORM");
     expect(positions(r)).not.toContain("mister");
     expect(positions(r)).not.toContain("dirigente-annata");
@@ -284,7 +284,7 @@ describe("sensitive topics", () => {
 
   it("minors (organisational): Presidente and Consiglio Direttivo decide, no team staff, safeguarding stays separate", () => {
     const r = routeChiFaCosa({ topic: "minori-organizzativo", site: "COLICO", teamKey: "pulcini" });
-    expect(r.approvers).toEqual(["direzione", "presidente"]);
+    expect(r.approvers).toEqual(["direttore-generale", "direzione", "presidente"]);
     expect(positions(r)).not.toContain("mister");
     expect(r.missingPositions.map((m) => m.position)).toContain("responsabile-safeguarding");
     expect(r.contentLimits.join(" ")).toMatch(/canale Safeguarding/);
@@ -344,14 +344,33 @@ describe("other topics", () => {
     expect(routeChiFaCosa({ topic: "pagamenti", site: "COLICO" }).approvers).toEqual(["tesoreria"]);
     expect(routeChiFaCosa({ topic: "comunicazioni", site: "COLICO" }).approvers).toEqual(["segreteria"]);
     expect(routeChiFaCosa({ topic: "tornei", site: "COLICO" }).approvers).toEqual(["responsabile-tornei"]);
-    expect(routeChiFaCosa({ topic: "sponsor", site: "COLICO" }).approvers).toEqual(["direzione", "presidente"]);
+    expect(routeChiFaCosa({ topic: "sponsor", site: "COLICO" }).approvers).toEqual(["direttore-generale", "direzione", "presidente"]);
   });
 
-  it("board topics: only Presidente or Direzione confirm, the DG waits (Presidente decides too)", () => {
+  it("board topics: Presidente, Direzione and DG confirm (Francesco 16/10/2026 13:31 «DG conferma tutto»)", () => {
+    for (const topic of ["sponsor", "minori-organizzativo", "salute", "impianti"] as const)
+      for (const site of ["COLICO", "DERVIO"] as const) {
+        for (const rp of [["presidente"], ["direzione"], ["direttore-generale"]])
+          expect(routeChiFaCosa({ topic, site, requesterPositions: rp }).status, `${topic} ${site} ${rp}`).toBe("CONFERMATA");
+        for (const rp of [["coordinatore-attivita-sportiva"], ["responsabile-infermeria"], ["responsabile-struttura-colico"]])
+          expect(routeChiFaCosa({ topic, site, requesterPositions: rp }).status, `${topic} ${site} ${rp}`).toBe("DA_CONFERMARE");
+      }
+  });
+
+  it("DG confirms on its own on every non-emergency topic, site and team (Francesco 16/10/2026 13:31)", () => {
+    expect(POSITION_RANK["direttore-generale"]).toBe(0);
+    for (const topic of CHI_FA_COSA_TOPICS.filter((t) => t !== "emergenza"))
+      for (const site of [...CHI_FA_COSA_SITES, null])
+        for (const teamKey of [null, ...REQUEST_TEAMS.map((t) => t.key)])
+          expect(
+            routeChiFaCosa({ topic, site, teamKey, requesterPositions: ["direttore-generale"] }).status,
+            `${topic} ${site} ${teamKey}`,
+          ).toBe("CONFERMATA");
+  });
+
+  it("other staff still wait on board topics", () => {
     for (const topic of ["sponsor", "minori-organizzativo", "salute", "impianti"] as const) {
-      for (const rp of [["presidente"], ["direzione"]])
-        expect(routeChiFaCosa({ topic, site: "COLICO", requesterPositions: rp }).status, `${topic} ${rp}`).toBe("CONFERMATA");
-      for (const rp of [["direttore-generale"], ["responsabile-infermeria"], ["responsabile-struttura-colico"]])
+      for (const rp of [["tesoreria"], ["responsabile-infermeria"], ["responsabile-struttura-colico"]])
         expect(routeChiFaCosa({ topic, site: "COLICO", requesterPositions: rp }).status, `${topic} ${rp}`).toBe("DA_CONFERMARE");
     }
   });
