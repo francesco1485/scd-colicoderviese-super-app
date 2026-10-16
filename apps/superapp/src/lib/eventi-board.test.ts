@@ -93,7 +93,8 @@ describe("eventi, tornei e comunità in SCD METAL (source)", () => {
     expect(community).toContain("Giocatori con nome e iniziale");
     expect(community).toContain("Per votare serve un account del club");
     expect(community).toContain("Sotto i 14 anni con l'account della famiglia");
-    expect(community).toContain("Nessuna classifica individuale dei minori");
+    expect(community).toContain("Attività di base esclusa");
+    expect(community).not.toContain("Nessuna classifica individuale dei minori");
     expect(community).not.toMatch(/lotteria|adotta/i);
   });
 });

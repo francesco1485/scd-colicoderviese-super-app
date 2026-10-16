@@ -244,7 +244,7 @@ function ClcRow({ today }: { today: string }) {
 function TournamentRow({ t }: { t: TournamentEdition }) {
   const body: ReactNode = (
     <>
-      <DateTile day={t.status === "IN_PREPARAZIONE" ? null : t.date} />
+      <DateTile day={t.status === "IN_PREPARAZIONE" || t.status === "DATE_DA_CONFERMARE" ? null : t.date} />
       <KindBar kind="torneo" />
       <span className="grid min-w-0 flex-1 gap-0.5">
         <span className={`${METAL_LABEL} ${EVENT_KINDS.torneo.ink}`}>
