@@ -5,6 +5,16 @@ import { describe, expect, it } from "vitest";
 const src = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 
 describe("sponsor LED spots in the UI (UD-119)", () => {
+  it("the sponsor page shows the club LED wall in rotation (Francesco 16/10/2026 20:56), same rules as the board", () => {
+    const sponsor = src("../routes/sponsor.tsx");
+    expect(sponsor).toContain("<SponsorLedwallLive />");
+    const live = src("./SponsorLedwallLive.tsx");
+    expect(live).toContain("spotsForLedwall()");
+    expect(live).toContain("ledOnAir(");
+    expect(live).toContain("prefers-reduced-motion: reduce");
+    expect(live).toContain('rel: "noopener noreferrer"');
+  });
+
   const ui = src("./SponsorSpots.tsx");
 
   it("no vetrine (Francesco 15/10/2026): no rotating spot block anywhere in the app, no partner band on /sponsor", () => {
