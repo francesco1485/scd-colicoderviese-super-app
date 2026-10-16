@@ -26,7 +26,7 @@ const ORG = "00000000-0000-0000-0000-000000000001";
 const U = (n) => `10000000-0000-0000-0000-0000000000${String(n).padStart(2, "0")}`;
 // 1 Direzione, 2 DG, 3 Segreteria, 4 responsabile tornei, 5 tesoreria, 6 responsabile campi, 7 family,
 // 8 coordinatore, 9 responsabile attivita di base, 10 mister
-const DIR = U(1), DG = U(2), SEG = U(3), RTO = U(4), TES = U(5), RCA = U(6), FAM = U(7), COO = U(8), RAB = U(9), MIS = U(10), PRES = U(11), DSA = U(12);
+const DIR = U(1), DG = U(2), SEG = U(3), RTO = U(4), TES = U(5), RCA = U(6), FAM = U(7), COO = U(8), RAB = U(9), MIS = U(10), PRES = U(11), DSA = U(12), TS2 = U(13);
 // 11 Presidente, 12 direttore sportivo agonistica
 
 const base = `
@@ -66,7 +66,8 @@ insert into public.scd_memberships (organization_id, user_id, role, scope) value
   ('${ORG}', '${RAB}', 'STAFF', '{"positions":["responsabile-attivita-base"]}'),
   ('${ORG}', '${MIS}', 'MISTER', '{"positions":["mister"]}'),
   ('${ORG}', '${PRES}', 'STAFF', '{"positions":["presidente"]}'),
-  ('${ORG}', '${DSA}', 'STAFF', '{"positions":["direttore-sportivo-agonistica"]}');
+  ('${ORG}', '${DSA}', 'STAFF', '{"positions":["direttore-sportivo-agonistica"]}'),
+  ('${ORG}', '${TS2}', 'STAFF', '{"positions":["tesoreria","segreteria"]}');
 `;
 
 // prerequisites guard: r139 alone refuses to run
@@ -286,6 +287,11 @@ assert.equal((await act(COO, vis.id, "accept")).code, "forbidden", "coordinatore
 assert.equal((await act(DSA, vis.id, "accept")).code, "forbidden", "direttore sportivo never decides");
 assert.equal((await act(PRES, vis.id, "accept")).ok, true, "the Presidente decides");
 assert.equal((await pay(TES, vis.id, { status: "DA_PAGARE", amountCents: 1000 })).code, "forbidden");
+// Francesco ~17:00 «No, senza pagamento»: a visit is never paid, even for a Tesoreria that sees it
+assert.equal((await pay(TS2, vis.id, { status: "DA_PAGARE", amountCents: 1000 })).code, "no_payment");
+assert.equal((await pay(TS2, vis.id, { status: "NON_DOVUTO" })).code, "no_payment");
+assert.equal((await board(TS2)).rows.find((r) => r.id === vis.id).can.pay, false);
+assert.equal((await board(TS2)).rows.find((r) => r.id === vis.id).paymentLinkAllowed, false);
 
 // start/close by the owner position; informed cannot
 assert.equal((await act(TES, t1.id, "start")).code, "forbidden");

@@ -141,7 +141,8 @@ function IntakePage({ data }: { data: IntakeDesk }) {
                 "«Li crea la Tesoreria»: il link di pagamento lo crea una persona della Tesoreria, solo dopo «Accettata», e lo registra qui.",
                 "«DG conferma tutto» (13:31): il Direttore Generale conferma le richieste, tranne affitto campi e visite.",
                 "«Decide presidente e consiglio direttivo» (16:39): affitto dei campi e visite ai centri li decidono il Presidente e il Consiglio Direttivo (in app: chi ha il ruolo Direzione).",
-                "«Preparo e inoltro» (16:55): su affitti e visite il DG prepara e inoltra.",
+                "«Preparo e inoltro» (16:55): su affitti e visite il DG prepara e inoltra. «Tengo anche Direzione» (17:00): come membro del Consiglio può decidere anche lui.",
+                "«No, senza pagamento» (17:00): le visite non si pagano (la domanda citava visite mediche, massaggi e nutrizione: da confermare che valga per le visite ai centri).",
               ]}
             />
           </Card>
@@ -151,7 +152,7 @@ function IntakePage({ data }: { data: IntakeDesk }) {
                 "Fasi: Ricevuta → In valutazione → Accettata o Non accolta → In gestione → Chiusa.",
                 "Chi decide gli altri tipi: tornei responsabile tornei, DG e Presidente; sponsor e convenzioni DG, Presidente e Consiglio; altro Segreteria, DG e Presidente.",
                 "Chi prepara e chi è informato per ogni tipo.",
-                "Sponsor e convenzioni: contratto e fattura, nessun link di pagamento.",
+                "Sponsor e convenzioni: contratto e fattura, nessun link di pagamento. Tornei, affitti e altro: pagamento dopo «Accettata».",
                 "I recapiti hanno una scadenza (proposta: 6 o 12 mesi); la cancellazione automatica si attiva con un job da creare.",
                 "Al massimo 60 richieste all'ora dal modulo pubblico.",
               ]}

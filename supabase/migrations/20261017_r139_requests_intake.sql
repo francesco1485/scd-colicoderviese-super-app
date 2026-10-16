@@ -68,9 +68,15 @@
 -- ruolo «Direzione». Tu, come DG, su queste due richieste cosa fai?" Francesco answered «Preparo e inoltro»: the
 -- Consiglio Direttivo is the Direzione (role DIRECTION or position 'direzione', same convention as lib/chi-fa-cosa.ts
 -- BOARD_POSITION; the r138 catalogue codes 'consigliere' are not membership positions) and the DG prepares and
--- forwards these two kinds. An account of the DG that also carries the role DIRECTION decides as a member of the
--- Consiglio: the model cannot tell the two apart. Everything else below is PROPOSED: the other kinds' positions,
--- the per-kind payment-link yes/no, the 60/hour cap and the contact retention periods. Per kind:
+-- forwards these two kinds. VERIFIED ~17:00: to "Il tuo account nell'app deve avere solo il ruolo DG, così non decidi
+-- tu affitti e visite?" Francesco answered «Tengo anche Direzione»: the DG keeps the role Direzione, so as a member of
+-- the Consiglio he can also decide rentals and visits (accepted by Francesco; no logic change).
+-- VERIFIED ~17:00: to "Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della Tesoreria?"
+-- Francesco answered «No, senza pagamento»: VISITA_CENTRO has no payment (rules 'payment' false, payment_set refuses
+-- it with 'no_payment'). Note: the question named medical, massage and nutrition visits, while VISITA_CENTRO is a
+-- visit of schools or groups to the sports centres; applied here as the coordinator instructed, to be confirmed.
+-- Everything else below is PROPOSED: the other kinds' positions, the other kinds' payment and payment-link yes/no,
+-- the 60/hour cap and the contact retention periods. Per kind:
 --   ISCRIZIONE_TORNEO (tornei, PROPOSED): decide responsabile-tornei, DG, Presidente; prepare segreteria; inform
 --     coordinatore, tesoreria;
 --   SPONSOR, CONVENZIONE (sponsor, PROPOSED): decide DG + Presidente + Consiglio (direzione), inform tesoreria;
@@ -246,37 +252,37 @@ returns jsonb language sql immutable set search_path to 'public' as $$
       'preparers', jsonb_build_array('segreteria'),
       'informed', jsonb_build_array('coordinatore-attivita-sportiva','tesoreria'),
       'owners', jsonb_build_array('responsabile-tornei','segreteria'),
-      'siteRequired', false, 'paymentLink', true)
+      'siteRequired', false, 'payment', true, 'paymentLink', true)
     when 'SPONSOR' then jsonb_build_object('area', 'crm', 'topic', 'sponsor',
       'deciders', jsonb_build_array('direttore-generale','presidente','direzione'),
       'preparers', jsonb_build_array(),
       'informed', jsonb_build_array('tesoreria'),
       'owners', jsonb_build_array('direttore-generale','presidente','tesoreria'),
-      'siteRequired', false, 'paymentLink', false)
+      'siteRequired', false, 'payment', true, 'paymentLink', false)
     when 'CONVENZIONE' then jsonb_build_object('area', 'crm', 'topic', 'sponsor',
       'deciders', jsonb_build_array('direttore-generale','presidente','direzione'),
       'preparers', jsonb_build_array(),
       'informed', jsonb_build_array('tesoreria'),
       'owners', jsonb_build_array('direttore-generale','presidente','tesoreria'),
-      'siteRequired', false, 'paymentLink', false)
+      'siteRequired', false, 'payment', true, 'paymentLink', false)
     when 'AFFITTO_CAMPO' then jsonb_build_object('area', 'impianti-campi', 'topic', 'impianti',
       'deciders', jsonb_build_array('presidente','direzione'),
       'preparers', jsonb_build_array('direttore-generale','responsabile-campi'),
       'informed', jsonb_build_array('tesoreria','responsabile-struttura-colico','responsabile-struttura'),
       'owners', jsonb_build_array('responsabile-campi','tesoreria','direttore-generale'),
-      'siteRequired', true, 'paymentLink', true)
+      'siteRequired', true, 'payment', true, 'paymentLink', true)
     when 'VISITA_CENTRO' then jsonb_build_object('area', 'impianti-campi', 'topic', 'impianti',
       'deciders', jsonb_build_array('presidente','direzione'),
       'preparers', jsonb_build_array('direttore-generale','segreteria'),
       'informed', jsonb_build_array('responsabile-campi','responsabile-struttura-colico','responsabile-struttura'),
       'owners', jsonb_build_array('segreteria','direttore-generale'),
-      'siteRequired', true, 'paymentLink', true)
+      'siteRequired', true, 'payment', false, 'paymentLink', false)
     when 'ALTRO' then jsonb_build_object('area', 'segreteria', 'topic', 'comunicazioni',
       'deciders', jsonb_build_array('segreteria','direttore-generale','presidente'),
       'preparers', jsonb_build_array(),
       'informed', jsonb_build_array(),
       'owners', jsonb_build_array('segreteria'),
-      'siteRequired', false, 'paymentLink', true)
+      'siteRequired', false, 'payment', true, 'paymentLink', true)
     else null
   end;
 $$;
@@ -702,7 +708,8 @@ begin
         'decide', public.scd_request_can(p_organization_id, r.kind, r.site, r.owner_position, 'decide'),
         'prepare', public.scd_request_can(p_organization_id, r.kind, r.site, r.owner_position, 'prepare'),
         'contact', public.scd_request_can(p_organization_id, r.kind, r.site, r.owner_position, 'prepare'),
-        'pay', v_pay and r.status in ('ACCETTATA','IN_GESTIONE','CHIUSA')),
+        'pay', v_pay and r.status in ('ACCETTATA','IN_GESTIONE','CHIUSA')
+               and (public.scd_request_kind_rules(r.kind)->>'payment')::boolean),
         'owners', to_jsonb(public.scd_request_kind_positions(r.kind, r.site, 'owners')),
         'paymentLinkAllowed', (public.scd_request_kind_rules(r.kind)->>'paymentLink')::boolean)
       order by coalesce(r.received_at, r.created_at) desc)
@@ -907,6 +914,8 @@ begin
   if not public.scd_request_can(p_organization_id, r.kind, r.site, r.owner_position, 'view') then
     return jsonb_build_object('ok', false, 'code', 'forbidden');
   end if;
+  -- kinds without payment (VISITA_CENTRO, Francesco ~17:00 «No, senza pagamento»)
+  if not (public.scd_request_kind_rules(r.kind)->>'payment')::boolean then return jsonb_build_object('ok', false, 'code', 'no_payment'); end if;
   if r.status not in ('ACCETTATA','IN_GESTIONE','CHIUSA') then return jsonb_build_object('ok', false, 'code', 'state'); end if;
   if v_status is null or v_status not in ('NON_DOVUTO','DA_PAGARE','LINK_INVIATO','PAGATO_DA_RISCONTRARE','RISCONTRATO','ANNULLATO') then
     return jsonb_build_object('ok', false, 'code', 'invalid');

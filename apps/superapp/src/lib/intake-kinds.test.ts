@@ -105,6 +105,10 @@ describe("rules follow chi-fa-cosa (G14) and never route families, athletes, par
     expect(INTAKE_RULES.SPONSOR.paymentLink).toBe(false);
     expect(INTAKE_RULES.CONVENZIONE.paymentLink).toBe(false);
     expect(INTAKE_RULES.ISCRIZIONE_TORNEO.paymentLink).toBe(true);
+    // Francesco ~17:00 «No, senza pagamento»
+    expect(INTAKE_RULES.VISITA_CENTRO.payment).toBe(false);
+    expect(INTAKE_RULES.VISITA_CENTRO.paymentLink).toBe(false);
+    expect(INTAKE_KINDS.filter((k) => !INTAKE_RULES[k].payment)).toEqual(["VISITA_CENTRO"]);
   });
 });
 

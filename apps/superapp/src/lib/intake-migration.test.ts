@@ -97,6 +97,7 @@ describe("r139 Vetrina richieste (staged, not applied)", () => {
         expect(arr, `${k} ${set}`).toEqual([...r[set]]);
       }
       expect(b, k).toContain(`'siteRequired', ${r.siteRequired}`);
+      expect(b, k).toContain(`'payment', ${r.payment}`);
       expect(block![2], k).toBe(String(r.paymentLink));
     }
   });

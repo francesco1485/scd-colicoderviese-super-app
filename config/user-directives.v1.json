@@ -3752,20 +3752,22 @@
     },
     {
       "sourceDate": "2026-10-16",
-      "sourceTime": "15:44; 16:39; 16:55",
+      "sourceTime": "15:44; 16:39; 16:55; 17:00",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
       "sourceQuoteFragments": [
         "Esterni Tally, soci app",
         "Li crea la Tesoreria",
         "decide presidente e consiglio direttivo",
-        "Preparo e inoltro"
+        "Preparo e inoltro",
+        "No, senza pagamento",
+        "Tengo anche Direzione"
       ],
       "id": "UD-163",
       "name": "VETRINA_RICHIESTE_EXTERNALS_TALLY_MEMBERS_APP_PAYMENT_LINKS_BY_TESORERIA",
       "context": "Francesco (DG) 16/10/2026, chat PC, answers to the questions of the Vetrina richieste design (PROGETTO_VETRINA_RICHIESTE, request of 14:57: Tally links and forms in the gestionali for tournaments, visits, sponsors, companies, field rental, other, all catalogued in one place, managed after acceptance with a traced payment). Question 1 (two doors) answered «Esterni Tally, soci app»; question 3 (SumUp links) answered «Li crea la Tesoreria». Earlier the same day: «DG conferma tutto» (13:31). Implemented as phase F1 on branch feat/pc-vetrina-richieste: migration r139 STAGED (not applied), lib/intake-kinds.ts, lib/intake-links.ts, lib/intake.functions.ts, /gestionale block and /gestionale/richieste.",
       "normalizedCommand": {
-        "rule": "External parties (società, aziende, scuole, privati adulti) send requests through ONE Tally form «Richieste alla SCD» with a branch per kind and a hidden field tipo; members and families ask from their in-app area, so no minor's name passes through Tally. Every request lives in the single catalogue public.scd_requests. The payment link of an accepted request is created by a Tesoreria person (no automatic SumUp links), recorded on the request and reconciled later; nothing is paid before acceptance. 16:39 «decide presidente e consiglio direttivo» (answer to: who decides AFFITTO CAMPO and VISITA AL CENTRO): field rentals and visits to the centres are decided by the Presidente and the Consiglio Direttivo. ~16:55, to the question «Per l'affitto del campo e le visite al centro decidono il Presidente e il Consiglio Direttivo... Nell'app il Consiglio Direttivo corrisponde a chi ha il ruolo «Direzione». Tu, come DG, su queste due richieste cosa fai?» Francesco answered «Preparo e inoltro»: the Consiglio Direttivo is the role Direzione in the app and the DG prepares and forwards these two kinds. No threshold under which the DG decides alone has been decided.",
+        "rule": "External parties (società, aziende, scuole, privati adulti) send requests through ONE Tally form «Richieste alla SCD» with a branch per kind and a hidden field tipo; members and families ask from their in-app area, so no minor's name passes through Tally. Every request lives in the single catalogue public.scd_requests. The payment link of an accepted request is created by a Tesoreria person (no automatic SumUp links), recorded on the request and reconciled later; nothing is paid before acceptance. 16:39 «decide presidente e consiglio direttivo» (answer to: who decides AFFITTO CAMPO and VISITA AL CENTRO): field rentals and visits to the centres are decided by the Presidente and the Consiglio Direttivo. ~16:55, to the question «Per l'affitto del campo e le visite al centro decidono il Presidente e il Consiglio Direttivo... Nell'app il Consiglio Direttivo corrisponde a chi ha il ruolo «Direzione». Tu, come DG, su queste due richieste cosa fai?» Francesco answered «Preparo e inoltro»: the Consiglio Direttivo is the role Direzione in the app and the DG prepares and forwards these two kinds. ~17:00, to \"Il tuo account nell'app deve avere solo il ruolo DG, così non decidi tu affitti e visite?\" Francesco answered «Tengo anche Direzione»: the DG keeps the role Direzione and, as a Consiglio member, can also decide rentals and visits (accepted). ~17:00, to \"Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della Tesoreria?\" Francesco answered «No, senza pagamento»: VISITA_CENTRO has no payment (scope note: the question named medical, massage and nutrition visits; applied to VISITA_CENTRO, to be confirmed). No threshold under which the DG decides alone has been decided.",
         "scope": "VETRINA_RICHIESTE_DOORS_AND_PAYMENTS",
         "engines": "TEMPO (one catalogue, deciders told in the app at once) and SOLDI (tournament fees and field rentals traced to the bank movements)",
         "measure": "requests per month and kind (scd_requests.received_at); median hours from RICEVUTA to decision; share of accepted requests with payment RISCONTRATO within 7 days of LINK_INVIATO; 0 minors' names in Tally submissions (form asks for an adult referent only)",
@@ -3776,7 +3778,7 @@
           "Make scenario Tally -> scd_request_ingest (service role) to be created after the form",
           "placement of the public links on /tornei, /sponsor, /partner, /fornitori, /impianti, /contatti (pages of the CLOUD chat)",
         "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
-        "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment link yes/no per kind (no link for sponsors and convenzioni), ingest cap 60/hour, contact retention periods (12 months from receipt, 6 after refusal or cancellation, 12 after closing; automatic deletion only once a scheduled job is created)"
+        "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour, contact retention periods (12 months from receipt, 6 after refusal or cancellation, 12 after closing; automatic deletion only once a scheduled job is created)"
         ]
       }
     }

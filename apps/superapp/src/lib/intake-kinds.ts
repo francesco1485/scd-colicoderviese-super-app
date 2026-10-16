@@ -69,7 +69,10 @@ export const INTAKE_SITE_LABEL: Readonly<Record<IntakeSite, string>> = { COLICO:
  * «Direzione». Tu, come DG, su queste due richieste cosa fai?"): the DG is a preparer of these two kinds, and the
  * Consiglio Direttivo is the Direzione (position 'direzione' / role DIRECTION, as BOARD_POSITION in chi-fa-cosa.ts). PROPOSED, to be confirmed: the deciders of the other kinds, every
  * preparer/informed/owner list, the per-kind payment-link yes/no, the 60/hour ingest cap and the contact retention
- * periods. No threshold under which the DG decides alone: not decided, not implemented.
+ * periods. No threshold under which the DG decides alone: not decided, not implemented. VERIFIED ~17:00: «Tengo anche
+ * Direzione» (the DG keeps the role Direzione, so he can also decide rentals and visits as a Consiglio member) and
+ * «No, senza pagamento» to "Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della
+ * Tesoreria?": VISITA_CENTRO has no payment (the question named medical visits: scope to be confirmed).
  */
 
 export interface IntakeKindRule {
@@ -82,6 +85,8 @@ export interface IntakeKindRule {
   /** Positions that may own the accepted request (assign). */
   owners: readonly string[];
   siteRequired: boolean;
+  /** False when the kind is never paid (VISITA_CENTRO, Francesco ~17:00 «No, senza pagamento»): no payment at all. */
+  payment: boolean;
   /** False for sponsors and convenzioni: invoiced by contract, never by a payment link. */
   paymentLink: boolean;
 }
@@ -101,6 +106,7 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
     informed: ["coordinatore-attivita-sportiva", "tesoreria"],
     owners: ["responsabile-tornei", "segreteria"],
     siteRequired: false,
+    payment: true,
     paymentLink: true,
   },
   SPONSOR: {
@@ -111,6 +117,7 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
     informed: ["tesoreria"],
     owners: ["direttore-generale", "presidente", "tesoreria"],
     siteRequired: false,
+    payment: true,
     paymentLink: false,
   },
   CONVENZIONE: {
@@ -121,6 +128,7 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
     informed: ["tesoreria"],
     owners: ["direttore-generale", "presidente", "tesoreria"],
     siteRequired: false,
+    payment: true,
     paymentLink: false,
   },
   AFFITTO_CAMPO: {
@@ -132,6 +140,7 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
     informed: ["tesoreria", "responsabile-struttura-colico", "responsabile-struttura"],
     owners: ["responsabile-campi", "tesoreria", "direttore-generale"],
     siteRequired: true,
+    payment: true,
     paymentLink: true,
   },
   VISITA_CENTRO: {
@@ -143,7 +152,8 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
     informed: ["responsabile-campi", "responsabile-struttura-colico", "responsabile-struttura"],
     owners: ["segreteria", "direttore-generale"],
     siteRequired: true,
-    paymentLink: true,
+    payment: false,
+    paymentLink: false,
   },
   ALTRO: {
     area: "segreteria",
@@ -153,6 +163,7 @@ export const INTAKE_RULES: Readonly<Record<IntakeKind, IntakeKindRule>> = {
     informed: [],
     owners: ["segreteria"],
     siteRequired: false,
+    payment: true,
     paymentLink: true,
   },
 };
@@ -705,6 +716,8 @@ export function intakeError(code: string | null | undefined): string {
       return "Richiesta non trovata.";
     case "link":
       return "Il link deve iniziare con https:// e non avere spazi.";
+    case "no_payment":
+      return "Questo tipo di richiesta è senza pagamento.";
     case "link_not_allowed":
       return "Per sponsor e convenzioni niente link: contratto e fattura.";
     case "amount":
