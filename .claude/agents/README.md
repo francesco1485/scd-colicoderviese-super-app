@@ -1,10 +1,12 @@
 # Agenti SCD
 
-Quarantacinque agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Quarantasette agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
 | scd-grafica | Disegna e migliora pagine, schermate, grafiche, partendo dalle piattaforme migliori |
+| scd-iride | Responsabile di Iride, la segreteria AI su WhatsApp: conoscenza, regole, qualità (modifiche allo scenario solo con l'ok di Francesco) |
+| scd-tavola-esatta | Riproduce le tavole approvate di Francesco come schermate vere, misurando |
 | scd-loghi-idee | Trova gli stemmi reali degli avversari e idee da altre società |
 | scd-bandi | Cerca bandi e contributi (Italia, Lombardia, UE, fondazioni) con scadenze |
 | scd-mail | Smista la posta del club e prepara bozze di risposta |

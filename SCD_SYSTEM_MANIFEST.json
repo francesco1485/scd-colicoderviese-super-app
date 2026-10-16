@@ -878,6 +878,7 @@
         "team_assignment": "r72 (2026-10-12): Segreteria/Direzione confirm a PENDING athlete and assign a team, add a second team (multi-annata call-ups) or move (previous membership closed with valid_to, never removed); registration_status VERIFIED only when the Secretariat declares it saw the FIGC registration; history in scd_person_events (ENTRATA / CAMBIO_SQUADRA with from/to team) and scd_audit_events TEAM_ASSIGN — supabase/migrations/20261012_r72_team_assignment.sql, scd_staff_assign_team, /segreteria/persone (teams of athletes now listed and filterable, 'senza squadra')",
         "secretariat_desk": "r73 (2026-10-12): read-only function scd_secretariat_desk(org) returns the day's queue as COUNTS only (access requests pending, people pending, athletes without team, registration unverified, certificates missing/expired/expiring 30d/declared, call-ups pending in 72h, accounts never signed in); Direzione/Segreteria only; shown as 'Scrivania del giorno' on /segreteria with a link per line (Persone with ?squadra=nessuna / ?stato=pending, Certificati, Accessi) — supabase/migrations/20261012_r73_secretariat_desk.sql, src/lib/secretariat-desk.ts",
         "transport_live": "r110 (2026-10-15, STAGED NOT APPLIED): Pulmino in diretta phase 1 — scd_transport_live_drivers/sessions/points with RLS on, no policies, no grants; SECURITY DEFINER scd_transport_live_start (only the account linked to the assigned driver, day of the run, from departure-60 min to planned end+60 min, acknowledgement on first start), _ping (driver only, >=10 s apart, accuracy <=500 m, fix <=2 min old), _stop (driver or transport office), _view (driver: own runs today; families: runs with a CONFIRMED seat of their circle, status/last update/distance only, no coordinates, no names; office: also coordinates), _purge (service_role: closes expired sessions, deletes points >24 h and sessions >90 days), _link_driver (transport office). App: transport-live.ts (pure rules + tests), transport-live.functions.ts (fail-closed on missing scd_transport_live_engine), TransportLiveDriverPanel on /pulmini, TransportLiveFamilyCard on /famiglia; Permissions-Policy geolocation=(self) only on /pulmini.",
+        "structure_activities_write": "r137 (2026-10-16, STAGED NOT APPLIED, applied only after Francesco writes «applica r137»; requires r135 applied and r79 work queue, guarded): write path of G04 Attivita in struttura (/gestionale/struttura). Append-only audit scd_structure_activity_events (RLS on, no policies, no grants, trigger refuses update/delete); writer gate scd_structure_writer = DIRECTION role or positions presidente/direttore-generale (UD-159, not executable by authenticated); probe scd_structure_write_access(org) -> {canWrite} (missing = page says 'Scrittura non ancora attiva', fail closed); SECURITY DEFINER scd_structure_activity_create/update/cancel with fixed search_path, 42501 for non-writers, validated input (no e-mail/phone, role ids only, Europe/Rome times), rows never deleted. Every change notifies the Segreteria in the existing queue scd_proposals (machine G04, area segreteria, UD-156); DERVIO notices are generic (no title, time or kind) because the queue is also read by office positions that do not read Dervio. Tests: supabase/tests/r137_structure_activities_write.pglite.mjs, apps/superapp/src/lib/structure-write-migration.test.ts.",
         "transport_board": "r74 (2026-10-12): Pulmini in Supabase (scd_transport_vehicles/drivers/stops/riders/runs); scd_transport_sync(org,payload) copies the 05_PULMINI master (sheet stays master, rows missing are deactivated, no rider names); scd_transport_board for responsabile-trasporti/Direzione/Segreteria (autista read without phones); scd_transport_plan_run refuses double bookings and is audited; r99 (2026-10-13, UD-108): vans under the trainings on /pulmini — the four vans stay separate units (Pulmino 1 Lago, 2 Lecco, 3 Valtellina, 4 Chiavenna), a rider goes on the van written in the Master (vehicle) or else on the van of his exact line (LAGO/LECCO, COLICO, DA VERIFICARE reported as 'da collocare'), per training slot andata/ritorno from the weekday flags; tapping a van shows who is always on board, destination Centro Sportivo Colico, route from the Master stops (line board 2026/27 only as labelled fallback, times never invented), driver role and 8 + autista seats. Riders' first/last name copied from the same Master (scd_transport_riders.first_name/last_name/vehicle_label, scd_transport_sync_rider_names) and read only through scd_transport_rider_roster (same audience as scd_transport_board); the server function getPulminiVans (apps/superapp/src/lib/pulmini-vans.functions.ts) gives names only with an open non-preview gate + board + roster, formatted by RIDER_NAME_FORMAT (first name + surname initial) and allowlisted (no codes, phones, parents, stops of a child, notes); staging preview and other sessions get counts and 'Nomi visibili solo con accesso del responsabile trasporti' — supabase/migrations/20261013_r99_transport_rider_names.sql (written, NOT applied until Direzione approval)",
         "compensation": "r75 (2026-10-12, UD-075): scd_comp_agreements/entries/periods/documents; competence month due on day 15 of the next month; Direzione (DIRECTION or positions direzione/presidente/direttore-generale) edits agreements, records entries, authorizes only without blockers (relationship ATTIVO, IBAN CONFERMATO, contract/RASD OK, net > 0) and locks the month; Tesoreria (position tesoreria) records entries and marks paid with date/method/reference; documents in private bucket scd-private under <org>/comp/; IBAN never stored (status only); app never executes payments; all writes in scd_audit_events; initial import of 36 agreements from SCD Control Tower 2026/27 (tools/sync/compensation_control_tower.py); page /tesoreria/compensi",
         "operations_positions": "r76 (2026-10-12, UD-076): assignable positions extended with tesoreria (office, Direzione only), segreteria-presenza, segreteria-remoto, responsabile-tornei, responsabile-struttura(-colico/-dervio), responsabile-lavanderia, collaboratore-lavanderia-pulizia, responsabile-infermeria, collaboratore-magazzino, dirigente-collaboratore; people need not be tesserati",
@@ -2081,6 +2082,59 @@
           "LOG_APPEND_ONLY_RLS_NO_POLICIES_ACCESS_ONLY_VIA_SECURITY_DEFINER"
         ],
         "imported_at": "2026-10-15"
+      },
+      {
+        "id": "SCD_SALUTE",
+        "kind": "INTERNAL_WORKFLOW",
+        "trust": "INTERNAL_VERIFIED",
+        "status": "APPLIED_R136",
+        "approval": "Francesco 16/10/2026 07:04 'Applica r136', then 'Senza infortuni per ora': applied by the main session; injuries register deferred until the consent design (UD-043, UD-047)",
+        "title": "Infermeria and Nutrizionista (DG 15/10/2026 14:33; 16/10 06:23 'a pieno regime'): certificate expiry board (read-only), first-aid kits and AED/BLSD per site; nutrition guidance by age group and consultation requests. Injuries register deferred (UD-043 consent design)",
+        "endpoint": "Supabase SCD PULSE SECURITY DEFINER functions scd_health_staff, scd_infermeria_*, scd_nutrition_* (no direct table access)",
+        "authority_domains": [
+          "HEALTH_STAFF_OPERATIONS",
+          "FIRST_AID_EQUIPMENT",
+          "NUTRITION_GENERAL_GUIDANCE"
+        ],
+        "storage": "supabase/migrations/20261016_r136_infermeria_nutrizione.sql (APPLIED on SCD PULSE 16/10/2026; catalogue = live r100 + nutrizione, r101 must carry nutrizione when applied): scd_first_aid_kits, scd_aed_devices with RLS on and no policies; nutrition requests go to scd_proposals (r79) through scd_proposal_ingest as RISERVATO with title 'Richiesta consulenza nutrizionista · <squadra>' only, and scd_proposal_queue is recreated identical to r79 except area 'nutrizione' excluded (never in the office queue); section 'nutrizione' appended to scd_section_catalog; position 'nutrizionista' appended to scd_access_admin_guard; helpers scd_health_staff / scd_health_short_name not executable by API roles",
+        "consumers": [
+          "SCD_SUPABASE.scd_first_aid_kits",
+          "SCD_SUPABASE.scd_aed_devices",
+          "SCD_SUPABASE.scd_proposals (area nutrizione, RISERVATO, excluded from scd_proposal_queue)",
+          "SCD_SUPABASE.scd_athletes.medical_certificate_* (read-only)",
+          "apps/superapp/src/lib/health-areas.ts",
+          "apps/superapp/src/lib/infermeria.functions.ts",
+          "apps/superapp/src/lib/nutrizionista.functions.ts",
+          "apps/superapp/src/components/scd/InfermeriaBoard.tsx",
+          "apps/superapp/src/routes/infermeria.tsx",
+          "apps/superapp/src/routes/nutrizionista.tsx"
+        ],
+        "routes": [
+          "/infermeria",
+          "/nutrizionista"
+        ],
+        "rules": [
+          "PAGE_OPENS_FOR_POSITION_RESPONSABILE_INFERMERIA_OR_DIREZIONE_ONLY_R100_GRANTS_HONOURED_BY_DB_BUT_DO_NOT_OPEN_THE_PAGE_GAP_ACCESS_R100",
+          "R100_GRANTS_COUNT_ONLY_THROUGH_VERIFIED_IDENTITY_LINKS",
+          "INJURIES_REGISTER_DEFERRED_UNTIL_CONSENT_DESIGN_UD_043_NO_MINORS_HEALTH_DATA",
+          "NO_FREE_TEXT_NO_DIAGNOSIS_SYMPTOM_OR_THERAPY",
+          "NAMES_FIRST_NAME_PLUS_SURNAME_INITIAL",
+          "CERTIFICATE_BOARD_ONE_ROW_PER_ATHLETE",
+          "OWN_SITE_GRANT_SEES_KITS_AND_AED_OF_ITS_SITE_NEVER_CERTIFICATES",
+          "NUTRITION_REQUESTS_RISERVATO_NEVER_IN_THE_OFFICE_QUEUE_THE_NUTRITIONIST_CALLS_THE_PARENT_BACK",
+          "UNKNOWN_NEVER_ZERO_DENIED_ERROR_AND_NOT_APPLIED_ARE_DISTINCT_STATES",
+          "HEALTH_DATA_NEVER_IN_LOGS_PUBLIC_PAGES_OR_WORK_QUEUE_TITLES",
+          "DATABASE_ERRORS_NEVER_SHOWN_FIXED_ITALIAN_SENTENCES",
+          "FAMILIES_SEE_ONLY_GENERAL_GUIDANCE_FOR_THEIR_OWN_CIRCLE_SCD_MY_FAMILY",
+          "CONSULTATION_REQUEST_ONLY_FOR_OWN_CIRCLE_ONE_OPEN_PER_PERSON_THREE_PER_DAY",
+          "NO_PERSONAL_PLANS_NO_DIETS_GUIDANCE_PASSES_ERA_GUARD_PLUS_THERAPY_WORDS",
+          "UNTIL_R136_APPLIED_SECTIONS_SAY_FUNZIONE_IN_PREPARAZIONE"
+        ],
+        "engines": {
+          "TEMPO": "staff sanitario and Segreteria stop chasing certificates, kit and AED checks on paper; measured by expired/missing certificates and overdue kits/AED visible on the KPI strip and time-to-take of nutrition requests (scd_proposal_events CREATED to TAKE)",
+          "PERSONE": "families get age-group guidance and a consultation path without exposing health data; measured by nutrition requests received and closed per month"
+        },
+        "imported_at": "2026-10-16"
       }
     ],
     "conflict_resolution": [

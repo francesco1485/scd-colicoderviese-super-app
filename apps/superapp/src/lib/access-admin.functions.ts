@@ -99,7 +99,8 @@ function explain(error: { code?: string; message: string }): string {
   if (m.includes("cannot edit own access")) return "Non puoi modificare il tuo accesso: chiedilo a un'altra persona della Direzione.";
   if (m.includes("Direzione only")) return "Solo la Direzione può dare o togliere ruoli e aree d'ufficio, o modificare un account d'ufficio.";
   if (m.includes("last Direzione")) return "Deve restare almeno un accesso Direzione attivo.";
-  if (m.includes("unknown position")) return "Area non riconosciuta.";
+  if (m.includes("unknown position"))
+    return "Il database non riconosce uno degli incarichi scelti: togli quell'incarico e salva.";
   if (m.includes("unknown team")) return "Squadra non riconosciuta.";
   if (m.includes("invalid email")) return "E-mail non valida.";
   if (error.code === "42501") return "Non hai i permessi per questa modifica.";
