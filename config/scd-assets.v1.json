@@ -2278,7 +2278,7 @@
       "source_drive_file_id": "1O5kBSCgrPLnoZLqX-aZMRsTxht2k0r3Y",
       "sponsor_state": "CONFIRMED",
       "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 30, 1920x1080 -> 1280x720 Lanczos, 25 fps, yuv420p, audio removed, +faststart",
-      "use": "public home 'Sul LED wall' and /crm 'Spot LED' (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
+      "use": "/sponsor LED wall rotation (src/components/SponsorLedwallLive.tsx, UD-142), /crm 'Spot LED' and /spot/$slug (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
     },
@@ -2317,7 +2317,7 @@
       "source_drive_file_id": "1Dkrw-qAnM1baoeKyit4EYBJPmJHJc3l5",
       "sponsor_state": "CONFIRMED",
       "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 30, 1920x1080 -> 1280x720 Lanczos, 25 fps, yuv420p, audio removed, +faststart",
-      "use": "public home 'Sul LED wall' and /crm 'Spot LED' (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
+      "use": "/sponsor LED wall rotation (src/components/SponsorLedwallLive.tsx, UD-142), /crm 'Spot LED' and /spot/$slug (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
     },
@@ -2356,7 +2356,7 @@
       "source_drive_file_id": "1gNZD0GSBBRqstkn-KLFYJPBEabq9onyd",
       "sponsor_state": "CONFIRMED",
       "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 30, 1920x1080 -> 1280x720 Lanczos, 25 fps, yuv420p, audio removed, +faststart",
-      "use": "public home 'Sul LED wall' and /crm 'Spot LED' (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
+      "use": "/sponsor LED wall rotation (src/components/SponsorLedwallLive.tsx, UD-142), /crm 'Spot LED' and /spot/$slug (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
     },
@@ -2395,7 +2395,7 @@
       "source_drive_file_id": "1czXp1qdesPFNOps0Gr-gwEZIFbw-S0eF",
       "sponsor_state": "CONFIRMED",
       "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 30, 1920x1080 -> 1280x720 Lanczos, 25 fps, yuv420p, audio removed, +faststart",
-      "use": "public home 'Sul LED wall' and /crm 'Spot LED' (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
+      "use": "/sponsor LED wall rotation (src/components/SponsorLedwallLive.tsx, UD-142), /crm 'Spot LED' and /spot/$slug (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
     },
@@ -2434,7 +2434,7 @@
       "source_drive_file_id": "18VMOztDlDsMXZ1KsOFMFd4ZPF-se2nhp",
       "sponsor_state": "CONFIRMED",
       "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 30, 1920x1080 -> 1280x720 Lanczos, 25 fps, yuv420p, audio removed, +faststart",
-      "use": "public home 'Sul LED wall' and /crm 'Spot LED' (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
+      "use": "/sponsor LED wall rotation (src/components/SponsorLedwallLive.tsx, UD-142), /crm 'Spot LED' and /spot/$slug (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
     },
@@ -2499,7 +2499,7 @@
       "source_drive_file_id": "1vyKsw2KedMx83EdZjsEyQBXCyi7bD5ei",
       "sponsor_state": "CONFIRMED",
       "transform": "ffmpeg transcode only (content unaltered): libx264 high, preset slow, CRF 30, 1920x1080 -> 1280x720 Lanczos, 25 fps, yuv420p, audio removed, +faststart",
-      "use": "public home 'Sul LED wall' and /crm 'Spot LED' (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
+      "use": "/sponsor LED wall rotation (src/components/SponsorLedwallLive.tsx, UD-142), /crm 'Spot LED' and /spot/$slug (src/components/SponsorSpots.tsx) via src/lib/sponsor-spots.ts",
       "note": "spot ufficiale sponsor confermato; approvazione testi da registrare",
       "verified_at": "2026-10-14"
     },
