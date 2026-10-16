@@ -3510,6 +3510,60 @@
           "AGENTS.md SCD:TEAM"
         ]
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "08:53",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "sourceQuoteFragments": [
+        "ok Iride - orari allenamenti pubblici - le attività le decido nel gestionale io e il presidente poi una volta assegnata l' agente si modella sulle autorizzazione e diventa alter ego di quel responsabile - dervio 1 al momento - non pubblicare ancora - api verifica tu e vedi tu cosa creare - sono molti gestionali nel gestionale da creare secondo me e vanno ragionati bene -"
+      ],
+      "id": "UD-158",
+      "name": "IRIDE_MAIL_ONLY_WHEN_NEEDED_AND_PUBLIC_TRAINING_TIMES",
+      "context": "Francesco 16/10/2026 08:53 (chat PC), after seeing the proposal (6 mails yesterday, 2 needed; contacts book bug; phone numbers in internal mails). «ok Iride» and «orari allenamenti pubblici».",
+      "normalizedCommand": {
+        "rule": "Iride (Make scenario 7979437) sends the internal mail '[Iride] Richiesta di assistenza' only when a person is needed (emergency, health, minors, payments, registrations, complaint, decision), at most one per contact every 24 hours (urgent always), with no phone numbers and no health details; 'non so' questions go to the evening summary with the knowledge gaps. Training times (team, weekdays, time, pitch only; no names) are public: Iride may give them and the app may show them.",
+        "scope": "IRIDE_WHATSAPP_AND_PUBLIC_TRAINING_TIMES",
+        "engines": "TEMPO (fewer useless mails; measured as Iride mails per day and share that needed a person) and PERSONE (families get training times at once)",
+        "status": "APPROVED_IMPLEMENTATION_IN_PROGRESS"
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "08:53",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "sourceQuoteFragments": [
+        "ok Iride - orari allenamenti pubblici - le attività le decido nel gestionale io e il presidente poi una volta assegnata l' agente si modella sulle autorizzazione e diventa alter ego di quel responsabile - dervio 1 al momento - non pubblicare ancora - api verifica tu e vedi tu cosa creare - sono molti gestionali nel gestionale da creare secondo me e vanno ragionati bene -"
+      ],
+      "id": "UD-159",
+      "name": "ACTIVITIES_DECIDED_BY_DG_AND_PRESIDENT_AGENT_AS_ALTER_EGO",
+      "context": "Francesco 16/10/2026 08:53 (chat PC), answering who sees the activities (Colico readers of /gestionale/struttura) and the role of agents.",
+      "normalizedCommand": {
+        "rule": "Who sees and does the activities is decided inside the gestionale by the Direttore Generale and the Presidente (the role creators of r111 / person grants r100), not in code. Once a responsibility is assigned to a person, that person's agent works only within the person's grants and becomes the alter ego of that responsible (same perimeter, same teams/site, never more). The Colico reader list in r135 stays a temporary default until the DG and the President assign it in the gestionale.",
+        "scope": "ACCESS_DECISIONS_AND_PER_RESPONSIBLE_AGENTS",
+        "engines": "TEMPO (each responsible has an assistant shaped on their authorisations)",
+        "status": "RECORDED_DESIGN_PENDING"
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "08:53",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "sourceQuoteFragments": [
+        "ok Iride - orari allenamenti pubblici - le attività le decido nel gestionale io e il presidente poi una volta assegnata l' agente si modella sulle autorizzazione e diventa alter ego di quel responsabile - dervio 1 al momento - non pubblicare ancora - api verifica tu e vedi tu cosa creare - sono molti gestionali nel gestionale da creare secondo me e vanno ragionati bene -"
+      ],
+      "id": "UD-160",
+      "name": "DERVIO_ONE_MATCH_PER_WEEK_NO_PUBLISH_YET_GESTIONALI_DESIGN_FIRST",
+      "context": "Francesco 16/10/2026 08:53 (chat PC).",
+      "normalizedCommand": {
+        "rule": "Dervio rotation: 1 home youth match per week for now (from the youngest, from Saturday 24/10/2026). Do not publish the PC branches yet (Planning, Struttura, Infermeria/Nutrizionista, orchestra) until Francesco says so. The new API: the chat verifies which one it is and proposes what to build with it. The many gestionali still to create must be reasoned carefully (design with Francesco before building).",
+        "scope": "DERVIO_ROTATION_PUBLISHING_API_GESTIONALI",
+        "engines": "PERSONE and TEMPO",
+        "status": "RECORDED"
+      }
     }
   ],
   "completionGate": {
