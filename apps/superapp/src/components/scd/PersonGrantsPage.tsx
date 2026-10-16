@@ -221,6 +221,7 @@ export function PersonGrantsPage({ initial, personId }: { initial: PersonGrantsD
 
         <div className="flex min-w-0 flex-col gap-[18px]">
           <RoleLoader
+            personId={personId}
             connected={data.connected}
             locked={locked}
             minor={data.person?.minor ?? null}

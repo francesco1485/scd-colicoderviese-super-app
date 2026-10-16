@@ -705,7 +705,9 @@
       "r100_state": "VERIFIED 15/10/2026 19:45 on SCD PULSE: r100 applied on 14/10/2026 (schema_migrations 20261014111613), 0 grants saved; no existing guard reads scd_can yet.",
       "role_templates": {
         "decided_by": "Francesco (DG) 15/10/2026, claude.ai project doc claude/SCD_DELEGHE_DECISIONI_2026-10-15.md",
-        "migration": "supabase/migrations/20261015_r111_role_templates.sql (STAGED, apply only on \"applica r111\")",
+        "migration": "supabase/migrations/20261015_r111_role_templates.sql (APPLIED 16/10/2026 13:37-13:45 on SCD PULSE by the PC chat on Francesco's \"applica r111\"; not in schema_migrations)",
+        "state": "APPLIED 16/10/2026 — VERIFIED by read-only SELECTs 16/10/2026 (chat cloud): scd_role_templates and scd_role_template_grants with RLS, triggers scd_person_grants_base_access / scd_structure_roles_creator_guard / scd_identity_links_creator_guard, function bodies byte-identical to the file; 0 role templates saved. r138 (position catalogue) also VERIFIED live: 118 positions, 0 held, scd_section_platform('nutrizione') = CORE.",
+        "position_link": "supabase/migrations/20261016_r112_role_template_positions.sql (STAGED, NOT APPLIED, needs \"applica r112\"): scd_role_templates.position_code (FK to r138 scd_position_catalog of the same club) + scd_set_role_template_position (Presidente / DG only, ACTIVE positions only, audited CHANGE_ROLE). A suggestion only: the role comes first in 'Carica un ruolo' for holders of that position; it opens and grants nothing. Also hardens the r111 creator guards: a structure role with position_code 'presidente' / 'direttore-generale' (r138 column) is protected like the role_label (only a creator or the service role adds, changes, closes or links it); scd_is_role_creator unchanged. Test: supabase/tests/r112_role_template_positions.pglite.mjs.",
         "behaviour_test": "supabase/tests/r111_role_templates.pglite.mjs",
         "platforms": ["ONE", "CORE", "GROW"],
         "tables": ["scd_role_templates", "scd_role_template_grants"],
@@ -4172,9 +4174,9 @@
     {
       "id": "GAP-ACCESS-R100",
       "severity": "HIGH",
-      "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 (applied 14/10, VERIFIED 15/10: 0 grants saved) and the admin page /direzione/accessi/$personId exist; role templates (r111, /direzione/ruoli) are staged. The existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
-      "required_fix": "Direzione grants sections person by person (optionally from r111 roles after \"applica r111\"); then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
-      "safe_runtime_behavior": "Grants saved today change nobody's access because no guard reads scd_can yet; r111 writes stay off until applied; pending access requests stay pending."
+      "statement": "UD-112 (Direzione 14/10/2026): access must be granted per person and per section, never derived from roles. The catalogue, migration r100 (applied 14/10, VERIFIED 15/10: 0 grants saved) and the admin page /direzione/accessi/$personId exist; role templates (r111 applied 16/10, /direzione/ruoli) are live with 0 roles; r112 (role ↔ organigram position) is staged. The existing work-area guards still open areas from role positions (session.ts ROLE_POSITIONS, areas.ts canSeeArea).",
+      "required_fix": "Direzione grants sections person by person (optionally from r111 roles, live since 16/10); then each existing guard is switched to scd_can (person-grants.server.ts sectionCheck) with tests, removing role-derived opening.",
+      "safe_runtime_behavior": "Grants saved today change nobody's access because no guard reads scd_can yet; r111 roles only fill a person's checklist with unconfirmed proposals; the r112 position link stays off until applied; pending access requests stay pending."
     },
     {
       "id": "GAP-LOTTERIA-R102",

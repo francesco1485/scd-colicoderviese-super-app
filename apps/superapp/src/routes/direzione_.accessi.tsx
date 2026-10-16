@@ -4,6 +4,7 @@ import { KeyRound, ListChecks, Search, ShieldCheck, UserPlus, X } from "lucide-r
 import { createContext, useContext, useMemo, useState } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
+import { RolesLink } from "@/components/scd/RolesLink";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
 import {
   AUDIT_LABEL,
@@ -163,6 +164,7 @@ function AccessiPage({ initial, people, preview }: { initial: AccessAdminData; p
         </div>
 
         <div className="flex min-w-0 flex-col gap-[18px]">
+          <RolesLink />
           <Card id="accessi-regole" title="Le regole" sub="Le applica il database, non solo questa pagina.">
             <ul className="m-0 list-none px-4 pb-4 text-[14.5px] leading-snug sm:px-[18px]">
               <li className="flex gap-2 py-1"><ShieldCheck className="mt-0.5 size-4 flex-none text-[var(--in-info)]" aria-hidden="true" />Ruoli e aree d'ufficio li dà e li toglie solo la Direzione.</li>

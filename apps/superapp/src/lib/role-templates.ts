@@ -23,6 +23,7 @@ import {
   type SectionDef,
   type Site,
 } from "./person-grants";
+import type { Tone } from "../components/home/tones";
 
 export const PLATFORMS = ["ONE", "CORE", "GROW"] as const;
 export type Platform = (typeof PLATFORMS)[number];
@@ -96,6 +97,61 @@ export interface RoleTemplate {
   active: boolean;
   grants: readonly TemplateGrant[];
   updatedAt: string;
+  /** r112: organigram position (r138 catalogue) the role is meant for; null = none or r112 not applied. */
+  positionCode?: string | null;
+}
+
+/**
+ * One club colour per platform, always the same meaning (Francesco 16/10/2026 21:54 «cerca di mettere anche altri
+ * colori»): SCD ONE = azzurro (families and fans), SCD CORE = navy (club management), SCD GROW = sole (sponsors).
+ */
+export const PLATFORM_TONE: Readonly<Record<Platform, Tone>> = { ONE: "azzurro", CORE: "navy", GROW: "sole" };
+
+/** A position of the organigram catalogue (r138) a role can be meant for. Codes and labels only, never holders. */
+export interface PositionOption {
+  code: string;
+  label: string;
+  group: string;
+}
+
+/** Positions offered in the role editor: active ones, sorted by group then label; positions already linked kept. */
+export function positionChoices(
+  positions: ReadonlyArray<PositionOption & { status?: string }>,
+  keep: ReadonlyArray<string | null | undefined> = [],
+): PositionOption[] {
+  return positions
+    .filter((p) => (p.status ?? "ACTIVE") === "ACTIVE" || keep.includes(p.code))
+    .map(({ code, label, group }) => ({ code, label, group }))
+    .sort((a, b) => a.group.localeCompare(b.group) || a.label.localeCompare(b.label, "it"));
+}
+
+/** Label of a linked position, "da confermare" when the code is not (or no longer) in the catalogue. */
+export function positionLabelOf(code: string | null | undefined, positions: readonly PositionOption[]): string | null {
+  if (!code) return null;
+  return positions.find((p) => p.code === code)?.label ?? "posizione da confermare";
+}
+
+/** Active roles meant for one of the person's organigram positions (r112), first in "Carica un ruolo". */
+export function suggestedTemplateIds(templates: readonly RoleTemplate[], personPositions: readonly string[]): string[] {
+  if (!personPositions.length) return [];
+  const set = new Set(personPositions);
+  return templates.filter((t) => t.active && t.positionCode && set.has(t.positionCode)).map((t) => t.id);
+}
+
+/** Suggested roles first (in the given order), then the others; nothing is dropped. */
+export function orderSuggestedFirst<T extends { id: string }>(templates: readonly T[], suggested: readonly string[]): T[] {
+  const set = new Set(suggested);
+  return [...templates.filter((t) => set.has(t.id)), ...templates.filter((t) => !set.has(t.id))];
+}
+
+export type RolesBanner = "offline" | "not-applied" | "unknown" | "creator" | "read-only";
+
+/** Which notice the page shows: no database, r111 missing, check failed, creator, or Direzione read-only. */
+export function rolesBanner(d: { connected: boolean; engine: string; actor: { isCreator: boolean } }): RolesBanner {
+  if (!d.connected) return "offline";
+  if (d.engine === "not-applied") return "not-applied";
+  if (d.engine !== "applied") return "unknown";
+  return d.actor.isCreator ? "creator" : "read-only";
 }
 
 /** True when one of the person's active structure roles is Presidente or Direttore Generale. */
@@ -223,6 +279,8 @@ export function explainRoleError(error: { code?: string; message: string }, notA
   if (m.includes("role not found")) return "Ruolo non trovato.";
   if (m.includes("label length")) return "Il nome deve avere da 2 a 80 caratteri.";
   if (m.includes("unknown platform")) return "Piattaforma non riconosciuta.";
+  if (m.includes("unknown position")) return "Posizione dell'organigramma non trovata: ricarica la pagina.";
+  if (m.includes("position not active")) return "La posizione non è attiva: prima va approvata nel catalogo ruoli.";
   if (error.code === "42501") return "Non hai i permessi per questa modifica.";
   return "Modifica non riuscita, riprova.";
 }

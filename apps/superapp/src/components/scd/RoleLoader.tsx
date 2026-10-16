@@ -10,18 +10,21 @@ import { useState } from "react";
 
 import { Card } from "@/components/scd/interior-ui";
 import { SITES, SITE_LABEL, type Grant, type Site } from "@/lib/person-grants";
-import { PLATFORM_LABEL, applyPlan, needsSite, needsTeams, type RoleTemplate } from "@/lib/role-templates";
+import { PLATFORM_LABEL, applyPlan, needsSite, needsTeams, orderSuggestedFirst, type RoleTemplate } from "@/lib/role-templates";
 import { getActiveRoleTemplates } from "@/lib/role-templates.functions";
 
 const selectCls = "h-11 w-full rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[15px] text-[var(--in-ink)] outline-none focus:border-[var(--in-info)]";
 
 export function RoleLoader({
+  personId,
   connected,
   locked,
   minor,
   teams,
   onLoad,
 }: {
+  /** The person of the checklist: with r112 applied, roles meant for her organigram positions come first. */
+  personId?: string;
   connected: boolean;
   locked: boolean;
   minor: boolean | null;
@@ -30,6 +33,7 @@ export function RoleLoader({
 }) {
   const load = useServerFn(getActiveRoleTemplates);
   const [templates, setTemplates] = useState<RoleTemplate[] | null>(null);
+  const [suggested, setSuggested] = useState<string[]>([]);
   const [engine, setEngine] = useState<string>("unknown");
   const [pickedId, setPickedId] = useState("");
   const [teamIds, setTeamIds] = useState<string[]>([]);
@@ -41,9 +45,10 @@ export function RoleLoader({
   async function open() {
     setMessage(null);
     try {
-      const res = await load();
+      const res = await load({ data: personId ? { personId } : {} });
       setEngine(res.engine);
-      setTemplates(res.templates);
+      setSuggested(res.suggested);
+      setTemplates(orderSuggestedFirst(res.templates, res.suggested));
       if (res.readError) setMessage("Lettura dei ruoli non riuscita, riprova.");
       else if (res.engine !== "applied") setMessage("I ruoli si caricano dopo «applica r111».");
       else if (!res.templates.length) setMessage("Nessun ruolo attivo: li crea il Presidente o il Direttore Generale in Direzione → Ruoli.");
@@ -78,10 +83,13 @@ export function RoleLoader({
               <select value={pickedId} onChange={(e) => { setPickedId(e.target.value); setTeamIds([]); setSite(null); setMessage(null); }} className={`${selectCls} font-normal`}>
                 <option value="">Scegli…</option>
                 {templates.map((t) => (
-                  <option key={t.id} value={t.id}>{PLATFORM_LABEL[t.platform]} · {t.label} ({t.grants.length})</option>
+                  <option key={t.id} value={t.id}>{suggested.includes(t.id) ? "★ Consigliato · " : ""}{PLATFORM_LABEL[t.platform]} · {t.label} ({t.grants.length})</option>
                 ))}
               </select>
             </label>
+            {suggested.length > 0 && (
+              <p data-testid="role-suggested" className="m-0 text-[13.5px] leading-snug text-[var(--in-sub)]">★ Consigliato: ruolo pensato per una posizione che questa persona ricopre nell'organigramma. Resta una proposta.</p>
+            )}
             {picked && needsTeams(picked) && (
               <fieldset className="m-0 flex flex-col gap-1 border-0 p-0">
                 <legend className="mb-1 text-[15px] font-semibold">Squadre di questa persona</legend>

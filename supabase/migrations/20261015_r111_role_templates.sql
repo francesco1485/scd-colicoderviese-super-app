@@ -1,5 +1,8 @@
--- r111: role templates on top of r100 person grants (Direzione 15/10/2026). STAGED: written, NOT applied.
--- Apply only after Francesco writes "applica r111". Never on project dfnwzwutvnwiitiffwvr.
+-- r111: role templates on top of r100 person grants (Direzione 15/10/2026). APPLIED 16/10/2026 on SCD PULSE.
+-- Applied on ndevtxxijbcnskgysdit 16/10/2026 13:37–13:45 by the PC chat (SQL editor) on Francesco's «applica r111»;
+-- schema_migrations does not record it. VERIFIED 16/10/2026 by read-only SELECTs (chat cloud, squad deleghe): tables,
+-- the three triggers and the function bodies are byte-identical to this file. Only these comment lines changed after
+-- applying. Never re-apply by hand; never on project dfnwzwutvnwiitiffwvr.
 --
 -- Francesco's decisions (claude.ai project doc claude/SCD_DELEGHE_DECISIONI_2026-10-15.md, verbatim):
 --   1. "confermo ma deve esserci anche possibilita di creare uno vuoto da zero sempre in tutte le piattaforme"

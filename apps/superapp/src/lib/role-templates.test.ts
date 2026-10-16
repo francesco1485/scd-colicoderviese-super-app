@@ -28,6 +28,7 @@ import {
 const repo = (p: string) => fileURLToPath(new URL(`../../../../${p}`, import.meta.url));
 const SQL100 = readFileSync(repo("supabase/migrations/20261014_r100_person_grants.sql"), "utf8");
 const SQL111 = readFileSync(repo("supabase/migrations/20261015_r111_role_templates.sql"), "utf8");
+const SQL138 = readFileSync(repo("supabase/migrations/20261016_r138_position_catalog.sql"), "utf8");
 const routeTree = readFileSync(fileURLToPath(new URL("../routeTree.gen.ts", import.meta.url)), "utf8");
 
 function literal(tag: string, sql: string): unknown {
@@ -48,9 +49,12 @@ describe("platforms (Francesco 15/10: a role can always be created empty on ever
     for (const s of SECTIONS) expect(PLATFORMS).toContain(sectionPlatform(s.code));
   });
 
-  it("migration r111 keeps the same platform for every section", () => {
-    const sql = literal("plat", SQL111) as Array<{ code: string; platform: string }>;
-    expect(sql).toEqual(SECTIONS.map((s) => ({ code: s.code, platform: s.platform })));
+  it("the live platform list (r111, widened by r138 with nutrizione) keeps the same platform for every section", () => {
+    const r111 = literal("plat", SQL111) as Array<{ code: string; platform: string }>;
+    const r138 = literal("plat", SQL138) as Array<{ code: string; platform: string }>;
+    expect(r138).toEqual(SECTIONS.map((s) => ({ code: s.code, platform: s.platform })));
+    // r138 only adds: every r111 entry is still there with the same platform.
+    for (const e of r111) expect(r138).toContainEqual(e);
   });
 
   it("each platform offers sections to put in a role, and the empty role is valid everywhere", () => {
@@ -192,9 +196,10 @@ describe("base access first and wiring", () => {
     expect(SQL111).not.toMatch(/before (update|delete)[^;]*scd_person_grants/);
   });
 
-  it("r111 is staged, additive and never touches the forbidden project", () => {
-    expect(SQL111.split("\n")[0]).toMatch(/STAGED: written, NOT applied/);
+  it("r111 is marked applied on SCD PULSE (16/10), additive and never touches the forbidden project", () => {
+    expect(SQL111.split("\n")[0]).toMatch(/APPLIED 16\/10\/2026 on SCD PULSE/);
     expect(SQL111).toMatch(/applica r111/);
+    expect(SQL111).toMatch(/never on project dfnwzwutvnwiitiffwvr/);
     expect(SQL111.replace(/^--.*$/gm, "")).not.toMatch(/drop table|truncate|delete from public\.scd_person_grants/i);
   });
 
