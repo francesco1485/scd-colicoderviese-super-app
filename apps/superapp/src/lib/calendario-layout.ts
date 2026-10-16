@@ -36,7 +36,7 @@ export const PLACE_STYLE: Readonly<Record<PlaceTone, { bar: string; pill: string
   neutro: {
     bar: "bg-[#c3cee0]",
     pill: "bg-[#eef1f6] text-[#4a5a78]",
-    label: "Sede da definire",
+    label: "Casa/trasferta da definire",
   },
 };
 

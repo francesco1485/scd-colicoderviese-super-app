@@ -379,8 +379,8 @@ function Calendario() {
                     const name = fmt(c.date, { weekday: "long", day: "numeric" });
                     const body = (
                       <>
-                        <span className="text-[11px] font-semibold text-[#7a8aa8]">{c.letter}</span>
-                        <span className={`relative grid size-9 place-items-center rounded-full font-display text-[15px] ${c.isToday ? "bg-[#13254d] font-bold text-white" : c.games ? "font-bold text-[#14264d]" : "text-[#7a8aa8]"}`}>
+                        <span className="text-[11px] font-semibold text-[#62728f]">{c.letter}</span>
+                        <span className={`relative grid size-9 place-items-center rounded-full font-display text-[15px] ${c.isToday ? "bg-[#13254d] font-bold text-white" : c.games ? "font-bold text-[#14264d]" : "text-[#62728f]"}`}>
                           {c.day}
                           {c.games > 0 && <span aria-hidden="true" className={`absolute -bottom-1 size-[6px] rounded-full ring-1 ${c.home ? "bg-[#ffd84a] ring-[#c99600]" : "bg-[#1266b8] ring-[#0b4f9e]"}`} />}
                         </span>
@@ -454,7 +454,7 @@ function Calendario() {
           {tab !== "Squadra" && (
             <button type="button" onClick={() => set({ vista: "prossime", p: undefined })}
               className="scd-focus scd-gold flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[8px] font-display text-[16px] font-semibold">
-              Vedi tutti gli eventi <ArrowRight className="size-[18px]" strokeWidth={2.4} aria-hidden="true" />
+              Vedi tutte le gare <ArrowRight className="size-[18px]" strokeWidth={2.4} aria-hidden="true" />
             </button>
           )}
 
@@ -489,7 +489,7 @@ function Calendario() {
               <b className="block font-display text-[16px] leading-tight">Rotazione campi</b>
               <small className="block text-[13px] leading-snug text-[#52627f]">Chi usa quale campo a Colico e a Dervio. Per staff e dirigenti, con accesso.</small>
             </span>
-            {member ? <ChevronRight className="size-5 shrink-0 text-[#0457af]" aria-hidden="true" /> : <Lock className="size-4 shrink-0 text-[#62728f]" aria-label="Riservato" />}
+            <Lock className="size-4 shrink-0 text-[#62728f]" aria-hidden="true" /><span className="sr-only">Riservato a staff e dirigenti</span>
           </Link>
 
           {tab !== "Squadra" && nextBlock}
