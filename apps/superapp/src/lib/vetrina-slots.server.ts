@@ -363,15 +363,14 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
     commercial: true,
   },
   {
-    // Prima pagina del Super Giornalista, sabato 17/10/2026 (bozza in Drive 02_BOZZA_PRONTA, Francesco «vai spedito»
-    // 16/10 18:56). Fonte: calendario pubblico FIGC/LND (Juniores U19 Élite – Ardor Lazzate 15:00, U16 Élite – Vis Nova
+    // Prima pagina del Super Giornalista, sabato 17/10/2026 (approvata dalla Direzione il 16/10). Fonte: calendario pubblico FIGC/LND (Juniores U19 Élite – Ardor Lazzate 15:00, U16 Élite – Vis Nova
     // Giussano 18:00, Colico Campo 1). Solo quel giorno.
     id: "sabato-casa-20261017",
     kind: "fixtures",
     theme: "dirette",
     kicker: "Oggi a Colico · Campo 1",
     title: "Juniores alle 15, U16 alle 18",
-    text: "Due gare di campionato in casa: Juniores contro Ardor Lazzate, U16 contro Vis Nova Giussano. Orari, campo e ingresso nell'app.",
+    text: "Due gare Élite in casa: Juniores contro Ardor Lazzate, U16 contro Vis Nova Giussano. Orari, campo e ingresso nell'app.",
     href: "/calendario",
     search: { vista: "oggi" },
     cta: "Le gare di oggi",
