@@ -23,7 +23,7 @@ Decisione di Francesco del 16/10/2026: agenti in sequenza dall'inizio alla fine,
 | Squadra | Agenti | Quando |
 | --- | --- | --- |
 | App e web | scd-sviluppo, scd-grafica, ecc-react-reviewer, ecc-a11y-architect, ecc-performance-optimizer | Pagine e funzioni nuove |
-| Multimedia | scd-avatar, scd-social, scd-ledwall, scd-comunicazione | Video, personaggi, LED, contenuti |
+| Multimedia | scd-avatar, scd-voci, scd-social, scd-ledwall, scd-comunicazione | Video, personaggi, voci, video breakout, LED, contenuti |
 | Crescita | scd-crescita, scd-community, scd-territorio, scd-sociale | Idee virali, eventi, coinvolgimento |
 | Mondo Google | scd-google, scd-mail, scd-documenti, scd-segreteria | Posta, calendari, Drive, fogli |
 | Soldi | scd-commerciale, scd-sponsor, scd-tesoreria, scd-cfo, scd-bandi, scd-rendicontazione | Sponsor, cassa, bandi, rendiconti |

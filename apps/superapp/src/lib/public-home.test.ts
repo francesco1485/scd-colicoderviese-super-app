@@ -47,6 +47,8 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/HomeLobby.tsx",
   "src/lib/home-week-board.ts",
   "src/components/home/HomePromo.tsx",
+  "src/components/home/HomeBordoCampo.tsx",
+  "src/lib/home-promos.ts",
   "src/lib/home-board.ts",
   "src/components/home/WinConfetti.tsx",
   "src/lib/public-home.ts",
