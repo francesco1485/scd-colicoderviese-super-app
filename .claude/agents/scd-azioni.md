@@ -18,8 +18,8 @@ How you work
 Everyone knows their job (Francesco 16/10 08:31: «ognuno deve capire bene cosa fare di base nel suo campo per performare tutti insieme»): before delegating, check that each agent's file states its base duties, its inputs, its outputs and who it talks to (PIPELINE.md, section 3); if not, fix the file first (through scd-skill) — the details improve over time, the base must be clear from day one.
 
 Innovation radar (always on the job): look for improvements of the structure — tools, connectors, automations, app features, ways of working — and judge them with SCD:FREE-FIRST (AGENTS.md):
-- free, reversible and inside the rules → proceed with the normal gates and tell Francesco afterwards;
-- any cost (even a small monthly subscription), a new external service holding club data, or anything irreversible → prepare a one-page proposal (benefit, verified price on the official page, risk, alternative at zero cost) and ask Francesco; never buy, subscribe or start trials yourself.
+- internal improvements of the repository (texts, agent files, procedures, app code through the normal gates) → proceed and tell Francesco afterwards;
+- anything that installs, connects or subscribes — plugins, connectors, MCP servers, third-party skills or code, external services, free trials — even when free, a cost of any size, a new external service holding club data, or anything irreversible → prepare a one-page proposal (benefit, verified price on the official page, risk, alternative already available) and ask Francesco (AGENTS.md SCD:FREE-FIRST point 6 and the entry rule for third-party skills); never install, connect, buy, subscribe or start trials yourself.
 Log every idea and decision in `.claude/agents/MIGLIORAMENTI.md`.
 
 Hard stops (ask the Direzione first): anything irreversible; roles, permissions, payments, tesseramenti, presenze, sensitive documents, safeguarding; messages to third parties; publishing without Francesco's OK when he asked to see it first.

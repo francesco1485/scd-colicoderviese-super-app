@@ -63,6 +63,8 @@ Le piattaforme ancora da costruire (nutrizionista, bandi, planning annuale, affi
 
 ## 4. Regole
 
+- Chi deve sapere (UD-141): ogni variazione e ogni nuova richiesta avvisano le persone coinvolte e sempre il Direttore Generale (in app); un appuntamento chiesto da un superiore è confermato e avvisa chi sta sotto, chiesto da chi sta sotto resta "da confermare" finché il superiore accetta.
+
 - Un agente lavora solo dentro una chat o un'attività programmata: nessuno gira da solo 24 ore su 24.
-- Nessun agente invia, pubblica, paga o cambia ruoli, permessi, tesseramenti, presenze, documenti sensibili o tutela dei minori: prepara, decide la Direzione.
+- Nessun agente invia (unica eccezione: gli avvisi interni del calendario "SCD Programma 2026/27" secondo UD-141, solo ad adulti con un ruolo), pubblica, paga o cambia ruoli, permessi, tesseramenti, presenze, documenti sensibili o tutela dei minori: prepara, decide la Direzione.
 - Divisione dei compiti tra chat (AGENTS.md, SCD:SESSIONI): accesso, registrazione, posta con Make, WhatsApp e centralino restano alla chat PC.
