@@ -8,6 +8,8 @@ import { workAreaView, type WorkAreaGate } from "./access";
 import {
   BASE_PAGES,
   BASE_WORK_AREAS,
+  GRANT_PAGE_AREAS,
+  shellRailFor,
   GRANT_NAV_AREAS,
   NO_IDENTITY,
   OWN_GATE_AREAS,
@@ -28,7 +30,7 @@ import {
   type ResolverFacts,
 } from "./access-resolver";
 import { ALL_ONLY_SITE, gateWithGrants, grantAllAt, navFor, probesFor, readIdentity, type ResolverClient } from "./access-resolver.server";
-import { ACCESS_MENU, WORK_AREA_IDS, menuFor } from "./areas";
+import { ACCESS_MENU, WORK_AREA_IDS, menuFor, railFor } from "./areas";
 import { SECTIONS, findSection, type Level, type Perimeter } from "./person-grants";
 import { cacheControlFor } from "./http-policy";
 
@@ -146,17 +148,17 @@ describe("c) grants: the six roles through example templates", () => {
   it("Dirigente di squadra: mister (read, own teams) only", () => {
     expect(open(ROLES["Dirigente di squadra"]!)).toEqual(["mister"]);
   });
-  it("Responsabile: mister, impianti e campi, organigramma (quadro already base)", () => {
-    expect(open(ROLES["Responsabile"]!)).toEqual(["impianti-campi", "mister", "organigramma"]);
+  it("Responsabile: mister and impianti e campi (quadro already base; organigramma waits for its data path)", () => {
+    expect(open(ROLES["Responsabile"]!)).toEqual(["impianti-campi", "mister"]);
   });
   it("Direttore sportivo: everything granted with perimeter ALL plus the team-scoped pages", () => {
-    expect(open(ROLES["Direttore sportivo"]!)).toEqual(["impianti-campi", "mister", "organigramma"]);
+    expect(open(ROLES["Direttore sportivo"]!)).toEqual(["impianti-campi", "mister"]);
   });
   it("Socio: nothing beyond the base", () => {
     expect(open(ROLES["Socio"]!)).toEqual([]);
   });
-  it("Consigliere: organigramma and tesoreria (read, ALL); /direzione keeps its own Direzione rule", () => {
-    expect(open(ROLES["Consigliere"]!)).toEqual(["organigramma", "tesoreria"]);
+  it("Consigliere: nothing yet beyond the base (organigramma, tesoreria and /direzione keep the old rule until their data read grants)", () => {
+    expect(open(ROLES["Consigliere"]!)).toEqual([]);
     expect(GRANT_NAV_AREAS).not.toContain("direzione");
   });
 
@@ -213,7 +215,7 @@ describe("the gate: old rule OR grant, never narrower, fail-closed", () => {
     expect(resolveWorkAreaGate("pulmini", CLOSED, { signedIn: true, identity: VERIFIED, probes: null })).toEqual(CLOSED);
     // quadro reads only getTrainingQuadro (any signed-in member) and the public calendar.
     const q = src("../routes/quadro.index.tsx");
-    expect(q).toMatch(/await getTrainingQuadro\(\)/);
+    expect(q).toMatch(/getTrainingQuadro\(\), getSession\(\)/);
     expect(q).not.toMatch(/getStaff|getTransport|getPulmini|scd_my_/);
   });
 
@@ -260,9 +262,9 @@ describe("server side (fake client): r113 first, scd_can fallback, fail-closed",
     const { sb, calls } = fake({
       ...FAMILY_SELF,
       scd_my_section_access: () => ({ data: null, error: MISSING }),
-      scd_can: (a) => ({ data: a["p_section_code"] === "organigramma", error: null }),
+      scd_can: (a) => ({ data: a["p_section_code"] === "impianti-campi", error: null }),
     });
-    expect(await gateWithGrants("organigramma", CLOSED, ctx(sb))).toMatchObject({ view: "page", via: "grant" });
+    expect(await gateWithGrants("impianti-campi", CLOSED, ctx(sb))).toMatchObject({ view: "page", via: "grant" });
     const sites = calls.filter((c) => c.fn === "scd_can").map((c) => c.args["p_site"]);
     expect(sites).toEqual([null, ALL_ONLY_SITE]);
     // OWN_TEAMS-like answer (true without context, false with the ALL-only site) on a sensitive section: closed.
@@ -312,7 +314,58 @@ describe("server side (fake client): r113 first, scd_can fallback, fail-closed",
     expect(n1.auto.map((a) => a.id)).toEqual(["famiglia", "squadre"]);
     expect(without.calls.some((c) => c.fn === "scd_can")).toBe(false);
     const withR113 = fake({ ...parent, scd_my_section_access: () => ({ data: ROLES["Responsabile"], error: null }) });
-    expect((await navFor(ctx(withR113.sb))).grantAreas.sort()).toEqual(["impianti-campi", "mister", "organigramma"]);
+    expect((await navFor(ctx(withR113.sb))).grantAreas.sort()).toEqual(["impianti-campi", "mister"]);
+  });
+});
+
+describe("grant allow-list (scd-revisore BLOCK 2): a grant opens only areas whose data accept it", () => {
+  it("is exactly mister and impianti-campi, and the nav lists nothing else", () => {
+    expect(GRANT_PAGE_AREAS).toEqual(["mister", "impianti-campi"]);
+    expect([...GRANT_NAV_AREAS].sort()).toEqual(["impianti-campi", "mister"]);
+    const everything = probesFromRows(SECTIONS.flatMap((x) => (x.levels.length ? [{ section_code: x.code, level: x.levels.at(-1)!, perimeter: "ALL" as Perimeter }] : [])));
+    for (const id of WORK_AREA_IDS) {
+      const g = resolveWorkAreaGate(id, CLOSED, { signedIn: true, identity: VERIFIED, probes: everything });
+      if (GRANT_PAGE_AREAS.includes(id) || BASE_WORK_AREAS.includes(id)) continue;
+      expect(g, id).toEqual(CLOSED);
+    }
+  });
+
+  it("every allow-listed area has a data path that accepts the grant or answers per viewer", () => {
+    // mister: the page data is per viewer (scd_my_team_roster / scd_my_team_athlete_ids) or member-level.
+    const mister = src("../routes/gestionale.mister.tsx");
+    expect(mister).toMatch(/await getMyRoster\(\)/);
+    expect(mister).toMatch(/await getTrainingQuadro\(\)/);
+    const roster = src("./roster.functions.ts");
+    expect(roster).toMatch(/rpc\("scd_my_team_roster"/);
+    expect(roster).toMatch(/rpc\("scd_my_team_athlete_ids"/);
+    // impianti-campi: the page and the approvals feed receive the grant.
+    const imp = src("./impianti.functions.ts");
+    expect(imp).toMatch(/gateWithGrants\("impianti-campi"/);
+    expect(imp).toMatch(/approvalsAccess\(access\.session, access\.stagingPreview, access\.grant\.approve\)/);
+    expect(src("../components/impianti-campi/ImpiantiPage.tsx")).toMatch(/impiantiAccess\(access\.session, access\.stagingPreview, access\.grant\.view\)/);
+  });
+});
+
+describe("interior rail of a base area (scd-revisore BLOCK 1)", () => {
+  it("a member opened by the base rule gets no staff rail and the label Socio", () => {
+    const base: WorkAreaGate = { view: "page", preview: false, via: "base" };
+    expect(shellRailFor(base, new Set())).toEqual({ rail: [], roleLabel: "Socio" });
+    expect(shellRailFor(base, new Set(["famiglia"]))).toEqual({ rail: [], roleLabel: "Socio" });
+    expect(shellRailFor(base, new Set(["atleta", "partner"]))).toEqual({ rail: [], roleLabel: "Socio" });
+  });
+
+  it("staff keep the rail of their positions; the staging preview keeps the preview rail", () => {
+    const seg = shellRailFor({ view: "page", preview: false }, new Set(["segreteria"]));
+    expect(seg.roleLabel).toBe("Segreteria");
+    expect(seg.rail).toEqual(railFor(new Set(["segreteria"])));
+    expect(shellRailFor({ view: "page", preview: true }, new Set()).roleLabel).toBe("Anteprima staff");
+  });
+
+  it("the quadro page builds its rail with shellRailFor, never from an empty preview set", () => {
+    const q = src("../routes/quadro.index.tsx");
+    expect(q).toMatch(/shellRailFor\(gate, new Set\(roles\)\)/);
+    expect(q).toMatch(/rail=\{shell\.rail\}/);
+    expect(q).not.toMatch(/PREVIEW_ROLES|roleLabel="Anteprima staff"/);
   });
 });
 
@@ -361,7 +414,7 @@ describe("wiring and security (source assertions)", () => {
       expect(cacheControlFor(p), p).toBe("private, no-store, max-age=0");
   });
 
-  it("r113 is staged, not applied, and only reads the caller's own grants", () => {
+  it("r113 (applied 17/10/2026 on Francesco's «applica r113») only reads the caller's own grants", () => {
     const sql = src("../../../../supabase/migrations/20261017_r113_my_section_access.sql");
     expect(sql).toMatch(/APPLIED on SCD PULSE .* «ok ruoli - applica r112 - applica r113»/);
     const body = sql.split("\n").filter((l) => !l.trimStart().startsWith("--")).join("\n");

@@ -1,6 +1,8 @@
 import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
+import { getSession } from "@/lib/auth.functions";
+import { shellRailFor } from "@/lib/access-resolver";
 import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute } from "@tanstack/react-router";
 import { AlertTriangle, Clock3, Info } from "lucide-react";
@@ -45,7 +47,7 @@ import {
 type Search = { settimana?: Week | undefined };
 
 /** Rail role set: only areas open to every staff role appear (the page itself is behind the work-area gate). */
-const PREVIEW_ROLES: ReadonlySet<string> = new Set();
+const NO_ROLES: ReadonlySet<string> = new Set();
 
 export const Route = createFileRoute("/quadro/")({
   validateSearch: (s: Record<string, unknown>): Search =>
@@ -55,10 +57,11 @@ export const Route = createFileRoute("/quadro/")({
   loader: async () => {
     const gate = await getWorkAreaGate({ data: { area: "quadro" } });
     // Closed gate: nothing of the quadro is read or serialised, only the access screen renders.
-    if (gate.view !== "page") return { gate, interior: false, ...EMPTY_QUADRO, groups: [] };
-    const { quadro: q } = await getTrainingQuadro();
+    if (gate.view !== "page") return { gate, interior: false, ...EMPTY_QUADRO, groups: [], roles: [] as string[] };
+    const [{ quadro: q }, session] = await Promise.all([getTrainingQuadro(), getSession()]);
     const cal = loadCalendar();
-    return { gate, interior: gate.view === "page", ...q, groups: cal.groups };
+    // Positions only shape the rail (shellRailFor): a member opened by the base rule gets no staff rail.
+    return { gate, interior: gate.view === "page", ...q, groups: cal.groups, roles: session.roles };
   },
   head: () => ({
     meta: [
@@ -85,8 +88,9 @@ const range = (from: number, to: number) =>
   `${fromMinutes(from)}–${fromMinutes(to)}`;
 
 function QuadroPage() {
-  const { days, slots, rotations, rooms, generatedUTC, note, groups } =
+  const { days, slots, rotations, rooms, generatedUTC, note, groups, gate, roles } =
     Route.useLoaderData();
+  const shell = useMemo(() => shellRailFor(gate, new Set(roles)), [gate, roles]);
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const week: Week = search.settimana ?? "A";
@@ -162,8 +166,9 @@ function QuadroPage() {
       title="Quadro settimanale"
       path="/quadro"
       activeAreaId="quadro"
-      roles={PREVIEW_ROLES}
-      roleLabel="Anteprima staff"
+      roles={NO_ROLES}
+      rail={shell.rail}
+      roleLabel={shell.roleLabel}
       highlights={[
         {
           value: entries.length || null,
@@ -590,7 +595,10 @@ function WeekSwitch({
   );
 }
 
-/** Staff only (Direzione 15/10/2026): without an allowed session the area's access screen, never the preview. */
+/**
+ * Base for every signed-in member (Francesco 16/10/2026 23:34, access-resolver.ts BASE_WORK_AREAS) plus the old staff
+ * rule; signed out the area's access screen. Members get no staff rail (shellRailFor).
+ */
 function QuadroPageGate() {
   const { gate } = Route.useLoaderData();
   return (

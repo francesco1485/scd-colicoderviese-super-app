@@ -18,9 +18,10 @@
  * base sections (nothing to grant), unknown sections. Every server data function keeps its own check: opening a page
  * never widens what its data functions return.
  */
-import { ACCESS_MENU, INTERIOR_RAIL, WORK_AREA_IDS, findArea, type AreaIcon, type MenuEntry, type MenuGroup } from "./areas";
+import { ACCESS_MENU, INTERIOR_RAIL, WORK_AREA_IDS, findArea, railFor, type AreaIcon, type MenuEntry, type MenuGroup, type RailGroup } from "./areas";
 import type { WorkAreaGate } from "./access";
 import { LEVELS, SECTIONS, findSection, levelCovers, type Level, type Perimeter } from "./person-grants";
+import { isStaffSession, sessionBadge } from "./session";
 
 /** Identity link states that count as verified (r56/r61 scd_my_person_ids uses the same two). */
 export const VERIFIED_LINK_STATES = ["AUTO_VERIFIED", "VERIFIED_BY_STAFF"] as const;
@@ -212,6 +213,17 @@ export interface ResolverFacts {
   probes: GrantProbes | null;
 }
 
+/**
+ * Areas a section grant may open TODAY: only those whose data path already accepts the grant or answers per viewer, so
+ * a grant never opens an empty shell (scd-revisore 17/10/2026, BLOCK 2). Every other area stays on the old rule until
+ * its data functions read the grant too; widening a data function is a separate, explicit change.
+ * - mister: roster and call-ups from scd_my_team_roster / scd_my_team_athlete_ids (per viewer), training quadro
+ *   (any member), public calendar;
+ * - impianti-campi: impianti.functions.ts readAccess passes the grant to the page (grant.view) and to the approvals
+ *   feed (grantAllAt APPROVE, perimeter ALL).
+ */
+export const GRANT_PAGE_AREAS: readonly string[] = ["mister", "impianti-campi"];
+
 /** Registry areas outside WORK_AREA_IDS whose own gate also asks the resolver (impianti.functions.ts). */
 export const OWN_GATE_AREAS: readonly string[] = ["impianti-campi"];
 
@@ -223,6 +235,7 @@ export function resolveWorkAreaGate(areaId: string, old: WorkAreaGate, facts: Re
   if (old.view === "page" && !old.preview) return old;
   if (!WORK_AREA_IDS.includes(areaId) && !OWN_GATE_AREAS.includes(areaId)) return old;
   if (facts.signedIn && BASE_WORK_AREAS.includes(areaId)) return { view: "page", preview: false, via: "base" };
+  if (!GRANT_PAGE_AREAS.includes(areaId)) return old;
   const section = sectionForArea(areaId);
   if (!section || !facts.identity.verified || !facts.probes) return old;
   if (grantOpens(section, "READ", facts.probes.get(section))) return { view: "page", preview: false, via: "grant" };
@@ -232,11 +245,7 @@ export function resolveWorkAreaGate(areaId: string, old: WorkAreaGate, facts: Re
 /* ---------------------------------------------------------------- navigation */
 
 /** Areas a grant can put in the navigation: work areas with a catalogue section (one link each). */
-export const GRANT_NAV_AREAS: readonly string[] = [
-  ...WORK_AREA_IDS.filter((id) => sectionForArea(id) !== null && !BASE_WORK_AREAS.includes(id)),
-  // Impianti e campi has its own gate (impianti.functions.ts) wired to the same grant.
-  "impianti-campi",
-];
+export const GRANT_NAV_AREAS: readonly string[] = GRANT_PAGE_AREAS.filter((id) => sectionForArea(id) !== null && !BASE_WORK_AREAS.includes(id));
 
 /** Work areas opened by grants for this person (navigation only; each page keeps its server gate). */
 export function grantAreasFor(facts: ResolverFacts): string[] {
@@ -325,4 +334,15 @@ export function mergeNav(groups: readonly MenuGroup[], nav: AccessNav): MenuGrou
   if (auto.length) out.push({ title: "Per te e la tua famiglia", entries: auto });
   if (granted.length) out.push({ title: "Abilitate dalla Direzione", entries: granted });
   return out;
+}
+
+/**
+ * Rail and footer label of an interior page. A member who opens a base area (/quadro, gate.via "base") is not staff:
+ * no work-area rail (it would list areas they cannot open) and the label «Socio». Staff keep the rail of their
+ * positions; the staging preview keeps the preview rail.
+ */
+export function shellRailFor(gate: WorkAreaGate, roles: ReadonlySet<string>): { rail: RailGroup[]; roleLabel: string } {
+  if (gate.preview) return { rail: railFor(new Set()), roleLabel: "Anteprima staff" };
+  if (roles.size > 0 && isStaffSession(roles)) return { rail: railFor(roles), roleLabel: sessionBadge(roles) };
+  return { rail: [], roleLabel: "Socio" };
 }

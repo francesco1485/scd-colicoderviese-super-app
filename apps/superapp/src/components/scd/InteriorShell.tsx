@@ -19,6 +19,8 @@ export interface InteriorShellProps {
   roles: ReadonlySet<string>;
   /** Who is looking, in plain words (rail footer). */
   roleLabel: string;
+  /** Rail decided by the page (access-resolver.ts shellRailFor); when absent it comes from `roles`. */
+  rail?: readonly RailGroup[] | undefined;
   /** "Oggi" counts. Unknown values render "—" and are muted, never 0. */
   highlights?: readonly StripItem[];
   /** Injected for tests and screenshots; defaults to now. */
@@ -205,8 +207,8 @@ export function HighlightStrip({ items }: { items: readonly StripItem[] }) {
  * date and search, optional dark "Oggi" strip, ground #F2F7FC body.
  * Phone: the rail becomes a drawer behind a compact blue bar; same product, same data.
  */
-export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, highlights, today, badge, children }: InteriorShellProps) {
-  const groups = useMemo(() => railFor(roles), [roles]);
+export function InteriorShell({ title, path, activeAreaId, roles, roleLabel, rail, highlights, today, badge, children }: InteriorShellProps) {
+  const groups = useMemo(() => (rail ? [...rail] : railFor(roles)), [rail, roles]);
   const [drawer, setDrawer] = useState(false);
   const [day, setDay] = useState(() => formatClubDay(today ?? new Date()));
   useEffect(() => { if (!today) setDay(formatClubDay(new Date())); }, [today]);
