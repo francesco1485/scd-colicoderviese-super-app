@@ -1,4 +1,6 @@
 import { getTrainingQuadro } from "@/lib/quadro.functions";
+import { IntakeEntry } from "@/components/intake/IntakeViews";
+import { getIntakeSummary, type IntakeSummary } from "@/lib/intake.functions";
 import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { EMPTY_QUADRO } from "@/lib/public-snapshots";
@@ -67,9 +69,11 @@ export const Route = createFileRoute("/gestionale/")({
     // Closed gate: nothing of the board is read or serialised, only the access screen renders.
     const cal = loadCalendar();
     const { quadro: q } = gate.view === "page" ? await getTrainingQuadro() : { quadro: EMPTY_QUADRO };
-    if (gate.view !== "page") return { gate, interior: false, groups: [], events: [], sourceModifiedAt: cal.sourceModifiedAt, season: cal.season, slots: q.slots, days: q.days, quadroUTC: q.generatedUTC, quadroNote: q.note };
+    const intake: IntakeSummary = gate.view === "page" ? await getIntakeSummary() : { state: "none", formReady: false };
+    if (gate.view !== "page") return { gate, interior: false, groups: [], events: [], sourceModifiedAt: cal.sourceModifiedAt, season: cal.season, slots: q.slots, days: q.days, quadroUTC: q.generatedUTC, quadroNote: q.note, intake };
     return {
       gate,
+      intake,
       interior: gate.view === "page",
       groups: cal.groups,
       events: cal.events,
@@ -117,6 +121,7 @@ function GestionalePage() {
     days,
     quadroUTC,
     quadroNote,
+    intake,
   } = Route.useLoaderData();
   const now = useRomeNow();
   const [offset, setOffset] = useState(0);
@@ -173,6 +178,9 @@ function GestionalePage() {
       ]}
     >
       <div className="flex flex-col gap-[18px]">
+        {/* Vetrina richieste (UD-163): first block of the gestionale wall. */}
+        <IntakeEntry summary={intake} />
+
         <SnapshotNotice>
           Calendario ufficiale {season}: copia del{" "}
           {freshnessLabel(sourceModifiedAt)} · Quadro allenamenti: copia del{" "}
