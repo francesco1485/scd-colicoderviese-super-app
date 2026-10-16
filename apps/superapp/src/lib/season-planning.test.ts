@@ -223,7 +223,8 @@ describe("aggregation", () => {
     const full = buildSeasonPlan(baseInput());
     expect(full.kpis.matches).toBe(1);
     expect(full.kpis.events).toBe(3);
-    expect(full.kpis.duePartial).toBe(false);
+    // LND/CRL deadlines are not connected yet, so the due count stays partial even with every other source.
+    expect(full.kpis.duePartial).toBe(true);
     // 31/10 fees + SGS level-3 deadlines on 31/10 + Cervellone 05/11 + fee 30/11? (outside 30 days) — computed, not hard-coded.
     expect(full.kpis.dueSoon).toBe(upcomingDeadlines(full.items, "2026-10-16").length);
     expect(full.kpis.dueSoon).toBeGreaterThan(0);
@@ -243,5 +244,20 @@ describe("aggregation", () => {
     expect(games.length).toBe(cal.events.filter((e) => e.date >= SEASON.from && e.date <= SEASON.to).length);
     expect(games.every((g) => g.date >= SEASON.from && g.date <= SEASON.to)).toBe(true);
     expect(plan.sources.find((s) => s.id === "calendario")?.note).toBe("copia di sicurezza inclusa nell'app");
+  });
+
+  it("due count is partial while any deadline source is not connected, and flags Cervellone failures", () => {
+    const plan = buildSeasonPlan(baseInput());
+    const lnd = plan.sources.find((x) => x.id === "lnd");
+    expect(lnd?.state).toBe("da collegare");
+    expect(plan.kpis.duePartial).toBe(true);
+
+    const failed = buildSeasonPlan(baseInput({ knowledge: null, knowledgeStatus: "error" }));
+    expect(failed.sources.find((x) => x.id === "cervellone")).toMatchObject({ state: "da collegare", note: "lettura non riuscita, riprova" });
+    expect(failed.kpis.duePartial).toBe(true);
+
+    const truncated = buildSeasonPlan(baseInput({ knowledgeStatus: "truncated" }));
+    expect(truncated.sources.find((x) => x.id === "cervellone")?.note).toBe("parziale: troppe voci, mostrate solo le prime");
+    expect(truncated.kpis.duePartial).toBe(true);
   });
 });

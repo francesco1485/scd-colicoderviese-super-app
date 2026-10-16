@@ -426,6 +426,8 @@ export interface PlanInput {
   sgs: { deadlines: readonly DeadlineView[]; level: number } | null;
   /** null: Cervellone not connected for this session. */
   knowledge: readonly KbItem[] | null;
+  /** "error": the user has the role but the Cervellone read failed; "truncated": the read hit its row limit. */
+  knowledgeStatus?: "ok" | "error" | "truncated" | undefined;
 }
 
 export interface SeasonPlan {
@@ -478,7 +480,14 @@ export function buildSeasonPlan(input: PlanInput): SeasonPlan {
       label: "Scadenze del club (Cervellone)",
       state: input.knowledge ? "collegato" : "da collegare",
       master: "SCD CERVELLONE · Catalogo e Memoria (Drive)",
-      note: input.knowledge ? "da 30 giorni fa in poi" : "serve l'accesso con un ruolo d'ufficio",
+      note:
+        input.knowledgeStatus === "error"
+          ? "lettura non riuscita, riprova"
+          : input.knowledgeStatus === "truncated"
+            ? "parziale: troppe voci, mostrate solo le prime"
+            : input.knowledge
+              ? "da 30 giorni fa in poi"
+              : "serve l'accesso con un ruolo d'ufficio",
     },
     {
       id: "lnd",
@@ -499,11 +508,16 @@ export function buildSeasonPlan(input: PlanInput): SeasonPlan {
       matches: input.calendar ? matches.length : null,
       events: dated.length,
       dueSoon: upcomingDeadlines(items, input.today).length,
-      duePartial: !input.knowledge || !input.sgs,
+      // Partial whenever any deadline source is not connected (LND/CRL is not wired yet): unknown is never shown as complete.
+      duePartial:
+        input.knowledgeStatus === "truncated" || sources.some((s) => DEADLINE_SOURCE_IDS.has(s.id) && s.state !== "collegato"),
     },
     sources,
   };
 }
+
+/** Sources that feed the "scadenze nei prossimi 30 giorni" KPI. */
+const DEADLINE_SOURCE_IDS: ReadonlySet<string> = new Set(["quote", "sgs", "cervellone", "lnd"]);
 
 /** Previous / next month key inside the season, or null at the edges. */
 export function stepMonth(key: string, delta: -1 | 1, months: readonly SeasonMonth[] = seasonMonths()): string | null {

@@ -51,9 +51,22 @@ type Search = { mese?: string | undefined; vista?: PlanFilter | undefined };
 async function soft<T>(p: Promise<T>): Promise<T | null> {
   try {
     return await p;
-  } catch {
+  } catch (err) {
+    console.error("[gestionale/planning] source failed to load", err);
     return null;
   }
+}
+
+const KB_LIMIT = 200;
+
+/** Distinguishes "no role" (not connected) from "read failed" and "row limit reached". */
+function kbStatus(kb: Awaited<ReturnType<typeof searchKnowledge>> | null): "ok" | "error" | "truncated" | undefined {
+  if (!kb || !kb.connected) return undefined;
+  if (kb.error || !kb.result) {
+    if (kb.error) console.error("[gestionale/planning] Cervellone read failed", kb.error);
+    return "error";
+  }
+  return kb.result.items.length >= KB_LIMIT ? "truncated" : "ok";
 }
 
 export const Route = createFileRoute("/gestionale/planning")({
@@ -70,13 +83,14 @@ export const Route = createFileRoute("/gestionale/planning")({
     if (gate.view !== "page") return { gate, interior: false as const };
     const [cal, kb] = await Promise.all([
       soft(getPublicCalendarSnapshot()),
-      soft(searchKnowledge({ data: { onlyDue: true, limit: 200 } })),
+      soft(searchKnowledge({ data: { onlyDue: true, limit: KB_LIMIT } })),
     ]);
     return {
       gate,
       interior: true as const,
       calendar: cal ? { events: cal.events, groups: cal.groups, sourceModifiedAt: cal.sourceModifiedAt, origin: cal.origin } : null,
       knowledge: kb?.connected && kb.result ? kb.result.items : null,
+      knowledgeStatus: kbStatus(kb),
     };
   },
   head: ({ loaderData }) => workAreaHead("planning", loaderData?.gate),
@@ -86,6 +100,7 @@ export const Route = createFileRoute("/gestionale/planning")({
 interface Loaded {
   calendar: { events: PublicEvent[]; groups: PublicGroup[]; sourceModifiedAt: string; origin: string } | null;
   knowledge: KbItem[] | null;
+  knowledgeStatus: "ok" | "error" | "truncated" | undefined;
   preview: boolean;
 }
 
@@ -93,7 +108,7 @@ function PlanningRoute() {
   const data = Route.useLoaderData();
   return (
     <WorkAreaGateView id="planning" gate={data.gate}>
-      {data.interior && <PlanningPage data={{ calendar: data.calendar, knowledge: data.knowledge, preview: data.gate.preview }} />}
+      {data.interior && <PlanningPage data={{ calendar: data.calendar, knowledge: data.knowledge, knowledgeStatus: data.knowledgeStatus, preview: data.gate.preview }} />}
     </WorkAreaGateView>
   );
 }
@@ -116,8 +131,9 @@ function PlanningPage({ data }: { data: Loaded }) {
       feeDeadlines: FEE_DEADLINES[SEASON.label],
       sgs: { deadlines: deadlinesFor(level, now.date), level },
       knowledge: data.knowledge,
+      knowledgeStatus: data.knowledgeStatus,
     });
-  }, [data.calendar, data.knowledge, now.date]);
+  }, [data.calendar, data.knowledge, data.knowledgeStatus, now.date]);
 
   const month = search.mese ?? defaultMonth(now.date);
   const visible = useMemo(() => filterPlan(plan.items, filter), [plan.items, filter]);
