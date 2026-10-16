@@ -4,7 +4,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import snapshot from "@/data/calendario-snapshot-20261010.json";
+import snapshot from "@/data/calendario-snapshot.json";
 import {
   DEFAULT_OPTIONS,
   PRESETS,

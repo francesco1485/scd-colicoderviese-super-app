@@ -85,6 +85,7 @@ import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
+import { Route as SegreteriaRichiesteRouteImport } from './routes/segreteria_.richieste'
 import { Route as SegreteriaStoriaRouteImport } from './routes/segreteria_.storia'
 import { Route as SostieniIndexRouteImport } from './routes/sostieni.index'
 import { Route as SostieniDonaMaterialeRouteImport } from './routes/sostieni.dona-materiale'
@@ -116,6 +117,7 @@ import { Route as GestionaleImpiantiDervioRouteImport } from './routes/gestional
 import { Route as GestionaleImpiantiNuovaRouteImport } from './routes/gestionale_.impianti.nuova'
 import { Route as GestionaleImpiantiSimulazioneRouteImport } from './routes/gestionale_.impianti.simulazione'
 import { Route as GestionaleDistintaEventIdSpettatoriRouteImport } from './routes/gestionale_.distinta.$eventId.spettatori'
+import { Route as SegreteriaRichiesteIdModuloRouteImport } from './routes/segreteria_.richieste_.$id.modulo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -500,6 +502,11 @@ const SegreteriaPersoneRoute = SegreteriaPersoneRouteImport.update({
   path: '/segreteria/persone',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SegreteriaRichiesteRoute = SegreteriaRichiesteRouteImport.update({
+  id: '/segreteria_/richieste',
+  path: '/segreteria/richieste',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SegreteriaStoriaRoute = SegreteriaStoriaRouteImport.update({
   id: '/segreteria_/storia',
   path: '/segreteria/storia',
@@ -662,6 +669,12 @@ const GestionaleDistintaEventIdSpettatoriRoute =
     path: '/gestionale/distinta/$eventId/spettatori',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SegreteriaRichiesteIdModuloRoute =
+  SegreteriaRichiesteIdModuloRouteImport.update({
+    id: '/segreteria_/richieste_/$id/modulo',
+    path: '/segreteria/richieste/$id/modulo',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -733,6 +746,7 @@ export interface FileRoutesByFullPath {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/segreteria/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria/storia': typeof SegreteriaStoriaRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
@@ -771,6 +785,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
   '/gestionale/impianti/': typeof GestionaleImpiantiIndexRoute
   '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
+  '/segreteria/richieste/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -841,6 +856,7 @@ export interface FileRoutesByTo {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
+  '/segreteria/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria/storia': typeof SegreteriaStoriaRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
@@ -879,6 +895,7 @@ export interface FileRoutesByTo {
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
   '/gestionale/impianti': typeof GestionaleImpiantiIndexRoute
   '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
+  '/segreteria/richieste/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -951,6 +968,7 @@ export interface FileRoutesById {
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
+  '/segreteria_/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria_/storia': typeof SegreteriaStoriaRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
@@ -989,6 +1007,7 @@ export interface FileRoutesById {
   '/gestionale_/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
   '/gestionale_/impianti/': typeof GestionaleImpiantiIndexRoute
   '/gestionale_/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
+  '/segreteria_/richieste_/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1062,6 +1081,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/segreteria/richieste'
     | '/segreteria/storia'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
@@ -1100,6 +1120,7 @@ export interface FileRouteTypes {
     | '/gestionale/impianti/simulazione'
     | '/gestionale/impianti/'
     | '/gestionale/distinta/$eventId/spettatori'
+    | '/segreteria/richieste/$id/modulo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1170,6 +1191,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
     | '/segreteria/persone'
+    | '/segreteria/richieste'
     | '/segreteria/storia'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
@@ -1208,6 +1230,7 @@ export interface FileRouteTypes {
     | '/gestionale/impianti/simulazione'
     | '/gestionale/impianti'
     | '/gestionale/distinta/$eventId/spettatori'
+    | '/segreteria/richieste/$id/modulo'
   id:
     | '__root__'
     | '/'
@@ -1279,6 +1302,7 @@ export interface FileRouteTypes {
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
     | '/segreteria_/persone'
+    | '/segreteria_/richieste'
     | '/segreteria_/storia'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
@@ -1317,6 +1341,7 @@ export interface FileRouteTypes {
     | '/gestionale_/impianti/simulazione'
     | '/gestionale_/impianti/'
     | '/gestionale_/distinta/$eventId/spettatori'
+    | '/segreteria_/richieste_/$id/modulo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1389,6 +1414,7 @@ export interface RootRouteChildren {
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
+  SegreteriaRichiesteRoute: typeof SegreteriaRichiesteRoute
   SegreteriaStoriaRoute: typeof SegreteriaStoriaRoute
   SostieniDonaMaterialeRoute: typeof SostieniDonaMaterialeRoute
   SostieniFondoSolidaleRoute: typeof SostieniFondoSolidaleRoute
@@ -1421,6 +1447,7 @@ export interface RootRouteChildren {
   DirezioneAccessiPersonIdRoute: typeof DirezioneAccessiPersonIdRoute
   DirezionePostaCollegaRoute: typeof DirezionePostaCollegaRoute
   GestionaleDistintaEventIdSpettatoriRoute: typeof GestionaleDistintaEventIdSpettatoriRoute
+  SegreteriaRichiesteIdModuloRoute: typeof SegreteriaRichiesteIdModuloRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1957,6 +1984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SegreteriaPersoneRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/segreteria_/richieste': {
+      id: '/segreteria_/richieste'
+      path: '/segreteria/richieste'
+      fullPath: '/segreteria/richieste'
+      preLoaderRoute: typeof SegreteriaRichiesteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/segreteria_/storia': {
       id: '/segreteria_/storia'
       path: '/segreteria/storia'
@@ -2174,6 +2208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleDistintaEventIdSpettatoriRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/segreteria_/richieste_/$id/modulo': {
+      id: '/segreteria_/richieste_/$id/modulo'
+      path: '/segreteria/richieste/$id/modulo'
+      fullPath: '/segreteria/richieste/$id/modulo'
+      preLoaderRoute: typeof SegreteriaRichiesteIdModuloRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2268,6 +2309,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
+  SegreteriaRichiesteRoute: SegreteriaRichiesteRoute,
   SegreteriaStoriaRoute: SegreteriaStoriaRoute,
   SostieniDonaMaterialeRoute: SostieniDonaMaterialeRoute,
   SostieniFondoSolidaleRoute: SostieniFondoSolidaleRoute,
@@ -2301,6 +2343,7 @@ const rootRouteChildren: RootRouteChildren = {
   DirezionePostaCollegaRoute: DirezionePostaCollegaRoute,
   GestionaleDistintaEventIdSpettatoriRoute:
     GestionaleDistintaEventIdSpettatoriRoute,
+  SegreteriaRichiesteIdModuloRoute: SegreteriaRichiesteIdModuloRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

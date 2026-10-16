@@ -163,6 +163,34 @@ describe("third catalogue batch (2026-10-15)", () => {
   });
 });
 
+describe("Direzione crest batch (2026-10-15)", () => {
+  it("resolves the clubs added from the files supplied by the Direzione", () => {
+    const added: Record<string, string> = {
+      "S.C. ROVELLASCA 1910": "rovellasca",
+      "A.S.D. CIVATE 2014": "civate",
+      "BASE 96": "base-96",
+      "SPERANZA AGRATE": "speranza-agrate",
+      "U.S. CALCIO SAN PELLEGRINO 1922": "san-pellegrino",
+      "TRITIUM 1908": "tritium",
+      "LEMINE ALMENNO CALCIO A.S.D.": "lemine-almenno",
+      "FIORENTE 1946 COLOGNOLA": "fiorente-colognola",
+      "AURORA SERIATE 1967": "aurora-seriate",
+      "CDA CITTA DI ALBINO": "citta-di-albino",
+      "CASTELLO CITTA DI CANTU": "castello-citta-di-cantu",
+    };
+    for (const [name, slug] of Object.entries(added)) {
+      expect(crestFor(name).src, name).toBe(`/media/crests/${slug}.webp`);
+      expect(crestEntryFor(name)?.sourceKind, name).toBe("SCD_DIREZIONE_SUPPLIED");
+    }
+  });
+  it("keeps the earlier source on crests whose supplied file shows a different design", () => {
+    for (const slug of ["meda-1913", "luciano-manara", "pontelambrese", "cantu-san-paolo", "ars-rovagnate", "casati-arcore", "olympic-morbegno"]) {
+      const e = CREST_REGISTRY.find((x) => x.slug === slug);
+      expect(e?.sourceKind, slug).not.toBe("SCD_DIREZIONE_SUPPLIED");
+    }
+  });
+});
+
 describe("registry integrity", () => {
   it("every referenced file exists and no two entries share a slug", () => {
     const slugs = new Set<string>();
@@ -175,7 +203,13 @@ describe("registry integrity", () => {
           existsSync(resolve(ROOT, "public", e.file!.slice(1))),
           e.file!,
         ).toBe(true);
-        expect(e.sourceUrl, e.slug).toMatch(/^https:\/\//);
+        // a public https source, or a file handed over by the Direzione (provenance recorded in `source`)
+        if (e.sourceKind === "SCD_DIREZIONE_SUPPLIED") {
+          expect(e.sourceUrl, e.slug).toBeNull();
+          expect(e.source, e.slug).toMatch(/^Supplied by the SCD Direzione on \d{4}-\d{2}-\d{2}/);
+        } else {
+          expect(e.sourceUrl, e.slug).toMatch(/^https:\/\//);
+        }
         expect(e.verifiedAt, e.slug).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       }
       expect(e.licenceNote).toBe(

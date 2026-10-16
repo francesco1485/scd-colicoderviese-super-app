@@ -1,6 +1,8 @@
 /// <reference types="vite-plugin-pwa/client" />
 import { useEffect, useState } from "react";
 
+import { startInstallCapture } from "@/lib/install-prompt";
+
 /** Unico punto di registrazione del service worker, con guardie preview/dev. */
 function refusedContext() {
   if (!import.meta.env.PROD) return true;
@@ -45,6 +47,8 @@ export function PwaManager() {
   const [update, setUpdate] = useState<null | ((reload?: boolean) => Promise<void>)>(null);
 
   useEffect(() => {
+    // Keep the browser's install dialog for the "Installa l'app" button (it fires once, early).
+    startInstallCapture();
     if (!("serviceWorker" in navigator)) return;
     if (refusedContext()) {
       void unregisterAppSw();

@@ -27,8 +27,8 @@ const week = [
 ];
 
 describe("Home: settimana dal calendario validato", () => {
-  test("settimana 5–11 ottobre 2026: 10 gare", () => {
-    expect(week.flatMap((d) => itemsOn(items, d)).length).toBe(10);
+  test("settimana 5–11 ottobre 2026: 11 gare (con l'amichevole Esordienti 2015 del 05/10)", () => {
+    expect(week.flatMap((d) => itemsOn(items, d)).length).toBe(11);
   });
   test("sabato 10/10: 3 gare (Meda 14:30, Missaglia 15:00, Mandello 16:00)", () => {
     const today = itemsOn(items, "2026-10-10");

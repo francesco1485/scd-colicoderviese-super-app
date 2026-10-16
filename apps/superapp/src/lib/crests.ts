@@ -23,8 +23,10 @@ export type CrestEntry = {
   aliases: string[];
   status: CrestStatus;
   sourceUrl: string | null;
-  /** Provenance: "SCD Drive: <path> (fileId)" or the official page URL. */
+  /** Provenance: "SCD Drive: <path> (fileId)", the official page URL, or the Direzione hand-over note. */
   source: string | null;
+  /** OFFICIAL_FACEBOOK_PAGE_PICTURE, OFFICIAL_CLUB_WEBSITE, SCD_DRIVE or SCD_DIREZIONE_SUPPLIED (file handed over by the club, no public URL). */
+  sourceKind: string | null;
   /** Reference team page on tuttocampo.it (the Direzione's catalogue), when found. */
   tuttocampoUrl: string | null;
   verifiedAt: string | null;
@@ -70,6 +72,7 @@ export const CREST_REGISTRY: readonly CrestEntry[] = (
       status,
       sourceUrl: str(r["sourceUrl"]) || null,
       source: str(r["source"]) || null,
+      sourceKind: str(r["sourceKind"]) || null,
       tuttocampoUrl: /^https:\/\/(www\.)?tuttocampo\.it\//.test(str(r["tuttocampoUrl"]))
         ? str(r["tuttocampoUrl"])
         : null,

@@ -2,7 +2,7 @@
  * Validazione stretta della copia pubblica (mirror Drive, sola lettura) del calendario.
  * Pura e senza rete: usata dal ponte server e dai test. Rifiuta tutto ciò che non è nell'allowlist.
  */
-import bundled from "@/data/calendario-snapshot-20261010.json";
+import bundled from "@/data/calendario-snapshot.json";
 
 export const MIRROR_SCHEMA = "scd-calendar-public-v3";
 export const MIRROR_AUDIENCE = "PUBLIC_READ_ONLY_SNAPSHOT";
@@ -10,6 +10,10 @@ export const CANONICAL_SOURCE_ID = "1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs";
 export const MIRROR_SEASON = "2026/27";
 export const MAX_BYTES = 600 * 1024;
 export const BUNDLED_SOURCE_AT = (bundled as { source_modified_at: string }).source_modified_at;
+/** A public copy never has fewer than 70% of the games of the bundled one: an emptied file is refused, not served. */
+export const MIN_EVENTS = Math.floor(0.7 * (bundled as { events: unknown[] }).events.length);
+/** Tolerance for clocks: a copy "from the future" would freeze every later update (monotonic cache), so it is refused. */
+export const FUTURE_TOLERANCE_MS = 10 * 60_000;
 
 const EVENT_KEYS = new Set(["id", "date", "time", "end", "category", "group", "type", "home_away", "venue", "opponent", "round", "source", "notice", "match_status", "is_variation", "verification"]);
 const VERIFY_KEYS = ["time_confirmed", "venue_confirmed", "facility_review_required"] as const;
@@ -30,7 +34,7 @@ const validDate = (v: unknown) => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/
 
 export type MirrorCheck = { ok: true } | { ok: false; reason: string };
 
-export function validateMirror(raw: unknown): MirrorCheck {
+export function validateMirror(raw: unknown, nowMs: number = Date.now()): MirrorCheck {
   const fail = (reason: string): MirrorCheck => ({ ok: false, reason });
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return fail("root non oggetto");
   const r = raw as Record<string, unknown>;
@@ -41,6 +45,7 @@ export function validateMirror(raw: unknown): MirrorCheck {
   const at = typeof r["source_modified_at"] === "string" ? Date.parse(r["source_modified_at"]) : NaN;
   if (Number.isNaN(at)) return fail("source_modified_at");
   if (at < Date.parse(BUNDLED_SOURCE_AT)) return fail("più vecchio della copia di sicurezza");
+  if (at > nowMs + FUTURE_TOLERANCE_MS) return fail("data nel futuro");
   const groups = r["groups"];
   if (!groups || typeof groups !== "object" || Array.isArray(groups)) return fail("groups");
   for (const [id, g] of Object.entries(groups as Record<string, any>)) {
@@ -51,6 +56,7 @@ export function validateMirror(raw: unknown): MirrorCheck {
   }
   const events = r["events"];
   if (!Array.isArray(events) || events.length < 1 || events.length > 1000) return fail("events");
+  if (events.length < MIN_EVENTS) return fail("troppe poche gare rispetto alla copia di sicurezza");
   const ids = new Set<string>();
   for (const e of events as any[]) {
     if (!e || typeof e !== "object" || Array.isArray(e)) return fail("evento non oggetto");

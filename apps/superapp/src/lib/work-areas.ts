@@ -33,6 +33,7 @@ export type WorkAreaId =
   | "accessi"
   | "cervellone"
   | "certificati"
+  | "richieste"
   | "posta"
   | "posta-collega"
   | "lotteria"
@@ -131,6 +132,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Scadenze dei certificati medici di ogni atleta, squadra per squadra: chi manca, chi è scaduto, chi è da controllare. Direzione e Segreteria.",
     sources: ["supabase", "iscrizioni", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria"],
+  },
+  richieste: {
+    id: "richieste", label: "Richieste delle squadre", path: pathOf("richieste"), railId: "segreteria",
+    description: "Amichevoli chieste dalle squadre: dal messaggio alla bozza, la conferma entro 15 giorni, il calendario e il modulo federale da firmare.",
+    sources: ["supabase", "calendario", "inserimenti"],
+    insertRoles: ["Segreteria", "Direzione"],
   },
   lotteria: {
     id: "lotteria", label: "Lotteria dello sport", path: pathOf("lotteria"), railId: "direzione",

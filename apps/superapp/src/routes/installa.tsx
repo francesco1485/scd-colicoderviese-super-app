@@ -1,19 +1,23 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Copy, Download, Share2, Smartphone } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Bell, CalendarDays, Check, Copy, MessageCircle, Share2, Shield, UserPlus } from "lucide-react";
 import QRCode from "qrcode";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
-import { OFFICIAL_ADDRESS, displayAddress, installUrl } from "@/lib/install-link";
+import { InstallButton } from "@/components/scd/InstallButton";
+import { SEGRETERIA_WHATSAPP, displayAddress, installUrl } from "@/lib/install-link";
 
 /**
- * "Installa l'app": the one page to share everywhere (posters, WhatsApp groups, e-mails) until the
- * store apps exist (UD-071). Public, no personal data. The QR code points back to this page.
+ * "Installa l'app": the one page to share everywhere (posters, WhatsApp groups, e-mails) until the store apps exist
+ * (UD-071). Public, no personal data. Layout from the board "installa-v2" approved by Francesco 15/10/2026 18:52
+ * ("va bene procedi"): night-blue lake hero with the official crest, one action card (install), "Cosa trovi",
+ * Iride (the AI Segreteria on WhatsApp, UD-155) and the QR code, which comes first on a computer (people scan it with
+ * the phone) and last on a phone.
  */
 export const Route = createFileRoute("/installa")({
   head: () => ({
     meta: [
       { title: "Installa l'app | S.C.D. ColicoDerviese" },
-      { name: "description", content: "Come mettere l'app ufficiale della S.C.D. ColicoDerviese sul telefono, su iPhone e Android, in meno di un minuto." },
+      { name: "description", content: "L'app ufficiale della S.C.D. ColicoDerviese sul tuo telefono in 30 secondi, su iPhone e Android, senza store." },
     ],
   }),
   component: Installa,
@@ -22,9 +26,12 @@ export const Route = createFileRoute("/installa")({
 function Installa() {
   const [qrSvg, setQrSvg] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => () => window.clearTimeout(copiedTimer.current), []);
 
   useEffect(() => {
-    QRCode.toString(installUrl(), { type: "svg", margin: 1, errorCorrectionLevel: "M", color: { dark: "#062a52", light: "#ffffff" } })
+    QRCode.toString(installUrl(), { type: "svg", margin: 0, errorCorrectionLevel: "M", color: { dark: "#071d44", light: "#ffffff" } })
       .then(setQrSvg)
       .catch(() => setQrSvg(null));
   }, []);
@@ -36,7 +43,8 @@ function Installa() {
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
+      window.clearTimeout(copiedTimer.current);
+      copiedTimer.current = window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
     }
@@ -55,60 +63,137 @@ function Installa() {
   }
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10" data-testid="installa">
-      <header>
-        <h1 className="m-0 text-[34px] font-bold leading-tight">Installa l'app</h1>
-        <p className="mt-2 text-[16px] leading-relaxed">
-          Un minuto e l'app della società è sul tuo telefono, con lo stemma, senza passare dagli store.
-        </p>
-      </header>
-
-      <section aria-labelledby="link-t" className="grid gap-5 rounded-2xl border border-border bg-card p-5 sm:grid-cols-[minmax(0,1fr)_200px] sm:items-center sm:p-6">
-        <div className="min-w-0">
-          <h2 id="link-t" className="m-0 text-[15px] font-semibold text-muted-foreground">L'indirizzo dell'app</h2>
-          <p className="mt-1 break-all text-[26px] font-bold leading-tight text-[var(--scd-blue)] select-all" data-testid="install-address">{address}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" onClick={share} className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--scd-yellow)] px-4 text-[15px] font-semibold text-[#062a52]">
-              <Share2 className="size-4" aria-hidden="true" /> Condividi
-            </button>
-            <button type="button" onClick={copy} className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-border bg-white px-4 text-[15px] font-semibold">
-              {copied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
-              {copied ? "Copiato" : "Copia il link"}
-            </button>
-          </div>
-          <p className="mt-3 text-[13.5px] text-muted-foreground" aria-live="polite">
-            Inquadra il codice con la fotocamera per aprire questa pagina dal telefono. Stampalo su locandine e bacheche.
+    <main className="bg-[#071d44] text-white lg:grid lg:min-h-[calc(100vh-64px)] lg:grid-cols-[1.15fr_0.85fr]" data-testid="installa">
+      <header
+        className="relative overflow-hidden px-5 pb-[120px] pt-10 lg:flex lg:items-center lg:px-16 lg:py-16"
+        style={{
+          backgroundImage:
+            "linear-gradient(180deg, rgba(7,29,68,0.55) 0%, rgba(7,29,68,0.82) 55%, #071d44 100%), url(/media/scd/hero-colico.webp)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="mx-auto max-w-[620px] text-center lg:mx-0 lg:text-left">
+          <img
+            src="/media/brand/logo-scd.webp"
+            alt="Stemma S.C.D. ColicoDerviese"
+            width={480}
+            height={628}
+            className="mx-auto mb-3.5 h-auto w-[118px] drop-shadow-[0_10px_24px_rgba(0,0,0,0.45)] lg:mx-0 lg:mb-6 lg:w-[132px]"
+          />
+          <h1 className="m-0 font-[family-name:var(--font-brand)] text-[52px] font-normal uppercase leading-[0.95] tracking-[0.01em] [text-wrap:balance] lg:text-[96px]">
+            L'app del <span className="text-[var(--scd-yellow)]">club</span>
+            <br />
+            sul tuo telefono
+          </h1>
+          <p className="m-0 mt-3.5 font-[family-name:var(--font-uv-script)] text-[24px] lg:text-[30px]">Uniti si cresce sempre!</p>
+          <p className="mx-auto mt-3 max-w-[460px] text-[16px] leading-relaxed text-[#dbe6f6] lg:mx-0 lg:text-[19px]">
+            Gare, squadre e convocazioni in tasca. E la segreteria che risponde a ogni ora.
           </p>
         </div>
-        <figure className="m-0 justify-self-center">
-          <div className="grid size-[200px] place-items-center rounded-xl border border-border bg-white p-2" role="img" aria-label={`Codice QR per aprire ${link}`}>
-            {qrSvg ? <div className="size-full [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: qrSvg }} /> : <span className="text-[13px] text-muted-foreground">Codice QR…</span>}
+      </header>
+
+      <div className="relative -mt-24 flex flex-col gap-7 px-4 pb-10 lg:mt-0 lg:justify-center lg:gap-6 lg:bg-[linear-gradient(180deg,#0a2552,#071d44)] lg:px-14 lg:py-16">
+        <InstallButton />
+
+        <section aria-labelledby="trovi-t">
+          <h2 id="trovi-t" className="m-0 mb-3.5 font-[family-name:var(--font-display)] text-[24px] font-extrabold uppercase tracking-[0.02em]">
+            Cosa <span className="text-[var(--scd-yellow)]">trovi</span>
+          </h2>
+          <ul className="m-0 grid list-none grid-cols-4 gap-2 p-0">
+            <Feat icon={<CalendarDays className="size-[26px]" aria-hidden="true" />} text="Calendario gare" />
+            <Feat icon={<Shield className="size-[26px]" aria-hidden="true" />} text="Squadre" />
+            <Feat icon={<Bell className="size-[26px]" aria-hidden="true" />} text="Avvisi e convocazioni" />
+            <Feat icon={<MessageCircle className="size-[26px]" aria-hidden="true" />} text="Segreteria 24/7" />
+          </ul>
+        </section>
+
+        <section
+          aria-labelledby="iride-t"
+          className="grid grid-cols-[76px_minmax(0,1fr)] items-center gap-3.5 rounded-[22px] border border-white/10 bg-[linear-gradient(120deg,#0e3a7a,#0b2a5b)] p-4"
+          data-testid="install-iride"
+        >
+          {/* Iride's avatar file belongs to the cloud chat (personaggi, UD-139): the official crest stands in until that file
+              is on staging, then this image switches to /media/cast/iride/ in the same change that registers it. */}
+          <img
+            src="/media/brand/logo-scd.webp"
+            alt="Stemma S.C.D. ColicoDerviese"
+            width={480}
+            height={628}
+            loading="lazy"
+            className="size-[76px] rounded-full border-[3px] border-[var(--scd-yellow)] bg-white object-contain p-2"
+          />
+          <div className="min-w-0">
+            <span className="font-[family-name:var(--font-display)] text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--scd-yellow)]">
+              Segreteria AI · WhatsApp
+            </span>
+            <h2 id="iride-t" className="m-0 mb-1 mt-0.5 font-[family-name:var(--font-display)] text-[22px] font-extrabold uppercase leading-none">
+              Iride risponde 24/7
+            </h2>
+            <p className="m-0 text-[13.5px] leading-snug text-[#dbe6f6]">
+              Gare, iscrizioni, richieste. <span className="whitespace-nowrap select-all">{SEGRETERIA_WHATSAPP.display}</span>
+            </p>
           </div>
-        </figure>
-      </section>
+          <div className="col-span-2 grid grid-cols-2 gap-2">
+            <a
+              href="/iride.vcf"
+              download="Iride-Segreteria-ColicoDerviese.vcf"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[14px] bg-[var(--scd-yellow)] text-[15px] font-bold text-[#0b2a5b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              data-testid="iride-vcard"
+            >
+              <UserPlus className="size-[18px]" aria-hidden="true" /> Salva il contatto
+            </a>
+            <a
+              href={SEGRETERIA_WHATSAPP.chatUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[14px] border-2 border-white/35 text-[15px] font-bold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              data-testid="iride-whatsapp"
+            >
+              <MessageCircle className="size-[18px]" aria-hidden="true" /> Scrivi
+            </a>
+          </div>
+        </section>
 
-      <section aria-labelledby="ios-t" className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-        <h2 id="ios-t" className="m-0 flex items-center gap-2 text-[22px] font-bold"><Smartphone className="size-5" aria-hidden="true" /> iPhone e iPad</h2>
-        <ol className="m-0 mt-3 grid list-decimal gap-2 pl-5 text-[15.5px] leading-relaxed marker:font-bold marker:text-[var(--scd-blue)]">
-          <li>Apri l'indirizzo con <b>Safari</b>.</li>
-          <li>Tocca il pulsante <b>Condividi</b> (il quadrato con la freccia verso l'alto).</li>
-          <li>Scegli <b>Aggiungi alla schermata Home</b>, poi <b>Aggiungi</b>.</li>
-          <li>Apri l'app dall'icona con lo stemma: da lì puoi attivare le notifiche delle convocazioni.</li>
-        </ol>
-      </section>
-
-      <section aria-labelledby="android-t" className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-        <h2 id="android-t" className="m-0 flex items-center gap-2 text-[22px] font-bold"><Download className="size-5" aria-hidden="true" /> Android</h2>
-        <ol className="m-0 mt-3 grid list-decimal gap-2 pl-5 text-[15.5px] leading-relaxed marker:font-bold marker:text-[var(--scd-blue)]">
-          <li>Apri l'indirizzo con <b>Chrome</b>.</li>
-          <li>Tocca <b>Installa app</b> nel messaggio in basso, oppure il menu ⋮ e poi <b>Installa app</b>.</li>
-          <li>Conferma: l'icona con lo stemma compare tra le tue app.</li>
-        </ol>
-      </section>
-
-      <p className="m-0 text-[14.5px] text-muted-foreground">
-        Presto anche su Play Store e App Store, allo stesso indirizzo di sempre ({OFFICIAL_ADDRESS}). Cosa fare dopo: <Link to="/guida" className="underline">come funziona l'app</Link>.
-      </p>
+        <section
+          aria-labelledby="qr-t"
+          className="flex items-center gap-3.5 rounded-[22px] bg-white p-3.5 text-[#0b2a5b] lg:order-first lg:p-5"
+          data-testid="install-qr"
+        >
+          <div className="size-24 shrink-0 lg:size-[150px]" role="img" aria-label={`Codice QR per aprire ${link}`}>
+            {qrSvg ? <div className="size-full [&>svg]:size-full" dangerouslySetInnerHTML={{ __html: qrSvg }} /> : null}
+          </div>
+          <div className="min-w-0">
+            <h2 id="qr-t" className="m-0 font-[family-name:var(--font-display)] text-[20px] font-extrabold uppercase leading-none lg:text-[26px]">
+              Inquadra con il telefono
+            </h2>
+            <p className="m-0 mt-1 text-[13.5px] text-[#4a5d7e]">Apri la fotocamera e punta il codice: l'app si installa da lì.</p>
+            <p className="m-0 mt-1 break-all text-[15px] font-bold text-[#1556c4] select-all" data-testid="install-address">
+              {address}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button type="button" onClick={share} className="inline-flex min-h-11 items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-3 text-[14px] font-semibold focus-visible:outline focus-visible:outline-2">
+                <Share2 className="size-4" aria-hidden="true" /> Condividi
+              </button>
+              <button type="button" onClick={copy} className="inline-flex min-h-11 items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-3 text-[14px] font-semibold focus-visible:outline focus-visible:outline-2">
+                {copied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
+                {copied ? "Copiato" : "Copia"}
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
+  );
+}
+
+function Feat({ icon, text }: { icon: ReactNode; text: string }) {
+  return (
+    <li className="text-center">
+      <span className="mx-auto mb-2 grid size-[58px] place-items-center rounded-full border-2 border-[var(--scd-yellow)] bg-[rgba(255,214,0,0.12)] text-[var(--scd-yellow)]">
+        {icon}
+      </span>
+      <span className="block text-[13px] font-semibold leading-tight text-[#dbe6f6]">{text}</span>
+    </li>
   );
 }

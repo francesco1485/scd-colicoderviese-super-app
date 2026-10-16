@@ -1,11 +1,13 @@
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { describe, expect, test } from "vitest";
-import bundled from "@/data/calendario-snapshot-20261010.json";
+import bundled from "@/data/calendario-snapshot.json";
+import fixture20261010 from "@/data/calendario-snapshot-20261010.json";
 import { validateMirror } from "./calendar-mirror";
-import { createCachedSource, fetchMirror } from "./calendar-bridge.server";
+import { MIRROR_URLS, REPO_MIRROR_URL, createCachedSource, fetchMirror } from "./calendar-bridge.server";
 
 const clone = () => JSON.parse(JSON.stringify(bundled));
+const N = (bundled as { events: unknown[] }).events.length;
 const FUTURE = {
   id: "EVT-TEST-20270301-FIXTURE", date: "2027-03-01", time: "15:00", end: "", category: "Esordienti 11 anni (2015)",
   group: "2015", type: "AMICHEVOLE", home_away: "CASA", venue: "Campo di prova", opponent: "SQUADRA DI PROVA",
@@ -26,13 +28,48 @@ async function fixture() {
   return { url: `http://127.0.0.1:${port}/mirror.json`, set: (o: unknown) => { body = JSON.stringify(o); }, down: () => { up = false; }, stop: () => { server.close(); } };
 }
 
+describe("canali della copia pubblica", () => {
+  test("prima la copia oraria nel ramo dati del repository, poi Drive; solo https, mai il master", () => {
+    expect(MIRROR_URLS[0]).toBe(REPO_MIRROR_URL);
+    expect(REPO_MIRROR_URL).toBe("https://raw.githubusercontent.com/francesco1485/scd-colicoderviese-super-app/data/calendar-public/calendar-public.json");
+    for (const u of MIRROR_URLS) {
+      expect(u.startsWith("https://")).toBe(true);
+      expect(u).not.toMatch(/1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs|docs\.google\.com\/spreadsheets/);
+    }
+  });
+  test("il canale del repository non segue rimandi; Drive sì", async () => {
+    const seen: Record<string, RequestRedirect | undefined> = {};
+    const spy = async (u: string, init?: RequestInit) => { seen[u] = init?.redirect; return new Response("no", { status: 503 }); };
+    await fetchMirror(MIRROR_URLS, spy);
+    expect(seen[REPO_MIRROR_URL]).toBe("error");
+    for (const u of MIRROR_URLS.slice(1)) expect(seen[u]).toBe("follow");
+  });
+  test("una copia servita come text/plain (raw di GitHub) è accettata; una pagina HTML no", async () => {
+    const mk = (ct: string) => async () => new Response(JSON.stringify(bundled), { status: 200, headers: { "content-type": ct } });
+    expect((await fetchMirror(["https://x/plain"], mk("text/plain; charset=utf-8"))).origin).toBe("mirror");
+    expect((await fetchMirror(["https://x/html"], mk("text/html"))).origin).toBe("fallback");
+  });
+});
+
 describe("validazione copia pubblica", () => {
-  test("la copia inclusa (mirror RC6 10/10) è accettata", () => expect(validateMirror(bundled)).toEqual({ ok: true }));
+  test("la copia inclusa (generata dal master il 15/10) è accettata", () => expect(validateMirror(bundled)).toEqual({ ok: true }));
   test("rifiuta email/telefono in un campo", () => {
     const a = clone(); a.events[0].venue = "info mario.rossi@example.com"; expect(validateMirror(a).ok).toBe(false);
     const b = clone(); b.events[0].opponent = "chiama 333 1234567"; expect(validateMirror(b).ok).toBe(false);
   });
   test("rifiuta ID duplicato", () => { const a = clone(); a.events.push(a.events[0]); expect(validateMirror(a).ok).toBe(false); });
+  test("la vecchia copia del 09/10 ancora su Drive è rifiutata: più vecchia di quella inclusa", () =>
+    expect(validateMirror(fixture20261010)).toEqual({ ok: false, reason: "più vecchio della copia di sicurezza" }));
+  test("rifiuta una copia con data nel futuro (bloccherebbe ogni aggiornamento successivo)", () => {
+    const a = clone(); a.source_modified_at = "2099-01-01T00:00:00Z";
+    expect(validateMirror(a)).toEqual({ ok: false, reason: "data nel futuro" });
+    const b = clone(); b.source_modified_at = "2026-10-15T12:00:00.000Z";
+    expect(validateMirror(b, Date.parse("2026-10-15T11:55:00Z")).ok).toBe(true); // dentro la tolleranza di 10 minuti
+  });
+  test("rifiuta una copia svuotata: meno del 70% delle gare della copia inclusa", () => {
+    const a = clone(); a.source_modified_at = "2026-10-15T10:00:00.000Z"; a.events = a.events.slice(0, Math.floor(a.events.length * 0.5));
+    expect(validateMirror(a)).toEqual({ ok: false, reason: "troppe poche gare rispetto alla copia di sicurezza" });
+  });
   test("rifiuta dati più vecchi della copia di sicurezza", () => { const a = clone(); a.source_modified_at = "2026-10-01T00:00:00Z"; expect(validateMirror(a).ok).toBe(false); });
   test("rifiuta campi sconosciuti, HTML e verification mancante", () => {
     const a = clone(); a.events[0].telefono_genitore = "x"; expect(validateMirror(a).ok).toBe(false);
@@ -53,19 +90,19 @@ describe("ponte con cache 5 minuti", () => {
     const src = createCachedSource([f.url], undefined, () => t);
     const first = await src();
     expect(first.origin).toBe("mirror");
-    expect(first.events.length).toBe(156);
-    const upd = clone(); upd.source_modified_at = "2026-10-10T08:00:00.000Z"; upd.events.push(FUTURE); f.set(upd);
-    t = 4 * 60_000; expect((await src()).events.length).toBe(156); // ancora in cache
+    expect(first.events.length).toBe(N);
+    const upd = clone(); upd.source_modified_at = "2026-10-15T10:00:00.000Z"; upd.events.push(FUTURE); f.set(upd);
+    t = 4 * 60_000; expect((await src()).events.length).toBe(N); // ancora in cache
     t = 5 * 60_000 + 1; const fresh = await src();
-    expect(fresh.events.length).toBe(157);
-    expect(fresh.sourceModifiedAt).toBe("2026-10-10T08:00:00.000Z");
+    expect(fresh.events.length).toBe(N + 1);
+    expect(fresh.sourceModifiedAt).toBe("2026-10-15T10:00:00.000Z");
     f.stop();
   });
-  test("rete giù: copia di sicurezza RC3 visibile", async () => {
+  test("rete giù: copia di sicurezza inclusa visibile", async () => {
     const f = await fixture(); f.down();
     const r = await fetchMirror([f.url]);
     expect(r.origin).toBe("fallback");
-    expect(r.events.length).toBe(156);
+    expect(r.events.length).toBe(N);
     f.stop();
     const off = await fetchMirror(["http://127.0.0.1:1/none"]);
     expect(off.origin).toBe("fallback");
@@ -88,27 +125,27 @@ describe("ultima copia verificata (lastGood)", () => {
   test("v1 valida -> v2 valida -> rete giù: resta v2 come 'stale'", async () => {
     const f = await fixture(); let t = 0;
     const src = createCachedSource([f.url], undefined, () => t);
-    f.set(at("2026-10-10T08:00:00.000Z")); expect((await src()).origin).toBe("mirror");
-    t = 6 * 60_000; f.set(at("2026-10-10T09:00:00.000Z", true)); const v2 = await src();
-    expect(v2.origin).toBe("mirror"); expect(v2.events.length).toBe(157);
+    f.set(at("2026-10-15T10:00:00.000Z")); expect((await src()).origin).toBe("mirror");
+    t = 6 * 60_000; f.set(at("2026-10-15T11:00:00.000Z", true)); const v2 = await src();
+    expect(v2.origin).toBe("mirror"); expect(v2.events.length).toBe(N + 1);
     t = 12 * 60_000; f.down(); const s = await src();
     expect(s.origin).toBe("stale");
-    expect(s.sourceModifiedAt).toBe("2026-10-10T09:00:00.000Z");
-    expect(s.events.length).toBe(157);
+    expect(s.sourceModifiedAt).toBe("2026-10-15T11:00:00.000Z");
+    expect(s.events.length).toBe(N + 1);
     f.stop();
   });
   test("avvio con rete giù: copia di sicurezza inclusa", async () => {
     const src = createCachedSource(["http://127.0.0.1:1/none"], undefined, () => 0);
-    const r = await src(); expect(r.origin).toBe("fallback"); expect(r.events.length).toBe(156);
+    const r = await src(); expect(r.origin).toBe("fallback"); expect(r.events.length).toBe(N);
   });
   test("dopo una copia valida: PII, HTML o copia più vecchia non degradano", async () => {
     const f = await fixture(); let t = 0;
     const src = createCachedSource([f.url], undefined, () => t);
-    f.set(at("2026-10-10T09:00:00.000Z", true)); await src();
-    const bad = at("2026-10-11T00:00:00.000Z"); bad.events[0].venue = "scrivi a x@y.it"; f.set(bad);
-    t = 6 * 60_000; let r = await src(); expect(r.origin).toBe("stale"); expect(r.events.length).toBe(157);
-    f.set(at("2026-10-10T08:30:00.000Z"));
-    t = 12 * 60_000; r = await src(); expect(r.sourceModifiedAt).toBe("2026-10-10T09:00:00.000Z"); expect(r.events.length).toBe(157);
+    f.set(at("2026-10-15T11:00:00.000Z", true)); await src();
+    const bad = at("2026-10-15T12:00:00.000Z"); bad.events[0].venue = "scrivi a x@y.it"; f.set(bad);
+    t = 6 * 60_000; let r = await src(); expect(r.origin).toBe("stale"); expect(r.events.length).toBe(N + 1);
+    f.set(at("2026-10-15T10:30:00.000Z"));
+    t = 12 * 60_000; r = await src(); expect(r.sourceModifiedAt).toBe("2026-10-15T11:00:00.000Z"); expect(r.events.length).toBe(N + 1);
     f.stop();
   });
   test("Verifica forzata: al massimo una ogni 30 s, una sola lettura in corso", async () => {

@@ -5,9 +5,9 @@ import { loadCalendar } from "./public-snapshots";
 const PII_RE = /@|\+39|\b3\d{9}\b|targa|autista|telefono/i;
 
 describe("snapshot pubblici", () => {
-  test("calendario: 156 eventi, nessuno ritirato, nessun dato personale", () => {
+  test("calendario: 171 eventi (amichevoli del club da confermare incluse), nessuno ritirato, nessun dato personale", () => {
     const c = loadCalendar();
-    expect(c.events.length).toBe(156);
+    expect(c.events.length).toBe(171);
     expect(c.events.some((e) => /RITIR|ANNULL/i.test(e.status))).toBe(false);
     expect(PII_RE.test(JSON.stringify(c))).toBe(false);
   });
@@ -35,8 +35,8 @@ describe("quadro: settimane e loghi", () => {
 
 describe("calendario RC2: verifiche visibili", () => {
   const c = loadCalendar();
-  test("31 gare con orario o sede da confermare", () => {
-    expect(c.events.filter((e) => !(e.timeConfirmed && e.venueConfirmed)).length).toBe(31);
+  test("46 gare con orario o sede da confermare (31 ufficiali + 15 amichevoli del club)", () => {
+    expect(c.events.filter((e) => !(e.timeConfirmed && e.venueConfirmed)).length).toBe(46);
   });
   test("14 gare con disponibilità impianto da verificare", () => {
     expect(c.events.filter((e) => e.facilityReview).length).toBe(14);
@@ -79,13 +79,13 @@ import { readFileSync } from "node:fs";
 import { freshnessLabel, resolveAnnata } from "./public-snapshots";
 describe("calendario RC3 mobile", () => {
   const c = loadCalendar();
-  test("snapshot (mirror RC6): hash file e fonte master tracciati", () => {
-    const buf = readFileSync(new URL("../data/calendario-snapshot-20261010.json", import.meta.url));
-    expect(createHash("sha256").update(buf).digest("hex")).toBe("2bb056f16aa29287803e3e2fc5cb41d891d87fc07ce8a4bf50d98a664d83e10f");
-    expect(c.sourceModifiedAt).toBe("2026-10-09T20:36:32.903Z");
+  test("copia inclusa (generata dal master con tools/sync/calendar_public_payload.py): hash file e fonte master tracciati", () => {
+    const buf = readFileSync(new URL("../data/calendario-snapshot.json", import.meta.url));
+    expect(createHash("sha256").update(buf).digest("hex")).toBe("bb1a32d24e0a2c215616fe4fa5204e5a3e9214e4174473a3b5a675754ded1c6e");
+    expect(c.sourceModifiedAt).toBe("2026-10-15T09:47:09.544Z");
   });
-  test("freschezza in ora italiana: 09/10/2026 ore 22:36", () => {
-    expect(freshnessLabel(c.sourceModifiedAt)).toBe("09/10/2026 ore 22:36");
+  test("freschezza in ora italiana: 15/10/2026 ore 11:47", () => {
+    expect(freshnessLabel(c.sourceModifiedAt)).toBe("15/10/2026 ore 11:47");
   });
   test("?annata= risolve solo annate/categorie del master", () => {
     expect(resolveAnnata(c.groups, "2015")?.id).toBe("2015");

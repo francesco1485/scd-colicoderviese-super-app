@@ -245,6 +245,7 @@ export const WORK_AREA_IDS: readonly string[] = [
   "accessi",
   "cervellone",
   "certificati",
+  "richieste",
   "posta",
   "posta-collega",
   "lotteria",

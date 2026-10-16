@@ -15,7 +15,7 @@ Francesco 14/10/2026: "meno regole, la logica". Le sezioni sotto restano valide 
 6. **Niente va online senza un secondo sguardo.** Chi scrive non vede i propri errori. Quindi controlli automatici verdi, revisione di `scd-revisore` e `scd-sicurezza` con PASS, poi pubblicazione ("Pubblica sempre") e controllo del sito vero.
 7. **Prima capire lo stato reale.** Lavorare su una fotografia vecchia rompe il lavoro degli altri (l'altra chat, gli agenti notturni). Quindi prima si verifica lo stato (SCD:STATE), poi si scrive.
 
-**I pochi divieti assoluti** (nessuna logica li supera): dati personali o di minori in pubblico; segreti (password, chiavi, IBAN, codici fiscali) in chat, codice o log; pagamenti, ruoli/permessi, tesseramenti, presenze, safeguarding modificati in produzione da un agente; messaggi inviati a terzi senza persona; migrazioni applicate senza "applica"; il progetto Supabase dfnwzwutvnwiitiffwvr.
+**I pochi divieti assoluti** (nessuna logica li supera): dati personali o di minori in pubblico; segreti (password, chiavi, IBAN, codici fiscali) in chat, codice o log; pagamenti, ruoli/permessi, tesseramenti, presenze, safeguarding modificati in produzione da un agente; messaggi inviati a terzi senza persona (unica eccezione: le risposte della Segreteria AI a chi ha scritto per primo, entro i limiti di UD-155); migrazioni applicate senza "applica"; il progetto Supabase dfnwzwutvnwiitiffwvr.
 
 ## Regola 0
 Prima di modificare codice, dati, UI, workflow, API, ruoli, fonti o infrastruttura leggere:

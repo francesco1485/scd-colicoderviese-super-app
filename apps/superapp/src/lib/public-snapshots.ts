@@ -1,9 +1,9 @@
 /**
- * Adapter di consultazione per le FOTOGRAFIE (non live): calendario = copia di sicurezza dal mirror Drive validato del 09/10/2026 22:36 (RC6, scaricata il 10/10/2026), quadro = 09/10/2026
+ * Adapter di consultazione per le FOTOGRAFIE (non live): calendario = copia di sicurezza generata dal master del 15/10/2026 11:47 con tools/sync/calendar_public_payload.py (src/data/calendario-snapshot.json), quadro = 09/10/2026
  * di Calendario eventi e Quadro allenamenti. Non sono master: i master restano su Drive.
  * Espone solo campi in allowlist, così nessun dato personale può passare.
  */
-import calendarRaw from "@/data/calendario-snapshot-20261010.json";
+import calendarRaw from "@/data/calendario-snapshot.json";
 
 export const SNAPSHOT_BANNER = "Quadro del 09/10/2026 · per i cambi vale l'avviso del mister";
 export const EMPTY_MESSAGE = "Dati non disponibili in questa anteprima";

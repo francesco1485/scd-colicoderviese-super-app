@@ -3312,6 +3312,49 @@
       "sourceDate": "2026-10-15",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
+      "id": "UD-137",
+      "name": "TOP11_VOTE_OPEN_TO_ANY_CLUB_ACCOUNT",
+      "sourceQuoteFragments": [
+        "Lascia votare tutti"
+      ],
+      "context": "Francesco 15/10/2026 ~14:20 (chat cloud), answer to the question whether the Top 11 vote should be restricted to tesserati with a migration (today scd_cast_week_vote accepts any active membership, USER_BASE included). Option chosen: 'Lascia votare tutti' (only the copy changes to 'serve un account del club').",
+      "normalizedCommand": {
+        "rule": "The Top 11 vote stays open to every registered club account (any active membership); no migration. Public copy says an account of the club is needed, never 'votano i tesserati'. Amends UD-094 ('voted by members').",
+        "status": "DONE_PENDING_PUBLISH",
+        "delivered": [
+          "apps/superapp/src/routes/top11.tsx",
+          "apps/superapp/src/routes/community.tsx"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-138",
+      "name": "PUBLIC_CALENDAR_HOURLY_COPY_IN_REPOSITORY",
+      "sourceQuoteFragments": [
+        "Sì, subito e ogni ora",
+        "Copia nel repository",
+        "Sì, aggiungi la regola"
+      ],
+      "context": "Francesco 15/10/2026 14:20-15:20 (chat cloud), answers to three questions: regenerate the public calendar from the Master Calendario now and every hour; channel = a copy in the repository (data branch) instead of the Drive file the connector cannot overwrite; add a GitHub rule against deleting or force-pushing main, staging/superapp and data/calendar-public before the hourly task starts (created by Francesco: the session proxy cannot write repository settings).",
+      "normalizedCommand": {
+        "rule": "The app calendar comes from the master through tools/sync/calendar_public_payload.py; the bundled copy is refreshed by reviewed releases and an hourly scheduled task writes only calendar-public.json on branch data/calendar-public, read first by calendar-bridge.server.ts and always checked by validateMirror (never older, never in the future, at least 70% of the games). The hourly task starts only after the GitHub ruleset exists.",
+        "status": "CODE_LIVE_TASK_WAITING_FOR_RULESET",
+        "delivered": [
+          "tools/sync/calendar_public_payload.py",
+          "apps/superapp/src/data/calendario-snapshot.json",
+          "apps/superapp/src/lib/calendar-bridge.server.ts",
+          "apps/superapp/src/lib/calendar-mirror.ts",
+          "apps/superapp/docs/CALENDAR_HOURLY_TASK.md"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
       "id": "UD-150",
       "name": "FIGC_PLAYER_HISTORY_ALWAYS_AVAILABLE_IN_SUPER_APP",
       "sourceQuoteFragments": [
@@ -3336,6 +3379,89 @@
           "routes": "/segreteria/storia (link 'Storia' in the Segreteria Tesseramenti card)",
           "migration": "supabase/migrations/20261015_r131_figc_player_history.sql (STAGED, NOT APPLIED)",
           "manifest_source": "FIGC_STORICO_CALCIATORI"
+        }
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "15:07-15:17",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-154",
+      "name": "REQUEST_MACHINE_FRIENDLY_MATCH_FIRST_CASE",
+      "sourceQuoteFragments": [
+        "se il responsabile deve inserire una amichevole o altro se manda un messaggio alla segreteria lei lo legge in automatico e lo mette in calendario, poi il responsabile lo trova nel suo portale e entro 15 gg da conferma per farlo comparire a calendario, lì poi nel dare conferma chiede alla segreteria di inviare il modulo amichevoli alla figc, compila lui i dati con il caricamento della squadra avversaria come nuova società o se già è anagrafata la prende nella barra ricerca e in automatico arriva alla segreteria il file da stampare e far firmare al presidente o responsabile",
+        "il responsabile attività di base conferma fino ad annata 2014 a 2021 - direttore sportivo generale prima squadra e juniores - direttore sportivo agonistica 2015/2013 - 2011 - chi visualizza e deve essere messo sempre a conoscenza il direttore generale e coordinatore attività sportiva"
+      ],
+      "context": "Francesco 15/10/2026 (chat PC). 15:07 the request flow; 15:13 delegated the decisions (Segreteria creates drafts and prepares the federal form, Direzione sees everything); 15:17 who confirms by birth-year group and who is always informed. Same pattern later for tornei, pulmino, campo, visite.",
+      "normalizedCommand": {
+        "rule": "One generic request machine (scd_requests, one table for every kind; only AMICHEVOLE active). A team's message to the Segreteria is read by a deterministic parser into a draft (unknown fields stay null); the Segreteria corrects it and sends it to whoever confirms that birth-year group; the confirmer finds it in La mia SCD and confirms within 15 days (never after the match) or answers 'non possibile'; on confirmation the opponent is picked from the club search bar or added as 'Nuova societa', an internal calendar row is created and the Segreteria gets two tasks: copy the prepared row into the Master Calendario (the only public calendar) and print the federal form to have signed by the Presidente. Confirmers: Responsabile Attivita di Base (2014-2021: Esordienti 2014/2015, Pulcini, Primi Calci, Piccoli Amici), Direttore Sportivo Agonistica (2011-2013: U16, U15; Francesco wrote '2015/2013 - 2011', 2015 already belongs to the Attivita di Base), Direttore Sportivo Generale (Prima Squadra, Juniores U19); the Direzione may confirm on behalf. Direttore Generale and Coordinatore Attivita Sportiva see every request and are always informed in the app (no e-mail, no external message).",
+        "scope": "SECRETARIAT_TEAMS_DIRECTION",
+        "engines": "TEMPO (hours from message to confirmed friendly, minutes of Segreteria per federal form, no phone round-trips) and PERSONE (families see confirmed friendlies in the calendar)",
+        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_PENDING",
+        "constraints": [
+          "migration r133 is staged and applied only after an explicit 'applica r133'",
+          "positions direttore-sportivo-agonistica and direttore-sportivo-generale do not exist in the registry: until Francesco creates them only the Direzione confirms U16, U15, Prima Squadra and Juniores (fail closed); mapping in ONE constant REQUEST_CONFIRMERS mirrored in SQL",
+          "federal notice: SGS regional/provincial/local 3 working days (attivita di base) or 5 (Giovanissimi/Allievi), national 5, international and abroad 20 (CU n.1/n.5 SGS 2026/27, VERIFIED 15/10); LND friendlies (Prima, Juniores) UNVERIFIED: shown as 'regole da verificare'",
+          "the e-mail to the Ufficio Tornei CR Lombardia is a DRAFT to copy; the app never sends it; the address is INFERRED from the club mailbox",
+          "Safeguarding officer and managers' names and phones are written by hand on the printed form (club setting still to create)",
+          "ONE public source (scd-revisore 15/10): no merge into the public calendar; the team's message is never stored; venues only from the club's facilities; an edit of a waiting request sends it back to draft; a confirmed friendly can be cancelled (internal event CANCELLED, Segreteria removes it from the Master)"
+        ],
+        "implementation": {
+          "pure_logic": "apps/superapp/src/lib/request-machine.ts, apps/superapp/src/lib/request-parser.ts",
+          "server": "apps/superapp/src/lib/request-machine.functions.ts",
+          "routes": "/segreteria/richieste, /segreteria/richieste/$id/modulo, card 'Richieste da confermare' in /la-mia-scd",
+          "migration": "supabase/migrations/20261015_r133_requests_machine.sql (STAGED, NOT APPLIED)",
+          "manifest_source": "SCD_RICHIESTE"
+        }
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "17:16-19:06",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-155",
+      "name": "AI_SEGRETERIA_AUTONOMOUS_REPLIES_AND_SECRETARY_AGENT",
+      "sourceQuoteFragments": [
+        "deve essere una segreteria chatboat a tutti gli effetti, deve leggere e scrivere e rispondere e fare tutto quelo che fa una segretaria di ultima generazione Ai e che coordina la struttura tra mail e telefno per migliorare servizzi e coordinare i lavori e preparai nella piattaforma, se ancora meglio aperta h24 senza mai fermarsi e anche se resce a leggere il passato delle chat per capire meglio ancora",
+        "anche a recuperare e sistemare il telefono o accaount anagrfando e scrivedo e salvando tutti i contatti presenti cosi da sapere chi contattare",
+        "risposte: Tutto in automatico; costo AI: Budget piccolo ok; contatti: Rubrica da verificare",
+        "creare un agente ad oc per la segreteria super evoluto ed esperto in tutto quelo che è un segretario sportivo, di calcio, di sport, di associaizoni, di adempimenti, di programmazione",
+        "i contatti devono essere messi dal drive e dalla mail di sportlub nei contatti di google e anagrafati e poi posrati nel telefono caricando account sportclueb sul telefono",
+        "anche immagine e risposta del numero deve essere fatta da avatar deella segreteria",
+        "vorrei mettere u nome di una divinità greca (17:33) -> scelta: Iride; avatar: 'si questa' (17:37)",
+        "vera non ce piu ce iride - crovi per i piu giovani (18:40, chat cloud)",
+        "ok salva cognome e ruolo (18:26)",
+        "va bene procedi (18:52, pagina /installa con Iride, foto e contatto)",
+        "Confermo l'eccezione in AGENTS.md (19:01: risposte automatiche di Iride a chi ha scritto per primo)",
+        "chi l'ha contattata e cosa voleva… lei deve poter mandare whatsapp a persona che puo rispondere o puo autorizzare… calciatore chiede appuntamento con infermeria, iride manda messaggio a fisioterapista e direttore generale… verificare come si comporta il fisioterapista (19:05)",
+        "se uno contatta per una amichevole da impostare come responsabile lei deve comunicare a direttore sportivo a mister annata e a direttore generale e cosi via ragionando (19:06)"
+      ],
+      "context": "Francesco 15/10/2026 (chat PC). Extends UD-154 from friendlies to every request on every channel. Choices given through the question card at 17:18: automatic replies, small AI budget (about 20-30 EUR/month, today covered by the Make plan credits), contacts saved only after the Segreteria checks them (refined at 18:26, 'ok salva cognome e ruolo': Iride stores at once only what the person declares - name, surname, declared role - and only the Segreteria writes the verified role). At 17:21 asked for a dedicated expert secretary agent; at 17:28 'via'; at 17:30 contacts to Google Contacts of sportclubcolico and the WhatsApp profile as the Segreteria avatar.",
+      "normalizedCommand": {
+        "rule": "The AI Segreteria (persona Iride on every channel, Francesco 15/10 17:33 and 18:40; the app chat follows through the cloud chat, UD-139) reads every inbound message of the official channels (WhatsApp Business via Make first, then club mail, then a phone voice assistant), answers ALONE 24/7 from the club knowledge (Google Doc 'SCD · Segreteria AI · Conoscenza') and the public calendar, writes the request and the answer in SCD_INTAKE_LOG with office, type, urgency and 'serve persona', and marks what a person must handle. This is the only exception to the AGENTS.md rule 'messaggi inviati a terzi senza persona': replies to whoever wrote first, within the fixed limits below. The agent scd-iride owns Iride (prompt, knowledge, channels, quality); scd-segreteria is the expert source on rules and deadlines. Staff alerts (19:05-19:06): when a request needs a person, Iride must tell the people who can answer or authorise it, reasoning on the topic (infermeria -> physiotherapist + general manager; friendly to set up -> sporting director + coach of the age group + general manager), from a 'chi fa cosa' sheet confirmed by the Segreteria, track who takes it and remind after a deadline; sending to staff is a new sending channel and starts only after Francesco's OK on the design.",
+        "scope": "SECRETARIAT_ALL_CHANNELS",
+        "engines": "TEMPO (answers at night and on weekends without volunteers, schede already classified), PERSONE (families get an answer in seconds), SOLDI (no lost registration or sponsor request)",
+        "status": "WHATSAPP_ACTIVE_MAIL_PHONE_CONTACTS_PENDING",
+        "constraints": [
+          "always declares it is an AI assistant (EU AI Act transparency); persona Iride, no signature at the end",
+          "emergencies, injuries, health, a minor in difficulty, abuse and safeguarding: no answer on the merits, 112 when there is danger, urgency ALTA and a person takes over",
+          "never confirms or decides payments, registrations, tesseramenti, roles, permissions, presenze, sanctions or prices not in the knowledge",
+          "never gives personal data of other people and never asks for IBAN, codice fiscale, passwords or health data",
+          "with a minor: general club information only, a parent is invited to write",
+          "only replies to people who wrote first (WhatsApp 24-hour window); messages the club starts towards many contacts stay a Direzione decision",
+          "contacts from the sportclubcolico mailbox and Drive go to a 'rubrica da verificare' and reach Google Contacts of sportclubcolico only after the Segreteria checks them; never in the repo",
+          "Iride is the AI Segreteria persona everywhere (WhatsApp now; the app chat replaces Vera through the cloud chat, Francesco 18:40); avatar approved 17:37 (Canva MAHYF_fzGq0) for WhatsApp and the app",
+          "the contacts book stores name, surname and declared role only of adults who introduce themselves (children: team only), says so in the reply and deletes on CANCELLA; the declared role never unlocks reserved information"
+        ],
+        "implementation": {
+          "make_scenario": "7979437 'SCD · Segreteria AI · WhatsApp' (Make AI Tools on Make's AI Provider, plan credits)",
+          "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
+          "agent": ".claude/agents/scd-iride.md (owner) and .claude/agents/scd-segreteria.md (expert source)",
+          "agents_md_exception": "AGENTS.md divieti assoluti: 'unica eccezione: le risposte della Segreteria AI a chi ha scritto per primo, entro i limiti di UD-155' (Francesco 19:01)",
+          "register": "SCD_INTAKE_LOG",
+          "install_page": "/installa (Francesco 18:52): one-tap install, Iride card with avatar (file owned by the cloud chat, UD-139), vCard /iride.vcf, wa.me"
         }
       }
     }
