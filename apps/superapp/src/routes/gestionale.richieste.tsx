@@ -75,7 +75,7 @@ function IntakePage({ data }: { data: IntakeDesk }) {
           <Chip tone="warn">Funzione in preparazione</Chip>
         )
       }
-      note="Decide chi ha il ruolo; il DG conferma tutto. Nessuna mail automatica."
+      note="Decide chi ha il ruolo; il DG conferma tutto tranne affitti e visite (Presidente e Consiglio). Nessuna mail automatica."
       highlights={[
         { value: counts ? counts.RICEVUTA : null, label: "ricevute da guardare" },
         { value: counts ? counts.IN_VALUTAZIONE : null, label: "in valutazione" },
@@ -140,7 +140,8 @@ function IntakePage({ data }: { data: IntakeDesk }) {
                 "«Esterni Tally, soci app»: società, aziende, scuole e privati adulti usano un solo modulo Tally; soci e famiglie chiedono dall'app.",
                 "«Li crea la Tesoreria»: il link di pagamento lo crea una persona della Tesoreria, solo dopo «Accettata», e lo registra qui.",
                 "«DG conferma tutto» (13:31): il Direttore Generale conferma le richieste, tranne affitto campi e visite.",
-                "«Decide presidente e consiglio direttivo» (16:39): affitto dei campi e visite ai centri li decidono il Presidente e il Consiglio Direttivo.",
+                "«Decide presidente e consiglio direttivo» (16:39): affitto dei campi e visite ai centri li decidono il Presidente e il Consiglio Direttivo (in app: chi ha il ruolo Direzione).",
+                "«Preparo e inoltro» (16:55): su affitti e visite il DG prepara e inoltra.",
               ]}
             />
           </Card>
@@ -149,7 +150,7 @@ function IntakePage({ data }: { data: IntakeDesk }) {
               items={[
                 "Fasi: Ricevuta → In valutazione → Accettata o Non accolta → In gestione → Chiusa.",
                 "Chi decide gli altri tipi: tornei responsabile tornei, DG e Presidente; sponsor e convenzioni DG, Presidente e Consiglio; altro Segreteria, DG e Presidente.",
-                "Affitti e visite: il DG li segue e li inoltra; chi prepara e chi è informato per ogni tipo.",
+                "Chi prepara e chi è informato per ogni tipo.",
                 "Sponsor e convenzioni: contratto e fattura, nessun link di pagamento.",
                 "I recapiti hanno una scadenza (proposta: 6 o 12 mesi); la cancellazione automatica si attiva con un job da creare.",
                 "Al massimo 60 richieste all'ora dal modulo pubblico.",

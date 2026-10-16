@@ -63,9 +63,12 @@
 --
 -- Deciders. DECIDED by Francesco: «DG conferma tutto» (13:31), «Li crea la Tesoreria» (15:44: the payment link of an
 -- accepted request is created by a Tesoreria person) and, VERIFIED 16:39, «decide presidente e consiglio direttivo»
--- for AFFITTO_CAMPO and VISITA_CENTRO. The Consiglio Direttivo is the Direzione: role DIRECTION or position
--- 'direzione' (same convention as lib/chi-fa-cosa.ts BOARD_POSITION; the r138 catalogue codes 'consigliere' are not
--- membership positions). An account of the DG that also carries the role DIRECTION decides as a member of the
+-- for AFFITTO_CAMPO and VISITA_CENTRO. VERIFIED ~16:55: to the question "Per l'affitto del campo e le visite al
+-- centro decidono il Presidente e il Consiglio Direttivo... Nell'app il Consiglio Direttivo corrisponde a chi ha il
+-- ruolo «Direzione». Tu, come DG, su queste due richieste cosa fai?" Francesco answered «Preparo e inoltro»: the
+-- Consiglio Direttivo is the Direzione (role DIRECTION or position 'direzione', same convention as lib/chi-fa-cosa.ts
+-- BOARD_POSITION; the r138 catalogue codes 'consigliere' are not membership positions) and the DG prepares and
+-- forwards these two kinds. An account of the DG that also carries the role DIRECTION decides as a member of the
 -- Consiglio: the model cannot tell the two apart. Everything else below is PROPOSED: the other kinds' positions,
 -- the per-kind payment-link yes/no, the 60/hour cap and the contact retention periods. Per kind:
 --   ISCRIZIONE_TORNEO (tornei, PROPOSED): decide responsabile-tornei, DG, Presidente; prepare segreteria; inform
@@ -230,8 +233,9 @@ alter table public.scd_request_contacts enable row level security;
 revoke all on table public.scd_request_contacts from anon, authenticated;
 
 -- ---------------------------------------------------------------- 4. rules per kind (mirror of lib/intake-kinds.ts)
--- PROPOSED, to be confirmed by Francesco (design question 5 open; only «DG conferma tutto» and «Li crea la Tesoreria»
--- are decided): area, chi-fa-cosa topic, positions that decide / prepare / are informed / may own the accepted request, whether a
+-- Decided: «DG conferma tutto», «Li crea la Tesoreria», and for AFFITTO_CAMPO / VISITA_CENTRO the deciders
+-- (Presidente + Consiglio Direttivo, 16:39) and the DG as preparer («Preparo e inoltro», ~16:55), see the header.
+-- Everything else here is PROPOSED, to be confirmed by Francesco: area, chi-fa-cosa topic, positions that decide / prepare / are informed / may own the accepted request, whether a
 -- site (COLICO/DERVIO) is required and whether the Tesoreria may record a payment link (sponsors and convenzioni are
 -- invoiced by contract, never by link). NULL for AMICHEVOLE and unknown kinds.
 create or replace function public.scd_request_kind_rules(p_kind text)

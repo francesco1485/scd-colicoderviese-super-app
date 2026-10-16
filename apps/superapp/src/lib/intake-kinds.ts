@@ -65,8 +65,9 @@ export const INTAKE_SITE_LABEL: Readonly<Record<IntakeSite, string>> = { COLICO:
 /**
  * Decided by Francesco: «DG conferma tutto» (13:31), «Li crea la Tesoreria» (15:44, payment link by a Tesoreria person
  * after Accettata) and, VERIFIED 16:39, «decide presidente e consiglio direttivo» for AFFITTO_CAMPO and VISITA_CENTRO
- * (the DG handles and forwards them: preparer). The Consiglio Direttivo is the Direzione (position 'direzione' / role
- * DIRECTION, as BOARD_POSITION in chi-fa-cosa.ts). PROPOSED, to be confirmed: the deciders of the other kinds, every
+ * and, VERIFIED ~16:55, «Preparo e inoltro» (answer to: "Nell'app il Consiglio Direttivo corrisponde a chi ha il ruolo
+ * «Direzione». Tu, come DG, su queste due richieste cosa fai?"): the DG is a preparer of these two kinds, and the
+ * Consiglio Direttivo is the Direzione (position 'direzione' / role DIRECTION, as BOARD_POSITION in chi-fa-cosa.ts). PROPOSED, to be confirmed: the deciders of the other kinds, every
  * preparer/informed/owner list, the per-kind payment-link yes/no, the 60/hour ingest cap and the contact retention
  * periods. No threshold under which the DG decides alone: not decided, not implemented.
  */
