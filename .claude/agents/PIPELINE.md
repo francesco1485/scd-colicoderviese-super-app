@@ -46,6 +46,9 @@ Struttura decisa da Francesco: **un solo link** (app.colicoderviese.it) che fa d
 
 Squadre in parallelo: le piattaforme indipendenti si lavorano insieme, una per ramo; dentro una piattaforma la catena è in sequenza. Le cose chieste prima (lavanderia, pulizia, spogliatoi, affitto campi, conti correnti, enti) restano da collocare in una delle 26 su indicazione di Francesco.
 
+### Miglioramento continuo (Francesco 16/10 23:23)
+Ogni piattaforma ha una scheda viva in `docs/piattaforme/NN-*.md`, memoria del suo responsabile. Il ciclo notturno «SCD Cantiere piattaforme» (attività programmata) lavora due piattaforme per notte secondo `docs/piattaforme/ROTAZIONE.md`: stato reale → benchmark delle migliori piattaforme al mondo → nozioni con fonte → visione a 3 mesi → prossimo passo costruito su un ramo con test, foto e PASS × 2 → richieste alle altre piattaforme → riga in `REGISTRO.md`. Nulla va online senza «pubblica» di Francesco.
+
 ## 1. Sequenza (dall'idea al sito vero)
 
 | Passo | Agente | Obbligatorio? | Perché |
