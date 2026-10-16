@@ -897,3 +897,9 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Scenario promemoria creato SPENTO: 8003125 «SCD · Iride · Promemoria DG» (ogni 6 ore quando acceso); si accende solo con OK di Francesco.
 - UD-164 → `APPLIED_TO_LIVE_7979437`; manifest: Iride live v4. Nessun messaggio WhatsApp inviato e nessuna esecuzione lanciata da Claude.
 - 18:45: promemoria 8003125 ACCESO dopo l'OK di Francesco («Sì, accendilo»). Il promemoria resta uno solo per richiesta; la soglia delle 48 ore è PROPOSED.
+
+## 2026-10-16 ~22:00 — chat cloud — home "Con noi, a bordo campo" e più colori (UD-143)
+- Francesco 21:43: promo a rotazione in fondo alla home (sponsor di bordo campo con «Scrivici e ti ricontattiamo» → /sponsor#proposta; Sky nella divisa gara con gli sponsor ogni due giorni; «Sostieni i nostri colori»; convenzioni solo quelle che annuncia, oggi nessuna). Regole pure in `src/lib/home-promos.ts` (giorno di Roma), fascia `src/components/home/HomeBordoCampo.tsx`; pausa, stop con mouse/focus/scheda nascosta, mai in movimento con movimento ridotto. Eccezione a UD-152 e UD-151 solo per questa fascia (UD-143).
+- Francesco 21:54 «cerca di mettere anche altri colori»: fasce azzurro e sole in finitura metallo (`.scd-band-azzurro`, `.scd-band-sole`, pulsante `.scd-navy-btn`), toni in `src/components/home/tones.ts`; slide «In primo piano» a colori alterni (azzurro, blu, sole). Contrasti ≥ 4,5:1.
+- Super Giornalista: ogni mattina il post social gemello della fascia con lo sponsor del giorno taggato (solo bozza; pubblicazione quando Francesco collega un account social). Attività programmata aggiornata.
+- Ledwall: con movimento ridotto spento di nuovo il tabellone non resta su un vecchio fermo-immagine; registro asset: `use` dei video anteprima LED aggiornato.

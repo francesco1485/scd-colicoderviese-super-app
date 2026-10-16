@@ -14,8 +14,12 @@
  * Copy can change at will (Francesco: «puoi decidere tu la grafica e il messaggio e cambiarlo quanto vuoi»).
  */
 import { SPONSORS, type Sponsor } from "@/lib/sponsors";
+import type { Tone } from "@/components/home/tones";
 
 export type PromoKind = "bordo-campo" | "sky" | "colori" | "convenzione";
+
+/** Routes a promo may link to (all public and existing). */
+export type PromoRoute = "/sponsor" | "/kit" | "/calendario";
 
 export interface Convenzione {
   id: string;
@@ -24,7 +28,7 @@ export interface Convenzione {
   title: string;
   text: string;
   /** Where the visitor goes (internal path); defaults to the sponsor page. */
-  href?: string;
+  href?: PromoRoute;
   /** Inclusive Rome days, YYYY-MM-DD. */
   from: string;
   until: string;
@@ -42,8 +46,10 @@ export interface Promo {
   kicker: string;
   title: string;
   text: string;
-  cta: { label: string; to: string; hash?: string };
-  secondary?: { label: string; to: string };
+  cta: { label: string; to: PromoRoute; hash?: string };
+  secondary?: { label: string; to: PromoRoute };
+  /** Colour of the band (Francesco 21:54 «anche altri colori»). */
+  tone: Tone;
   /** Sponsor shown big (sponsor of the day / convention partner). */
   sponsor?: Sponsor;
 }
@@ -107,6 +113,7 @@ export function promosForDay(
     {
       kind: "bordo-campo",
       id: "bordo-campo",
+      tone: "navy",
       kicker: "A bordo campo",
       title: "Questi sono i nostri sponsor",
       text: "Ci sostengono a bordo campo, partita dopo partita. Vuoi farlo anche tu? Scrivici e ti ricontattiamo.",
@@ -119,6 +126,7 @@ export function promosForDay(
     out.push({
       kind: "sky",
       id: "sky-divisa",
+      tone: "azzurro",
       kicker: "Sky in divisa",
       title: "Sulla maglia, chi crede in noi",
       text: "Sky veste la divisa gara con i marchi delle aziende che sostengono la ColicoDerviese. Vuoi esserci anche tu? Scrivici e ti ricontattiamo.",
@@ -127,8 +135,9 @@ export function promosForDay(
   out.push({
     kind: "colori",
     id: "nostri-colori",
+    tone: "sole",
     kicker: "Sostieni i nostri colori",
-    title: "Il blu e il giallo, anche fuori dal campo",
+    title: "I nostri colori, anche fuori dal campo",
     text: "Indossa il kit 2026/27, vieni a tifare alle partite in casa, porta la tua azienda a bordo campo.",
     cta: { label: "Scopri il kit", to: "/kit" },
     secondary: { label: "Partite in casa", to: "/calendario" },
@@ -137,6 +146,7 @@ export function promosForDay(
     out.push({
       kind: "convenzione",
       id: `convenzione-${c.id}`,
+      tone: "azzurro",
       kicker: "Convenzione",
       title: c.title,
       text: c.text,

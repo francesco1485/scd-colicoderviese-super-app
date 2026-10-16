@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 
 import { LogoTile, SponsorLogo } from "@/components/scd/Logos";
 import { nextIndex } from "@/components/home/HomeSlides";
+import { TONES } from "@/components/home/tones";
 import { promosForDay, sponsorWindow, type Promo } from "@/lib/home-promos";
 import { sponsorLabel } from "@/lib/sponsors";
 
@@ -19,14 +20,14 @@ const ADVANCE_MS = 8000;
 const SKY_SRC = "/media/brand/sky-atv-cut.webp";
 const KIT_SRC = "/media/kit/kit-2026-27-blu.webp";
 const CTA =
-  "scd-gold scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-4 font-display text-[15px] font-semibold";
+  "scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-4 font-display text-[15px] font-semibold";
 const GHOST =
-  "scd-focus inline-flex min-h-11 items-center rounded-[10px] px-3 font-display text-[15px] font-semibold text-white underline-offset-4 hover:underline";
+  "scd-focus inline-flex min-h-11 items-center rounded-[10px] px-3 font-display text-[15px] font-semibold underline-offset-4 hover:underline";
 
 function Visual({ p, day }: { p: Promo; day: string }) {
   if (p.kind === "sky")
     return (
-      <span className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_50%_40%,rgb(127_208_255/0.35),transparent_62%)]">
+      <span className={`absolute inset-0 grid place-items-center ${TONES[p.tone].glow}`}>
         <img
           src={SKY_SRC}
           alt="Sky, la mascotte del club, nella divisa gara con i marchi degli sponsor"
@@ -38,7 +39,7 @@ function Visual({ p, day }: { p: Promo; day: string }) {
     );
   if (p.kind === "colori")
     return (
-      <span className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_50%_40%,rgb(255_216_74/0.22),transparent_62%)]">
+      <span className={`absolute inset-0 grid place-items-center ${TONES[p.tone].glow}`}>
         <img
           src={KIT_SRC}
           alt="Kit ufficiale ColicoDerviese 2026/27"
@@ -62,7 +63,7 @@ function Visual({ p, day }: { p: Promo; day: string }) {
     <span className="absolute inset-0 grid content-center gap-3 p-4 lg:p-6">
       {p.sponsor && (
         <span className="grid gap-1.5">
-          <span className="font-display text-[11px] font-bold uppercase tracking-[0.1em] text-[#ffd84a]">Oggi in primo piano</span>
+          <span className={`font-display text-[11px] font-bold uppercase tracking-[0.1em] ${TONES[p.tone].kicker}`}>Oggi in primo piano</span>
           <LogoTile className="h-[78px] w-full p-3 lg:h-[96px]">
             <SponsorLogo sponsor={p.sponsor} box={{ w: 200, h: 64 }} />
           </LogoTile>
@@ -109,6 +110,7 @@ export function HomeBordoCampo({ day }: { day: string }) {
   if (n === 0) return null;
   const i = Math.min(active, n - 1);
   const p = promos[i]!;
+  const t = TONES[p.tone];
   const btn =
     "scd-focus grid size-11 place-items-center rounded-full border border-[#c3cee0] bg-white text-[#13254d] hover:bg-[#eef2f8]";
 
@@ -162,22 +164,23 @@ export function HomeBordoCampo({ day }: { day: string }) {
         aria-roledescription="slide"
         aria-label={`${i + 1} di ${n}: ${p.title}`}
         data-promo={p.id}
-        className="scd-band grid overflow-hidden rounded-[14px] text-white shadow-[0_10px_24px_-16px_rgb(15_29_61/0.8)] ring-1 ring-[#b8c5dd]/30 lg:grid-cols-[minmax(0,1fr)_minmax(0,42%)]"
+        data-tone={p.tone}
+        className={`${t.band} grid overflow-hidden rounded-[14px] shadow-[0_10px_24px_-16px_rgb(15_29_61/0.8)] ring-1 ring-[#b8c5dd]/30 lg:grid-cols-[minmax(0,1fr)_minmax(0,42%)]`}
       >
         <div className="flex flex-col gap-1.5 p-4 lg:justify-center lg:gap-2 lg:p-7">
-          <span className="font-display text-[11px] font-bold uppercase tracking-[0.1em] text-[#ffd84a] lg:text-[12px]">{p.kicker}</span>
+          <span className={`font-display text-[11px] font-bold uppercase tracking-[0.1em] ${t.kicker} lg:text-[12px]`}>{p.kicker}</span>
           <h3 className="m-0 font-display text-[22px] font-bold leading-[1.05] lg:text-[28px]">{p.title}</h3>
-          <p className="m-0 text-[14px] leading-snug text-[#dbe5f7] lg:text-[16px]">{p.text}</p>
+          <p className={`m-0 text-[14px] leading-snug ${t.body} lg:text-[16px]`}>{p.text}</p>
           {p.kind === "bordo-campo" && p.sponsor && (
-            <p className="m-0 text-[13px] text-[#b4c3de]">Oggi in primo piano: {sponsorLabel(p.sponsor)}</p>
+            <p className={`m-0 text-[13px] ${t.muted}`}>Oggi in primo piano: {sponsorLabel(p.sponsor)}</p>
           )}
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <Link to={p.cta.to as never} {...(p.cta.hash ? { hash: p.cta.hash } : {})} className={CTA} data-testid={`promo-cta-${p.kind}`}>
+            <Link to={p.cta.to} {...(p.cta.hash ? { hash: p.cta.hash } : {})} className={`${t.cta} ${CTA}`} data-testid={`promo-cta-${p.kind}`}>
               {p.cta.label}
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
             {p.secondary && (
-              <Link to={p.secondary.to as never} className={GHOST}>
+              <Link to={p.secondary.to} className={`${t.ghost} ${GHOST}`}>
                 {p.secondary.label}
               </Link>
             )}
@@ -189,7 +192,7 @@ export function HomeBordoCampo({ day }: { day: string }) {
       </div>
 
       <p className="sr-only" aria-live="polite">
-        {paused || holding || still ? `Promozione ${i + 1} di ${n}: ${p.title}` : ""}
+        {paused || still ? `Promozione ${i + 1} di ${n}: ${p.title}` : ""}
       </p>
       {n > 1 && (
         <ol className="m-0 mt-2 flex list-none justify-center gap-0 p-0" aria-label="Scegli la promozione">

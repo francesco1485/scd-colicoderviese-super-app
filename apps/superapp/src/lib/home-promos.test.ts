@@ -79,3 +79,20 @@ describe("home promo band (UD-143)", () => {
     expect(lobby.indexOf("<HomeBordoCampo")).toBeGreaterThan(lobby.indexOf("<MonthCard"));
   });
 });
+
+describe("more club colours (Francesco 16/10 21:54)", () => {
+  it("gives each promo its own tone and cycles the slides through navy, azzurro and sole", async () => {
+    const { slideTone } = await import("@/components/home/HomeSlides");
+    const { TONES, toneAt } = await import("@/components/home/tones");
+    const tones = Object.fromEntries(promosForDay("2026-10-16").map((p) => [p.kind, p.tone]));
+    expect(tones["bordo-campo"]).toBe("navy");
+    expect(tones.colori).toBe("sole");
+    expect([slideTone(0), slideTone(1), slideTone(2)]).toEqual(["azzurro", "navy", "sole"]);
+    expect([toneAt(3), toneAt(4), toneAt(-1)]).toEqual(["navy", "azzurro", "sole"]);
+    // Gold on the yellow band would vanish: the sole band uses the navy button and navy text.
+    expect(TONES.sole.cta).toBe("scd-navy-btn");
+    expect(TONES.sole.band).toContain("text-[#13254d]");
+    const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+    for (const c of [".scd-band-azzurro", ".scd-band-sole", ".scd-navy-btn"]) expect(css).toContain(c);
+  });
+});
