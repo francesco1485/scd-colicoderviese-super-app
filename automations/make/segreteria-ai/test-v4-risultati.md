@@ -7,6 +7,12 @@ Esito attuale: **T1–T15 PASS dopo la revisione** (giro «R») e **T8c corretto
 Approvazioni: «ok Iride v4» (16:31) e «Sì, accendi la copia» (16:42). Le copie di test sono state attivate solo durante i test e ora sono **spente**: 8000995 isActive=false, 8001010 isActive=false (VERIFIED con scenarios_get).
 Non toccati: scenario 7979437 (lastEdit 2026-10-16T11:03Z, invariato), data store 220276, altri scenari. Nessun messaggio o mail reale inviato, nessuna riga scritta in INTAKE_LOG.
 
+## Go-live 16/10/2026 e T13 ripetuto (conservazione «cancella tutto»)
+Francesco ~18:20: «La accendo su Iride vera? Prima faccio un salvataggio... Il promemoria al DG lo creo spento.» → «Sì, accendi v4»; «A fine stagione, le richieste di amichevole a cui non hai mai risposto le cancello anche loro?» → «Sì, cancella tutto».
+- Conservazione: il ramo 2 dello scenario promemoria non esclude più `stato` = IN_ATTESA_DG; cancella ogni richiesta con codice «AM-» creata prima dell'ultimo 30 giugno (mai il CONTATORE). Unica modifica: tolta la condizione `stato ≠ IN_ATTESA_DG` dal modulo 6.
+- T13 ripetuto sulla copia spenta 8001010 (accesa solo per il giro, poi spenta, isActive=false VERIFIED): AM-0095 CONFERMATA e AM-0094 IN_ATTESA_DG con `creato_il` 01/10/2025 → **entrambe cancellate**; CONTATORE (numero 11) e le 12 richieste di questa stagione intatte. Solo data store di prova 221454/221474, nessun numero vero. Esito **PASS** · execution e4990482df4744bbb69034be8ae5e02d.
+- Live: salvataggio completo dello scenario 7979437 (v3, attivo, «immediately») prima dell'aggiornamento; v4 applicato alle 18:35 (16:35:18Z); scenarios_get dopo: blueprint identico al file testato, isActive=true. Scenario promemoria creato **spento**: 8003125 «SCD · Iride · Promemoria DG».
+
 ## Revisione 16/10/2026 · correzioni dei rilievi e nuovo giro di test «R» (17:47–17:59 ora italiana)
 Esito: **tutti i casi T1–T15 PASS** sulla versione corretta (con le note sotto). Copie attivate solo durante i test e poi **spente** (8000995 isActive=false, 8001010 isActive=false, VERIFIED con scenarios_get alla fine). Prima di ogni attivazione: scenarios_get della copia confrontato con il file locale (IDENTICO), nessun modulo WhatsApp/mail/Sheets, solo data store 221454/221455/221474 e webhook 3917667. Data store reale 221453: solo CONTATORE, mai scritto. Scenario live 7979437 e rubrica 220276 non toccati.
 

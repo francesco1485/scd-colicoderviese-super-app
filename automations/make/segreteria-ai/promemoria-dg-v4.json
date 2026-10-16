@@ -1,5 +1,5 @@
 {
- "name": "SCD · Iride · Promemoria conferme DG (48 ore) e pulizia fine stagione",
+ "name": "SCD · Iride · Promemoria DG",
  "flow": [
   {
    "id": 4,
@@ -125,11 +125,6 @@
            "a": "codice",
            "o": "text:startwith",
            "b": "AM-"
-          },
-          {
-           "a": "stato",
-           "o": "text:notequal",
-           "b": "IN_ATTESA_DG"
           },
           {
            "a": "creato_il",
