@@ -26,7 +26,8 @@ Decisione di Francesco del 16/10/2026: agenti in sequenza dall'inizio alla fine,
 | Multimedia | scd-avatar, scd-social, scd-ledwall, scd-comunicazione | Video, personaggi, LED, contenuti |
 | Crescita | scd-crescita, scd-community, scd-territorio, scd-sociale | Idee virali, eventi, coinvolgimento |
 | Mondo Google | scd-google, scd-mail, scd-documenti, scd-segreteria | Posta, calendari, Drive, fogli |
-| Soldi | scd-commerciale, scd-sponsor, scd-tesoreria, scd-cfo, scd-bandi | Sponsor, cassa, bandi |
+| Soldi | scd-commerciale, scd-sponsor, scd-tesoreria, scd-cfo, scd-bandi, scd-rendicontazione | Sponsor, cassa, bandi, rendiconti |
+| Consiglio esperto | scd-legale, scd-diritto-sport-lavoro, scd-rendicontazione, skill scd-direzione-amministrativa | Quando serve un parere: si interrogano, non decidono |
 | Campo | scd-squadre, scd-atleti, scd-impianti, scd-pulmini, scd-tornei | Calendari, allenamenti, mezzi, tornei |
 | Skill | scd-skill | Ogni settimana: nuove skill o migliorie dalle richieste ripetute |
 
@@ -42,11 +43,11 @@ Francesco 16/10 08:14: agenti in serie presenti in ogni piattaforma del gestiona
 
 | Piattaforma | Ingresso | Responsabile | Supporto | Parla con |
 | --- | --- | --- | --- | --- |
-| Segreteria e persone | posta, Iride, Tally, portale FIGC | scd-segreteria | scd-tesserati, scd-figc-lnd, scd-documenti | Tesoreria, Squadre, Infermeria |
+| Segreteria e persone | posta, Iride, Tally, portale FIGC | scd-segreteria | scd-tesserati, scd-figc-lnd, scd-documenti, scd-diritto-sport-lavoro | Tesoreria, Squadre, Infermeria |
 | Squadre, allenamenti, calendario | Master Calendario, Quadro allenamenti, C.U. | scd-squadre | scd-atleti, scd-impianti | Pulmini, Impianti, Comunicazioni, Google Calendar |
 | Impianti e rotazione campi | richieste in app, Comuni | scd-impianti | scd-squadre, scd-negoziazione | Squadre, Tornei, Calendar |
 | Pulmini | master flotta, richieste posto | scd-pulmini | scd-squadre | Squadre, Tesoreria, Calendar |
-| Tesoreria e fornitori | gestionale quote, banca, fornitori | scd-tesoreria | scd-cfo | Segreteria, Magazzino, Direzione |
+| Tesoreria e fornitori | gestionale quote, banca, fornitori | scd-tesoreria | scd-cfo, scd-rendicontazione | Segreteria, Magazzino, Direzione |
 | Magazzino e kit | ordine kit, consegne | scd-magazzino | scd-tesoreria | Segreteria, Shop |
 | Infermeria e tutela | certificati, appuntamenti (solo numeri) | scd-infermeria | scd-legale | Segreteria, Squadre |
 | Sponsor, partner, LED | CRM, contratti, spot | scd-commerciale | scd-sponsor, scd-ledwall | Comunicazioni, Tesoreria, Tornei |

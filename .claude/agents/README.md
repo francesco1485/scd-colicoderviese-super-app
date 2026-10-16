@@ -1,6 +1,6 @@
 # Agenti SCD
 
-Quarantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Quarantacinque agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
@@ -43,6 +43,8 @@ Quarantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. C
 | scd-centralino | Ingresso unico richieste (mail, WhatsApp, telefono), schede, tempi di risposta |
 | scd-community | Famiglie, eventi, fantacalcio, Top11, volontari, partecipazione |
 | scd-ledwall | LED wall del campo: formati, playlist, rotazione sponsor, rapporto di visibilità |
+| scd-diritto-sport-lavoro | Diritto sportivo (NOIF, giustizia sportiva, tesseramenti, svincoli) e del lavoro sportivo (lavoratori sportivi, collaboratori, volontari, rimborsi): consiglio, non decide |
+| scd-rendicontazione | Rendiconto e bilancio, rendicontazione di bandi e contributi, 5x1000, rapporti per gli sponsor |
 | scd-legale | Riforma dello sport, RASD, statuto, GDPR, contratti, assicurazioni (non sostituisce l'avvocato) |
 | scd-cfo | Budget, flusso di cassa a 13 settimane, costo per atleta, scenari, indicatori |
 | scd-commerciale | SCD GROW: listino diritti, proposte, metodo di vendita, rinnovi, ritorno per gli sponsor |

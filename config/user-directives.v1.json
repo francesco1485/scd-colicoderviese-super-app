@@ -3464,6 +3464,29 @@
           "install_page": "/installa (Francesco 18:52): one-tap install, Iride card with avatar (file owned by the cloud chat, UD-139), vCard /iride.vcf, wa.me"
         }
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "08:31",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-141",
+      "name": "CALENDAR_WHO_MUST_KNOW_AND_HIERARCHY",
+      "sourceQuoteFragments": [
+        "chi gestisce il Google calendar deve quando c'è una variazione avvisare chi deve saperlo",
+        "quando arriva una richiesta va avvisato chi deve sapere e nel frattempo sempre il direttore generale",
+        "se chi scrive a iride e ha ruolo dirigente fino a Mister da presidente a scendere chiede di inserire appuntamento",
+        "se superiore inserisce e viene accettata anche chi è sotto arriva notifica così sa"
+      ],
+      "context": "Francesco 16/10/2026 08:31 (chat cloud), refining the Google agent (scd-google) and Iride. Standing approval for internal notifications to adults with a club role through the club calendar and the app; WhatsApp/mail channels of Iride remain chat PC area and need their own approved setup.",
+      "normalizedCommand": {
+        "rule": "Calendar 'SCD Programma 2026/27': every variation notifies the people concerned and always the Direttore Generale; every new request notifies who decides or prepares (UD-154 chain) and always the Direttore Generale; an appointment asked by a person with a club role (Presidente down to mister, recognised against the registry) is inserted as confirmed when the requester is the superior of the people involved (they get a notification), as 'da confermare' with a request to the superior when the requester is below (others notified after acceptance), confirmed when equal. Only adults with a club role; never families, minors or external people; no health details, minors' names or money amounts.",
+        "appliesTo": [
+          ".claude/agents/scd-google.md",
+          ".claude/agents/PIPELINE.md",
+          "automations/make/segreteria-ai (chat PC)"
+        ]
+      }
     }
   ],
   "completionGate": {
