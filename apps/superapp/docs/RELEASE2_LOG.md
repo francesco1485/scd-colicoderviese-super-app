@@ -676,6 +676,8 @@ Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anc
 - Barra sponsor: si ferma sotto il puntatore o il dito; con "riduci movimento" è ferma. Test `home-motion.test.tsx`: la home non si muove mai da sola con "riduci movimento".
 - Da decidere: pulsante di pausa da tastiera per la barra sponsor (linguetta "Sponsor").
 - Revisione: scd-revisore PASS (note applicate: `flex-wrap` sui puntini), scd-sicurezza PASS.
+- Stato: DONE, commit `47cadb5` + `6a07dc2` + `9792f2e` (merge `bdd8b06`), **pubblicato** 15/10 14:29 (Render `dep-db8cdhivcj2c739054f0`, live). Controllo sul sito reale 390/1440 su /, /sponsor, /sostieni, /tornei, /pulmini, /ledwall/player: HTTP 200, nessun errore in console, nessuno scroll orizzontale; axe sul sito reale: 0 violazioni e 0 bersagli piccoli su /, /sponsor, /sostieni, /tornei (sul player live l'audit non arriva a "rete ferma" entro 30 s; in locale 0).
+- Prima di questo lavoro: staging (`aa108d7`, chat cloud) era avanti rispetto al live; pubblicato con Render `dep-db8c128u01pc73f90bf0`.
 
 
 
@@ -748,3 +750,19 @@ Backlog cloud B4. Motori: PERSONE (famiglie e tifosi leggono e toccano tutto anc
 - Home (`components/home/HomeLobby.tsx`): pillole delle squadre che giocano la settimana + Calendario + Eventi e tornei; un solo riquadro fisso "La gara della settimana" (monogramma del kit, scheda bianca, un pulsante); "In programma questa settimana" con schede gara di tutte le squadre e filtri; "Dal club" (locandina Christmas Lario Cup, kit 2026/27); "Per te" (telefono); "Perché la ColicoDerviese" (riconoscimenti verificati, squadre in calendario, campi); colonna destra su computer "Entra nel club". Nessun carosello, nessuna vetrina, nessuna mascotte; dati solo dal calendario pubblico.
 - Fondo pagina in tre fasce (riconoscimenti, club/contatti/app, note legali), sempre senza indice di pagine (UD-116).
 - Tolti: lago disegnato, quattro riquadri grandi, pannello sponsor duplicato, "Mondo Colico", elenco gare della vecchia Home. Catalogo immagini su Drive individuato (cartella ASSET UFFICIALI: maglie, motivo C, lago, forte), da usare nei prossimi passi con l'ok di Francesco.
+
+## B7 — Vera "come arrivo al campo?": indirizzo e link Maps di Colico e Dervio · 2026-10-16
+
+Backlog cloud B7. Motori: PERSONE (una famiglia o un nonno che chiede la strada riceve subito indirizzo e "Portami a … con Maps") e TEMPO (meno telefonate alla segreteria per la strada; nessuna chiamata al modello per questa domanda).
+- Nuovo `lib/club-directions.ts`: indirizzi dei due centri (SED-COL Via Lido SNC, Colico; SED-DER Via Guglielmo Marconi 1, Dervio) letti solo dal master `config/scd-facilities.v1.json`; senza via confermata niente link e "indirizzo in verifica", mai una via inventata. Se la domanda nomina Colico o Dervio risponde solo per quel centro, altrimenti per entrambi; trasferte e "contro …" restano all'assistente generale (la sede è nella gara del calendario).
+- Vera (`assistant.server.ts`): le domande sulla strada per i nostri campi ricevono sempre la risposta fissa con via + link Maps, non una parafrasi del modello. Motore a regole (`sky.functions.ts`): la stessa risposta prima degli intenti gara (prima "dove" rispondeva solo "Siamo a Colico (LC) · Alto Lago di Como").
+- Link Maps unico (`lib/maps-link.ts`, senza dati importati) per la scheda "Come arrivare" di /impianti e per il contesto di Vera: stesso URL di prima su /impianti (verificato 390/1440), nessun cambiamento visivo.
+- Test `club-directions.test.ts` (16): domanda "come arrivo al campo?" con via, comune e link Maps di Colico e Dervio; riconoscimento domande; trasferte escluse; niente link senza via; stesso link nel contesto di Vera.
+- Revisione 1: scd-sicurezza PASS (nota: "dove" generico non deve dare le vie); scd-revisore BLOCK (e-mail/PEC/sede legale, "come vengo iscritto", pulmino/kit, campo di un altro comune) → corretto: serve un luogo fisico nostro, esclusi contatti, iscrizioni, pulmini, kit/maglie, trasferte, partite senza "in casa" e "campo di <altro comune>"; il "dove" generico del motore a regole rimanda a Impianti e Calendario; 17 casi negativi e 3 test su `answerPublic` (niente modello né contesto per la strada; safeguarding prima; contatti al modello).
+- Gate: tsc, vitest 167 file / 1854 test, build, test:bundle 11/11, test:manifest PASS, test:claude-hooks 8/8.
+
+## 16/10/2026 07:00 · Chat cloud: Home come pagina social del club (ramo feat/cloud-grafica)
+- Francesco 05:59 (loghi in alto con link CR Lombardia e Monza, niente partita singola grande, annate e anni di nascita, fondo pagina leggero), 06:21 (barra stile Facebook, tocchi Instagram e TikTok, calendario forte solo da venerdì), 06:35 (effetto «fammi iscrivere», 99% telefono, spazio Pixellot), 06:51 «concentriamoci su creare la home e renderla pubblica», 06:55 «andiamo a mille per pubblicare».
+- Home (`components/home/HomeLobby.tsx`): profilo del club in alto come una pagina Facebook/Instagram (copertina con la foto ufficiale del lago senza campo né persone, stemma come immagine profilo, numeri veri: squadre e gare in calendario, riconoscimenti; Iscriviti / Messaggio a Iride / Accedi; i tre riconoscimenti con i link ufficiali); cerchi delle squadre con gli anni di nascita (scorciatoie al calendario, non storie); barra che scorre con le prossime gare; schede Post · Partite · Video (da venerdì a domenica si apre su Partite, dal lunedì al giovedì su Post); post del club con «Mi piace» e «Commenta» che portano all'iscrizione; riquadro «Solo per chi è dentro»; spazio dirette Pixellot con le gare in casa a Colico.
+- File del prompt di Iride riportato com'è su staging (area della chat PC).
+

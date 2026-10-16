@@ -41,6 +41,7 @@ import {
 } from "./assistant";
 import { EMPTY_CAST_FACTS, castAreaContext, isChatArea, isOperationalFor, isTicketRequest, type CastFacts } from "./cast-personas";
 import { detectDistress } from "./cast-safety";
+import { directionsReply, isClubDirectionsQuestion } from "./club-directions";
 import type { KbResult } from "./knowledge";
 import { REQUEST_RE, skyIntent, type SkyReply } from "./sky.functions";
 
@@ -165,6 +166,8 @@ export async function answerPublic(input: PublicAnswerInput, deps: PublicDeps): 
   const area = persona === "vera" && isChatArea(input.area) ? input.area : null;
   const rules = async () => asReply(await deps.rules({ message: input.message, persona, area }), persona, area);
   if (bypassesModel(input.message, area) || !cfg.enabled) return rules();
+  // Directions to our own pitches (B7): always the master's street + Maps link, never a model paraphrase.
+  if (isClubDirectionsQuestion(input.message)) return asReply(directionsReply(input.message), persona, area);
   const rl = publicLimiter.hit(limiterKey("ip", input.ip), (deps.now ?? Date.now)());
   if (!rl.ok) return { text: rateLimitedText(rl.retryAfterSec), mood: "alert", links: [{ label: "Contatti", to: "/contatti" }], ai: false, persona, area };
   let ctx: BuiltContext;
