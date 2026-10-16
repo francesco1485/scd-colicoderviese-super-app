@@ -86,7 +86,7 @@ describe("more club colours (Francesco 16/10 21:54)", () => {
     const { TONES, toneAt } = await import("@/components/home/tones");
     const tones = Object.fromEntries(promosForDay("2026-10-16").map((p) => [p.kind, p.tone]));
     expect(tones["bordo-campo"]).toBe("navy");
-    expect(tones.colori).toBe("sole");
+    expect(tones["colori"]).toBe("sole");
     expect([slideTone(0), slideTone(1), slideTone(2)]).toEqual(["azzurro", "navy", "sole"]);
     expect([toneAt(3), toneAt(4), toneAt(-1)]).toEqual(["navy", "azzurro", "sole"]);
     // Gold on the yellow band would vanish: the sole band uses the navy button and navy text.

@@ -36,7 +36,7 @@ export const TONES: Readonly<Record<Tone, ToneClasses>> = {
   },
   sole: {
     band: "scd-band-sole text-[#13254d]",
-    kicker: "text-[#0457af]",
+    kicker: "text-[#034a96]",
     body: "text-[#1c2c50]",
     muted: "text-[#3a4a6b]",
     cta: "scd-navy-btn",
