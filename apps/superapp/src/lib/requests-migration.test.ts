@@ -60,14 +60,15 @@ describe("r133 request machine (staged, not applied)", () => {
     expect(body).toContain("least(now() + interval '15 days', r.proposed_starts_at)");
   });
 
-  it("maps groups to confirmer positions exactly like REQUEST_CONFIRMERS (registry positions only)", () => {
-    const fn = body.match(/function public\.scd_request_group_confirmers[\s\S]*?\$\$;/)?.[0] ?? "";
+  it("maps groups to confirmer positions exactly like REQUEST_CONFIRMERS (registry positions only, latest file r138)", () => {
+    const r138 = read("../../../../supabase/migrations/20261016_r138_position_catalog.sql");
+    const fn = r138.match(/function public\.scd_request_group_confirmers[\s\S]*?\$\$;/)?.[0] ?? "";
     const branches = [...fn.matchAll(/when p_team_key in \(([^)]*)\) then array\[([^\]]*)\]/g)];
     expect(branches).toHaveLength(REQUEST_CONFIRMERS.length);
     for (const b of branches) {
       const groups = [...b[1]!.matchAll(/'([^']+)'/g)].map((m) => m[1]!);
       const positions = [...b[2]!.matchAll(/'([^']+)'/g)].map((m) => m[1]!);
-      for (const g of groups) expect(dbConfirmerPositions(g), g).toEqual(positions);
+      for (const g of groups) expect(dbConfirmerPositions(g, true), g).toEqual(positions);
     }
     const all = branches.flatMap((b) => [...b[1]!.matchAll(/'([^']+)'/g)].map((m) => m[1]));
     expect(all.sort()).toEqual(REQUEST_CONFIRMERS.flatMap((r) => r.groups).sort());

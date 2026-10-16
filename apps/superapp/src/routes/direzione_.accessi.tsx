@@ -1,7 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { KeyRound, ListChecks, Search, ShieldCheck, UserPlus, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
@@ -23,7 +23,7 @@ import {
 } from "@/lib/access-admin";
 import { getAccessAdmin, grantPersonAccess, revokeLink, setAccess, setTeams, type AccessAdminData } from "@/lib/access-admin.functions";
 import { getPeople, type PeopleData } from "@/lib/people.functions";
-import type { DbRole } from "@/lib/session";
+import { positionLive, type DbRole } from "@/lib/session";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /**
@@ -50,6 +50,9 @@ function AccessiRoute() {
   );
 }
 
+/** r138 live on the database (server-verified, AccessAdminData.r138Live): until then the r138 positions are not offered. */
+const R138Live = createContext(false);
+
 const ROLE_TONE: Partial<Record<DbRole, ChipTone>> = { DIRECTION: "crit", SECRETARIAT: "warn", MISTER: "info", MANAGER: "info", STAFF: "mute", FAMILY: "ok", ATHLETE: "ok" };
 const inputCls = "h-11 w-full rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[15px] text-[var(--in-ink)] outline-none focus:border-[var(--in-info)]";
 
@@ -72,6 +75,7 @@ function AccessiPage({ initial, people, preview }: { initial: AccessAdminData; p
   }
 
   return (
+    <R138Live.Provider value={data.r138Live === true}>
     <WorkAreaShell
       id="accessi"
       preview={preview}
@@ -193,6 +197,7 @@ function AccessiPage({ initial, people, preview }: { initial: AccessAdminData; p
       )}
       {granting && <GrantDialog people={people} actorRole={data.actorRole} onClose={() => setGranting(false)} onDone={async () => { setGranting(false); await refresh(); }} />}
     </WorkAreaShell>
+    </R138Live.Provider>
   );
 }
 
@@ -222,13 +227,16 @@ function AuditCard({ audit }: { audit: AccessAdminData["audit"] }) {
 }
 
 function PositionsPicker({ value, onChange, allowed }: { value: string[]; onChange: (v: string[]) => void; allowed: readonly string[] }) {
+  const live = useContext(R138Live);
   const toggle = (p: string) => onChange(value.includes(p) ? value.filter((x) => x !== p) : [...value, p]);
   return (
     <fieldset className="m-0 min-w-0 border-0 p-0">
       <legend className="mb-1 text-[15px] font-semibold">Aree in più</legend>
       <p className="m-0 mb-2 text-[13px] text-[var(--in-sub)]">Si aggiungono a quelle del ruolo. Esempio: un dirigente che guida il pulmino riceve "Autista".</p>
       <div className="grid gap-3">
-        {POSITION_GROUPS.map((g) => (
+        {POSITION_GROUPS.map((g) => ({ ...g, ids: g.ids.filter((p) => positionLive(p, live) || value.includes(p)) }))
+          .filter((g) => g.ids.length > 0)
+          .map((g) => (
           <div key={g.label}>
             <p className="m-0 mb-1 text-[13px] font-semibold text-[var(--in-sub)]">{g.label}</p>
             <div className="flex flex-wrap gap-2">
@@ -298,7 +306,7 @@ function AccountDialog({ account, teams, actorRole, isSelf, onClose, onDone }: {
   const [message, setMessage] = useState<string | null>(null);
   const editable = canEditAccount(actorRole, account.role, isSelf);
   const roles = grantableRoles(actorRole);
-  const allowed = grantablePositions(actorRole);
+  const allowed = grantablePositions(actorRole, useContext(R138Live));
   const accessChanged = role !== account.role || active !== account.active || [...positions].sort().join() !== [...account.positions].sort().join();
   const teamsChanged = [...teamCodes].sort().join() !== [...account.teams].sort().join();
   const changed = accessChanged || teamsChanged;
@@ -396,6 +404,7 @@ function AccountDialog({ account, teams, actorRole, isSelf, onClose, onDone }: {
 }
 
 function GrantDialog({ people, actorRole, onClose, onDone }: { people: PeopleData; actorRole: DbRole | null; onClose: () => void; onDone: () => Promise<void> }) {
+  const live = useContext(R138Live);
   const grant = useServerFn(grantPersonAccess);
   const [q, setQ] = useState("");
   const [personId, setPersonId] = useState<string | null>(null);
@@ -463,7 +472,7 @@ function GrantDialog({ people, actorRole, onClose, onDone }: { people: PeopleDat
           {roles.map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}{OFFICE_ROLES.includes(r) ? " (ufficio)" : ""}</option>)}
         </select>
       </label>
-      <div className="mt-4"><PositionsPicker value={positions} onChange={setPositions} allowed={grantablePositions(actorRole)} /></div>
+      <div className="mt-4"><PositionsPicker value={positions} onChange={setPositions} allowed={grantablePositions(actorRole, live)} /></div>
       <label className="mt-4 flex flex-col gap-1 text-[15px] font-semibold">
         Motivo
         <input value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} placeholder="Es. nuovo dirigente accompagnatore U15" className={`${inputCls} font-normal`} />

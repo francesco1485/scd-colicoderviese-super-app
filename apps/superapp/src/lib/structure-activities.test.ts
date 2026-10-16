@@ -225,9 +225,17 @@ describe("parsing r135 rows", () => {
 });
 
 describe("Dervio reserved (UD-156, Francesco 16/10/2026 06:57)", () => {
-  it("Dervio is read by the roles and by presidente, DG, coordinatore attività sportiva, responsabile attività di base only", () => {
+  it("Dervio is read by the roles and by presidente, DG, coordinatore attività sportiva, responsabile attività di base and the direttori sportivi only", () => {
     expect([...STRUCTURE_READER_POSITIONS_BY_SITE.DERVIO].sort()).toEqual(
-      ["coordinatore-attivita-sportiva", "direttore-generale", "presidente", "responsabile-attivita-base"].sort(),
+      [
+        "coordinatore-attivita-sportiva",
+        "direttore-generale",
+        "presidente",
+        "responsabile-attivita-base",
+        // Francesco 16/10/2026 13:32 (r138)
+        "direttore-sportivo-agonistica",
+        "direttore-sportivo-generale",
+      ].sort(),
     );
     for (const p of ["responsabile-struttura-dervio", "responsabile-campi", "responsabile-club-house", "responsabile-struttura", "responsabile-struttura-colico"]) {
       expect(STRUCTURE_READER_POSITIONS_BY_SITE.DERVIO, p).not.toContain(p);
