@@ -3,6 +3,7 @@ import { ChevronLeft, Store } from "lucide-react";
 
 import { ClubCardDetails, ClubCardFace, ClubCardLinks, ClubCardRules } from "@/components/scd/ClubCards";
 import { CLUB_CARDS, clubCard, isClubCardId } from "@/lib/club-cards";
+import { CREST_SHARE_IMAGE, PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * /card/$tipo — the web link of one club card (tesserato, sostenitore, partner). The Club House shares it and prints
@@ -15,15 +16,15 @@ export const Route = createFileRoute("/card/$tipo")({
   },
   head: ({ loaderData }) => {
     const t = loaderData ? clubCard(loaderData.id) : null;
-    const title = t ? `Card ${t.label} 2026/27 — S.C.D. ColicoDerviese` : "Card — S.C.D. ColicoDerviese";
-    return {
-      meta: [
-        { title },
-        { name: "description", content: t ? `${t.who} Si attiva alla Club House.` : "Le card della S.C.D. ColicoDerviese." },
-        { property: "og:title", content: title },
-        { property: "og:description", content: "Si attiva alla Club House del Centro Sportivo Colico." },
-      ],
-    };
+    if (!t) return pageHead(PUBLIC_PAGES.card);
+    const title = `Card ${t.label} 2026/27 — S.C.D. ColicoDerviese`;
+    return pageHead({
+      path: `/card/${t.id}`,
+      title,
+      description: `${t.who} Si attiva alla Club House.`,
+      ogDescription: "Si attiva alla Club House del Centro Sportivo Colico.",
+      image: CREST_SHARE_IMAGE,
+    });
   },
   component: CardPage,
 });

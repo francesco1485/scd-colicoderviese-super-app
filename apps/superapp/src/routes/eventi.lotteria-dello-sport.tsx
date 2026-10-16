@@ -17,7 +17,7 @@ import {
   type PublicLottery,
 } from "@/lib/lottery";
 import { getPublicLottery } from "@/lib/lottery.functions";
-import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { SHARE_PAGES, pageHead } from "@/lib/share";
 
 /** Staging-only structure preview: every value empty ("da definire"). */
 const STRUCTURE_PREVIEW: PublicLottery = {
@@ -58,9 +58,7 @@ export const Route = createFileRoute("/eventi/lotteria-dello-sport")({
           description: `${l.beneficiary} Giornata dello sport: ${l.sportDay ? longDay(l.sportDay) : "data da definire"}.`,
         }
       : SHARE_PAGES.lotteria;
-    return {
-      meta: [...pageMeta(page), ...(l ? [] : [{ name: "robots", content: "noindex" }])],
-    };
+    return pageHead(page, { extraMeta: l ? [] : [{ name: "robots", content: "noindex" }] });
   },
   component: LotteriaPublic,
 });

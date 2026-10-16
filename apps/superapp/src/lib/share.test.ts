@@ -134,7 +134,7 @@ describe("og:image uses official assets only", () => {
   });
 });
 
-/** Public pages of C3: each route head() is built by pageMeta and the page shows the ShareButton. */
+/** Public pages of C3: each route head() is built by pageHead (pageMeta + canonical, B8) and the page shows the ShareButton. */
 const ROUTES: { file: string; key: SharePageKey; path: string }[] = [
   { file: "src/routes/sponsor.tsx", key: "sponsor", path: "/sponsor" },
   { file: "src/routes/sostieni.index.tsx", key: "sostieni", path: "/sostieni" },
@@ -147,11 +147,11 @@ const ROUTES: { file: string; key: SharePageKey; path: string }[] = [
 ];
 
 describe("C3 routes", () => {
-  it.each(ROUTES)("$path: head() uses pageMeta (og:image + og:title) and the page renders ShareButton", ({ file, key, path }) => {
+  it.each(ROUTES)("$path: head() uses pageHead (og:image + og:title + canonical) and the page renders ShareButton", ({ file, key, path }) => {
     const src = read(file);
     expect(SHARE_PAGES[key].path).toBe(path);
     expect(src).toContain(`createFileRoute("${path === "/sostieni" ? "/sostieni/" : path}")`);
-    expect(src).toMatch(new RegExp(`pageMeta\\((SHARE_PAGES\\.${key}|page)\\)`));
+    expect(src).toMatch(new RegExp(`pageHead\\((SHARE_PAGES\\.${key}|page)[,)]`));
     expect(src).toContain(`<ShareButton page={SHARE_PAGES.${key}}`);
     // No hand-written og tags left behind (relative og:image was not usable by WhatsApp).
     expect(src).not.toMatch(/property: "og:/);
@@ -162,7 +162,7 @@ describe("C3 routes", () => {
 
   it("the lottery keeps noindex before publication but always carries Open Graph", () => {
     const src = read("src/routes/eventi.lotteria-dello-sport.tsx");
-    expect(src).toMatch(/\.\.\.pageMeta\(page\)/);
+    expect(src).toMatch(/pageHead\(page, \{ extraMeta:/);
     expect(src).toMatch(/name: "robots", content: "noindex"/);
   });
 });

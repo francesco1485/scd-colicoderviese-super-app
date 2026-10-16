@@ -10,6 +10,7 @@ import {
   getWeekVote,
   type VoteCandidate,
 } from "@/lib/social.functions";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * Top 11 della settimana (UD-094): ogni account del club dà 3 voti ai giocatori delle squadre agonistiche (Francesco 15/10/2026: voto aperto a ogni account registrato, non solo ai tesserati). I conteggi della
@@ -18,16 +19,7 @@ import {
  */
 export const Route = createFileRoute("/top11")({
   loader: () => getWeekVote(),
-  head: () => ({
-    meta: [
-      { title: "Top 11 della settimana — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "La Top 11 della settimana votata da chi ha un account del club S.C.D. ColicoDerviese: Prima Squadra, Juniores, U16 e U15 insieme.",
-      },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.top11),
   component: Top11Page,
 });
 

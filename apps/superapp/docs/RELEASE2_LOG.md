@@ -831,3 +831,13 @@ Francesco 16/10/2026 08:53 (UD-159) «le attività le decido nel gestionale io e
 - G03 Rotazione gare Dervio (`lib/dervio-rotation.ts`, eb680f1): solo logica pura e test; 1 gara a settimana dai più piccoli dal 24/10, luci ok, nota U16, inverno solo segnalato, pioggia ≥ 50% o ≥ 1 mm (decisa 12:04), FIGC e avversaria solo se si torna a Colico. Pagina richiesta alla chat cloud.
 - Orchestra (a67b01b): agenti, PIPELINE, registro comandi e tavola gestionali (solo documenti e istruzioni agenti; permessi degli agenti solo ridotti).
 - Controlli: scd-revisore PASS e scd-sicurezza PASS sul rilascio 641030b.
+
+## B8 — Anteprime dei link: titolo, descrizione, immagine e indirizzo canonico per ogni pagina pubblica · 2026-10-16
+
+Backlog cloud B8. Motori: PERSONE (un link girato su WhatsApp mostra il nome giusto della pagina e lo stemma, non il generico "Super App") e SOLDI (/sponsor, /card e /sostieni si presentano bene quando un partner o un genitore li inoltra). Misura: 0 pagine pubbliche con il titolo generico (test `public-meta.test.ts`).
+- Prima: 15 pagine pubbliche avevano solo titolo e descrizione; senza og:title propri ereditavano dal frame "S.C.D. ColicoDerviese — Super App", nessuna aveva og:image né indirizzo canonico (TanStack sostituisce i meta per nome, ma concatena i link).
+- `lib/share.ts`: `PUBLIC_PAGES` (home, calendario, eventi, lezioni tecnico-coordinative, impianti, società, kit, tifosi, comunicazioni, Top 11, rassegna stampa, fantacalcio, guida, card, fornitori) con i testi che ogni pagina aveva già; immagine sempre lo stemma ufficiale (`CREST_SHARE_IMAGE`) o la locandina ufficiale della Christmas Lario Cup; `canonicalUrl()` (origine ufficiale, solo percorso, senza ?lang= né #) e `pageHead()` (meta + link canonico). Anche le pagine C3 (sponsor, sostieni ×4, tornei, Christmas Lario Cup, lotteria interna) e /card/<tipo> passano da `pageHead()`; og:url = indirizzo canonico.
+- Fuori perimetro e non toccate (chat PC o safeguarding): /contatti, /elimina-account, /entra, /installa, /partner, /privacy, /safeguarding — elencate nel test con il motivo.
+- Test `public-meta.test.ts`: ogni pagina pubblica usa la propria voce del registro, titoli e indirizzi canonici unici, mai il titolo generico, og:image esistente in public/, un solo canonico, ogni prefisso di `PUBLIC_PREFIXES` coperto o assegnato ad altri. Controllo SSR locale: un `<link rel="canonical">` per pagina, anche dopo l'idratazione.
+- Nessun cambiamento visivo (solo `<head>`): controllo locale 390/1440 di /, /calendario, /kit, /card/sostenitore, /eventi/christmas-lario-cup, /sponsor: HTTP 200, nessun errore in console, nessuno scroll orizzontale.
+- Gate: tsc 0, vitest 185 file / 2679 test, build 0, test:bundle 11/11, test:manifest PASS, test:claude-hooks PASS.

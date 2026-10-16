@@ -9,6 +9,7 @@ import { ArrowLeft, Phone } from "lucide-react";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { dayMonth } from "@/lib/initiatives";
 import { getInitiative } from "@/lib/initiatives.functions";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 const INITIATIVE_ID = "lezioni-tecnico-coordinative-perico";
 
@@ -18,25 +19,7 @@ export const Route = createFileRoute("/eventi/lezioni-tecnico-coordinative")({
     if (!item) throw notFound();
     return item;
   },
-  head: () => ({
-    meta: [
-      { title: "Lezioni tecnico-coordinative — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "Lezioni per migliorare tecnica e coordinazione con il mister Alessandro Perico (Tecnico UEFA C), in collaborazione con la S.C.D. ColicoDerviese.",
-      },
-      {
-        property: "og:title",
-        content: "Lezioni tecnico-coordinative con il mister Alessandro Perico",
-      },
-      {
-        property: "og:description",
-        content: "In collaborazione con la S.C.D. ColicoDerviese. Giorni, orari e costi dal mister.",
-      },
-      { property: "og:type", content: "website" },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.lezioniTecnicoCoordinative),
   notFoundComponent: () => (
     <main className="mx-auto max-w-3xl px-4 py-16">
       <h1 className="text-2xl font-bold">Iniziativa non disponibile</h1>
