@@ -107,6 +107,12 @@ describe("public home v5", () => {
     expect(lobby).toContain('data-testid="home-board"');
     expect(lobby).toContain('data-testid="home-teams"');
     expect(lobby).not.toMatch(/setInterval|Carousel|slide|HeroArt|SkyJolly|PersonaAvatar/i);
+    // 16/10 06:35–06:51: social-profile home ("fammi iscrivere"): club profile with the lake cover (no pitch, no people),
+    // team circles with birth years, Post / Partite / Video tabs, Facebook-style posts whose like/comment ask to join.
+    for (const id of ["home-profile", "home-highlights", "home-tabs", "home-feed", "home-inside", "home-video", "home-join"])
+      expect(lobby).toContain(`data-testid="${id}"`);
+    expect(lobby).toContain('"/media/scd/lario-header.webp"');
+    expect(lobby).toMatch(/homeMode\(today\) === "partite" \? "partite" : "post"/);
   });
 
   it("home order (15/10 07:04, UD-134 09:18, new idea 21:35): notices, communication, lobby, results; no stories, no partner band", () => {

@@ -19,7 +19,29 @@
  * registry; birth years only when the master declares them (group.years). No minor named, no mascot.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ChevronRight, Download, ExternalLink, LogIn, MapPinned, MessageCircle, UserPlus, type LucideIcon } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarCheck,
+  CalendarDays,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  Heart,
+  LayoutGrid,
+  Lock,
+  LogIn,
+  MapPinned,
+  MessageCircle,
+  MessageSquare,
+  PlayCircle,
+  Radio,
+  Share2,
+  Sparkles,
+  Trophy,
+  UserPlus,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
@@ -136,37 +158,151 @@ function Ticker({ events, groups }: { events: readonly PublicEvent[]; groups: re
   );
 }
 
-/* ------------------------------------------------------------ 1. credits */
+/* ------------------------------------------------------- 1. club profile */
 
-function Credentials() {
+/** Official photo of the lake and the mountains (top crop of the club photo: no pitch, no people). */
+const COVER = "/media/scd/lario-header.webp";
+
+/**
+ * Club profile at the top, like a Facebook page / Instagram profile (06:21, 06:35): cover, crest as avatar, name,
+ * real numbers (teams and games of the season in the calendar, official credentials), "Iscriviti" as the main
+ * action (the "Segui" of the club), Iride as "Messaggio", and the three credentials with their links.
+ */
+function ClubProfile({ teams, games }: { teams: number; games: number }) {
   return (
-    <section aria-label="Riconoscimenti e affiliazioni della società" className={`${PANEL} grid grid-cols-3 divide-x divide-[#eef2f8] py-2`} data-testid="home-credentials">
-      {CLUB_CREDENTIALS.map((c) => {
-        const href = CREDENTIAL_LINK[c.id];
-        const body = (
-          <>
-            <img src={c.art.src} alt={c.alt} height={34} decoding="async" className="h-[30px] w-auto max-w-[88%] object-contain lg:h-[38px]" />
-            <span className="text-center text-[11px] font-extrabold uppercase leading-tight tracking-[0.04em] text-[#0b2a5b] lg:text-[12px]">{c.short}</span>
-            {href && (
-              <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-[#1556c4] lg:text-[11.5px]">
-                Sito ufficiale
-                <ExternalLink className="size-3" aria-hidden="true" />
-              </span>
-            )}
-          </>
-        );
-        const cls = "grid min-h-[86px] content-center justify-items-center gap-1 px-1.5 py-1";
-        return href ? (
-          <a key={c.id} href={href} target="_blank" rel="noopener noreferrer" className={`${cls} scd-focus rounded-[10px] hover:bg-[#f6f9fd]`} aria-label={`${c.title}, ${c.issuer}: sito ufficiale (apre una nuova scheda)`}>
-            {body}
+    <section aria-labelledby="home-profile-t" className={`${PANEL} overflow-hidden`} data-testid="home-profile">
+      <div className="relative h-[150px] overflow-hidden bg-[#1d5fd0] lg:h-[190px]">
+        <img src={COVER} alt="Il lago di Como e le montagne dell'Alto Lario visti da Colico" decoding="async" fetchPriority="high" className="absolute inset-0 size-full object-cover object-[50%_40%]" />
+        <span aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgb(11_42_91/0.05)_20%,rgb(11_42_91/0.72))]" />
+        <p className="absolute bottom-3 right-4 m-0 max-w-[62%] text-right">
+          <span className="block font-uv text-[30px] uppercase leading-[0.9] text-white [text-shadow:0_2px_10px_rgb(0_0_0/0.35)] lg:text-[40px]">
+            Il calcio
+            <br />
+            dell'Alto Lario
+          </span>
+          <span className="mt-1 inline-block rounded-[4px] bg-[#ffd600] px-1.5 py-[2px] text-[12px] font-extrabold uppercase text-[#061a3d]">Colico · Dervio</span>
+        </p>
+      </div>
+      <div className="relative px-4 pb-4">
+        <div className="flex items-start gap-3">
+          <span className="-mt-11 grid size-[84px] shrink-0 place-items-center rounded-full bg-white lg:-mt-12 shadow-[0_6px_18px_-8px_rgb(11_42_91/0.5)] ring-4 ring-white lg:size-[100px]">
+            <ClubCrestOfficial size={64} className="lg:hidden" />
+            <ClubCrestOfficial size={78} className="hidden lg:block" />
+          </span>
+          <dl className="m-0 grid flex-1 grid-cols-3 pt-2.5 text-center">
+            {[
+              [String(teams), teams === 1 ? "squadra" : "squadre"],
+              [String(games), "gare in stagione"],
+              [String(CLUB_CREDENTIALS.length), "riconoscimenti"],
+            ].map(([n, l]) => (
+              <div key={l} className="grid">
+                <dt className="sr-only">{l}</dt>
+                <dd className="m-0 font-uv text-[24px] leading-none text-[#0b1e3a] lg:text-[28px]">{n}</dd>
+                <dd className="m-0 text-[11.5px] font-semibold leading-tight text-[#5a6b85]">{l}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <h2 id="home-profile-t" className="m-0 mt-1.5 text-[19px] font-extrabold leading-tight text-[#0b1e3a] lg:text-[22px]">
+          S.C.D. ColicoDerviese
+        </h2>
+        <p className="m-0 mt-0.5 text-[14px] leading-snug text-[#23406e]">
+          Calcio a Colico e Dervio, sull'Alto Lario. Prima squadra, settore giovanile e scuola calcio · Stagione 2026/27
+        </p>
+        <div className="mt-3 grid grid-cols-[1fr_1fr_auto] gap-2">
+          <Link to="/registrati" className="scd-focus inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] bg-[#ffd600] text-[14.5px] font-extrabold text-[#061a3d] hover:brightness-95" data-testid="home-join">
+            <UserPlus className="size-4" aria-hidden="true" />
+            Iscriviti
+          </Link>
+          <a
+            href={SEGRETERIA_WHATSAPP.chatUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="scd-focus inline-flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] bg-[#eef3f9] text-[14.5px] font-bold text-[#0b2a5b] hover:bg-[#e2eaf5]"
+            aria-label="Messaggio a Iride, la segreteria AI, su WhatsApp (apre una nuova scheda)"
+          >
+            <MessageCircle className="size-4" aria-hidden="true" />
+            Messaggio
           </a>
-        ) : (
-          <div key={c.id} className={cls}>
-            {body}
-          </div>
-        );
-      })}
+          <Link to="/accedi" className="scd-focus inline-flex min-h-11 items-center justify-center gap-1 rounded-[10px] bg-[#eef3f9] px-3.5 text-[14.5px] font-bold text-[#0b2a5b] hover:bg-[#e2eaf5]">
+            <LogIn className="size-4" aria-hidden="true" />
+            Accedi
+          </Link>
+        </div>
+        <div className="mt-3 grid grid-cols-3 divide-x divide-[#eef2f8] rounded-[12px] border border-[#eef2f8]" data-testid="home-credentials" aria-label="Riconoscimenti e affiliazioni della società">
+          {CLUB_CREDENTIALS.map((c) => {
+            const href = CREDENTIAL_LINK[c.id];
+            const body = (
+              <>
+                <img src={c.art.src} alt={c.alt} height={28} decoding="async" className="h-[26px] w-auto max-w-[86%] object-contain lg:h-[32px]" />
+                <span className="text-center text-[10.5px] font-extrabold uppercase leading-tight tracking-[0.03em] text-[#0b2a5b]">{c.short}</span>
+                {href && (
+                  <span className="inline-flex items-center gap-0.5 text-[10.5px] font-bold text-[#1556c4]">
+                    Sito
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                  </span>
+                )}
+              </>
+            );
+            const cls = "grid min-h-[74px] content-center justify-items-center gap-1 px-1 py-1.5";
+            return href ? (
+              <a key={c.id} href={href} target="_blank" rel="noopener noreferrer" className={`${cls} scd-focus hover:bg-[#f6f9fd]`} aria-label={`${c.title}, ${c.issuer}: sito ufficiale (apre una nuova scheda)`}>
+                {body}
+              </a>
+            ) : (
+              <div key={c.id} className={cls}>
+                {body}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </section>
+  );
+}
+
+/** Instagram-style highlight circles: one per team (colour ring, birth years), plus Tornei and Dirette. */
+function Highlights({ groups, events }: { groups: readonly PublicGroup[]; events: readonly PublicEvent[] }) {
+  const teams = groups.filter((g) => g.id !== "other" && events.some((e) => e.group === g.id));
+  const circle = "grid size-[66px] place-items-center rounded-full p-[3px]";
+  return (
+    <nav aria-label="Squadre e sezioni" className="-mx-4 overflow-x-auto px-4" data-testid="home-highlights">
+      <ul className="m-0 flex w-max list-none gap-3.5 p-0 pb-1">
+        {teams.map((g) => {
+          const ys = birthYears(g).replace("Nati ", "");
+          return (
+            <li key={g.id}>
+              <Link to="/calendario" search={{ annata: g.id }} className="scd-focus grid w-[74px] justify-items-center gap-1 rounded-[10px] text-center">
+                <span className={circle} style={{ background: `conic-gradient(${g.color}, #ffd600, ${g.color})` }}>
+                  <span className="grid size-full place-items-center rounded-full bg-white">
+                    <span className="grid leading-none">
+                      <span className="font-uv text-[17px] text-[#0b1e3a]">{ys ? ys.slice(0, 4) : groupShort(g, g.label).slice(0, 3).toUpperCase()}</span>
+                      {ys.includes("–") && <span className="text-[9.5px] font-extrabold text-[#5a6b85]">–{ys.slice(-4)}</span>}
+                    </span>
+                  </span>
+                </span>
+                <span className="line-clamp-2 text-[11.5px] font-semibold leading-tight text-[#23406e]">{groupShort(g, g.label)}</span>
+              </Link>
+            </li>
+          );
+        })}
+        {[
+          { to: "/eventi", label: "Tornei", big: "🏆" },
+          { to: "/comunicazioni", label: "Dirette", big: "LIVE", search: { tab: "social" } },
+        ].map((h) => (
+          <li key={h.to}>
+            <Link to={h.to as never} search={h.search as never} className="scd-focus grid w-[74px] justify-items-center gap-1 rounded-[10px] text-center">
+              <span className={circle} style={{ background: "conic-gradient(#1556c4, #ffd600, #1556c4)" }}>
+                <span className="grid size-full place-items-center rounded-full bg-[#0b2a5b] text-[15px] font-extrabold text-white">
+                  <span aria-hidden="true">{h.big}</span>
+                </span>
+              </span>
+              <span className="text-[11.5px] font-semibold leading-tight text-[#23406e]">{h.label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -340,70 +476,211 @@ function Teams({ calendar, today }: { calendar: PublicCalendar; today: string })
   );
 }
 
-/* ---------------------------------------------------------- 4. magazine */
+/* -------------------------------------------------------------- 4. feed */
 
-function SlotVisual({ s, big }: { s: VetrinaSlot; big: boolean }) {
+/** Visual of a palinsesto item as a post image (the kit uses the official render, never the supplier price list). */
+function PostMedia({ s }: { s: VetrinaSlot }) {
   const v = s.id === "kit-2026-27" ? { kind: "image" as const, src: KIT_FULL, alt: "Kit ufficiale ColicoDerviese 2026/27", fit: "contain" as const, position: "center" } : s.visual;
   if (v.kind === "image")
     return (
-      <img
-        src={v.src}
-        alt={v.alt}
-        loading="lazy"
-        decoding="async"
-        className={`absolute inset-0 -z-10 size-full ${v.fit === "contain" ? "object-contain p-3" : "object-cover"}`}
-        style={{ objectPosition: v.position ?? "center" }}
-      />
+      <span className={`relative block aspect-[4/5] max-h-[460px] w-full overflow-hidden ${v.fit === "contain" ? "bg-[linear-gradient(160deg,#eef4ff,#d8e6ff)]" : "bg-[#0b2a5b]"}`}>
+        <img src={v.src} alt={v.alt} loading="lazy" decoding="async" className={`size-full ${v.fit === "contain" ? "object-contain p-4" : "object-cover"}`} style={{ objectPosition: v.position ?? "center" }} />
+      </span>
     );
   if (v.kind === "portrait")
-    return <img src={v.src} alt={v.alt} loading="lazy" decoding="async" className="absolute right-3 top-3 -z-10 size-[64px] rounded-full object-cover ring-2 ring-white/70" />;
+    return (
+      <span className="grid aspect-[16/9] w-full place-items-center bg-[linear-gradient(150deg,#3b82f6,#1556c4)]">
+        <img src={v.src} alt={v.alt} loading="lazy" decoding="async" className="size-[110px] rounded-full object-cover ring-4 ring-white/70" />
+      </span>
+    );
   return (
-    <span aria-hidden="true" className={`absolute right-3 top-2 -z-10 font-uv leading-none text-white/25 ${big ? "text-[120px]" : "text-[64px]"}`}>
-      {v.big}
+    <span aria-hidden="true" className="relative grid aspect-[16/9] w-full content-end overflow-hidden bg-[linear-gradient(150deg,#3b82f6,#0f45a6)] p-4">
+      <span className="absolute -right-2 -top-3 font-uv text-[150px] leading-none text-white/15">{v.big}</span>
+      <img src="/media/brand/tex/brush-yellow.svg" alt="" className="absolute -left-6 bottom-3 w-[70%] opacity-90" />
+      <span className="relative max-w-[85%] font-uv text-[38px] uppercase leading-[0.9] text-white [text-shadow:0_2px_0_rgb(6_26_61/0.35)]">{s.title}</span>
     </span>
   );
 }
 
-const TONES = ["bg-[linear-gradient(150deg,#1d5fd0,#0b2f6b)]", "bg-[linear-gradient(150deg,#0f7a3d,#0a4f2a)]", "bg-[linear-gradient(150deg,#c23c3f,#7d1f22)]", "bg-[linear-gradient(150deg,#7654b8,#40287a)]", "bg-[linear-gradient(150deg,#148b99,#0a5560)]"];
-
-function Magazine({ slots }: { slots: readonly VetrinaSlot[] }) {
-  if (slots.length === 0) return null;
+/** Facebook-style post of the club: like and comment ask to join (the hook), share opens the page. */
+function FeedPost({ s }: { s: VetrinaSlot }) {
+  const action = "scd-focus inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-[8px] text-[13.5px] font-bold text-[#4a5d7a] hover:bg-[#f3f6fb]";
   return (
-    <section aria-labelledby="home-mag-t" data-testid="home-magazine">
-      <Heading id="home-mag-t" sub="Notizie, iniziative, tornei e giochi: cambia ogni giorno">
-        Dal club
-      </Heading>
-      <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 lg:grid-cols-4 lg:grid-rows-[repeat(2,minmax(150px,auto))]">
-        {slots.map((s, i) => {
-          const big = i === 0;
-          const image = s.visual.kind === "image" || s.id === "kit-2026-27";
-          const kitLight = s.id === "kit-2026-27";
-          return (
-            <li key={s.id} className={big ? "col-span-2 lg:row-span-2" : ""}>
-              <Link
-                to={s.href as never}
-                search={s.search as never}
-                {...(s.hash ? { hash: s.hash } : {})}
-                className={`scd-focus relative isolate flex h-full flex-col justify-end overflow-hidden rounded-[16px] p-3.5 shadow-[0_10px_24px_-16px_rgb(11_42_91/0.5)] transition-transform duration-200 hover:-translate-y-0.5 ${
-                  big ? "min-h-[260px] lg:min-h-[320px] lg:p-5" : "min-h-[170px]"
-                } ${kitLight ? "bg-[linear-gradient(160deg,#eef4ff,#d8e6ff)]" : image ? "bg-[#0b2a5b]" : TONES[i % TONES.length]}`}
-                data-slot={s.id}
-              >
-                <SlotVisual s={s} big={big} />
-                {image && !kitLight && <span aria-hidden="true" className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,transparent_35%,rgb(6_26_61/0.88))]" />}
-                <span className={`text-[11px] font-extrabold uppercase tracking-[0.1em] ${kitLight ? "text-[#1556c4]" : "text-[#ffd600]"}`}>{s.kicker}</span>
-                <span className={`font-title font-black uppercase leading-[0.95] ${big ? "text-[28px] lg:text-[36px]" : "text-[19px]"} ${kitLight ? "text-[#0b1e3a]" : "text-white"}`}>{s.title}</span>
-                {big && <span className={`mt-1 max-w-[46ch] text-[13.5px] leading-snug ${kitLight ? "text-[#23406e]" : "text-white/85"}`}>{s.text}</span>}
-                <span className={`mt-1.5 inline-flex items-center gap-1 text-[13px] font-bold ${kitLight ? "text-[#1556c4]" : "text-white"}`}>
-                  {s.cta}
-                  <ArrowRight className="size-3.5" aria-hidden="true" />
+    <li>
+      <article className={`${PANEL} overflow-hidden`} data-slot={s.id}>
+        <header className="flex items-center gap-2.5 px-3.5 pb-2.5 pt-3">
+          <span className="grid size-10 place-items-center rounded-full bg-white ring-1 ring-[#e3eaf4]">
+            <ClubCrestOfficial size={30} />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-[14.5px] font-extrabold leading-tight text-[#0b1e3a]">S.C.D. ColicoDerviese</span>
+            <span className="block text-[12px] font-semibold text-[#5a6b85]">{s.kicker}</span>
+          </span>
+        </header>
+        <p className="m-0 px-3.5 pb-3 text-[14.5px] leading-snug text-[#0b1e3a]">
+          <span className="font-extrabold">{s.title}.</span> {s.text}
+        </p>
+        <Link to={s.href as never} search={s.search as never} {...(s.hash ? { hash: s.hash } : {})} className="scd-focus block" aria-label={`${s.title}: ${s.cta}`}>
+          <PostMedia s={s} />
+          <span className="flex items-center justify-between gap-2 border-b border-[#eef2f8] bg-[#f6f9fd] px-3.5 py-2.5">
+            <span className="truncate text-[13.5px] font-bold text-[#0b1e3a]">{s.cta}</span>
+            <ArrowRight className="size-4 shrink-0 text-[#1556c4]" aria-hidden="true" />
+          </span>
+        </Link>
+        <footer className="flex gap-1 px-2 py-1">
+          <Link to="/registrati" className={action} aria-label="Iscriviti per mettere mi piace">
+            <Heart className="size-[18px]" aria-hidden="true" />
+            Mi piace
+          </Link>
+          <Link to="/registrati" className={action} aria-label="Iscriviti per commentare">
+            <MessageSquare className="size-[18px]" aria-hidden="true" />
+            Commenta
+          </Link>
+          <Link to={s.href as never} search={s.search as never} className={action}>
+            <Share2 className="size-[18px]" aria-hidden="true" />
+            Apri
+          </Link>
+        </footer>
+      </article>
+    </li>
+  );
+}
+
+/** What a member finds inside (the "fammi iscrivere" hook): real sections of the app, no invented counts. */
+function InsideTeaser() {
+  const inside = [
+    { icon: Users, title: "La bacheca della comunità", text: "Foto, commenti e voti tra tifosi e famiglie." },
+    { icon: Trophy, title: "Top 11 e Fantacalcio SCD", text: "Vota i migliori in campo e sfida gli amici, gratis." },
+    { icon: Sparkles, title: "Crea il tuo campione", text: "Il tuo avatar con la maglia del club." },
+    { icon: CalendarCheck, title: "Allenamenti e convocazioni", text: "Della tua squadra, sul telefono." },
+  ];
+  return (
+    <li>
+      <section aria-labelledby="home-inside-t" className="overflow-hidden rounded-[16px] bg-[linear-gradient(150deg,#0f45a6,#1d5fd0)] p-4 text-white shadow-[0_14px_30px_-18px_rgb(11_42_91/0.7)]" data-testid="home-inside">
+        <p className="m-0 text-[11.5px] font-extrabold uppercase tracking-[0.1em] text-[#ffd600]">Solo per chi è dentro</p>
+        <h2 id="home-inside-t" className="m-0 mt-1 font-title text-[26px] font-black uppercase leading-none">Entra nel mondo ColicoDerviese</h2>
+        <ul className="m-0 mt-3 grid list-none gap-2 p-0">
+          {inside.map((i) => (
+            <li key={i.title} className="flex items-start gap-2.5 rounded-[12px] bg-white/10 p-2.5">
+              <span className="relative grid size-9 shrink-0 place-items-center rounded-[10px] bg-white/15">
+                <i.icon className="size-[18px]" aria-hidden="true" />
+                <Lock className="absolute -bottom-1 -right-1 size-3.5 rounded-full bg-[#ffd600] p-[2px] text-[#061a3d]" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[14.5px] font-extrabold leading-tight">{i.title}</span>
+                <span className="block text-[12.5px] leading-snug text-white/80">{i.text}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <Link to="/registrati" className="scd-focus mt-3 flex min-h-12 items-center justify-center gap-1.5 rounded-[12px] bg-[#ffd600] text-[15px] font-extrabold text-[#061a3d] hover:brightness-95">
+          <UserPlus className="size-[18px]" aria-hidden="true" />
+          Iscriviti gratis
+        </Link>
+      </section>
+    </li>
+  );
+}
+
+function Feed({ slots }: { slots: readonly VetrinaSlot[] }) {
+  const items: ReactNode[] = [];
+  slots.forEach((s, i) => {
+    items.push(<FeedPost key={s.id} s={s} />);
+    if (i === 0) items.push(<InsideTeaser key="inside" />);
+  });
+  if (slots.length === 0) items.push(<InsideTeaser key="inside" />);
+  return (
+    <ul className="m-0 grid list-none gap-4 p-0" data-testid="home-feed">
+      {items}
+    </ul>
+  );
+}
+
+/** Pixellot space (06:35): our home games live and on replay on the official channels; reels of the club's own images. */
+function VideoPanel({ events }: { events: readonly PublicEvent[] }) {
+  const home = events.filter((e) => e.homeAway === "CASA" && /colico/i.test(e.venue));
+  const reels = [
+    { src: "/media/eventi/christmas-lario-cup-2026-maschile.webp", alt: "Locandina Christmas Lario Cup 2026", to: "/eventi/christmas-lario-cup", label: "Christmas Lario Cup" },
+    { src: KIT_FULL, alt: "Kit ufficiale 2026/27", to: "/kit", label: "Kit 2026/27", contain: true },
+    { src: "/media/eventi/christmas-lario-cup-2026-female.webp", alt: "Locandina Christmas Lario Cup 2026 Female", to: "/eventi/christmas-lario-cup", label: "CLC Female" },
+  ];
+  return (
+    <div className="grid gap-4" data-testid="home-video">
+      <section aria-labelledby="home-live-t" className={`${PANEL} p-4`}>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 rounded-[6px] bg-[#e11d2e] px-1.5 py-[3px] text-[11px] font-extrabold uppercase text-white">
+            <Radio className="size-3.5" aria-hidden="true" />
+            Live
+          </span>
+          <h2 id="home-live-t" className="m-0 text-[17px] font-extrabold text-[#0b1e3a]">Dirette dal campo di Colico</h2>
+        </div>
+        <p className="m-0 mt-1.5 text-[14px] leading-snug text-[#23406e]">
+          Con le telecamere Pixellot le gare in casa si vedono in diretta e in replica sui canali ufficiali del club.
+        </p>
+        {home.length > 0 && (
+          <ul className="m-0 mt-2.5 grid list-none gap-1.5 p-0">
+            {home.slice(0, 4).map((e) => (
+              <li key={e.id} className="flex items-center justify-between gap-2 rounded-[10px] bg-[#f6f9fd] px-3 py-2 text-[13px]">
+                <span className="truncate font-bold text-[#0b1e3a]">{e.category}</span>
+                <span className="shrink-0 font-extrabold tabular-nums text-[#1556c4]">
+                  {new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", weekday: "short", day: "numeric" }).format(new Date(`${e.date}T12:00:00Z`))} · {e.time || "--:--"}
                 </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Link to="/comunicazioni" search={{ tab: "social" }} className="scd-focus mt-3 flex min-h-11 items-center justify-center gap-1.5 rounded-[10px] bg-[#0b2a5b] text-[14px] font-bold text-white hover:bg-[#123a78]">
+          <PlayCircle className="size-4" aria-hidden="true" />
+          Video e dirette del club
+        </Link>
+      </section>
+      <section aria-label="Video brevi del club">
+        <ul className="-mx-4 m-0 flex list-none snap-x gap-3 overflow-x-auto px-4 pb-1">
+          {reels.map((r) => (
+            <li key={r.label} className="w-[46vw] max-w-[200px] shrink-0 snap-start">
+              <Link to={r.to as never} className="scd-focus relative block aspect-[9/16] overflow-hidden rounded-[16px] bg-[#0b2a5b] shadow-[0_10px_24px_-16px_rgb(11_42_91/0.6)]">
+                <img src={r.src} alt={r.alt} loading="lazy" decoding="async" className={`size-full ${r.contain ? "bg-[linear-gradient(160deg,#eef4ff,#d8e6ff)] object-contain p-2" : "object-cover object-top"}`} />
+                <span className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent,rgb(6_26_61/0.85))] p-2.5 pt-8 text-[13px] font-extrabold text-white">{r.label}</span>
               </Link>
             </li>
-          );
-        })}
-      </ul>
-    </section>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+/** Instagram profile tabs: Post (the club's day), Partite (the board), Video (Pixellot). Default by weekday. */
+type ProfileTab = "post" | "partite" | "video";
+
+function ProfileTabs({ tab, setTab }: { tab: ProfileTab; setTab: (t: ProfileTab) => void }) {
+  const tabs: [ProfileTab, string, LucideIcon][] = [
+    ["post", "Post", LayoutGrid],
+    ["partite", "Partite", CalendarDays],
+    ["video", "Video", PlayCircle],
+  ];
+  return (
+    <div role="tablist" aria-label="Contenuti della pagina" className="sticky top-[var(--pub-header-h)] z-20 -mx-4 grid grid-cols-3 border-b border-[#e3eaf4] bg-[#f3f6fb]/95 px-4 backdrop-blur lg:static lg:mx-0 lg:rounded-[12px] lg:border lg:bg-white lg:px-0" data-testid="home-tabs">
+      {tabs.map(([id, label, Icon]) => {
+        const on = tab === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            id={`home-tab-${id}`}
+            aria-selected={on}
+            aria-controls={`home-panel-${id}`}
+            onClick={() => setTab(id)}
+            className={`scd-focus relative inline-flex min-h-12 items-center justify-center gap-1.5 text-[14px] font-extrabold ${on ? "text-[#0b1e3a]" : "text-[#5a6b85] hover:text-[#0b1e3a]"}`}
+          >
+            <Icon className="size-[18px]" aria-hidden="true" />
+            {label}
+            {on && <span aria-hidden="true" className="absolute inset-x-6 bottom-0 h-[3px] rounded-t-full bg-[#1556c4]" />}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -486,33 +763,31 @@ export function HomeLobby({
 }) {
   const nowMs = useMinuteClock(serverNow);
   const week = useMemo(() => weekBoardEvents(calendar.events, today), [calendar.events, today]);
-  const slots = (vetrina?.tutti ?? []).slice(0, 5);
-  const mode = homeMode(today);
+  const slots = (vetrina?.tutti ?? []).slice(0, 6);
+  const [tab, setTab] = useState<ProfileTab>(() => (homeMode(today) === "partite" ? "partite" : "post"));
+  const teams = useMemo(() => calendar.groups.filter((g) => g.id !== "other" && calendar.events.some((e) => e.group === g.id)).length, [calendar]);
   return (
-    <div className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-7 pt-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start lg:gap-7 lg:pt-6`} data-testid="home-lobby">
-      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-7 lg:gap-9">
+    <div className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-5 pt-3 lg:grid-cols-[minmax(0,640px)_300px] lg:justify-center lg:items-start lg:gap-8 lg:pt-6`} data-testid="home-lobby">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4">
+        <ClubProfile teams={teams} games={calendar.events.length} />
+        <Highlights groups={calendar.groups} events={calendar.events} />
         <Ticker events={week} groups={calendar.groups} />
-        <Credentials />
-        {mode === "partite" ? (
-          <>
-            <MatchBoard events={week} groups={calendar.groups} today={today} nowMs={nowMs} />
-            <Teams calendar={calendar} today={today} />
-            <Magazine slots={slots} />
-          </>
-        ) : (
-          <>
-            <Magazine slots={slots} />
-            <Teams calendar={calendar} today={today} />
-          </>
-        )}
-        <div className="grid gap-3 lg:hidden">
-          <JoinPanel />
-          <ul className="m-0 grid list-none gap-2.5 p-0">
-            {SERVICES.map((s) => (
-              <ServiceRow key={s.id} s={s} />
-            ))}
-          </ul>
+        <ProfileTabs tab={tab} setTab={setTab} />
+        <div role="tabpanel" id={`home-panel-${tab}`} aria-labelledby={`home-tab-${tab}`} className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5">
+          {tab === "post" && <Feed slots={slots} />}
+          {tab === "partite" && (
+            <>
+              <MatchBoard events={week} groups={calendar.groups} today={today} nowMs={nowMs} />
+              <Teams calendar={calendar} today={today} />
+            </>
+          )}
+          {tab === "video" && <VideoPanel events={week} />}
         </div>
+        <ul className="m-0 grid list-none gap-2.5 p-0 lg:hidden">
+          {SERVICES.map((s) => (
+            <ServiceRow key={s.id} s={s} />
+          ))}
+        </ul>
       </div>
       <aside className="hidden min-w-0 gap-3 lg:sticky lg:top-[calc(var(--pub-header-h)+20px)] lg:grid" aria-label="Il tuo club" data-testid="home-rail">
         <JoinPanel />
