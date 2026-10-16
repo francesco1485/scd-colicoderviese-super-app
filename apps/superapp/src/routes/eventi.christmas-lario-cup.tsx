@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Calendar, MapPin } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { KitTexture } from "@/components/scd/kit-texture";
+import { useEffect, useState } from "react";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { SHARE_PAGES, absoluteUrl, pageHead } from "@/lib/share";
 
@@ -38,74 +37,6 @@ export const Route = createFileRoute("/eventi/christmas-lario-cup")({
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-function Snow() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const c = ref.current;
-    if (!c) return;
-    const x = c.getContext("2d");
-    if (!x) return;
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0,
-      W = 0,
-      H = 0;
-    const size = () => {
-      W = c.width = c.offsetWidth * devicePixelRatio;
-      H = c.height = c.offsetHeight * devicePixelRatio;
-    };
-    size();
-    addEventListener("resize", size);
-    // Fiocchi in posizione deterministica (nessun valore casuale nei dati della pagina).
-    let seed = 7;
-    const rnd = () => {
-      seed = (seed * 9301 + 49297) % 233280;
-      return seed / 233280;
-    };
-    const fl = Array.from({ length: reduced ? 40 : 140 }, () => ({
-      x: rnd(),
-      y: rnd(),
-      r: rnd() * 2.4 + 0.6,
-      s: rnd() * 0.0012 + 0.0005,
-      w: rnd() * Math.PI * 2,
-    }));
-    const draw = () => {
-      x.clearRect(0, 0, W, H);
-      x.fillStyle = "rgba(255,255,255,.85)";
-      for (const f of fl) {
-        x.beginPath();
-        x.arc(f.x * W, f.y * H, f.r * devicePixelRatio, 0, 7);
-        x.fill();
-      }
-    };
-    const step = () => {
-      for (const f of fl) {
-        f.y += f.s;
-        f.w += 0.01;
-        f.x += Math.sin(f.w) * 0.0004;
-        if (f.y > 1) {
-          f.y = -0.02;
-          f.x = rnd();
-        }
-      }
-      draw();
-      raf = requestAnimationFrame(step);
-    };
-    if (reduced) draw();
-    else step();
-    return () => {
-      cancelAnimationFrame(raf);
-      removeEventListener("resize", size);
-    };
-  }, []);
-  return (
-    <canvas
-      ref={ref}
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-10 size-full"
-    />
-  );
-}
-
 function ChristmasLarioCup() {
   const { serverNow } = Route.useLoaderData();
   const lang: LarioLang = parseLarioLang(Route.useSearch().lang);
@@ -121,7 +52,6 @@ function ChristmasLarioCup() {
   const confirmed = confirmedCount();
   const cta =
     "inline-flex min-h-12 items-center justify-center gap-2 rounded-[14px] px-[18px] font-uv text-[18px] uppercase tracking-[0.06em] transition-transform active:translate-y-[3px]";
-  const red = `${cta} bg-gradient-to-b from-[#ff3b44] to-[#d8202a] text-white shadow-[0_4px_0_#a5121b,0_10px_30px_rgb(216_32_42/0.45)]`;
   const gold = `${cta} bg-gradient-to-b from-[#ffe066] to-[var(--uv-gold)] text-[var(--uv-night)] shadow-[0_4px_0_#b38f00]`;
   const ghost = `${cta} bg-white/10 text-white shadow-[inset_0_0_0_2px_rgb(255_255_255/0.4)]`;
 
@@ -132,116 +62,59 @@ function ChristmasLarioCup() {
       lang={lang}
       className="bg-[#020d2b] text-white"
     >
+      {/* Compact SCD METAL header (Francesco 16/10/2026 «queste barre così grandi io non le voglio»): brushed navy band,
+          official crest, title, date and place, the countdown and the two actions; the content starts right after. */}
       <section
         aria-labelledby="clc-t"
-        className="relative isolate flex items-end overflow-hidden px-4 pb-7 pt-5 sm:pb-8 sm:pt-7 lg:min-h-[calc(100svh-var(--pub-header-h))] lg:px-6 lg:pb-16 lg:pt-10"
+        className="scd-band relative overflow-hidden text-white lg:-mr-12 2xl:mr-0"
         data-hero="event"
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-[-6%_0_0] -z-40 bg-cover bg-[center_40%] brightness-[.62] saturate-[1.35]"
-          style={{ backgroundImage: "url(/media/scd/lario-header.webp)" }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-30 bg-[radial-gradient(70%_45%_at_50%_18%,rgb(255_207_74/0.28),transparent_70%),radial-gradient(60%_50%_at_15%_70%,rgb(216_32_42/0.25),transparent_70%),linear-gradient(180deg,rgb(2_13_43/0.3)_0%,rgb(2_13_43/0.55)_55%,#020d2b_100%)]"
-        />
-        <KitTexture motif="mountains-lake" overlay />
-        <Snow />
-        <div className="mx-auto grid w-full max-w-[1200px] gap-[16px] sm:gap-[22px] xl:grid-cols-[1.25fr_0.75fr] xl:items-end xl:gap-x-10">
-          <div className="grid gap-3 sm:gap-4">
-            <div className="flex items-center gap-[10px]">
-              <img
-                src="/media/brand/logo-scd.webp"
-                alt="S.C.D. ColicoDerviese"
-                className="h-[46px] w-auto sm:h-[60px]"
-              />
-              <span className="text-[13px] font-bold leading-tight text-[#bfe4ff]">
-                S.C.D. ColicoDerviese
-                <br />
-                {T.coWith} {E.coOrganizer}
+        <span aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(55%_120%_at_90%_0%,rgb(255_207_74/0.16),transparent_70%),radial-gradient(45%_110%_at_8%_100%,rgb(216_32_42/0.16),transparent_70%)]" />
+        <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[2px] bg-[linear-gradient(90deg,#8ea2c6,#ffffff_22%,#b8c5dd_50%,#ffffff_78%,#8ea2c6)]" />
+        <div className="relative mx-auto grid w-full max-w-[1200px] gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-8 lg:px-6 lg:py-6">
+          <div className="flex items-start gap-3 lg:items-center lg:gap-5">
+            <img
+              src="/media/brand/logo-scd.webp"
+              alt="S.C.D. ColicoDerviese"
+              className="h-[56px] w-auto shrink-0 drop-shadow-[0_8px_16px_rgb(0_0_0/0.45)] lg:h-[84px]"
+            />
+            <div className="grid min-w-0 gap-1">
+              <span className="font-display text-[11px] font-bold uppercase tracking-[0.1em] text-[#ffd23f] lg:text-[12px]">
+                {T.edition} · <span className="hidden sm:inline">S.C.D. ColicoDerviese </span>{T.coWith} {E.coOrganizer}
               </span>
-            </div>
-            <span className="justify-self-start -rotate-2 rounded-[8px] bg-[#d8202a] px-[14px] py-[6px] font-uv text-[18px] uppercase tracking-[0.12em] shadow-[0_6px_18px_rgb(216_32_42/0.5)]">
-              {T.edition}
-            </span>
-            <h1
-              id="clc-t"
-              className="font-uv text-[clamp(50px,14vw,180px)] uppercase leading-[0.8]"
-            >
-              <span className="uv-slam block bg-gradient-to-b from-white via-[#fff6d8] to-[#ffcf4a] bg-clip-text text-transparent [filter:drop-shadow(0_4px_0_#d8202a)_drop-shadow(0_8px_0_#a5121b)_drop-shadow(0_18px_24px_rgb(0_0_0/0.5))]">
-                Christmas
-              </span>
-              <span
-                className="uv-slam block text-[var(--uv-gold)] [filter:drop-shadow(0_4px_0_#021f4f)_drop-shadow(0_8px_0_#000a24)_drop-shadow(0_18px_24px_rgb(0_0_0/0.5))]"
-                style={{ animationDelay: ".18s" }}
-              >
-                Lario Cup
-              </span>
-            </h1>
-            <p className="font-uv-script -rotate-3 text-[clamp(20px,5vw,34px)] leading-[1.1] text-[#ffcf4a] [text-shadow:0_3px_0_rgb(0_0_0/0.4)]">
-              {T.tagline}
-            </p>
-            <div className="flex flex-wrap gap-[10px]">
-              <Pill
-                icon={
-                  <Calendar
-                    className="size-[26px] text-[#ffcf4a]"
-                    aria-hidden="true"
-                  />
-                }
-                title={T.dateTitle}
-                sub={T.dateSub}
-              />
-              <Pill
-                icon={
-                  <MapPin
-                    className="size-[26px] text-[#ffcf4a]"
-                    aria-hidden="true"
-                  />
-                }
-                title="Colico e Dervio"
-                sub={T.placeSub}
-              />
+              <h1 id="clc-t" className="m-0 font-display text-[28px] font-bold uppercase leading-[1] tracking-[0.01em] lg:text-[40px]">
+                Christmas <span className="text-[#ffd23f]">Lario Cup</span>
+              </h1>
+              <p className="m-0 text-[13px] leading-snug text-[#dbe5f7] lg:text-[16px]">{T.tagline}</p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                <Pill icon={<Calendar className="size-4 text-[#ffd23f]" aria-hidden="true" />} title={T.dateTitle} sub={T.dateSub} />
+                <Pill icon={<MapPin className="size-4 text-[#ffd23f]" aria-hidden="true" />} title="Colico e Dervio" sub={T.placeSub} />
+              </div>
             </div>
           </div>
-          <div className="grid gap-4">
-            <p
-              role="status"
-              className="inline-flex items-center gap-2 text-[14.5px] font-extrabold"
-            >
+          <div className="grid gap-2.5 lg:justify-items-end">
+            <p role="status" className="m-0 inline-flex items-center gap-2 font-display text-[14px] font-semibold text-[#dbe5f7]">
               <i
                 aria-hidden="true"
-                className={`size-[10px] rounded-full ${phase === "live" ? "uv-blink bg-[#ff3b44]" : "bg-[var(--uv-gold)]"}`}
+                className={`size-2 rounded-full ${phase === "live" ? "uv-blink bg-[#ff4d5e]" : "bg-[#ffd23f]"}`}
               />
               {T.state[phase]}
             </p>
-            <div
-              className="grid max-w-[520px] grid-cols-4 gap-2"
-              aria-label={T.countdownLabel}
-              data-testid="clc-countdown"
-            >
+            <div className="grid w-full max-w-[320px] grid-cols-4 gap-1.5" aria-label={T.countdownLabel} data-testid="clc-countdown">
               {[
                 [T.units[0], cd ? String(cd.d) : "0"],
                 [T.units[1], cd ? pad(cd.h) : "00"],
                 [T.units[2], cd ? pad(cd.m) : "00"],
                 [T.units[3], cd ? pad(cd.s) : "00"],
               ].map(([l, v]) => (
-                <div
-                  key={l}
-                  className="rounded-[14px] border-[1.5px] border-[rgb(255_207_74/0.45)] bg-gradient-to-b from-white/15 to-white/5 px-1 pb-2 pt-[10px] text-center"
-                >
-                  <b className="block font-uv text-[clamp(34px,10vw,58px)] leading-none tabular-nums">
-                    {v}
-                  </b>
-                  <small className="font-uv text-[12px] uppercase tracking-[0.14em] text-[#ffcf4a]">
-                    {l}
-                  </small>
+                <div key={l} className="rounded-[10px] border border-white/15 bg-black/20 px-1 pb-1 pt-1.5 text-center">
+                  <b className="block font-display text-[24px] font-bold leading-none tabular-nums lg:text-[28px]">{v}</b>
+                  <small className="font-display text-[10px] font-semibold uppercase tracking-[0.12em] text-[#b4c3de]">{l}</small>
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap gap-[10px]">
-              <a href="#iscrizioni" className={red}>
+            <div className="flex flex-wrap gap-2">
+              <a href="#iscrizioni" className="scd-gold scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-4 font-display text-[15px] font-semibold">
                 {T.enter}
               </a>
               <ShareButton page={SHARE_PAGES.christmasLarioCup} />
@@ -560,17 +433,11 @@ function Pill({
   sub: string;
 }) {
   return (
-    <div className="flex items-center gap-[10px] rounded-[14px] border-[1.5px] border-white/25 bg-white/10 px-[14px] py-[10px] backdrop-blur-md">
+    <span className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/20 bg-white/[0.07] px-3 py-1 font-display text-[13px] lg:text-[14px]">
       {icon}
-      <span>
-        <b className="block font-uv text-[22px] uppercase leading-none">
-          {title}
-        </b>
-        <small className="block text-[13px] font-bold text-[#bfe4ff]">
-          {sub}
-        </small>
-      </span>
-    </div>
+      <b className="font-semibold">{title}</b>
+      <span className="text-[#b4c3de]">{sub}</span>
+    </span>
   );
 }
 
