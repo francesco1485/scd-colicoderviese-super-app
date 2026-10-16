@@ -8,6 +8,8 @@ import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { KIND_LABEL, longDay, type PublicLottery } from "@/lib/lottery";
 import { getPublicLottery } from "@/lib/lottery.functions";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
+import { hasContent } from "@/lib/has-content";
+import { TOURNAMENTS, TOURNAMENT_STATUS_LABEL } from "@/lib/tournaments";
 
 export const Route = createFileRoute("/eventi/")({
   loader: async () => {
@@ -65,47 +67,21 @@ function Eventi() {
         </Link>
       </section>
       {lottery && <LotteryCard lottery={lottery} />}
-      {/* Always rendered: the home "Iniziative" tile lands on #iniziative (15/10/2026), never on nothing. */}
-      <section
-        id="iniziative"
-        aria-label="Iniziative"
-        className="scroll-mt-20 mx-auto grid max-w-6xl gap-4 px-4 pb-5 md:grid-cols-2"
-        data-testid="eventi-iniziative"
-      >
-        {initiatives.length > 0 ? (
-          initiatives.map((i) => <InitiativeCard key={i.id} item={i} />)
-        ) : (
-          <p className="card-premium m-0 p-5 text-[15px] font-semibold md:col-span-2" data-testid="eventi-iniziative-empty">
-            Nessuna iniziativa in corso.
-          </p>
-        )}
-      </section>
+      {/* Rendered only with something to show ("pagine piene", 16/10/2026): no empty "Nessuna iniziativa" block. */}
+      {hasContent(initiatives) && (
+        <section
+          id="iniziative"
+          aria-label="Iniziative"
+          className="scroll-mt-20 mx-auto grid max-w-6xl gap-4 px-4 pb-5 md:grid-cols-2"
+          data-testid="eventi-iniziative"
+        >
+          {initiatives.map((i) => <InitiativeCard key={i.id} item={i} />)}
+        </section>
+      )}
       <section className="mx-auto grid max-w-6xl gap-5 px-4 md:grid-cols-3">
         {eventi.length === 0 ? (
-          <div className="card-premium p-5 md:col-span-3">
-            <p className="m-0 text-[16px] font-bold">
-              Gli altri eventi della stagione
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Open day, tornei e serate compaiono qui appena la società li
-              pubblica. Intanto trovi gare e allenamenti nel calendario e le
-              novità nel feed del club.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Link
-                to="/calendario"
-                className="surface-sun inline-flex h-11 items-center rounded-lg px-4 text-sm font-bold uppercase"
-              >
-                Calendario
-              </Link>
-              <Link
-                to="/"
-                className="inline-flex h-11 items-center rounded-lg border border-border px-4 text-sm font-bold uppercase"
-              >
-                Dal club
-              </Link>
-            </div>
-          </div>
+          // No club event published: lead with the tournaments that exist (lib/tournaments.ts), not with an absence.
+          <SeasonTournaments />
         ) : (
           eventi.map((e) => (
             <article key={e.id} className="overflow-hidden card-premium">
@@ -212,5 +188,53 @@ function LotteryCard({ lottery }: { lottery: PublicLottery }) {
         </span>
       </Link>
     </section>
+  );
+}
+
+/** Tournaments of the season after the hero (Christmas Lario Cup maschile is the hero): one row each, to /tornei. */
+function SeasonTournaments() {
+  const rows = TOURNAMENTS.filter((t) => t.id !== "christmas-lario-cup-maschile");
+  return (
+    <div className="pb-10 md:col-span-3" data-testid="eventi-tornei">
+      <h2 className="m-0 font-uv text-[26px] uppercase leading-none text-[#13254d]">Tornei della stagione</h2>
+      <ul className="m-0 mt-3 grid list-none gap-2.5 p-0 md:grid-cols-3">
+        {rows.map((t) => (
+          <li key={t.id}>
+            <Link
+              to="/tornei"
+              hash={t.id}
+              className="scd-focus relative flex h-full flex-col overflow-hidden rounded-[18px] bg-white py-3.5 pl-5 pr-4 text-[#13254d] shadow-premium"
+              data-testid={`eventi-torneo-${t.id}`}
+            >
+              <span aria-hidden="true" className="scd-band-sole absolute inset-y-0 left-0 w-[6px]" />
+              <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#034a96]">
+                {t.section} · {TOURNAMENT_STATUS_LABEL[t.status]}
+              </span>
+              <b className="mt-1 block text-[18px] leading-tight">{t.name}</b>
+              {t.when && <span className="mt-0.5 block text-[14px] font-semibold text-[#3e5272]">{t.when}</span>}
+              <span className="mt-1 block flex-1 text-[14px] leading-snug text-[#3e5272]">{t.text}</span>
+              <span className="mt-2 inline-flex items-center gap-1 text-[14px] font-bold text-[#0457af]">
+                Scheda del torneo
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Link
+          to="/calendario"
+          className="scd-gold scd-focus inline-flex h-11 items-center rounded-[12px] px-4 text-sm font-bold uppercase"
+        >
+          Gare nel calendario
+        </Link>
+        <Link
+          to="/tornei"
+          className="scd-focus inline-flex h-11 items-center rounded-[12px] border border-[#c9d6e6] bg-white px-4 text-sm font-bold uppercase text-[#13254d]"
+        >
+          Tutti i tornei
+        </Link>
+      </div>
+    </div>
   );
 }

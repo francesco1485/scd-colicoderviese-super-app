@@ -15,6 +15,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import { DeleteAccountCard } from "@/components/scd/DeleteAccountCard";
+import { JoinClubScreen } from "@/components/scd/JoinClub";
 import { RequestsToConfirmCard } from "@/components/scd/RequestsToConfirmCard";
 import { FollowButton } from "@/components/universe/Feed";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
@@ -101,34 +102,16 @@ function MyPage() {
     serverNow,
     today,
   } = Route.useLoaderData();
+  // Visitors: a real sign-up page (what you get, Registrati / Entra), never an almost empty box (Francesco 16/10/2026).
   if (!session.user) {
     return (
-      <main
-        data-screen="la-mia-scd"
-        className="min-h-dvh bg-[#f2f6fb] px-4 pb-28 pt-6 text-[#0b1e3a]"
-      >
-        <div className="mx-auto max-w-[520px] rounded-[20px] bg-white p-5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
-          <h1 className="m-0 font-uv text-[28px] leading-none">LA MIA SCD</h1>
-          <p className="mb-4 mt-2 text-[15px] leading-[1.45] text-[#3e5272]">
-            Un solo link per tutti: ti iscrivi, segui le tue squadre e vedi i
-            tuoi impegni. Il resto lo abilita la Direzione.
-          </p>
-          <div className="flex gap-2">
-            <Link
-              to="/registrati"
-              className="scd-focus inline-flex h-12 flex-1 items-center justify-center rounded-[14px] bg-[var(--uv-gold)] font-bold text-[#0b1e3a]"
-            >
-              Iscriviti
-            </Link>
-            <Link
-              to="/entra"
-              className="scd-focus inline-flex h-12 flex-1 items-center justify-center rounded-[14px] border-2 border-[#0b2a5b] font-bold text-[#0b2a5b]"
-            >
-              Accedi
-            </Link>
-          </div>
-        </div>
-      </main>
+      <JoinClubScreen
+        screen="la-mia-scd"
+        kicker="La mia SCD"
+        title="Il tuo club, la tua area"
+        intro="Un solo account per tutti: ti iscrivi, segui le tue squadre e trovi i tuoi impegni. Per le famiglie si aggiungono le cose dei figli; i ruoli dello staff li abilita la Direzione."
+        next="/la-mia-scd"
+      />
     );
   }
   return (

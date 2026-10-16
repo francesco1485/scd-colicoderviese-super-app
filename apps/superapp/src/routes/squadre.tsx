@@ -1,29 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { HallDoors, HallHero } from "@/components/scd/hall";
-import {
-  MembersOnlyScreen,
-  membersOnlyHead,
-} from "@/components/scd/MembersOnly";
+import { JoinClubScreen } from "@/components/scd/JoinClub";
+import { membersOnlyHead } from "@/components/scd/MembersOnly";
 import { OfficialResults } from "@/components/scd/OfficialResults";
 import { dateParts, venueCase } from "@/lib/board-data";
 import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_PROFILE, hallTeams, type HallTeam } from "@/lib/club-profile";
+import { withContent } from "@/lib/has-content";
 import { romeParts } from "@/lib/home-week";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 import { BASE_ACTIVITY_TEAMS } from "@/lib/social";
 import { publicTeamCrest } from "@/lib/team-crest";
 
 /**
- * Teams are inside (UD-100, Direzione 13/10/2026): the loader asks the server for the session first and loads no
- * team data for anonymous visitors, who get the members-only screen.
+ * Teams are inside (UD-100, Direzione 13/10/2026): rosters, team pages, next matches and news stay for members.
+ * Visitors (Francesco 16/10/2026 23:08 «non voglio pagine vuote») get a public page instead of a lock: the categories
+ * of the season with championship (only where verified), birth years and the link to the public games calendar, plus
+ * Registrati / Entra. Data comes from the anonymous calendar snapshot (fixtures only, no annata crests, no people)
+ * and only the fields shown leave the server: no names, no rosters, no minors' data.
  */
 export const Route = createFileRoute("/squadre")({
   loader: async () => {
     const session = await getSession();
-    if (!session.user) return { signedIn: false as const };
     const calendar = await getPublicCalendarSnapshot();
+    if (!session.user)
+      return { signedIn: false as const, teams: publicTeams(hallTeams(calendar.groups)) };
     const now = new Date().toISOString();
     // "Today" in Europe/Rome, fixed by the server so SSR and hydration agree on the next match.
     const today = romeParts(now)?.date ?? now.slice(0, 10);
@@ -40,7 +43,7 @@ export const Route = createFileRoute("/squadre")({
 
 function SquadreRoute() {
   const data = Route.useLoaderData();
-  if (!data.signedIn) return <MembersOnlyScreen next="/squadre" />;
+  if (!data.signedIn) return <PublicTeamsScreen teams={data.teams} />;
   return (
     <SquadrePage groups={data.groups} events={data.events} today={data.today} />
   );
@@ -224,5 +227,105 @@ function TeamTile({ t, next }: { t: HallTeam; next: PublicEvent | null }) {
         </span>
       </Link>
     </li>
+  );
+}
+
+/** What a visitor may see of a team: category, championship (verified only), birth years, calendar link. */
+interface PublicTeam {
+  id: string;
+  name: string;
+  line: string;
+  years: string | null;
+  color: string;
+  /** /calendario?annata=… value; null when the team has no game in the public calendar. */
+  annata: string | null;
+}
+
+function publicTeams(teams: readonly HallTeam[]): PublicTeam[] {
+  return withContent(teams, (t) => t.label).map((t) => ({
+    id: t.id,
+    name: t.label.replace(/\s·\s/g, " "),
+    line: t.championship
+      ? `${t.championship.name} · ${t.championship.group}`
+      : BASE_ACTIVITY_TEAMS.has(t.id)
+        ? "Attività di base"
+        : "Settore giovanile",
+    years: t.years.length ? `${t.years.length === 1 ? "Annata" : "Annate"} ${t.years.join("–")}` : null,
+    color: t.color,
+    annata: t.annata,
+  }));
+}
+
+/** Signed-out /squadre: the season's categories and how to join, never an empty lock. */
+function PublicTeamsScreen({ teams }: { teams: readonly PublicTeam[] }) {
+  return (
+    <JoinClubScreen
+      screen="squadre"
+      kicker={`ColicoDerviese · Stagione ${CLUB_PROFILE.season}`}
+      title="Le nostre squadre"
+      intro={
+        teams.length > 0
+          ? `${teams.length} squadre tra Colico e Dervio, dalla Prima Squadra ai più piccoli. Le gare sono nel calendario pubblico; rose, convocazioni e notizie di ogni squadra sono nell'area soci.`
+          : "Dalla Prima Squadra ai più piccoli, tra Colico e Dervio. Rose, convocazioni e notizie di ogni squadra sono nell'area soci."
+      }
+      next="/squadre"
+      lead={
+        teams.length > 0 && (
+        <section
+          aria-labelledby="squadre-pub-t"
+          className="relative rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)] sm:p-5"
+          data-testid="public-team-list"
+        >
+          <h2 id="squadre-pub-t" className="m-0 font-uv text-[26px] uppercase leading-none text-[#13254d]">
+            Le categorie della stagione
+          </h2>
+          <ul className="m-0 mt-3 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-2 lg:grid-cols-3">
+            {teams.map((t) => (
+              <li key={t.id} data-team={t.id}>
+                <PublicTeamRow t={t} />
+              </li>
+            ))}
+          </ul>
+          <p className="m-0 mt-3 text-[13px] leading-snug text-[#3e5272]">
+            Squadre dal calendario SCD della stagione. Il campionato è indicato solo dove è verificato sul sito della
+            LND; per le altre squadre mostriamo la categoria.
+          </p>
+        </section>
+        )
+      }
+    />
+  );
+}
+
+function PublicTeamRow({ t }: { t: PublicTeam }) {
+  const body = (
+    <>
+      <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[5px]" style={{ background: t.color }} />
+      <span className="min-w-0 flex-1">
+        <span className="block font-title text-[19px] font-black uppercase leading-[1.05]">{t.name}</span>
+        <span className="mt-1 block text-[13.5px] font-semibold leading-snug text-[#3e5272]">{t.line}</span>
+        {t.years && <span className="block text-[13px] text-[#4a5d7a]">{t.years}</span>}
+      </span>
+      {t.annata && (
+        <span className="inline-flex shrink-0 items-center gap-1 text-[13.5px] font-bold text-[#0457af]">
+          Gare
+          <span aria-hidden="true">›</span>
+        </span>
+      )}
+    </>
+  );
+  const cls =
+    "relative flex min-h-[72px] items-center gap-3 overflow-hidden rounded-[16px] bg-white py-3 pl-4 pr-3.5 text-[#13254d] shadow-[0_2px_10px_rgb(11_42_91/0.08)]";
+  return t.annata ? (
+    <Link
+      to="/calendario"
+      search={{ annata: t.annata }}
+      className={`scd-focus ${cls} transition-colors hover:border-[#9fbde4] hover:bg-white`}
+      aria-label={`ColicoDerviese ${t.name}: ${t.line}${t.years ? `, ${t.years}` : ""}. Apri le gare nel calendario`}
+    >
+      {body}
+    </Link>
+  ) : (
+    <div className={cls}>{body}</div>
   );
 }
