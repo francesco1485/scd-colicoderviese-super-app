@@ -187,6 +187,19 @@ const NO_COPY = "Mai copiare frasi del messaggio ricevuto";
 const BASE_LIMITS: readonly string[] = [NO_NAMES_OF_MINORS, NO_COPY];
 
 /**
+ * Francesco 16/10/2026 11:58 «ok chi decide Presidente e Consiglio Direttivo»: for sponsor, minori-organizzativo,
+ * salute and impianti (Colico and Dervio) the deciders are the Presidente AND the Consiglio Direttivo. The registry
+ * has no separate "consiglio-direttivo" position: the board is the role DIRECTION, whose position is 'direzione'
+ * (session.ts ROLE_POSITIONS.DIRECTION; 'dirigenza' is the purchasing seat of the same role). So the Consiglio
+ * Direttivo is routed as 'direzione'.
+ */
+export const BOARD_POSITION = "direzione";
+const BOARD_DECIDERS: readonly Entry[] = [
+  { position: "presidente", duty: "DECIDE", reason: "decide con il Consiglio Direttivo (Francesco 16/10/2026)" },
+  { position: BOARD_POSITION, duty: "DECIDE", reason: "Consiglio Direttivo: decide con il Presidente (Francesco 16/10/2026)" },
+];
+
+/**
  * ONE table "topic -> positions" (G14). Deciders follow the existing chains: UD-154 for matches (group confirmer),
  * UD-155 examples (infermeria -> fisioterapista + DG; friendly -> direttore sportivo + mister + DG), UD-159 (DG and
  * Presidente decide the activities).
@@ -254,7 +267,10 @@ export const CHI_FA_COSA_TABLE: Readonly<Record<ChiFaCosaTopic, TopicRule>> = {
     immediate: false,
   },
   salute: {
-    entries: [{ position: "responsabile-infermeria", duty: "DECIDE", reason: "appuntamenti e infermeria (UD-155)" }],
+    entries: [
+      ...BOARD_DECIDERS,
+      { position: "responsabile-infermeria", duty: "INFORM", reason: "appuntamenti e infermeria (UD-155)" },
+    ],
     teamStaff: false,
     teamConfirmerDecides: false,
     siteStructure: false,
@@ -264,7 +280,7 @@ export const CHI_FA_COSA_TABLE: Readonly<Record<ChiFaCosaTopic, TopicRule>> = {
   },
   "minori-organizzativo": {
     entries: [
-      { position: "presidente", duty: "DECIDE", reason: "responsabile legale della tutela dei minori" },
+      ...BOARD_DECIDERS,
       { position: "segreteria", duty: "PREPARE", reason: "regole organizzative e documenti" },
       { position: "coordinatore-attivita-sportiva", duty: "INFORM", reason: "organizzazione delle squadre" },
     ],
@@ -280,7 +296,7 @@ export const CHI_FA_COSA_TABLE: Readonly<Record<ChiFaCosaTopic, TopicRule>> = {
     immediate: false,
   },
   impianti: {
-    entries: [{ position: "responsabile-campi", duty: "INFORM", reason: "campi e impianti" }],
+    entries: [...BOARD_DECIDERS, { position: "responsabile-campi", duty: "INFORM", reason: "campi e impianti" }],
     teamStaff: false,
     teamConfirmerDecides: false,
     siteStructure: true,
@@ -303,7 +319,7 @@ export const CHI_FA_COSA_TABLE: Readonly<Record<ChiFaCosaTopic, TopicRule>> = {
   },
   sponsor: {
     entries: [
-      { position: "presidente", duty: "DECIDE", reason: "firma gli accordi del club" },
+      ...BOARD_DECIDERS,
       { position: "tesoreria", duty: "INFORM", reason: "incassi e fatture" },
     ],
     teamStaff: false,
@@ -362,23 +378,18 @@ export const DERVIO_EXCLUDED: readonly string[] = [
 ];
 
 /**
- * PROPOSED (needs Francesco's OK, not a recorded directive): in an EMERGENZA at Dervio the Dervio structure people
- * are told too, because they may be on site. Only for topic "emergenza"; every other topic follows UD-156.
+ * Francesco 16/10/2026 11:58 «sì emergenze struttura Dervio»: in an EMERGENZA at Dervio the Dervio structure
+ * positions are told too. Only for topic "emergenza"; every other topic follows UD-156.
  */
-export const DERVIO_EMERGENCY_STRUCTURE_PROPOSED: readonly string[] = [
+export const DERVIO_EMERGENCY_STRUCTURE: readonly string[] = [
   "responsabile-struttura-dervio",
   "responsabile-struttura",
 ];
 
-/** Who decides a site question when the topic has no decider of its own (UD-156: Dervio decides the DG). */
-const SITE_DECIDER: Readonly<Record<"COLICO" | "DERVIO", string>> = {
-  COLICO: "responsabile-struttura-colico",
-  DERVIO: "direttore-generale",
-};
-
 /**
- * INFERRED (UD-156 context: Francesco is the DG and part of the Direzione): when the Direzione fallback decides a
- * group whose confirmer position does not exist yet, the Direttore Generale may confirm as Direzione.
+ * VERIFIED (Francesco 16/10/2026 11:58 «ok DG conferma come direzione»): when the Direzione fallback decides a
+ * group whose confirmer position does not exist yet, the Direttore Generale confirms as Direzione. Applied only when
+ * 'direzione' is the sole decider (UD-154 fallback); where the Presidente decides too, the Presidente's rank counts.
  */
 const FALLBACK_CONFIRM_RANK = 1;
 
@@ -509,10 +520,8 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
       const where = s === "COLICO" ? "Colico" : "Dervio";
       for (const p of SITE_STRUCTURE[s]) add(p, "INFORM", `struttura di ${where}`);
       if (s === "DERVIO" && rule.immediate)
-        for (const p of DERVIO_EMERGENCY_STRUCTURE_PROPOSED)
-          add(p, "INFORM", "emergenza a Dervio (PROPOSTA, da confermare con Francesco)");
-      if (!rule.entries.some((e) => e.duty === "DECIDE"))
-        add(SITE_DECIDER[s], "DECIDE", s === "DERVIO" ? "decide su Dervio (UD-156)" : "decide sulla struttura di Colico");
+        for (const p of DERVIO_EMERGENCY_STRUCTURE)
+          add(p, "INFORM", "emergenza a Dervio (Francesco 16/10/2026)");
     }
   }
   const touchesDervio = input.site === "DERVIO" || input.site === "ENTRAMBE" || input.site === null;
@@ -520,7 +529,7 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
   if (touchesDervio) {
     // UD-156: who does not see Dervio is not told about it (emergenza keeps only its own structure additions).
     const keep = rule.immediate
-      ? new Set<string>([...SITE_STRUCTURE.COLICO, ...DERVIO_EMERGENCY_STRUCTURE_PROPOSED])
+      ? new Set<string>([...SITE_STRUCTURE.COLICO, ...DERVIO_EMERGENCY_STRUCTURE])
       : new Set<string>();
     let removed = false;
     for (const p of DERVIO_EXCLUDED) if (!keep.has(p) && byPos.delete(p)) removed = true;
