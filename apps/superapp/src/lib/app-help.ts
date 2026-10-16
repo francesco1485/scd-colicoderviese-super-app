@@ -14,13 +14,19 @@ import type { SkyReply } from "./sky.functions";
 const APP_WORD_RE = /\b(app|applicazione|super ?app)\b/i;
 /** How-to words that, next to the app, make an app-help question. */
 const APP_HOW_RE = /come funziona|come (si )?usa|come (la |lo )?uso|come si scarica|come (la |lo )?scarico|a cosa serve|guida|istruzioni|tutorial/i;
-/** Login and sign-up of the app account (never the club registration of an athlete: that is "iscrizione"). */
-const ACCOUNT_RE =
-  /\b(come (mi |ci )?registr\w*|registrarmi|registrarsi|come (faccio ad? |posso |si fa ad? |devo )?(accedere|fare (il )?login|loggarmi|entrare con (la mia |l')?e-?mail)|accedere all'?\s?(app|area)|entrare nell'?\s?(app|area riservata)|accesso all'?\s?(app|area)|non riesco ad? (accedere|entrare|fare (il )?login)|(ho )?dimenticato la password|recuper\w* (la )?password|login)\b/i;
+/**
+ * Login and sign-up of the app account (never the club registration of an athlete, a pitch or a stadium): an access
+ * verb counts only next to the app or an account word, so "accedere al campo di Dervio", "entrare allo stadio",
+ * "registrare mio figlio alla scuola calcio", "registro la presenza" and "accesso all'area tribuna" go to the model.
+ */
+const ACCESS_VERB_RE = /\b(acced\w*|accesso|entra\w*|entro|registr\w*|login|logg\w*)\b/i;
+const ACCOUNT_WORD_RE = /\b(app|applicazione|super ?app|account|password|e-?mail|area riservata|profilo)\b/i;
+/** Lost password: always an account question. */
+const PASSWORD_RE = /\b((ho )?dimenticat\w* (la )?password|recuper\w* (la )?password|cambi\w* (la )?password)\b/i;
 
 /** Explicit questions about the app or its account: the fixed guide answers them, with or without AI. */
 export function isExplicitAppQuestion(message: string): boolean {
-  return (APP_WORD_RE.test(message) && APP_HOW_RE.test(message)) || ACCOUNT_RE.test(message);
+  return (APP_WORD_RE.test(message) && APP_HOW_RE.test(message)) || (ACCESS_VERB_RE.test(message) && ACCOUNT_WORD_RE.test(message)) || PASSWORD_RE.test(message);
 }
 
 /** The wide match of the old browser rule: used only when the model is off or fails (behaviour without the key). */

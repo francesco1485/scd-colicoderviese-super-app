@@ -47,10 +47,11 @@ describe("isExplicitAppQuestion: fixed guide only for explicit app / login quest
       "come funziona l'applicazione",
       "a cosa serve la super app?",
       "come si usa l'app",
-      "Come mi registro?",
-      "come faccio ad accedere?",
-      "Non riesco ad accedere",
+      "Come mi registro all'app?",
+      "come faccio ad accedere con la mia email?",
+      "Non riesco ad accedere all'area riservata",
       "come posso accedere all'app",
+      "login nell'app non va",
       "ho dimenticato la password",
       "Come funziona l'app",
     ]) {
@@ -66,6 +67,12 @@ describe("isExplicitAppQuestion: fixed guide only for explicit app / login quest
       "a cosa serve il certificato medico?",
       "come funziona il fondo solidale?",
       "c'è una guida per i genitori dei piccoli?",
+      "come faccio ad accedere al campo di Dervio?",
+      "non riesco ad entrare allo stadio",
+      "come registrare mio figlio alla scuola calcio?",
+      "come registro la presenza?",
+      "accesso all'area tribuna",
+      "login",
     ]) {
       expect(isExplicitAppQuestion(q), q).toBe(false);
     }
@@ -90,7 +97,7 @@ describe("answerPublic: fewer fixed answers (Francesco 16/10/2026 13:10)", () =>
   });
 
   it("explicit app questions still get the fixed guide, without calling the model", async () => {
-    for (const q of ["Come funziona l'app", "Come mi registro?"]) {
+    for (const q of ["Come funziona l'app", "Come mi registro all'app?", "ho dimenticato la password"]) {
       const t = ask(q, ON);
       const r = await t.run();
       expect(t.fetchImpl, q).not.toHaveBeenCalled();
