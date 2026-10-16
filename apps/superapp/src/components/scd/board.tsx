@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { KitTexture, type KitMotif } from "@/components/scd/kit-texture";
 import skyAsset from "@/assets/brand/sky-scd.png.asset.json";
 import lario from "@/assets/scd/lario-header.webp.asset.json";
+import { BoardMenuButton } from "@/components/scd/BoardMenuButton";
 
 export const CLUB_NAME = "S.C.D. ColicoDerviese";
 
@@ -124,7 +125,7 @@ export function HeroHeader({
           ) : (
             <Wordmark className="mt-[10px]" />
           )}
-          <div className={cx("ml-auto -mr-2", compact ? "mt-[2px] lg:mt-[8px]" : "mt-[8px]")}>{action}</div>
+          <div className={cx("ml-auto -mr-2 flex items-center gap-1", compact ? "mt-[2px] lg:mt-[8px]" : "mt-[8px]")}>{action}<BoardMenuButton /></div>
         </div>
         <div className={cx("relative z-10", compact && "pb-[var(--hh-bg-sm)] pt-[var(--hh-tg-sm)] lg:pb-[var(--hh-bg)] lg:pt-[var(--hh-tg)]")} style={gaps}>
           <h1 className={cx("font-bold tracking-[-0.01em] [text-shadow:0_2px_10px_rgb(0_0_0/0.45)]", compact ? "text-[26px] sm:text-[32px] lg:text-[40px]" : "text-[31px] sm:text-[40px]", "leading-[1.05]")}>{title}</h1>
@@ -162,7 +163,7 @@ export function PageHeader({ title, action, testId, motif = "monogram" }: { titl
         </Link>
         <div className="flex h-[76px] w-full items-center gap-3 pl-[86px]">
           <h1 className={cx("min-w-0 flex-1 truncate font-bold leading-none tracking-[-0.01em]", title.length > 16 ? "text-[23px] sm:text-[28px]" : title.length > 13 ? "text-[25px] sm:text-[28px]" : "text-[28px]")}>{title}</h1>
-          <div className="-mr-2 shrink-0">{action}</div>
+          <div className="-mr-2 flex shrink-0 items-center gap-1">{action}<BoardMenuButton /></div>
         </div>
       </div>
     </header>

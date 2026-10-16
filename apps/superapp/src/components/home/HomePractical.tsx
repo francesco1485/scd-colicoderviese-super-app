@@ -673,7 +673,7 @@ export function WeekendResults({ rows }: { rows: readonly ResultRow[] }) {
 
 /* ------------------------------------------------------------- the tip */
 
-/** Tip of the day, in rotation between the tip-only characters and Vera (UD-121). */
+/** Tip of the day, in rotation between the tip-only characters and Iride (UD-121, UD-155). */
 export function DailyTipCard({
   tip,
   signedIn,

@@ -7,10 +7,13 @@
  * Order of every answer:
  * 1. signs of distress (fixed referral, cast-safety.ts), safeguarding, plain-words requests (UD-045) and operational
  *    requests of an area (orders, registrations, tickets: UD-114) → rules engine, never the model;
- * 2. feature off (SCD_ASSISTANT_AI != "on") or no SCD_ANTHROPIC_API_KEY → rules engine (behaviour of today);
- * 3. rate limit (public 20 / 10 min per IP, staff 60 / hour per user);
- * 4. CONTEXT from real data → Claude (8 s timeout) → JSON parse + output guard;
- * 5. any error, timeout, quota or unreadable answer → rules engine.
+ * 2. explicit questions about the app or its login / sign-up → fixed app guide (app-help.ts); every other question
+ *    goes to the model (Francesco 16/10/2026: "meno risposte fisse");
+ * 3. feature off (SCD_ASSISTANT_AI != "on") or no SCD_ANTHROPIC_API_KEY → rules engine (behaviour of today, with the
+ *    wide "come funziona / guida" app guide first);
+ * 4. rate limit (public 20 / 10 min per IP, staff 60 / hour per user);
+ * 5. CONTEXT from real data → Claude (8 s timeout) → JSON parse + output guard;
+ * 6. any error, timeout, quota or unreadable answer → rules engine (same as 3).
  * When Vera's chat is opened with an area (a face, or the ticket office, cast-personas.ts) she answers from the public
  * projection plus the area notes, with the area's extra rules in the system prompt and her strict output guard.
  * Logs carry only outcome, persona, area, latency and token counts: never the question, the context or the answer.
@@ -18,6 +21,7 @@
 import { createHash } from "node:crypto";
 
 import { anthropicApiKey, callClaude, type FetchLike } from "./anthropic.server";
+import { appHelpReply, isExplicitAppQuestion, isLegacyAppHelp } from "./app-help";
 import {
   AI_TIMEOUT_MS,
   PUBLIC_CONTEXT_TOKENS,
@@ -119,13 +123,22 @@ async function modelAnswer(
     system: systemPrompt(persona, level, ctx, area),
     user: userPrompt(message),
     maxTokens: 450,
-    temperature: 0.2,
     timeoutMs: AI_TIMEOUT_MS,
     ...(deps.fetchImpl ? { fetchImpl: deps.fetchImpl } : {}),
   });
   const ms = (deps.now ?? Date.now)() - t0;
   if (!out.ok) {
-    log("fallback", { persona, area, level, reason: out.reason, status: out.reason === "http" ? out.status : null, ms });
+    const http = out.reason === "http" ? out : null;
+    log("fallback", {
+      persona,
+      area,
+      level,
+      reason: out.reason,
+      status: http ? http.status : null,
+      ...(http?.errorType ? { errType: http.errorType } : {}),
+      ...(http?.errorMessage ? { errMsg: JSON.stringify(http.errorMessage) } : {}),
+      ms,
+    });
     return null;
   }
   // Strict guard everywhere except staff reading the Cervellone (INTERNO / RISERVATO) without an area.
@@ -164,8 +177,11 @@ export async function answerPublic(input: PublicAnswerInput, deps: PublicDeps): 
   const cfg = assistantConfig(deps.env);
   const persona = input.persona;
   const area = persona === "vera" && isChatArea(input.area) ? input.area : null;
-  const rules = async () => asReply(await deps.rules({ message: input.message, persona, area }), persona, area);
-  if (bypassesModel(input.message, area) || !cfg.enabled) return rules();
+  const safety = async () => asReply(await deps.rules({ message: input.message, persona, area }), persona, area);
+  if (bypassesModel(input.message, area)) return safety();
+  if (isExplicitAppQuestion(input.message)) return asReply(appHelpReply(), persona, area);
+  const rules = async () => (isLegacyAppHelp(input.message) ? asReply(appHelpReply(), persona, area) : safety());
+  if (!cfg.enabled) return rules();
   // Directions to our own pitches (B7): always the master's street + Maps link, never a model paraphrase.
   if (isClubDirectionsQuestion(input.message)) return asReply(directionsReply(input.message), persona, area);
   const rl = publicLimiter.hit(limiterKey("ip", input.ip), (deps.now ?? Date.now)());
@@ -203,12 +219,15 @@ export interface StaffDeps extends AnswerDeps {
 export async function answerStaff(message: string, deps: StaffDeps, requested?: string | null): Promise<AssistantReply> {
   const s = await deps.session();
   if (!s.user) {
-    return { text: "Per parlare con Vera nelle aree riservate devi prima entrare con la tua e-mail.", mood: "info", links: [{ label: "Entra", to: "/accedi" }], ai: false, persona: "sky", area: null };
+    return { text: "Per parlare con Iride nelle aree riservate devi prima entrare con la tua e-mail.", mood: "info", links: [{ label: "Entra", to: "/accedi" }], ai: false, persona: "sky", area: null };
   }
   const { persona, area } = resolveChat("inside", { roles: s.roles, age15plus: null }, requested);
   const cfg = assistantConfig(deps.env);
-  const rules = async () => asReply(await deps.rules({ message, persona, area }), persona, area);
-  if (bypassesModel(message, area) || !cfg.enabled) return rules();
+  const safety = async () => asReply(await deps.rules({ message, persona, area }), persona, area);
+  if (bypassesModel(message, area)) return safety();
+  if (isExplicitAppQuestion(message)) return asReply(appHelpReply(), persona, area);
+  const rules = async () => (isLegacyAppHelp(message) ? asReply(appHelpReply(), persona, area) : safety());
+  if (!cfg.enabled) return rules();
   const rl = staffLimiter.hit(limiterKey("user", s.user.email.toLowerCase()), (deps.now ?? Date.now)());
   if (!rl.ok) return { text: rateLimitedText(rl.retryAfterSec), mood: "alert", ai: false, persona, area };
 

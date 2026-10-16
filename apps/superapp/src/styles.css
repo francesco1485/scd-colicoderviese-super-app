@@ -455,10 +455,10 @@ html.uv-big .sa-shell { zoom: 1.12; }
   --font-text: "Barlow", "Barlow Fallback", system-ui, sans-serif;
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   /* Telefono e tablet: barra più bassa (Direzione 13/10/2026 14:55, "barra grande in alto"). */
-  --pub-header-h: 56px;
+  --pub-header-h: 60px;
 }
 @media (min-width: 1024px) {
-  :root { --pub-header-h: 72px; }
+  :root { --pub-header-h: 68px; }
 }
 
 @theme inline {
@@ -953,3 +953,16 @@ html.uv-big .sa-shell { zoom: 1.12; }
   .scd-wiggle-on-hover:hover .scd-wiggle-target { animation: none !important }
 }
 
+
+/* Home ticker (Francesco 16/10/2026 06:21: «la barra che scorre sopra piccola con le partite»): pauses on hover,
+   focus and touch; no movement for people who ask for reduced motion (then it is a plain scrollable row). */
+@keyframes scd-ticker { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+.scd-ticker-track { animation: scd-ticker var(--ticker-s, 40s) linear infinite; }
+.scd-ticker:hover .scd-ticker-track,
+.scd-ticker:focus-within .scd-ticker-track,
+.scd-ticker[data-paused="true"] .scd-ticker-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .scd-ticker-track { animation: none; }
+  .scd-ticker { overflow-x: auto; }
+  .scd-ticker-dup { display: none; }
+}

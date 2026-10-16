@@ -15,6 +15,7 @@ import { romeParts } from "@/lib/home-week";
 import { getPublicSocial } from "@/lib/social.functions";
 import { EMPTY_WORLDS } from "@/lib/vetrina";
 import { getVetrina, type VetrinaDay } from "@/lib/vetrina.functions";
+import { getPublicTrainings } from "@/lib/quadro.functions";
 
 /** Longest wait for the R20 feed (alerts and weekend results) on the public home. */
 const FEED_BUDGET_MS = 1_500;
@@ -79,6 +80,7 @@ export const Route = createFileRoute("/")({
       );
       // Board home (VR-009, 15/10): "Mondo Colico" is the vetrina of the day; news are not shown (no waiting for them).
       // getVetrina also gives the server Rome day (QA day honoured outside production) that seeds the LED wall.
+      const trainingP = getPublicTrainings().catch(() => null);
       const vetrina: VetrinaDay = await getVetrina({
         data: { pressRecent: false },
       }).catch((): VetrinaDay => ({ today, worlds: EMPTY_WORLDS }));
@@ -88,6 +90,7 @@ export const Route = createFileRoute("/")({
         vetrina: vetrina.worlds,
         feed: await feedP,
         notice: await noticeP,
+        training: await trainingP,
         serverNow,
         today,
       };
@@ -159,6 +162,7 @@ function Home() {
       vetrina={data.vetrina}
       feed={data.feed}
       notice={data.notice}
+      training={data.training}
       nowMs={data.serverNow}
       today={data.today}
     />

@@ -240,9 +240,18 @@ export function AccessMenu() {
   const panelRef = useRef<HTMLDivElement>(null);
   const { session, refresh } = useSession();
 
+  // Element that had focus when the menu opened (the header button, or the bottom bar tab / any "scd:access-menu"
+  // opener on phones, where the header button is hidden): focus goes back there on close.
+  const openerRef = useRef<HTMLElement | null>(null);
+
   const close = useCallback((restoreFocus = true) => {
     setOpen(false);
-    if (restoreFocus) buttonRef.current?.focus();
+    if (!restoreFocus) return;
+    const opener = openerRef.current;
+    openerRef.current = null;
+    // A hidden element (display:none) has no client rects and cannot take focus: fall back to the header button.
+    if (opener?.isConnected && opener.getClientRects().length > 0) opener.focus();
+    else buttonRef.current?.focus();
   }, []);
 
   useEffect(() => setOpen(false), [pathname]);
@@ -256,6 +265,8 @@ export function AccessMenu() {
   }, [refresh]);
   useEffect(() => {
     if (!open) return;
+    const active = document.activeElement;
+    openerRef.current = active instanceof HTMLElement && active !== document.body ? active : null;
     panelRef.current?.querySelector<HTMLElement>("a,[tabindex]")?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();

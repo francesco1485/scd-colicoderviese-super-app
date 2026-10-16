@@ -223,7 +223,7 @@ export function parseConsent(raw: string | null): Consent | null {
 }
 
 /** Aree dove i pixel di marketing non devono mai partire: riservate, staff, minori, safeguarding. */
-const NO_MARKETING = /^\/(aree|core|safeguarding|entra|contatti|famiglia|infermeria|pulmini|magazzino|segreteria|tesoreria|direzione|crm|partner|gestionale|quadro|allenamenti|la-mia-scd|squadre)(\/|$)/;
+const NO_MARKETING = /^\/(aree|core|safeguarding|entra|contatti|famiglia|infermeria|nutrizionista|pulmini|magazzino|segreteria|tesoreria|direzione|crm|partner|gestionale|quadro|allenamenti|la-mia-scd|squadre)(\/|$)/;
 
 /** I pixel Meta/TikTok si caricano solo con consenso marketing e solo nelle pagine pubbliche. */
 export function marketingAllowed(c: Consent | null, pathname: string): boolean {

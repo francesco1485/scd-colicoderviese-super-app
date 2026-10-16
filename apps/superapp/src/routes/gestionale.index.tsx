@@ -5,6 +5,8 @@ import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
+  Building2,
+  CalendarRange,
   ChevronLeft,
   ChevronRight,
   Clock3,
@@ -178,6 +180,9 @@ function GestionalePage() {
         </SnapshotNotice>
 
         <ImpiantiEntry live={impiantiLive} />
+        <PlanningEntry />
+
+        <StrutturaEntry />
 
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[300px_minmax(0,1fr)]">
           <Card
@@ -420,6 +425,27 @@ function GestionalePage() {
                     </FutureLink>
                   </div>
                 </Card>
+
+                <Card
+                  id="gest-salute"
+                  title="Salute del club"
+                  sub="Infermeria e nutrizionista: riservate a chi ha l'abilitazione."
+                >
+                  <div className="flex flex-col gap-2 px-4 pb-4 text-[15px]">
+                    <Link
+                      to="/infermeria"
+                      className="scd-focus font-semibold text-[var(--in-info)] underline-offset-4 hover:underline"
+                    >
+                      Infermeria: certificati, cassette e DAE
+                    </Link>
+                    <Link
+                      to="/nutrizionista"
+                      className="scd-focus font-semibold text-[var(--in-info)] underline-offset-4 hover:underline"
+                    >
+                      Nutrizionista: consigli e richieste di consulenza
+                    </Link>
+                  </div>
+                </Card>
               </div>
             </div>
           </div>
@@ -431,6 +457,30 @@ function GestionalePage() {
 
 const colorOrNull = (m: Map<string, string>, id: string | null) =>
   id ? (m.get(id) ?? null) : null;
+
+/** Entry to "Attività in struttura": shifts, openings, evening activities and Club House evenings per site. */
+function StrutturaEntry() {
+  return (
+    <Link
+      to="/gestionale/struttura"
+      className="scd-focus flex flex-wrap items-center gap-4 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 shadow-[var(--in-card-shadow)] transition-transform duration-150 active:scale-[0.99] sm:flex-nowrap sm:px-6"
+    >
+      <span className="flex size-11 flex-none items-center justify-center rounded-xl bg-[var(--in-info-bg)] text-[var(--in-info)]">
+        <Building2 className="size-6" strokeWidth={1.8} aria-hidden="true" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[18px] font-bold leading-tight">Attività in struttura</span>
+        <span className="mt-0.5 block text-[14.5px] leading-snug text-[var(--in-sub)]">
+          Colico e Dervio: turni volontari, aperture e chiusure, attività serali, serate Club House
+        </span>
+      </span>
+      <span className="inline-flex h-11 flex-none items-center gap-2 rounded-[10px] border border-[#b9d5ef] px-4 text-[15px] font-semibold text-[var(--in-info)]">
+        Apri
+        <ChevronRight className="size-4" strokeWidth={2.2} aria-hidden="true" />
+      </span>
+    </Link>
+  );
+}
 
 /** Prominent entry to the facility planner (rotations, simulations, third-party rentals, events). */
 function ImpiantiEntry({ live }: { live: boolean }) {
@@ -483,6 +533,27 @@ function ImpiantiEntry({ live }: { live: boolean }) {
     >
       {body}
     </div>
+  );
+}
+
+/** Entry to the season planning (matches, tournaments and events, deadlines from 01/07/2026 to 30/06/2027). */
+function PlanningEntry() {
+  return (
+    <Link
+      to="/gestionale/planning"
+      className="scd-focus flex items-center gap-4 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 shadow-[var(--in-card-shadow)] transition-colors duration-150 hover:bg-[var(--in-info-bg)] sm:px-6"
+    >
+      <span className="flex size-12 flex-none items-center justify-center rounded-xl bg-[var(--in-info-bg)] text-[var(--in-info)]">
+        <CalendarRange className="size-6" strokeWidth={1.8} aria-hidden="true" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[18px] font-bold leading-tight">Planning annuale</span>
+        <span className="mt-1 block text-[14.5px] leading-snug text-[var(--in-sub)]">
+          La stagione 2026/27 in una pagina: gare, tornei ed eventi, scadenze del club e federali
+        </span>
+      </span>
+      <ChevronRight className="size-5 flex-none text-[var(--in-info)]" strokeWidth={2.2} aria-hidden="true" />
+    </Link>
   );
 }
 
