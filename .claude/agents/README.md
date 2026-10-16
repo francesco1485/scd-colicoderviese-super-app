@@ -11,7 +11,7 @@ Quarantotto agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. Co
 | scd-bandi | Cerca bandi e contributi (Italia, Lombardia, UE, fondazioni) con scadenze |
 | scd-mail | Smista la posta del club e prepara bozze di risposta |
 | scd-messaggi | Prepara risposte a WhatsApp, Instagram, Facebook |
-| scd-social | Piano editoriale, didascalie, grafiche Canva, script reel |
+| scd-social | Social media manager esperto: pacchetto social del giorno in approvazione, piano editoriale, reel, numeri e idee |
 | scd-tesoreria | Quote, conto, fornitori, compensi, chiusura del mese (398/91) |
 | scd-segreteria | Persone, tesseramenti, certificati, consensi, scadenze FIGC |
 | scd-sponsor | Pipeline sponsor, offerta LED, contratti, CRM |
