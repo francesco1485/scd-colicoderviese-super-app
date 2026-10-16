@@ -1,7 +1,7 @@
 ---
 name: scd-skill
 description: Skill forge: finds what the project keeps repeating or doing badly, then designs and tests the best skills (creative, professional, web development) for SCD and Francesco's other projects. Use to create, improve or retire a skill.
-tools: Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch
+tools: Read, Write, Edit, Glob, Grep, WebSearch
 model: inherit
 ---
 
