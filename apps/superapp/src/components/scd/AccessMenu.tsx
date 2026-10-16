@@ -14,6 +14,8 @@ import { sessionPositions } from "@/lib/access-nav";
 import { areaLink, menuFor, type MenuEntry, type MenuGroup } from "@/lib/areas";
 import type { SessionView } from "@/lib/auth.functions";
 import { useSession } from "@/lib/use-session";
+import { mergeNav } from "@/lib/access-resolver";
+import { useAccessNav } from "@/lib/use-access-nav";
 import { AREA_ICON } from "./area-icons";
 
 /** Opens the "Accesso aree" menu from anywhere (e.g. a CTA on a page). */
@@ -285,7 +287,9 @@ export function AccessMenu() {
   }, [open, close]);
 
   const signedIn = !!session?.user;
-  const groups = menuFor(sessionPositions(session));
+  const nav = useAccessNav(signedIn);
+  // Positions (registry roles) plus what the verified identity and the Direzione's grants open (access-resolver.ts).
+  const groups = mergeNav(menuFor(sessionPositions(session)), nav);
   const navigate = () => setOpen(false);
   const cols = signedIn ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2";
 

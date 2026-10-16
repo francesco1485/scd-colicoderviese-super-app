@@ -9,6 +9,9 @@ import {
   type VerifiedSession,
 } from "./impianti-access";
 import { R20_LOGIN_LIVE } from "./satellites";
+import { grantAllAt, gateWithGrants } from "./access-resolver.server";
+import { sessionView } from "./auth.functions";
+import { serverSupabase } from "./supabase.server";
 
 export interface ImpiantiAccessState {
   /** Staging preview switch (SCD_STAGING_PREVIEW=1 behind the staging gateway or on a dev server). */
@@ -20,14 +23,33 @@ export interface ImpiantiAccessState {
    * is not live: there is no login action that could verify a position.
    */
   session: VerifiedSession | null;
+  /**
+   * Section grants of the Direzione for "impianti-campi" (r100, read through the caller's own session by
+   * access-resolver.server.ts): view = READ (any perimeter: facility plans are not personal), approve = APPROVE with
+   * perimeter ALL. Both false without a verified identity, without the grants engine or on any error.
+   */
+  grant: { view: boolean; approve: boolean };
 }
 
-function readAccess(): ImpiantiAccessState {
-  return {
+const NO_GRANT = { view: false, approve: false } as const;
+
+async function readAccess(): Promise<ImpiantiAccessState> {
+  const base = {
     stagingPreview: stagingPreviewEnabled(process.env, import.meta.env.PROD),
     loginLive: R20_LOGIN_LIVE,
     session: null,
   };
+  try {
+    const s = await sessionView();
+    const signedIn = s.configured && !!s.user;
+    const ctx = { signedIn, organizationId: s.memberships[0]?.organizationId || null, sb: signedIn ? serverSupabase() : null };
+    if (!signedIn || !ctx.organizationId) return { ...base, grant: NO_GRANT };
+    const closed = { view: "access" as const, preview: false };
+    const [view, approve] = await Promise.all([gateWithGrants("impianti-campi", closed, ctx), grantAllAt("impianti-campi", "APPROVE", ctx)]);
+    return { ...base, grant: { view: view.view === "page", approve } };
+  } catch {
+    return { ...base, grant: NO_GRANT };
+  }
 }
 
 export const getImpiantiAccess = createServerFn({ method: "GET" }).handler(
@@ -49,9 +71,9 @@ const MAX_CSV_BYTES = 1_000_000;
  */
 export const getBookingProposals = createServerFn({ method: "GET" }).handler(
   async (): Promise<ProposalsFeed> => {
-    const access = readAccess();
+    const access = await readAccess();
     if (
-      approvalsAccess(access.session, access.stagingPreview).mode === "access"
+      approvalsAccess(access.session, access.stagingPreview, access.grant.approve).mode === "access"
     )
       return { status: "forbidden" };
     const url = bookingsCsvUrl(process.env);

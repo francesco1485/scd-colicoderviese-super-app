@@ -153,7 +153,7 @@ function Tool({
   const [draft, setDraft] = useState<BookingDraft | null>(null);
   const [sky, setSky] = useState(false);
   const canApprove =
-    approvalsAccess(access.session, access.stagingPreview).mode !== "access";
+    approvalsAccess(access.session, access.stagingPreview, access.grant.approve).mode !== "access";
   const requestedBy = position ? (POSITION_LABEL[position] ?? position) : "";
 
   const onAction = useCallback(
@@ -284,7 +284,7 @@ function Tool({
 }
 
 export function ImpiantiLayout({ access, quadro }: { access: ImpiantiAccessState; quadro: QuadroSnapshot | null }) {
-  const decision = impiantiAccess(access.session, access.stagingPreview);
+  const decision = impiantiAccess(access.session, access.stagingPreview, access.grant.view);
   if (decision.mode === "access") {
     return (
       <InteriorShell

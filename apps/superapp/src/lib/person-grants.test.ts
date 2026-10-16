@@ -349,7 +349,7 @@ describe("fail-closed engine detection (no behaviour change before r100)", () =>
     expect(await sectionCheck(client({ error: null }, { data: true, error: null }), "org", "mister", "READ")).toEqual({ engine: "applied", allowed: true });
   });
 
-  it("no existing guard calls scd_can yet", () => {
+  it("only the engine helper and the access resolver call scd_can (guards go through access-resolver.server.ts)", () => {
     const src = fileURLToPath(new URL("..", import.meta.url));
     const files: string[] = [];
     const walk = (d: string) => {
@@ -361,6 +361,6 @@ describe("fail-closed engine detection (no behaviour change before r100)", () =>
     };
     walk(src);
     const users = files.filter((f) => readFileSync(f, "utf8").includes('"scd_can"')).map((f) => f.slice(src.length));
-    expect(users).toEqual(["lib/person-grants.server.ts"]);
+    expect(users.sort()).toEqual(["lib/access-resolver.server.ts", "lib/person-grants.server.ts"]);
   });
 });

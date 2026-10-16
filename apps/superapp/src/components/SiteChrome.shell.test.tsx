@@ -45,6 +45,8 @@ vi.mock("@/lib/use-session", () => ({
   useSession: () => ({ session: state.session, loading: false, refresh: () => undefined }),
 }));
 vi.mock("@/lib/use-club-pulse", () => ({ useClubPulse: () => ({ pulse: null, pending: false }) }));
+// The access resolver's navigation answer (getAccessNav) comes from the server: empty here, tested in access-resolver.test.ts.
+vi.mock("@/lib/use-access-nav", () => ({ useAccessNav: () => ({ grantAreas: [], auto: [] }) }));
 
 import { MEMBERS_ONLY_PREFIXES, isPublicPath } from "@/lib/http-policy";
 import { sessionRolesFrom, type Membership } from "@/lib/session";
@@ -169,6 +171,24 @@ describe("desktop sidebar (Eurobet structure, SCD colours)", () => {
     for (const a of direction) expect(a.entry.reserved).toBe(true);
     state.session = session("DIRECTION");
     expect(renderToStaticMarkup(<SideNav />)).toContain('data-testid="side-work-areas"');
+  });
+
+  it("adds what the resolver opens (grants, verified family) and the base pages 'Per te' for signed-in people only", () => {
+    expect(workAreasFor(null, { grantAreas: ["mister"], auto: [] })).toEqual([]);
+    const fam = workAreasFor(session("USER_BASE"), {
+      grantAreas: ["mister"],
+      auto: [{ id: "famiglia", label: "Area famiglia", blurb: "x", icon: "home", items: 1 }],
+    }).map((a) => [a.entry.id, a.link.href]);
+    expect(fam).toEqual(expect.arrayContaining([["famiglia", "/famiglia"], ["mister", "/gestionale/mister"]]));
+    // Known-empty identity entry (no children) is not shown.
+    expect(workAreasFor(session("USER_BASE"), { grantAreas: [], auto: [{ id: "famiglia", label: "x", blurb: "x", icon: "home", items: 0 }] })).toEqual([]);
+    state.session = null;
+    expect(renderToStaticMarkup(<SideNav />)).not.toContain('data-testid="side-for-you"');
+    state.session = session("USER_BASE");
+    const html = renderToStaticMarkup(<SideNav />);
+    expect(html).toContain('data-testid="side-for-you"');
+    expect(html).toContain("Crea il tuo campione");
+    expect(html).toContain("Quadro settimanale");
   });
 });
 

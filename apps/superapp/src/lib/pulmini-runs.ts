@@ -171,3 +171,34 @@ export function runsByTraining(runs: readonly PulminoRun[]): Map<string, Pulmino
   }
   return m;
 }
+
+/**
+ * Pulmini service for every signed-in member (Francesco 16/10/2026 23:34: base access includes "le dinamiche del
+ * servizio pulmini: zone, orari, corse attive", no children's names). Only what a family needs to know how the service
+ * works: vehicle, departure, meeting point, seats and how many ride in total. The driver's name and the split by team
+ * stay in the staff area; a parent sees their own child's run in the family area (scd_transport_live_view, own family).
+ */
+export interface PulminoServiceRun {
+  eventId: string;
+  training: TrainingRef | null;
+  vehicle: string;
+  departure: string | null;
+  meetingPoint: string | null;
+  seats: number | null;
+  /** Total children on board (count only), never by name or team. */
+  riders: number;
+  driverAssigned: boolean;
+}
+
+export function serviceView(runs: readonly PulminoRun[]): PulminoServiceRun[] {
+  return runs.map((r) => ({
+    eventId: r.eventId,
+    training: r.training ? { day: r.training.day, start: r.training.start } : null,
+    vehicle: r.vehicle,
+    departure: r.departure,
+    meetingPoint: r.meetingPoint,
+    seats: r.seats,
+    riders: ridersTotal(r),
+    driverAssigned: r.driver !== null,
+  }));
+}

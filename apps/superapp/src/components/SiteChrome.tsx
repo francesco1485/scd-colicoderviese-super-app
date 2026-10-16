@@ -23,6 +23,9 @@ import {
   ShieldCheck,
   TrafficCone,
   Trophy,
+  Sparkles,
+  Star,
+  IdCard,
   UserRound,
   UsersRound,
   X,
@@ -32,6 +35,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import crest from "@/assets/brand/logo-scd.png.asset.json";
 import { sessionPositions, type ChromeSession } from "@/lib/access-nav";
+import { EMPTY_NAV, basePagesFor, mergeNav, type AccessNav } from "@/lib/access-resolver";
+import { useAccessNav } from "@/lib/use-access-nav";
 import {
   ACCESS_SCREEN_IDS,
   WORK_AREA_IDS,
@@ -104,10 +109,23 @@ export function sectionTarget(
 
 type WorkArea = { entry: MenuEntry; link: AreaLink & { href: string } };
 
-/** Work areas of the signed-in person for the sidebar: reserved entries of the access menu their positions open. */
-export function workAreasFor(session: ChromeSession): WorkArea[] {
+/** Icons of the base member pages ("Per te", access-resolver.ts BASE_PAGES). */
+const FOR_YOU_ICON: Readonly<Record<string, LucideIcon>> = {
+  "la-mia-scd": UserRound,
+  "crea-avatar": Sparkles,
+  fantacalcio: Trophy,
+  top11: Star,
+  tessera: IdCard,
+};
+
+/**
+ * Work areas of the signed-in person for the sidebar: reserved entries of the access menu their positions open, plus
+ * (access-resolver.ts mergeNav) the family / team entries of a verified identity and the areas the Direzione enabled.
+ * Entries with nothing inside and nothing to create are left out (no empty pages).
+ */
+export function workAreasFor(session: ChromeSession, nav: AccessNav = EMPTY_NAV): WorkArea[] {
   if (!session?.user) return [];
-  return menuFor(sessionPositions(session))
+  return mergeNav(menuFor(sessionPositions(session)), nav)
     .flatMap((g) => g.entries)
     .filter((e) => e.reserved)
     .map((e) => ({ entry: e, link: areaLink(e.id) }))
@@ -397,7 +415,10 @@ export function SideNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session } = useSession();
   const signedIn = !!session?.user;
-  const areas = workAreasFor(session);
+  const nav = useAccessNav(signedIn);
+  const areas = workAreasFor(session, nav);
+  // Base pages not already listed among the work areas (staff see the quadro there).
+  const forYou = basePagesFor(signedIn).filter((p) => !areas.some((a) => a.link.path === p.path));
   const row = (active: boolean) =>
     `scd-focus group relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-[15px] transition-colors duration-150 ${
       active
@@ -434,6 +455,25 @@ export function SideNav() {
           })}
         </ul>
       </nav>
+      {forYou.length > 0 && (
+        <nav aria-label="Per te" className="mt-4 border-t border-white/12 pt-3" data-testid="side-for-you">
+          <p className="m-0 px-3 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#ffd84a]">Per te</p>
+          <ul className="m-0 grid list-none gap-0.5 p-0">
+            {forYou.map((p) => {
+              const active = isActive(pathname, p.path!);
+              const Icon = FOR_YOU_ICON[p.id] ?? Star;
+              return (
+                <li key={p.id}>
+                  <Link to={p.path! as never} aria-current={active ? "page" : undefined} className={row(active)}>
+                    <Icon className="size-5 shrink-0" strokeWidth={active ? 2.4 : 1.9} aria-hidden="true" />
+                    <span className="min-w-0 flex-1 truncate">{p.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )}
       {areas.length > 0 && (
         <nav aria-label="Le tue aree di lavoro" className="mt-4 border-t border-white/12 pt-3" data-testid="side-work-areas">
           <p className="m-0 px-3 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#ffd84a]">Le tue aree</p>

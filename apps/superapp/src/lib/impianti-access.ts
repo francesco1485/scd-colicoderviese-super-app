@@ -23,7 +23,11 @@ const area = findArea("impianti-campi");
 /** Positions allowed on the area (registry). */
 export const IMPIANTI_POSITIONS: readonly string[] = area?.roles ?? [];
 
+/** Pseudo-position shown when the area opens through a section grant of the Direzione, not a club position. */
+export const GRANT_POSITION = "abilitazione-direzione";
+
 export const POSITION_LABEL: Readonly<Record<string, string>> = {
+  [GRANT_POSITION]: "Abilitazione della Direzione",
   presidente: "Presidente",
   "direttore-generale": "Direttore generale",
   "responsabile-attivita-base": "Responsabile attività di base",
@@ -43,9 +47,12 @@ export type ImpiantiAccess =
 export function impiantiAccess(
   session: VerifiedSession | null,
   stagingPreview: boolean,
+  /** Section grant "impianti-campi" READ of the Direzione (access-resolver.server.ts), decided on the server. */
+  granted = false,
 ): ImpiantiAccess {
   if (session?.position && IMPIANTI_POSITIONS.includes(session.position))
     return { mode: "tool", position: session.position };
+  if (granted) return { mode: "tool", position: GRANT_POSITION };
   if (stagingPreview) return { mode: "preview" };
   return { mode: "access", reason: session ? "position" : "no-session" };
 }
@@ -82,9 +89,12 @@ export const APPROVER_POSITIONS: readonly string[] =
 export function approvalsAccess(
   session: VerifiedSession | null,
   stagingPreview: boolean,
+  /** Section grant "impianti-campi" APPROVE with perimeter ALL (never a narrower one), decided on the server. */
+  granted = false,
 ): ImpiantiAccess {
   if (session?.position && APPROVER_POSITIONS.includes(session.position))
     return { mode: "tool", position: session.position };
+  if (granted) return { mode: "tool", position: GRANT_POSITION };
   if (stagingPreview) return { mode: "preview" };
   return { mode: "access", reason: session ? "position" : "no-session" };
 }

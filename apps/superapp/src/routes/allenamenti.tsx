@@ -15,6 +15,8 @@ import { PeoplePins } from "@/components/scd/PeoplePins";
 import planimetria from "@/assets/scd/planimetria_colico.webp.asset.json";
 import { VanPlan2D } from "@/components/scd/VanPlan2D";
 import { getPulminiVans } from "@/lib/pulmini-vans.functions";
+import { getPulminiService, type PulminiService } from "@/lib/pulmini-runs.functions";
+import { serviceRunsForDay } from "@/lib/pulmini-service-view";
 import { getTransportBoard } from "@/lib/transport.functions";
 import { fleetFromBoard } from "@/lib/van-plan";
 
@@ -34,9 +36,11 @@ export const Route = createFileRoute("/allenamenti")({
     const session = await getSession();
     if (!session.user) throw redirect({ to: "/accedi", search: { next: location.href } });
     // Vans in 2D: getPulminiVans answers only to the Pulmini work area (staff); everyone else gets null and nothing.
-    const [roster, emails, training, vans, family] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro(), getPulminiVans(), getMyTrainingKids().catch(() => ({ state: "error" as const, kids: [] }))]);
+    // Pulmini service (base for every signed-in member, Francesco 16/10/2026 23:34): times, meeting points, runs, no names.
+    const noService: PulminiService = { state: "not-configured", asOf: null, runs: [] };
+    const [roster, emails, training, vans, family, service] = await Promise.all([getStaffRoster(), getStaffEmails(), getTrainingQuadro(), getPulminiVans(), getMyTrainingKids().catch(() => ({ state: "error" as const, kids: [] })), getPulminiService().catch(() => noService)]);
     const transport = vans ? await getTransportBoard() : null;
-    return { ...training.quadro, people: roster.people, emails, vans, board: transport?.board ?? null, kids: family.kids };
+    return { ...training.quadro, people: roster.people, emails, vans, board: transport?.board ?? null, kids: family.kids, service };
   },
   head: () => ({
     meta: [
@@ -53,7 +57,7 @@ const SHORT: Record<string, string> = { "LUNEDÌ": "Lun", "MARTEDÌ": "Mar", "ME
 const nice = (d: string) => d.charAt(0) + d.slice(1).toLowerCase();
 
 function Allenamenti() {
-  const { days, slots, rotations, note, people, emails, vans, board, kids } = Route.useLoaderData();
+  const { days, slots, rotations, note, people, emails, vans, board, kids, service } = Route.useLoaderData();
   const fleet = useMemo(() => fleetFromBoard(board), [board]);
   const now = useRomeNow();
   const [day, setDay] = useState(days[0] ?? "");
@@ -229,6 +233,8 @@ function Allenamenti() {
             </ol>
           )}
 
+          {!vans && service.state !== "signed-out" && <PulminiServiceSection service={service} day={day} label={nice(day)} />}
+
           {vans && (
             <section className="mt-6 overflow-hidden rounded-[18px] bg-white p-4 text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)]" aria-labelledby="all-pulmini" data-testid="allenamenti-pulmini">
               <h2 id="all-pulmini" className="font-uv text-[26px] uppercase leading-none text-[var(--in-ink)]">Pulmini di {nice(day)}</h2>
@@ -365,5 +371,36 @@ function Pitch({ name, text, zones, small = false }: { name: string; text: strin
         )}
       </div>
     </figure>
+  );
+}
+
+/** Pulmini service of the day for every member: vehicle, departure, meeting point, seats, riders as a count. No names. */
+function PulminiServiceSection({ service, day, label }: { service: PulminiService; day: string; label: string }) {
+  const runs = serviceRunsForDay(service.runs, day);
+  return (
+    <section className="mt-6 overflow-hidden rounded-[18px] bg-white p-4 text-[var(--scd-ink)] shadow-[0_14px_28px_rgb(0_10_40/0.28)]" aria-labelledby="all-servizio-pulmini" data-testid="allenamenti-servizio-pulmini">
+      <h2 id="all-servizio-pulmini" className="font-uv text-[26px] uppercase leading-none text-[var(--in-ink)]">Pulmini di {label}</h2>
+      <p className="mb-3 mt-1 text-[14px] leading-snug text-[var(--in-sub)]">
+        Orari, punti di ritrovo e posti delle corse. I nomi dei ragazzi non compaiono mai: chi è genitore vede la corsa del proprio figlio nell'area famiglia.
+      </p>
+      {service.state === "not-configured" ? (
+        <p className="m-0 text-[14.5px] text-[var(--in-sub)]">Corse da confermare: il programma dei pulmini non è ancora collegato.</p>
+      ) : runs.length === 0 ? (
+        <p className="m-0 text-[14.5px] text-[var(--in-sub)]">Nessuna corsa in programma per questo giorno.</p>
+      ) : (
+        <ul className="m-0 grid list-none gap-2 p-0">
+          {runs.map((r, i) => (
+            <li key={`${r.vehicle}-${r.departure ?? i}`} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-[12px] bg-[#f2f6fc] px-3 py-2.5 text-[14.5px]">
+              <b className="text-[var(--in-ink)]">{r.vehicle}</b>
+              <span>Partenza {r.departure ?? "da confermare"}</span>
+              <span>Ritrovo {r.meetingPoint ?? "da confermare"}</span>
+              <span className="text-[var(--in-sub)]">
+                {r.seats === null ? "posti da confermare" : `${r.riders} su ${r.seats} posti`} · {r.driverAssigned ? "autista assegnato" : "autista da confermare"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

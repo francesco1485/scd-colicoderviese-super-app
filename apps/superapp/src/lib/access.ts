@@ -174,6 +174,8 @@ export interface WorkAreaGate {
   view: "page" | "access";
   /** True when the page is shown only because of the staging preview (banner required). */
   preview: boolean;
+  /** Set when the page opens through the resolver (access-resolver.ts): a Direzione section grant or the base layer. */
+  via?: "grant" | "base";
 }
 
 /**
