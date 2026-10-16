@@ -17,6 +17,7 @@ import {
   matchEndMin,
   planDervioRotation,
   rainDecision,
+  rainMoveActive,
   resolveLeadDays,
   surfaceFromText,
   weekStartOf,
@@ -82,10 +83,10 @@ const PLAN: DervioCandidate[] = PLAN_ROWS.map(([date, time, group], i) => ({
 }));
 
 /**
- * Expected picks with the lights constraint of `rotation.ts` (no match ending after 17:00
- * while the Dervio lights are not verified): 19 Dervio matches.
+ * Expected picks with `lightsVerified: false` (lights constraint of `rotation.ts`: no match
+ * ending after 17:00): 19 Dervio matches.
  */
-const EXPECTED: ReadonlyArray<readonly [string, string]> = [
+const EXPECTED_LIGHTS_NOT_VERIFIED: ReadonlyArray<readonly [string, string]> = [
   ["2026-10-24", "primicalci"],
   ["2026-10-31", "pulcini"],
   ["2026-11-07", "u19"],
@@ -108,10 +109,10 @@ const EXPECTED: ReadonlyArray<readonly [string, string]> = [
 ];
 
 /**
- * Picks of the "Dervio 1" draft, which did not apply the lights rule: reproduced
- * exactly with `lightsVerified: true` (21 matches).
+ * Default plan (DG «luci Dervio ok», lights verified): reproduces the "Dervio 1" draft
+ * exactly (21 matches).
  */
-const EXPECTED_LIGHTS_VERIFIED: ReadonlyArray<readonly [string, string]> = [
+const EXPECTED: ReadonlyArray<readonly [string, string]> = [
   ["2026-10-24", "primicalci"],
   ["2026-10-31", "pulcini"],
   ["2026-11-07", "u16"],
@@ -214,9 +215,17 @@ describe("planDervioRotation", () => {
     expect(weeks[0]?.pick?.label).toBe("Primi Calci");
   });
 
-  it("plans 19 Dervio matches on the 2026/27 plan with the lights rule", () => {
+  it("default (lights ok): reproduces the Dervio 1 draft, 21 matches, evening matches included", () => {
     const picks = dervioPicks(planDervioRotation(PLAN));
     expect(picks.map((p) => [p.match.date, p.group])).toEqual(EXPECTED);
+    expect(picks).toHaveLength(21);
+    expect(picks.some((p) => (p.endMin ?? 0) > 17 * 60)).toBe(true);
+    expect(planDervioRotation(PLAN).every((w) => w.excluded.length === 0)).toBe(true);
+  });
+
+  it("with lightsVerified: false the lights rule gives 19 matches, none ending after 17:00", () => {
+    const picks = dervioPicks(planDervioRotation(PLAN, { lightsVerified: false }));
+    expect(picks.map((p) => [p.match.date, p.group])).toEqual(EXPECTED_LIGHTS_NOT_VERIFIED);
     expect(picks).toHaveLength(19);
     for (const p of picks) {
       expect(p.endMin).not.toBeNull();
@@ -224,13 +233,14 @@ describe("planDervioRotation", () => {
     }
   });
 
-  it("reproduces the Dervio 1 draft exactly when the lights are verified", () => {
-    const picks = dervioPicks(planDervioRotation(PLAN, { lightsVerified: true }));
-    expect(picks.map((p) => [p.match.date, p.group])).toEqual(EXPECTED_LIGHTS_VERIFIED);
+  it("U16 Élite gets its Dervio turns (7 Saturdays) now that the lights are ok", () => {
+    const u16 = dervioPicks(planDervioRotation(PLAN)).filter((p) => p.group === "u16");
+    expect(u16).toHaveLength(7);
+    expect(u16.every((p) => weekdayOf(p.match.date) === 5)).toBe(true);
   });
 
-  it("excludes U16 07/11 18:00 and U19 Tue 16/02 20:00 (lights) with a visible reason", () => {
-    const weeks = planDervioRotation(PLAN);
+  it("lights not verified: U16 07/11 18:00 and U19 Tue 16/02 20:00 excluded with a visible reason", () => {
+    const weeks = planDervioRotation(PLAN, { lightsVerified: false });
     const nov = weeks.find((w) => w.weekStart === "2026-11-02");
     expect(nov?.pick?.group).toBe("u19");
     expect(nov?.excluded).toEqual([
@@ -246,18 +256,18 @@ describe("planDervioRotation", () => {
     expect(EXCLUSION_LABEL["needs-lights"]).toContain("17:00");
   });
 
-  it("flags winter grass picks by default (Dec–Feb on natural grass)", () => {
+  it("winter grass picks are kept and only flagged by default (inverno sì)", () => {
     const picks = dervioPicks(planDervioRotation(PLAN));
     const winter = picks.filter((p) => p.winterGrass).map((p) => p.match.date);
     expect(winter).toEqual([
       "2026-12-05",
-      "2026-12-13",
+      "2026-12-12",
       "2026-12-19",
       "2027-01-09",
       "2027-01-23",
       "2027-01-31",
       "2027-02-06",
-      "2027-02-21",
+      "2027-02-16",
     ]);
   });
 
@@ -270,7 +280,7 @@ describe("planDervioRotation", () => {
     expect(dec?.skipReason).toBe("all-excluded");
     expect(dec?.excluded.every((e) => e.reason === "winter-grass")).toBe(true);
     // The rotation resumes in March from where it stopped.
-    expect(picks.map((p) => p.match.date).filter((d) => d >= "2027-03-01")[0]).toBe("2027-03-07");
+    expect(picks.map((p) => p.match.date).filter((d) => d >= "2027-03-01")[0]).toBe("2027-03-02");
   });
 
   it("never schedules two Dervio matches in the same week", () => {
@@ -290,8 +300,23 @@ describe("planDervioRotation", () => {
     }
   });
 
-  it("skips weeks without allowed home matches (Christmas break, lights) and keeps them visible", () => {
+  it("skips weeks without eligible home matches (Christmas break) and keeps them visible", () => {
     const weeks = planDervioRotation(PLAN);
+    expect(weeks).toHaveLength(29);
+    expect(weeks.filter((w) => !w.pick).map((w) => [w.weekStart, w.skipReason])).toEqual([
+      ["2026-12-21", "no-eligible-home-match"],
+      ["2026-12-28", "no-eligible-home-match"],
+      ["2027-01-11", "no-eligible-home-match"],
+      ["2027-02-08", "no-eligible-home-match"],
+      ["2027-02-22", "no-eligible-home-match"],
+      ["2027-03-15", "no-eligible-home-match"],
+      ["2027-03-22", "no-eligible-home-match"],
+      ["2027-04-26", "no-eligible-home-match"],
+    ]);
+  });
+
+  it("lights not verified: two more weeks become all-excluded", () => {
+    const weeks = planDervioRotation(PLAN, { lightsVerified: false });
     const gaps = weeks.filter((w) => !w.pick).map((w) => [w.weekStart, w.skipReason]);
     expect(gaps).toEqual([
       ["2026-11-16", "all-excluded"],
@@ -309,10 +334,13 @@ describe("planDervioRotation", () => {
   });
 
   it("when the next team's match is excluded, the following team in age order plays", () => {
-    const weeks = planDervioRotation([
-      m("late", "2026-10-24", "piccoli", { time: "16:30" }), // 3v3 ends 17:15 → lights
-      m("ok", "2026-10-24", "pulcini", { time: "10:00" }),
-    ]);
+    const weeks = planDervioRotation(
+      [
+        m("late", "2026-10-24", "piccoli", { time: "16:30" }), // 3v3 ends 17:15 → lights
+        m("ok", "2026-10-24", "pulcini", { time: "10:00" }),
+      ],
+      { lightsVerified: false },
+    );
     expect(weeks[0]?.pick?.match.id).toBe("ok");
     expect(weeks[0]?.excluded).toEqual([
       { matchId: "late", group: "piccoli", date: "2026-10-24", reason: "needs-lights" },
@@ -320,12 +348,12 @@ describe("planDervioRotation", () => {
   });
 
   it("unknown kick-off is excluded while the lights are not verified (fail-closed)", () => {
-    const weeks = planDervioRotation([m("x", "2026-10-24", "u15", { time: null })]);
+    const weeks = planDervioRotation([m("x", "2026-10-24", "u15", { time: null })], {
+      lightsVerified: false,
+    });
     expect(weeks[0]?.pick).toBeNull();
     expect(weeks[0]?.excluded[0]?.reason).toBe("kickoff-unknown");
-    const verified = planDervioRotation([m("x", "2026-10-24", "u15", { time: null })], {
-      lightsVerified: true,
-    });
+    const verified = planDervioRotation([m("x", "2026-10-24", "u15", { time: null })]);
     expect(verified[0]?.pick?.match.id).toBe("x");
     expect(verified[0]?.pick?.endMin).toBeNull();
   });
@@ -338,7 +366,14 @@ describe("planDervioRotation", () => {
     expect(matchEndMin(m("c", "2026-10-24", "u16", { time: "15:30", end: "15:00" }))).toBe(
       17 * 60 + 15,
     );
-    expect(exclusionReason(m("b", "2026-10-24", "u16", { time: "15:30", end: "16:55" }))).toBeNull();
+    const off = { lightsVerified: false };
+    expect(
+      exclusionReason(m("b", "2026-10-24", "u16", { time: "15:30", end: "16:55" }), off),
+    ).toBeNull();
+    expect(exclusionReason(m("a", "2026-10-24", "u16", { time: "15:30" }), off)).toBe(
+      "needs-lights",
+    );
+    expect(exclusionReason(m("a", "2026-10-24", "u16", { time: "15:30" }))).toBeNull();
   });
 
   it("esordienti (annata da verificare) and Prima Squadra are excluded with a visible reason", () => {
@@ -431,7 +466,7 @@ describe("planDervioRotation", () => {
 
   it("endDate cuts later matches", () => {
     const picks = dervioPicks(planDervioRotation(PLAN, { endDate: "2026-11-08" }));
-    expect(picks.map((p) => p.group)).toEqual(["primicalci", "pulcini", "u19"]);
+    expect(picks.map((p) => p.group)).toEqual(["primicalci", "pulcini", "u16"]);
   });
 
   it("does not mutate the input", () => {
@@ -442,15 +477,43 @@ describe("planDervioRotation", () => {
 });
 
 describe("dervioChecklist", () => {
-  it("has the eight items in a fixed order", () => {
+  const RAIN = { date: "2026-11-07", precipitationProbability: 90 };
+
+  it("weekly list: tasks plus the Comune note, no Comune task, no rain-move items", () => {
     const items = dervioChecklist({ matchDate: "2026-11-07", today: "2026-10-16" });
+    expect(items.map((i) => i.id)).toEqual([
+      "team-notice",
+      "weather-check",
+      "all-notice",
+      "club-page",
+      "weather-decision",
+      "comune-season-note",
+    ]);
+    expect(byId(items, "comune-season-note")).toMatchObject({
+      kind: "note",
+      status: "info",
+      dueDate: null,
+      daysLeft: null,
+      label: "Comune di Dervio informato con il programma stagionale",
+    });
+    expect(items.every((i) => i.kind !== "conditional")).toBe(true);
+  });
+
+  it("order follows CHECKLIST_ORDER when every item is present", () => {
+    const items = dervioChecklist({
+      matchDate: "2026-11-07",
+      today: "2026-10-16",
+      group: "u16",
+      movedToColico: true,
+    });
     expect(items.map((i) => i.id)).toEqual(CHECKLIST_ORDER);
-    expect(items).toHaveLength(8);
+    expect(items).toHaveLength(9);
   });
 
   it("first match 24/10: team notice already overdue on 16/10, all notice on 21/10", () => {
     const items = dervioChecklist({ matchDate: "2026-10-24", today: "2026-10-16" });
     expect(byId(items, "team-notice")).toMatchObject({
+      kind: "task",
       dueDate: "2026-10-10",
       status: "overdue",
       daysLeft: -6,
@@ -463,7 +526,6 @@ describe("dervioChecklist", () => {
     expect(byId(items, "club-page").dueDate).toBe("2026-10-21");
     expect(byId(items, "weather-check").dueDate).toBe("2026-10-21");
     expect(byId(items, "weather-decision").dueDate).toBe("2026-10-23");
-    expect(byId(items, "comune-notice")).toMatchObject({ dueDate: "2026-09-24", status: "overdue" });
   });
 
   it("T-14 and T-3 are calendar days across the DST change of 25/10/2026", () => {
@@ -489,48 +551,111 @@ describe("dervioChecklist", () => {
     expect(byId(items, "all-notice").daysLeft).toBe(11);
   });
 
-  it("LND/SGS and guests+referee have no invented deadline", () => {
-    const items = dervioChecklist({ matchDate: "2026-11-07", today: "2026-10-16" });
-    expect(byId(items, "lnd-sgs-field-change")).toMatchObject({
+  it("U16 at Dervio carries the note 'anticipare orario U16 (sabato)', other teams do not", () => {
+    const u16 = dervioChecklist({ matchDate: "2026-11-07", today: "2026-10-16", group: "u16" });
+    expect(byId(u16, "u16-time-note")).toMatchObject({
+      kind: "note",
+      status: "info",
       dueDate: null,
-      daysLeft: null,
-      status: "no-deadline",
+      owner: "direzione",
     });
-    expect(byId(items, "guests-referee-notice").status).toBe("no-deadline");
+    expect(byId(u16, "u16-time-note").label).toMatch(/^Anticipare orario U16 \(sabato\)/);
+    const u15 = dervioChecklist({ matchDate: "2026-11-07", today: "2026-10-16", group: "u15" });
+    expect(u15.some((i) => i.id === "u16-time-note")).toBe(false);
+    const done = dervioChecklist({
+      matchDate: "2026-11-07",
+      today: "2026-10-16",
+      group: "u16",
+      done: ["u16-time-note"],
+    });
+    expect(byId(done, "u16-time-note").status).toBe("done");
+  });
+
+  it("rain move back to Colico adds FIGC (LND/SGS) and opponent + referee items on T-1", () => {
+    const items = dervioChecklist({
+      matchDate: "2026-11-07",
+      today: "2026-11-06",
+      movedToColico: true,
+    });
+    expect(byId(items, "lnd-sgs-field-change")).toMatchObject({
+      kind: "conditional",
+      dueDate: "2026-11-06",
+      status: "due-today",
+      owner: "segreteria",
+    });
+    expect(byId(items, "lnd-sgs-field-change").label).toContain("FIGC");
+    expect(byId(items, "opponent-referee-notice")).toMatchObject({
+      kind: "conditional",
+      dueDate: "2026-11-06",
+      status: "due-today",
+    });
+    expect(byId(items, "opponent-referee-notice").label).toContain("avversaria");
+  });
+
+  it("rain rule saying 'valuta cambio giorno' shows the rain-move items; dry or missing does not", () => {
+    const wet = rainDecision("2026-11-07", RAIN);
+    expect(rainMoveActive({ rain: wet })).toBe(true);
+    const withRain = dervioChecklist({ matchDate: "2026-11-07", today: "2026-11-04", rain: wet });
+    expect(withRain.filter((i) => i.kind === "conditional").map((i) => i.id)).toEqual([
+      "lnd-sgs-field-change",
+      "opponent-referee-notice",
+    ]);
+    const dry = rainDecision("2026-11-07", { date: "2026-11-07", precipitationProbability: 5 });
+    const missing = rainDecision("2026-11-07", null);
+    for (const rain of [dry, missing]) {
+      const items = dervioChecklist({ matchDate: "2026-11-07", today: "2026-11-04", rain });
+      expect(items.some((i) => i.kind === "conditional")).toBe(false);
+    }
+    expect(rainMoveActive({})).toBe(false);
+    expect(rainMoveActive({ movedToColico: false, rain: null })).toBe(false);
+  });
+
+  it("winter alone never adds rain-move items (inverno sì, se piove no)", () => {
+    const items = dervioChecklist({ matchDate: "2027-01-09", today: "2027-01-01" });
+    expect(items.some((i) => i.kind === "conditional")).toBe(false);
   });
 
   it("lead days can be injected", () => {
     const items = dervioChecklist({
       matchDate: "2026-11-07",
       today: "2026-10-16",
-      leadDays: { lndSgsFieldChange: 10, guestsRefereeNotice: 5, comuneNotice: null },
+      movedToColico: true,
+      leadDays: { teamNotice: 10, rainMoveNotice: 0 },
     });
-    expect(byId(items, "lnd-sgs-field-change").dueDate).toBe("2026-10-28");
-    expect(byId(items, "guests-referee-notice").dueDate).toBe("2026-11-02");
-    expect(byId(items, "comune-notice").status).toBe("no-deadline");
+    expect(byId(items, "team-notice").dueDate).toBe("2026-10-28");
+    expect(byId(items, "lnd-sgs-field-change").dueDate).toBe("2026-11-07");
   });
 
   it("done items are done, also when late (set or array)", () => {
     const items = dervioChecklist({
       matchDate: "2026-10-24",
       today: "2026-10-16",
-      done: ["team-notice", "lnd-sgs-field-change"],
+      done: ["team-notice"],
     });
     expect(byId(items, "team-notice").status).toBe("done");
-    expect(byId(items, "lnd-sgs-field-change").status).toBe("done");
     const viaSet = dervioChecklist({
       matchDate: "2026-10-24",
-      today: "2026-10-16",
-      done: new Set<ChecklistItemId>(["comune-notice"]),
+      today: "2026-10-25",
+      movedToColico: true,
+      done: new Set<ChecklistItemId>(["lnd-sgs-field-change"]),
     });
-    expect(byId(viaSet, "comune-notice").status).toBe("done");
+    expect(byId(viaSet, "lnd-sgs-field-change").status).toBe("done");
+    expect(byId(viaSet, "opponent-referee-notice").status).toBe("overdue");
   });
 
   it("weather decision is not applicable on a synthetic pitch, kept when surface is unknown", () => {
-    const synth = dervioChecklist({ matchDate: "2026-11-07", today: "2026-10-16", surface: "synthetic" });
+    const synth = dervioChecklist({
+      matchDate: "2026-11-07",
+      today: "2026-10-16",
+      surface: "synthetic",
+    });
     expect(byId(synth, "weather-decision").status).toBe("not-applicable");
     expect(byId(synth, "weather-check").status).toBe("upcoming");
-    const unknown = dervioChecklist({ matchDate: "2026-11-07", today: "2026-10-16", surface: "unknown" });
+    const unknown = dervioChecklist({
+      matchDate: "2026-11-07",
+      today: "2026-10-16",
+      surface: "unknown",
+    });
     expect(byId(unknown, "weather-decision").status).toBe("upcoming");
   });
 
@@ -556,43 +681,46 @@ describe("dervioChecklist", () => {
     expect(isIsoDay(20261016)).toBe(false);
   });
 
-  it("lead days are clamped to integers 0–60; null stays 'no deadline'", () => {
+  it("lead days are clamped to integers 0–60", () => {
     expect(MAX_LEAD_DAYS).toBe(60);
     const lead = resolveLeadDays({
       teamNotice: 400,
       allNotice: -5,
       weatherCheck: 2.6,
       weatherDecision: Number.NaN,
-      comuneNotice: null,
-      lndSgsFieldChange: 1e9,
-      guestsRefereeNotice: Number.POSITIVE_INFINITY,
+      rainMoveNotice: Number.POSITIVE_INFINITY,
     });
     expect(lead).toEqual({
       teamNotice: 60,
       allNotice: 0,
       weatherCheck: 3,
       weatherDecision: 1,
-      comuneNotice: null,
-      lndSgsFieldChange: 60,
-      guestsRefereeNotice: null,
+      rainMoveNotice: 1,
     });
-    expect(resolveLeadDays().comuneNotice).toBe(30);
+    expect(resolveLeadDays()).toEqual({
+      teamNotice: 14,
+      allNotice: 3,
+      weatherCheck: 3,
+      weatherDecision: 1,
+      rainMoveNotice: 1,
+    });
   });
 
   it("summary counts every status", () => {
     const items = dervioChecklist({
       matchDate: "2026-10-24",
       today: "2026-10-21",
-      done: ["comune-notice"],
+      group: "u16",
+      done: ["u16-time-note"],
     });
-    const s = checklistSummary(items);
-    expect(s).toEqual({
-      done: 1,
+    expect(checklistSummary(items)).toEqual({
+      done: 1, // U16 note
       overdue: 1, // team notice (10/10)
       "due-today": 3, // all notice, club page, weather check (21/10)
       upcoming: 1, // weather decision (23/10)
-      "no-deadline": 2,
+      "no-deadline": 0,
       "not-applicable": 0,
+      info: 1, // Comune note
     });
   });
 
@@ -606,13 +734,19 @@ describe("dervioChecklist", () => {
   });
 
   it("labels and owners contain roles only, no personal names", () => {
-    const items = dervioChecklist({ matchDate: "2026-11-07", today: "2026-10-16" });
+    const items = dervioChecklist({
+      matchDate: "2026-11-07",
+      today: "2026-10-16",
+      group: "u16",
+      movedToColico: true,
+    });
     for (const i of items) {
       expect(["segreteria", "responsabile-impianti", "direzione"]).toContain(i.owner);
       expect(i.label.length).toBeGreaterThan(0);
     }
   });
 });
+
 
 describe("rainDecision", () => {
   it("rain forecast on grass → valuta cambio giorno, decided the day before", () => {
