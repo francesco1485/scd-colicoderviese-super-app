@@ -83,7 +83,11 @@ export const Route = createFileRoute("/gestionale/planning")({
     if (gate.view !== "page") return { gate, interior: false as const };
     const [cal, kb] = await Promise.all([
       soft(getPublicCalendarSnapshot()),
-      soft(searchKnowledge({ data: { onlyDue: true, limit: KB_LIMIT } })),
+      // A thrown read (network, session) is a failed read, not a missing role: keep it distinguishable.
+      searchKnowledge({ data: { onlyDue: true, limit: KB_LIMIT } }).catch((err: unknown) => {
+        console.error("[gestionale/planning] Cervellone read threw", err);
+        return { connected: true, result: null, error: "Ricerca non riuscita. Riprova tra poco." } as Awaited<ReturnType<typeof searchKnowledge>>;
+      }),
     ]);
     return {
       gate,
