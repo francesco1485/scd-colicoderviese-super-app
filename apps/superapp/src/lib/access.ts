@@ -30,6 +30,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   lotteria: { label: "Lotteria dello sport", icon: "coin" },
   planning: { label: "Planning annuale", icon: "calendar" },
   struttura: { label: "Attività in struttura", icon: "home" },
+  intake: { label: "Vetrina richieste", icon: "file" },
 };
 
 /** Plain Italian for the role ids used in the registry. */

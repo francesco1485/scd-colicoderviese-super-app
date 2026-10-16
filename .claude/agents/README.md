@@ -1,6 +1,6 @@
 # Agenti SCD
 
-Quarantasette agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Quarantotto agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
@@ -21,6 +21,7 @@ Quarantasette agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. 
 | scd-google | Mondo Google di sportclubcolico@gmail.com: posta, calendari, Drive, fogli, documenti; mappa, ordine, proposte |
 | scd-skill | Fabbrica delle skill: trova cosa serve, progetta e prova le skill migliori |
 | scd-crescita | Crescita e viralità: creator, social, TV, giornali, sport, grafica; idee che portano gente al campo |
+| scd-super-giornalista | Il Super Giornalista: ogni mattina la Prima pagina del club (notizie, interazione, social, app), coordina comunicazione, social, crescita e community |
 | scd-stratega | Priorità della settimana, rischi, decisioni da prendere |
 | scd-avatar | Crea e ambienta avatar e personaggi 2D e 3D (sintetici, mai volti reali senza consenso) |
 | scd-regista | Il regista del gestionale: cosa fare oggi, in che ordine, chi lo fa, cosa prepara subito Claude |

@@ -41,7 +41,8 @@ export type WorkAreaId =
   | "gestionale"
   | "quadro"
   | "planning"
-  | "struttura";
+  | "struttura"
+  | "intake";
 
 export interface DriveMaster {
   key: string;
@@ -286,6 +287,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Settimana dei centri di Colico e Dervio: allenamenti e gare in casa, turni volontari, aperture, chiusure, attività serali e serate Club House. Ruoli, mai nomi.",
     sources: ["quadro", "calendario", "impianti", "supabase", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria", "Responsabile struttura"],
+  },
+  intake: {
+    id: "intake", label: "Vetrina richieste", path: pathOf("intake"), railId: "gestionale",
+    description: "Le richieste che arrivano da fuori in un solo catalogo: iscrizioni ai tornei, sponsor, convenzioni, affitto dei campi, visite ai centri e altro. Decide chi ha il ruolo, il pagamento lo registra la Tesoreria dopo l'accettazione.",
+    sources: ["supabase", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria", "Tesoreria"],
   },
   quadro: {
     id: "quadro", label: "Quadro settimanale", path: pathOf("quadro"), railId: "quadro",
