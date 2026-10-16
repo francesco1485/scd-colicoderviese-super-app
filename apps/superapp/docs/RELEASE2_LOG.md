@@ -911,3 +911,15 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Nota: dopo RIFIUTATA/ANNULLATA r139 usa `least(purge_after, now() + 6 mesi)`: se i 12 mesi dall'arrivo scadono prima, vale la data più vicina.
 - Nome ufficiale: alla domanda «S.C.D. o S.D.C.?» Francesco indica «S.D.C. ColicoDerviese A.S.D.». Solo registrato (UD-163): nell'app non è stato rinominato nulla.
 - 20:03: Francesco scrive «applica r140». Migrazione applicata su SCD PULSE dall'editor SQL (sha1 1e7a370687af5ccad9f45fa67f0dfa4d30597f72 verificato sul file a 2eab5e4). Verifica in sola lettura: pg_cron 1.6.4 installato, un solo job attivo `scd_intake_contacts_purge` («17 1 * * *», `select public.scd_request_contacts_purge();`).
+## 2026-10-16 ~23:00 — chat cloud — pagine Partite, Eventi e Comunità, hub GROW (Francesco 21:38 «completare le piattaforme», 21:54 «altri colori»)
+- /calendario (Partite): stile METAL della home con «IN CASA» sole e «TRASFERTA» azzurro, settimana con pallini casa/trasferta, colonna destra Prossima in casa · Come arrivare · Rotazione campi (riservata, lucchetto); dati del calendario invariati.
+- /eventi, /eventi/christmas-lario-cup (solo testata), /community: testata compatta MetalPageHeader, un colore per tipo di evento (tornei sole, iniziative azzurro, club blu), comunità in Gioca · Segui · Partecipa; regole Top 11 e Fantacalcio dai testi esistenti; lotteria e Adotta invariate (UD-132).
+- /grow: hub interno GROW dietro lo stesso accesso di /crm (tolto il rinvio demo a /sponsor), copertura spot LED calcolata da sponsors.ts e sponsor-spots.ts (7 pronti, 30 da preparare), strumenti GROW con stato; /sponsor senza promesse di misurazione («Report in arrivo»).
+- Revisioni indipendenti scd-revisore + scd-sicurezza: PASS × 2 per ogni ramo (Eventi dopo correzione del testo sul Fantacalcio).
+
+## 2026-10-16 ~23:50 — chat cloud — «pagine piene» (Francesco 23:08 «non voglio pagine vuote», 23:43 «pubblica le pagine»)
+- /eventi: sezione Iniziative solo con iniziative o lotteria pubblicata; tornei della stagione sempre in testa. /eventi/christmas-lario-cup: riquadro live solo da torneo iniziato, prima una riga «Si accende l'8 dicembre».
+- /sostieni: per i visitatori solo le azioni attive oggi (proposta sponsor, Fondo Solidale spiegato, materiale tramite segreteria); catalogo e campagne solo quando la Direzione apre la raccolta (r101).
+- /top11: «Come funziona» in 4 passi al posto del vuoto; premi solo se esistono.
+- /squadre da non collegati: variante di UD-100 — solo categoria, campionato verificato, annate e link alle gare; resta tra le pagine solo soci (no-store, noindex). /crea e /la-mia-scd da non collegati: pagina di iscrizione JoinClub (porta solo a /registrati e /accedi).
+- Revisioni indipendenti scd-revisore + scd-sicurezza sull'integrazione 320b47a: PASS × 2.

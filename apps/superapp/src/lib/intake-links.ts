@@ -51,7 +51,7 @@ export function intakeLink(kind: IntakeKind, hints: IntakeLinkHints = {}, formUr
 /** Public pages where each link belongs (placement on public pages is the CLOUD chat's area, AGENTS.md SCD:SESSIONI). */
 export const INTAKE_LINK_PLACES: Readonly<Record<IntakeKind, readonly string[]>> = {
   ISCRIZIONE_TORNEO: ["/tornei", "/eventi/christmas-lario-cup"],
-  SPONSOR: ["/sponsor", "/grow"],
+  SPONSOR: ["/sponsor"],
   CONVENZIONE: ["/partner", "/fornitori"],
   AFFITTO_CAMPO: ["/impianti"],
   VISITA_CENTRO: ["/impianti"],

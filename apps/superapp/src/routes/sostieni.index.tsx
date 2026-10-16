@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Building2,
-  HeartHandshake,
   Lightbulb,
   Package,
   ShieldCheck,
@@ -11,17 +10,12 @@ import { useState } from "react";
 import {
   CampaignCard,
   ItemCard,
-  NotActiveNote,
   PledgeDialog,
-  btnLine,
-  btnSun,
 } from "@/components/giving/public";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { TribuneSeatsSection } from "@/components/giving/TribuneSeats";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import {
-  CATEGORY_LABEL,
-  ITEM_CATEGORIES,
   ITEM_STATUS_LABEL,
   PROPOSAL_AREA_LABEL,
   PROPOSAL_STATUS_LABEL,
@@ -30,12 +24,15 @@ import {
 import { getGivingPublic } from "@/lib/giving.functions";
 import { pageHead, SHARE_PAGES } from "@/lib/share";
 import { INTERNAL_ONLY } from "@/lib/internal-initiatives";
-import { findTribuneItem, tribuneDraftItem } from "@/lib/tribune-seats";
+import { findTribuneItem } from "@/lib/tribune-seats";
+import { readyActions } from "@/lib/has-content";
 
 /**
  * Sostieni il club (UD-113, SCD ONE): Fondo Solidale, "Adotta un oggetto", campaigns palestra / infermeria (goods),
- * improvement proposals. Public, no payment in the app. Until r101 is applied the page shows its structure and
- * "Da attivare"; no item, amount or name is invented.
+ * improvement proposals. Public, no payment in the app; no item, amount or name is invented.
+ * "Pagine piene" (Francesco 16/10/2026 23:08): a visitor sees only what works today. Until r101 is applied the
+ * catalogue, campaigns, tribune and proposal form stay hidden (they would only answer "Da attivare"); the page offers
+ * the sponsor proposal, the Fondo Solidale explanation and the secretariat for goods and adoptions.
  */
 export const Route = createFileRoute("/sostieni/")({
   loader: () => getGivingPublic(),
@@ -43,21 +40,43 @@ export const Route = createFileRoute("/sostieni/")({
   component: SostieniPage,
 });
 
-const HOW = [
+/** What a visitor can do today, whether or not the giving engine (r101) is open. */
+const TODAY = [
   {
-    icon: HeartHandshake,
-    t: "Adotta un oggetto",
-    d: "Da solo o insieme ad altri: ogni contributo avvicina l'obiettivo.",
+    id: "sponsor",
+    icon: Building2,
+    t: "Sei un'azienda?",
+    d: "Visibilità al campo, sulle maglie e nell'app: proponi un accordo su misura.",
+    cta: "Proponi una sponsorizzazione",
+    to: "/sponsor",
+    hash: "proposta",
   },
   {
+    id: "fondo",
+    icon: ShieldCheck,
+    t: "Fondo Solidale",
+    d: "Nessun ragazzo resta fuori per la quota: il Fondo aiuta le famiglie in difficoltà. Domande e decisioni restano riservate.",
+    cta: "Come funziona",
+    to: "/sostieni/fondo-solidale",
+    hash: undefined,
+  },
+  {
+    id: "segreteria",
     icon: Package,
-    t: "Dona materiale",
-    d: "Attrezzi per la palestra, materiale e arredi per l'infermeria.",
+    t: "Materiale e oggetti",
+    d: "Attrezzi per la palestra, materiale per l'infermeria o un oggetto da adottare: scrivi alla segreteria.",
+    cta: "Contatta la segreteria",
+    to: "/contatti",
+    hash: undefined,
   },
   {
+    id: "proponi",
     icon: Lightbulb,
-    t: "Proponi un'idea",
-    d: "Segnala cosa servirebbe al club, anche in forma anonima.",
+    t: "Proponi un miglioramento",
+    d: "Campi, palestra, infermeria, club house, sicurezza: scrivici, anche senza nome.",
+    cta: "Proponi",
+    to: "/sostieni/proponi",
+    hash: undefined,
   },
 ] as const;
 
@@ -72,6 +91,13 @@ function SostieniPage() {
   // C2 "Adotta un seggiolino": the tribune is an item of the same catalogue, shown in its own section with the seat map.
   const tribune = findTribuneItem(allItems);
   const items = allItems.filter((i) => i !== tribune);
+  // Only what works today: the secretariat while the online catalogue is closed, the proposal form once it is open.
+  const today = readyActions(
+    TODAY.map((a) => ({
+      ...a,
+      ready: a.id === "segreteria" ? !active : a.id === "proponi" ? active : true,
+    })),
+  );
   return (
     <main>
       <PageHero
@@ -90,57 +116,56 @@ function SostieniPage() {
       </PageHero>
 
       <section
+        aria-label="Cosa puoi fare oggi"
         className={`${heroOverlapCls} mx-auto grid max-w-6xl grid-cols-1 gap-3 px-4 sm:grid-cols-3`}
+        data-testid="sostieni-today"
       >
-        {HOW.map((x) => (
-          <div key={x.t} className="card-premium p-4">
-            <x.icon className="size-5 text-primary" aria-hidden="true" />
-            <p className="mt-2 font-display text-sm font-bold uppercase">
-              {x.t}
-            </p>
-            <p className="m-0 text-xs text-muted-foreground">{x.d}</p>
-          </div>
+        {today.map((x) => (
+          <Link
+            key={x.id}
+            to={x.to}
+            {...(x.hash ? { hash: x.hash } : {})}
+            className="scd-focus group flex flex-col rounded-[20px] bg-white p-4 shadow-premium transition-shadow hover:shadow-[0_8px_22px_rgb(11_42_91/0.16)] sm:p-5"
+            data-testid={`sostieni-today-${x.id}`}
+          >
+            <span aria-hidden="true" className="scd-band grid size-10 place-items-center rounded-[12px] text-[#ffd84a]">
+              <x.icon className="size-5" />
+            </span>
+            <b className="mt-3 block text-[17px] leading-tight text-[#13254d]">{x.t}</b>
+            <span className="mt-1 block flex-1 text-[14px] leading-snug text-[#3e5272]">{x.d}</span>
+            <span className="mt-3 inline-flex items-center gap-1 text-[14.5px] font-bold text-[#0457af]">
+              {x.cta}
+              <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">›</span>
+            </span>
+          </Link>
         ))}
       </section>
 
-      {!active && (
-        <div className="mx-auto mt-8 max-w-6xl px-4">
-          <NotActiveNote>
-            Le pagine sono pronte: catalogo, campagne e proposte si accendono
-            quando la Direzione dà l'OK.
-          </NotActiveNote>
-        </div>
-      )}
-
-      {!INTERNAL_ONLY.seatAdoption && (
+      {active && tribune && !INTERNAL_ONLY.seatAdoption && (
         <TribuneSeatsSection
           item={tribune}
           active={active}
-          onAdopt={(unit) => {
-            // Not active: the draft item opens the same dialog, which answers "Da attivare" and sends nothing.
-            const item = tribune ?? (active ? null : tribuneDraftItem());
-            if (item) setPledge({ item, unit });
-          }}
+          onAdopt={(unit) => setPledge({ item: tribune, unit })}
         />
       )}
 
-      <section
-        className="mx-auto mt-14 max-w-6xl px-4"
-        aria-labelledby="adotta-title"
-      >
-        <p className="eyebrow">Adotta un oggetto</p>
-        <h2 id="adotta-title" className="mt-1 text-3xl font-bold">
-          Cose di cui il club ha bisogno
-        </h2>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Ogni oggetto ha prezzo o «da preventivo», fornitore e stato:{" "}
-          {(["DA_ADOTTARE", "IN_RACCOLTA", "ADOTTATO", "CONSEGNATO"] as const)
-            .map((s) => ITEM_STATUS_LABEL[s].toLowerCase())
-            .join(", ")}
-          . Più persone possono adottare lo stesso oggetto; alcuni sono divisi
-          in unità.
-        </p>
-        {items.length > 0 ? (
+      {active && items.length > 0 && (
+        <section
+          className="mx-auto mt-14 max-w-6xl px-4"
+          aria-labelledby="adotta-title"
+        >
+          <p className="eyebrow">Adotta un oggetto</p>
+          <h2 id="adotta-title" className="mt-1 text-3xl font-bold">
+            Cose di cui il club ha bisogno
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+            Ogni oggetto ha prezzo o «da preventivo», fornitore e stato:{" "}
+            {(["DA_ADOTTARE", "IN_RACCOLTA", "ADOTTATO", "CONSEGNATO"] as const)
+              .map((st) => ITEM_STATUS_LABEL[st].toLowerCase())
+              .join(", ")}
+            . Più persone possono adottare lo stesso oggetto; alcuni sono
+            divisi in unità.
+          </p>
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {items.map((i) => (
               <ItemCard
@@ -150,40 +175,10 @@ function SostieniPage() {
               />
             ))}
           </div>
-        ) : (
-          <div
-            className="mt-6 rounded-2xl border border-dashed border-border bg-card p-5"
-            data-testid="adopt-empty"
-          >
-            <p className="m-0 font-semibold">
-              {active
-                ? tribune
-                  ? "Altri oggetti in arrivo."
-                  : "Il catalogo è in preparazione."
-                : "Catalogo da attivare."}
-            </p>
-            <p className="m-0 mt-1 text-sm text-muted-foreground">
-              Le categorie:{" "}
-              {ITEM_CATEGORIES.map((c) => CATEGORY_LABEL[c]).join(" · ")}.
-            </p>
-          </div>
-        )}
-        <p className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
-          <Building2 className="mt-0.5 size-4 flex-none" aria-hidden="true" />
-          <span>
-            Sei un'azienda?{" "}
-            <Link
-              to="/sponsor"
-              hash="proposta"
-              className="font-semibold text-primary underline"
-            >
-              Passa dall'area sponsor
-            </Link>
-            : ti proponiamo visibilità e un accordo su misura.
-          </span>
-        </p>
-      </section>
+        </section>
+      )}
 
+      {active && (
       <section
         className="mx-auto mt-14 max-w-6xl px-4"
         aria-labelledby="campagne-title"
@@ -205,39 +200,8 @@ function SostieniPage() {
           />
         </div>
       </section>
+      )}
 
-      <section className="mx-auto mt-14 grid max-w-6xl gap-4 px-4 md:grid-cols-2">
-        <article
-          className="surface-deep rounded-2xl p-6 shadow-premium"
-          data-testid="fondo-teaser"
-        >
-          <p className="eyebrow">Fondo Solidale</p>
-          <h2 className="mt-1 text-2xl font-bold">
-            Nessun ragazzo resta fuori per la quota
-          </h2>
-          <p className="mt-2 text-sm opacity-85">
-            Il Fondo aiuta le famiglie in difficoltà a pagare la quota. Domande
-            e decisioni restano riservate alla Direzione.
-          </p>
-          <Link to="/sostieni/fondo-solidale" className={`${btnSun} mt-4`}>
-            Come funziona
-          </Link>
-        </article>
-        <article className="card-premium p-6" data-testid="proponi-teaser">
-          <p className="eyebrow">Proponi un miglioramento</p>
-          <h2 className="mt-1 text-2xl font-bold">
-            Hai visto qualcosa che manca?
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Campi, palestra, infermeria, club house, sicurezza: scrivici, anche
-            senza nome. Le proposte non sono pubbliche finché lo staff non le
-            pubblica.
-          </p>
-          <Link to="/sostieni/proponi" className={`${btnLine} mt-4`}>
-            Proponi
-          </Link>
-        </article>
-      </section>
 
       {data && data.proposals.length > 0 && (
         <section

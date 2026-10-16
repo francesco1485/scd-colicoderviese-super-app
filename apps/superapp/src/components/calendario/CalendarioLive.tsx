@@ -1,30 +1,24 @@
 /**
- * Building blocks of the public "Calendario live" page (board VR-009, screen 2): white rows with the coloured left
- * bar, the date block, the round type icon, bold title and place line; the "Prossime gare" rows with the big date
- * block; the live banner (red "In campo ora" with the minute, otherwise the countdown to the next kick-off); the
- * followed-team chips with the star.
+ * Building blocks of the public "Partite" page (/calendario) in the SCD METAL "via di mezzo" design of the home
+ * (Francesco 16/10/2026: «un colore uguale e un po più metallico… mettere in pista in modo definitivo», then the same
+ * design on Partite): white cards with the silver top edge, match rows like "Oggi in campo" (big time, thin bar, team
+ * and opponent, venue and pitch, a small pill on the right), the live pulse on the navy band, the followed-team chips.
  *
- * Rules (AGENTS.md, Direzione 13/10/2026): our side is always the official club crest + "ColicoDerviese <team>";
- * an opponent crest appears only when crestFor() returns a verified file (never a drawn shield, never invented);
- * no score (the calendar has none); no minor named. Palette of the home: navy #0b2a5b, blue #1556c4,
- * light #eef3f9, white, yellow #ffd600; red only for "live".
+ * Colour with purpose (21:54 «cerca di mettere anche altri colori»): sole = home game, azzurro = away game, red = live
+ * only (lib/calendario-layout.ts). Rules (AGENTS.md, Direzione 13/10/2026): our side is always the official club crest
+ * + "ColicoDerviese <team>"; an opponent crest appears only when crestFor() returns a verified file (never drawn, never
+ * invented); no score (the calendar has none); no minor named.
  */
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Clock3, MapPin, Star } from "lucide-react";
+import { ChevronDown, ChevronRight, MapPin, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { venueShort } from "@/components/home/HomeSections";
 import { GroupResultsLink } from "@/components/scd/OfficialResults";
-import { dateParts, groupShort, matchTitle } from "@/lib/board-data";
-import {
-  eventRank,
-  gameIcon,
-  matchClock,
-  nextKickoff,
-  liveGames,
-  typePrefix,
-} from "@/lib/calendario-live";
+import { dateParts, groupShort } from "@/lib/board-data";
+import { PLACE_STYLE, placeTone } from "@/lib/calendario-layout";
+import { eventRank, matchClock, nextKickoff, liveGames, typePrefix } from "@/lib/calendario-live";
 import { matchdayClass } from "@/lib/home-matchday";
 import { crestFor, opponentLabel } from "@/lib/crests";
 import { countdownParts } from "@/lib/home-board";
@@ -32,103 +26,18 @@ import { matchShare } from "@/lib/share-match";
 import { ShareWhatsApp } from "@/components/scd/ShareWhatsApp";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 
+/** White card with the thin metallic top edge (same as HomeLobby). */
 export const CARD =
-  "rounded-[16px] bg-white shadow-[0_1px_2px_rgb(11_42_91/0.06),0_10px_24px_-14px_rgb(11_42_91/0.35)]";
+  "relative overflow-hidden rounded-[12px] border border-[#d6deeb] bg-white shadow-[0_6px_18px_-14px_rgb(20_38_77/0.55)] before:absolute before:inset-x-0 before:top-0 before:z-[1] before:h-[3px] before:bg-[linear-gradient(90deg,#8ea2c6,#ffffff_22%,#b8c5dd_50%,#ffffff_78%,#8ea2c6)] before:content-['']";
+/** Small uppercase label of the design system. */
+export const LABEL = "font-display text-[11px] font-bold uppercase tracking-[0.1em] lg:text-[12px]";
 const LIVE_RED = "#c40018";
+const PILL = "inline-flex items-center justify-center whitespace-nowrap rounded-[4px] px-1.5 py-[2px] font-display text-[10.5px] font-bold uppercase tracking-[0.06em]";
 
-const fmt = (iso: string, o: Intl.DateTimeFormatOptions) =>
-  new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", ...o }).format(
-    new Date(`${iso}T12:00:00Z`),
-  );
-
-/* ------------------------------------------------------------------ icons */
-
-/** Round type icon of a row: ball = partita, trophy = coppa/torneo, cone = allenamento (members only). */
-export function TypeIcon({
-  kind,
-  live = false,
-}: {
-  kind: "ball" | "trophy" | "cone";
-  live?: boolean;
-}) {
-  const bg =
-    kind === "cone"
-      ? "bg-[#fff1e8]"
-      : kind === "trophy"
-        ? "bg-[#fff7cc]"
-        : "bg-[#eef3f9]";
-  return (
-    <span
-      aria-hidden="true"
-      className={`relative grid size-10 shrink-0 place-items-center rounded-full ${bg} lg:size-11`}
-    >
-      {kind === "ball" && (
-        <svg viewBox="0 0 32 32" className="size-7">
-          <circle
-            cx="16"
-            cy="16"
-            r="13"
-            fill="#fff"
-            stroke="#0b2a5b"
-            strokeWidth="2"
-          />
-          <path d="m16 9.5 5.5 4-2 6.5h-7l-2-6.5z" fill="#0b2a5b" />
-          <path
-            d="M16 9.5V3.5M21.5 13.5l5.5-2M19.5 20l3.5 5M12.5 20 9 25M10.5 13.5l-5.5-2"
-            stroke="#0b2a5b"
-            strokeWidth="1.6"
-          />
-        </svg>
-      )}
-      {kind === "trophy" && (
-        <svg viewBox="0 0 32 32" className="size-7">
-          <path
-            d="M10 5h12v6a6 6 0 0 1-12 0z"
-            fill="#ffd600"
-            stroke="#0b2a5b"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M10 8H6a4 4 0 0 0 4 5M22 8h4a4 4 0 0 1-4 5"
-            fill="none"
-            stroke="#0b2a5b"
-            strokeWidth="2"
-          />
-          <path
-            d="M16 17v5M11 27h10M12.5 22h7l1 5h-9z"
-            fill="#0b2a5b"
-            stroke="#0b2a5b"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-      {kind === "cone" && (
-        <svg viewBox="0 0 32 32" className="size-7">
-          <path d="M13 4h6l6 20H7z" fill="#ff6a1a" />
-          <path d="M11.2 12h9.6M9.6 18h12.8" stroke="#fff" strokeWidth="2.4" />
-          <rect x="4" y="24" width="24" height="4" rx="1.5" fill="#ff6a1a" />
-        </svg>
-      )}
-      {live && (
-        <span
-          className="scd-live-dot absolute -right-0.5 -top-0.5 size-3 rounded-full ring-2 ring-white"
-          style={{ background: LIVE_RED }}
-        />
-      )}
-    </span>
-  );
-}
+const fmt = (iso: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("it-IT", { timeZone: "UTC", ...o }).format(new Date(`${iso}T12:00:00Z`));
 
 /** Our official crest and, only when the registry has the verified file, the opponent crest, stacked (home first). */
-export function StackedCrests({
-  e,
-  size = 34,
-}: {
-  e: Pick<PublicEvent, "opponent" | "homeAway">;
-  size?: number;
-}) {
+export function StackedCrests({ e, size = 34 }: { e: Pick<PublicEvent, "opponent" | "homeAway">; size?: number }) {
   const opp = e.opponent ? crestFor(e.opponent) : null;
   const them = opp?.src ? (
     <img
@@ -143,10 +52,7 @@ export function StackedCrests({
     />
   ) : null;
   const us = (
-    <span
-      className="relative grid shrink-0 place-items-center rounded-full bg-white ring-2 ring-white"
-      style={{ width: size, height: size }}
-    >
+    <span className="relative grid shrink-0 place-items-center rounded-full bg-white ring-2 ring-white" style={{ width: size, height: size }}>
       <ClubCrestOfficial size={Math.round(size * 0.86)} />
     </span>
   );
@@ -162,39 +68,17 @@ export function StackedCrests({
 
 /* ------------------------------------------------------------------ rows */
 
-function DateLead({
-  date,
-  time,
-  clock,
-}: {
-  date: string;
-  time: string;
-  clock: ReturnType<typeof matchClock>;
-}) {
-  const d = dateParts(date);
-  return (
-    <span className="grid w-[50px] shrink-0 justify-items-center leading-none text-[#0b2a5b] lg:w-[56px]">
-      <span className="text-[12px] font-extrabold uppercase">{d.weekday}</span>
-      <span className="font-uv text-[30px] leading-[0.95] lg:text-[34px]">
-        {d.day}
+/** "In casa" (sole) / "Trasferta" (azzurro) pill, or the red live minute. */
+function PlacePill({ homeAway, live }: { homeAway: string; live: string | null }) {
+  if (live)
+    return (
+      <span className={`${PILL} gap-1 bg-[#ffe3e6] text-[#b0001a]`} data-testid="row-live">
+        <span aria-hidden="true" className="scd-live-dot size-1.5 rounded-full" style={{ background: LIVE_RED }} />
+        {live}
       </span>
-      <span className="text-[12px] font-extrabold uppercase">{d.month}</span>
-      {clock.state === "live" ? (
-        <span
-          className="mt-1 rounded-[5px] px-1 py-[2px] text-[12px] font-extrabold tabular-nums text-white"
-          style={{ background: LIVE_RED }}
-        >
-          {clock.label}
-        </span>
-      ) : (
-        <span
-          className={`mt-1 text-[13.5px] font-extrabold tabular-nums ${clock.state === "done" ? "text-[#4a5d7a]" : ""}`}
-        >
-          {time || "--:--"}
-        </span>
-      )}
-    </span>
-  );
+    );
+  const s = PLACE_STYLE[placeTone(homeAway)];
+  return <span className={`${PILL} ${s.pill}`}>{s.label}</span>;
 }
 
 export function GameRow({
@@ -218,100 +102,72 @@ export function GameRow({
   const live = clock.state === "live";
   const done = clock.state === "done";
   const certain = e.timeConfirmed && e.venueConfirmed;
-  const home = e.homeAway === "CASA";
+  const tone = placeTone(e.homeAway);
+  const home = tone === "casa";
   const team = groupShort(g, e.category);
   const prefix = typePrefix(e.type);
-  const title = matchTitle(
-    { homeAway: e.homeAway, opponent: opponentLabel(e.opponent) },
-    `ColicoDerviese ${team}`,
-  );
+  const opp = opponentLabel(e.opponent);
   return (
     <li
       data-event-id={e.id}
       data-state={clock.state}
-      className={`${CARD} relative overflow-hidden`}
+      data-place={tone}
+      className={`relative border-t border-[#edf1f7] first:border-t-0 ${home && !done ? "bg-[linear-gradient(90deg,#fff8dc_0%,rgb(255_248_220/0)_55%)]" : ""}`}
     >
-      <span
-        className="absolute inset-y-0 left-0 w-[5px]"
-        style={{ background: live ? LIVE_RED : (g?.color ?? "#668196") }}
-        aria-hidden="true"
-      />
       <button
         type="button"
         onClick={toggle}
         aria-expanded={open}
-        className={`scd-focus flex w-full items-center gap-[10px] py-[12px] pl-[14px] pr-[10px] text-left lg:gap-[14px] lg:pl-[18px] lg:pr-[14px] ${done ? "opacity-75" : ""}`}
+        className={`scd-focus flex w-full items-stretch gap-3 px-3 py-3 text-left lg:gap-4 lg:px-5 ${done ? "opacity-70" : ""}`}
       >
-        <DateLead date={e.date} time={e.time} clock={clock} />
-        <TypeIcon kind={gameIcon(e.type)} live={live} />
+        <span className="grid w-[58px] shrink-0 content-start justify-items-start gap-1 font-display lg:w-[64px]">
+          <span className={`text-[21px] font-bold leading-none tabular-nums lg:text-[23px] ${done ? "text-[#62728f]" : "text-[#14264d]"}`}>{e.time || "--:--"}</span>
+          <PlacePill homeAway={e.homeAway} live={live ? clock.label : null} />
+        </span>
+        <span aria-hidden="true" className={`w-[4px] shrink-0 self-stretch rounded-full ${live ? "bg-[#c40018]" : PLACE_STYLE[tone].bar}`} />
         <span className="min-w-0 flex-1">
           {live && (
-            <span
-              className="mb-[3px] inline-flex items-center gap-1 text-[11.5px] font-extrabold uppercase tracking-[0.04em]"
-              style={{ color: LIVE_RED }}
-            >
-              <span
-                className="scd-live-dot size-1.5 rounded-full"
-                style={{ background: LIVE_RED }}
-                aria-hidden="true"
-              />
-              In campo · {clock.label}
-              <span className="sr-only">
-                {" "}
-                dal calcio d'inizio in calendario
-              </span>
+            <span className="mb-[2px] block font-display text-[11.5px] font-bold uppercase tracking-[0.06em]" style={{ color: LIVE_RED }}>
+              In campo ora<span className="sr-only">, {clock.label} dal calcio d'inizio in calendario</span>
             </span>
           )}
-          <span className="block break-words text-[15.5px] font-extrabold leading-[1.2] text-[#0b1e3a] lg:text-[17px]">
-            {prefix ? `${prefix} · ` : ""}
-            {title}
-          </span>
-          <span className="mt-[4px] flex items-start gap-[3px] text-[13px] font-medium leading-[1.25] text-[#4a5d7a] lg:text-[14px]">
-            <MapPin
-              className="mt-[1px] size-[14px] shrink-0 text-[#1556c4]"
-              strokeWidth={2.4}
-              aria-hidden="true"
-            />
-            <span className="min-w-0 break-words">
-              {home ? "" : "Trasferta · "}
-              {e.venue ? venueShort(e.venue) : "Sede da definire"}
-              {done && (
-                <span className="ml-[5px] whitespace-nowrap rounded bg-[#eef3f9] px-[5px] text-[11px] font-bold uppercase text-[#23406e]">
-                  Terminata
-                </span>
-              )}
-              {!certain && (
-                <span className="ml-[5px] whitespace-nowrap rounded bg-[#fff3b0] px-[5px] text-[11px] font-bold uppercase text-[#6b4f00]">
-                  da confermare
-                </span>
-              )}
-              {e.isVariation && (
-                <span className="ml-[5px] whitespace-nowrap rounded border border-[#1556c4] px-[4px] text-[11px] font-bold uppercase text-[#1556c4]">
-                  Variazione
-                </span>
-              )}
+          <span className="flex items-baseline gap-1.5">
+            <span aria-hidden="true" className="size-[9px] shrink-0 translate-y-[-1px] rounded-full ring-2 ring-white" style={{ background: g?.color ?? "#8a9bb8" }} />
+            <span className="min-w-0 break-words font-display text-[16px] leading-[1.2] text-[#14264d] lg:text-[17px]">
+              {prefix && <span className="font-semibold text-[#0457af]">{prefix} · </span>}
+              <span className="font-semibold text-[#52627f]">ColicoDerviese </span>
+              <b className="font-bold">{team}</b>
             </span>
           </span>
+          <span className="mt-0.5 block break-words text-[14px] font-semibold leading-snug text-[#14264d] lg:text-[15px]">
+            <span className="font-normal text-[#62728f]">{home ? "con " : tone === "fuori" ? "a casa di " : "vs "}</span>
+            {opp || "avversario da definire"}
+          </span>
+          <span className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12.5px] leading-tight text-[#52627f] lg:text-[13px]">
+            <span className="inline-flex min-w-0 items-start gap-1">
+              <MapPin className="mt-[1px] size-[13px] shrink-0 text-[#0457af]" strokeWidth={2.4} aria-hidden="true" />
+              <span className="min-w-0 break-words">{e.venue ? venueShort(e.venue) : "Sede da definire"}</span>
+            </span>
+            {done && <span className={`${PILL} bg-[#eef1f6] text-[#4a5a78]`}>Terminata</span>}
+            {!certain && <span className={`${PILL} bg-[#fff3b0] text-[#5c4400]`}>da confermare</span>}
+            {e.isVariation && <span className={`${PILL} border border-[#0457af] text-[#0457af]`}>Variazione</span>}
+          </span>
         </span>
-        <StackedCrests e={e} size={30} />
+        <span className="flex shrink-0 flex-col items-end justify-between gap-2">
+          <span className="hidden lg:block">
+            <StackedCrests e={e} size={30} />
+          </span>
+          <ChevronDown className={`size-5 text-[#7a8aa8] transition-transform duration-200 motion-reduce:transition-none ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+        </span>
       </button>
       {open && (
-        <div className="mx-[12px] mb-[12px] grid gap-1.5 rounded-[12px] bg-[#eef3f9] px-3 py-3 text-[14px] text-[#0b1e3a]">
+        <div className="mx-3 mb-3 grid gap-1.5 rounded-[10px] border border-[#e3e9f3] bg-[#f5f8fc] px-3 py-3 text-[14px] text-[#14264d] lg:mx-5">
           <div>
-            <Clock3 className="mr-1 inline size-4" aria-hidden="true" />
-            {fmt(e.date, {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}{" "}
-            ·{" "}
-            {e.time
-              ? `${e.time}${certain ? "" : " (indicativo)"}`
-              : "orario da definire"}
+            {fmt(e.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })} ·{" "}
+            {e.time ? `${e.time}${certain ? "" : " (indicativo)"}` : "orario da definire"}
           </div>
           <div className="flex gap-1">
-            <MapPin className="mt-1 size-4 shrink-0" aria-hidden="true" />
+            <MapPin className="mt-1 size-4 shrink-0 text-[#0457af]" aria-hidden="true" />
             <span className="break-words">
               {e.venue || "Sede da definire"}
               {e.venueConfirmed ? "" : " (da confermare)"}
@@ -319,14 +175,14 @@ export function GameRow({
           </div>
           <dl className="m-0 grid gap-1.5">
             <div>
-              <dt className="inline text-[#4a5d7a]">Categoria: </dt>
+              <dt className="inline text-[#52627f]">Categoria: </dt>
               <dd className="inline">
                 {e.category}
                 {e.round ? ` · giornata ${e.round}` : ""}
               </dd>
             </div>
             <div>
-              <dt className="inline text-[#4a5d7a]">Provenienza: </dt>
+              <dt className="inline text-[#52627f]">Provenienza: </dt>
               <dd className="inline">
                 {e.source || "Calendario SCD"} ·{" "}
                 {e.status === "OFFICIAL_CALENDAR"
@@ -338,33 +194,25 @@ export function GameRow({
               </dd>
             </div>
           </dl>
-          {e.facilityReview && (
-            <div className="font-semibold text-[#4a5d7a]">
-              Disponibilità impianto da verificare
-            </div>
-          )}
+          {e.facilityReview && <div className="font-semibold text-[#52627f]">Disponibilità impianto da verificare</div>}
           {e.notice.map((n) => (
             <div key={n} className="font-semibold">
               ⚠ {n}
             </div>
           ))}
           <div className="flex flex-wrap items-center gap-2 pt-1">
+            <span className="lg:hidden">
+              <StackedCrests e={e} size={30} />
+            </span>
             {g && (
               <button
                 type="button"
                 onClick={() => onFollow(g.id)}
                 aria-pressed={followed}
-                className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-full bg-white px-3 text-[13.5px] font-bold text-[#0b2a5b] shadow-[0_1px_3px_rgb(11_42_91/0.15)]"
+                className="scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-full border border-[#d6deeb] bg-white px-3 text-[13.5px] font-bold text-[#14264d]"
               >
-                <Star
-                  className="size-4"
-                  fill={followed ? "#ffd600" : "none"}
-                  stroke={followed ? "#8a6d00" : "#0b2a5b"}
-                  aria-hidden="true"
-                />
-                {followed
-                  ? `Segui già ColicoDerviese ${team}`
-                  : `Segui ColicoDerviese ${team}`}
+                <Star className="size-4" fill={followed ? "#ffd84a" : "none"} stroke={followed ? "#8a6d00" : "#14264d"} aria-hidden="true" />
+                {followed ? `Segui già ColicoDerviese ${team}` : `Segui ColicoDerviese ${team}`}
               </button>
             )}
             <GroupResultsLink group={e.group} />
@@ -375,14 +223,14 @@ export function GameRow({
                     date: e.date,
                     time: e.time,
                     group: e.group,
-                    opponent: opponentLabel(e.opponent),
+                    opponent: opp,
                     homeAway: e.homeAway === "FUORI" ? "FUORI" : e.homeAway === "CASA" ? "CASA" : "",
                     place: e.venue ? venueShort(e.venue) : "",
                     pending: certain ? [] : ["Orario o campo da confermare"],
                   },
                   team,
                 )}
-                className="bg-white shadow-[0_1px_3px_rgb(11_42_91/0.15)]"
+                className="border border-[#d6deeb] bg-white"
               />
             )}
           </div>
@@ -401,132 +249,63 @@ export type TrainingItem = {
   teams?: string;
 };
 
+/** Members only: a training slot of the chosen annata, green bar (one tone per meaning), link to the board. */
 export function TrainingRow({ r }: { r: TrainingItem }) {
-  const d = dateParts(r.date);
   return (
-    <li className={`${CARD} scd-rise relative overflow-hidden`}>
-      <span
-        className="absolute inset-y-0 left-0 w-[5px] bg-[#1f9d55]"
-        aria-hidden="true"
-      />
-      <Link
-        to="/allenamenti"
-        className="scd-focus flex items-center gap-[10px] py-[12px] pl-[14px] pr-[10px] lg:gap-[14px] lg:pl-[18px]"
-      >
-        <span className="grid w-[50px] shrink-0 justify-items-center leading-none text-[#0b2a5b] lg:w-[56px]">
-          <span className="text-[12px] font-extrabold uppercase">
-            {d.weekday}
-          </span>
-          <span className="font-uv text-[30px] leading-[0.95] lg:text-[34px]">
-            {d.day}
-          </span>
-          <span className="text-[12px] font-extrabold uppercase">
-            {d.month}
-          </span>
-          <span className="mt-1 text-[13.5px] font-extrabold tabular-nums">
-            {r.time}
-          </span>
+    <li className="relative border-t border-[#edf1f7] first:border-t-0">
+      <Link to="/allenamenti" className="scd-focus flex items-stretch gap-3 px-3 py-3 lg:gap-4 lg:px-5">
+        <span className="grid w-[58px] shrink-0 content-start justify-items-start gap-1 font-display lg:w-[64px]">
+          <span className="text-[21px] font-bold leading-none tabular-nums text-[#14264d] lg:text-[23px]">{r.time}</span>
+          <span className={`${PILL} bg-[#e3f5ea] text-[#156b3a]`}>Allen.</span>
         </span>
-        <TypeIcon kind="cone" />
+        <span aria-hidden="true" className="w-[4px] shrink-0 self-stretch rounded-full bg-[#1f9d55]" />
         <span className="min-w-0 flex-1">
-          <span className="block break-words text-[15.5px] font-extrabold leading-[1.2] text-[#0b1e3a]">
-            {r.title}
-          </span>
-          <span className="mt-[4px] flex items-start gap-[3px] text-[13px] font-medium leading-[1.25] text-[#4a5d7a]">
-            <MapPin
-              className="mt-[1px] size-[14px] shrink-0 text-[#1556c4]"
-              strokeWidth={2.4}
-              aria-hidden="true"
-            />
+          <span className="block break-words font-display text-[16px] font-bold leading-[1.2] text-[#14264d]">{r.title}</span>
+          <span className="mt-1 flex items-start gap-1 text-[12.5px] leading-tight text-[#52627f]">
+            <MapPin className="mt-[1px] size-[13px] shrink-0 text-[#0457af]" strokeWidth={2.4} aria-hidden="true" />
             <span className="min-w-0">{r.sub}</span>
           </span>
-          {r.teams && (
-            <span className="mt-[2px] block truncate text-[12px] font-medium text-[#4a5d7a]">
-              {r.teams}
-            </span>
-          )}
+          {r.teams && <span className="mt-[2px] block truncate text-[12px] text-[#62728f]">{r.teams}</span>}
         </span>
-        <ChevronRight
-          className="size-5 shrink-0 text-[#1556c4]"
-          aria-hidden="true"
-        />
+        <ChevronRight className="size-5 shrink-0 self-center text-[#0457af]" aria-hidden="true" />
       </Link>
     </li>
   );
 }
 
-/** "Prossime gare" row of the board: big date block, crests, "ColicoDerviese <categoria> vs <avversario>", venue, chevron. */
-export function NextMatchRow({
-  e,
-  g,
-  nowMs,
-  testId,
-}: {
-  e: PublicEvent;
-  g: PublicGroup | undefined;
-  nowMs: number;
-  testId?: string;
-}) {
+/** Compact row of "Prossime gare" and "Le mie squadre": date block, tone bar, team and opponent, time · venue. */
+export function NextMatchRow({ e, g, nowMs, testId }: { e: PublicEvent; g: PublicGroup | undefined; nowMs: number; testId?: string }) {
   const d = dateParts(e.date);
   const team = groupShort(g, e.category);
   const clock = matchClock(e, nowMs);
-  const home = e.homeAway === "CASA";
+  const tone = placeTone(e.homeAway);
+  const opp = opponentLabel(e.opponent);
   return (
-    <li
-      className={`${CARD} scd-rise relative overflow-hidden`}
-      data-testid={testId}
-    >
-      <span
-        className="absolute inset-y-0 left-0 w-[5px]"
-        style={{
-          background:
-            clock.state === "live" ? LIVE_RED : (g?.color ?? "#668196"),
-        }}
-        aria-hidden="true"
-      />
+    <li className="border-t border-[#edf1f7] first:border-t-0" data-testid={testId}>
       <Link
         to="/calendario"
-        search={{
-          annata: g ? (g.years[0] ?? g.id) : undefined,
-          vista: "prossime",
-        }}
-        className="scd-focus grid grid-cols-[62px_auto_minmax(0,1fr)_auto] items-center gap-[10px] py-[12px] pl-[14px] pr-[10px] hover:bg-[#fbfcfe]"
+        search={{ annata: g ? (g.years[0] ?? g.id) : undefined, vista: "prossime" }}
+        className="scd-focus flex items-stretch gap-3 px-3 py-2.5 hover:bg-[#f5f8fc]"
       >
-        <span className="grid justify-items-center border-r border-[#e3eaf4] pr-[8px] leading-none text-[#0b2a5b]">
-          <span className="text-[12.5px] font-extrabold">{d.weekday}</span>
-          <span className="font-uv text-[40px] leading-[0.95]">{d.day}</span>
-          <span className="text-[12.5px] font-extrabold">{d.month}</span>
+        <span className="grid w-[40px] shrink-0 justify-items-center font-display leading-none text-[#14264d]">
+          <span className="text-[11px] font-bold uppercase text-[#62728f]">{d.weekday}</span>
+          <span className="text-[22px] font-bold">{d.day}</span>
+          <span className="text-[11px] font-bold uppercase text-[#62728f]">{d.month}</span>
         </span>
-        <StackedCrests e={e} size={38} />
-        <span className="min-w-0">
-          <span className="block text-[15px] font-extrabold leading-[1.2] text-[#0b1e3a]">
-            {matchTitle(
-              { homeAway: e.homeAway, opponent: opponentLabel(e.opponent) },
-              `ColicoDerviese ${team}`,
-            )}
+        <span aria-hidden="true" className={`w-[3px] shrink-0 self-stretch rounded-full ${clock.state === "live" ? "bg-[#c40018]" : PLACE_STYLE[tone].bar}`} />
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-[15px] font-bold leading-[1.2] text-[#14264d]">
+            {team}
+            <span className="font-normal text-[#62728f]"> {tone === "casa" ? "con" : tone === "fuori" ? "a casa di" : "vs"} </span>
+            {opp || "avversario da definire"}
           </span>
-          <span className="mt-[4px] flex items-start gap-[3px] text-[12.5px] font-medium leading-[1.25] text-[#4a5d7a]">
-            <MapPin
-              className="mt-[1px] size-[13px] shrink-0 text-[#1556c4]"
-              strokeWidth={2.4}
-              aria-hidden="true"
-            />
-            <span className="min-w-0 break-words">
-              {clock.state === "live" ? (
-                <b style={{ color: LIVE_RED }}>In campo · {clock.label} · </b>
-              ) : e.time ? (
-                <b className="text-[#0b2a5b]">{e.time} · </b>
-              ) : null}
-              {home ? "" : "Trasferta · "}
-              {e.venue ? venueShort(e.venue) : "Sede da definire"}
-            </span>
+          <span className="mt-0.5 block text-[12.5px] leading-tight text-[#52627f]">
+            {clock.state === "live" ? <b style={{ color: LIVE_RED }}>In campo · {clock.label} · </b> : e.time ? <b className="text-[#14264d]">{e.time} · </b> : null}
+            {tone === "fuori" ? "Trasferta · " : ""}
+            {e.venue ? venueShort(e.venue) : "Sede da definire"}
           </span>
         </span>
-        <ChevronRight
-          className="size-6 shrink-0 text-[#0b2a5b]"
-          strokeWidth={2.4}
-          aria-hidden="true"
-        />
+        <ChevronRight className="size-5 shrink-0 self-center text-[#7a8aa8]" aria-hidden="true" />
       </Link>
     </li>
   );
@@ -535,18 +314,10 @@ export function NextMatchRow({
 /* ------------------------------------------------------------------ live banner */
 
 /**
- * Hero pulse: red "In campo ora" with the minute while a game is being played (from the calendar kick-off), otherwise
- * the countdown to the next kick-off. Seconds tick only on the device, after hydration.
+ * Pulse on the navy band: red "In campo ora" with the minute while a game is being played (from the calendar
+ * kick-off), otherwise the countdown to the next kick-off. Seconds tick only on the device, after hydration.
  */
-export function LiveBanner({
-  events,
-  groups,
-  nowMs,
-}: {
-  events: readonly PublicEvent[];
-  groups: readonly PublicGroup[];
-  nowMs: number;
-}) {
+export function LiveBanner({ events, groups, nowMs }: { events: readonly PublicEvent[]; groups: readonly PublicGroup[]; nowMs: number }) {
   const [now, setNow] = useState(nowMs);
   useEffect(() => {
     setNow(Date.now());
@@ -564,23 +335,17 @@ export function LiveBanner({
     const clock = matchClock(first, now);
     return (
       <p
-        className="m-0 inline-flex w-fit max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-[12px] px-3 py-2 text-[13.5px] font-bold text-white shadow-[0_6px_18px_-8px_rgb(0_0_0/0.6)]"
+        className="m-0 inline-flex w-fit max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-[8px] px-3 py-1.5 font-display text-[14px] font-bold text-white shadow-[0_6px_18px_-8px_rgb(0_0_0/0.6)]"
         style={{ background: LIVE_RED }}
         data-testid="cal-live-banner"
         role="status"
       >
-        <span
-          className="scd-live-dot size-2 rounded-full bg-white"
-          aria-hidden="true"
-        />
-        <span>In campo ora</span>
+        <span className="scd-live-dot size-2 rounded-full bg-white" aria-hidden="true" />
+        <span className="uppercase tracking-[0.06em]">In campo ora</span>
         <span className="min-w-0 truncate font-semibold">
-          ColicoDerviese {team(first)} ·{" "}
-          {opponentLabel(first.opponent) || "avversario da definire"}
+          ColicoDerviese {team(first)} · {opponentLabel(first.opponent) || "avversario da definire"}
         </span>
-        <span className="font-uv text-[20px] leading-none tabular-nums">
-          {clock.label}
-        </span>
+        <span className="text-[19px] leading-none tabular-nums">{clock.label}</span>
         {live.length > 1 && (
           <span className="font-semibold">
             +{live.length - 1} {live.length === 2 ? "altra" : "altre"}
@@ -589,28 +354,21 @@ export function LiveBanner({
       </p>
     );
   }
-  const next = nextKickoff(events, now, (e) =>
-    eventRank(e, (g) => matchdayClass(g) === "agonistica"),
-  );
+  const next = nextKickoff(events, now, (e) => eventRank(e, (g) => matchdayClass(g) === "agonistica"));
   if (!next) return null;
   const left = countdownParts(next.startMs - now);
   const d = dateParts(next.e.date);
   return (
     <p
-      className="m-0 inline-flex w-fit max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-[12px] bg-white/12 px-3 py-2 text-[13px] font-semibold text-white backdrop-blur-sm"
+      className="m-0 inline-flex w-fit max-w-full flex-wrap items-center gap-x-2 gap-y-0.5 rounded-[8px] border border-white/15 bg-white/[0.07] px-3 py-1.5 font-display text-[13.5px] text-[#dfe7f7]"
       data-testid="cal-countdown"
     >
-      <span
-        className="scd-live-dot size-2 rounded-full bg-[#ffd600]"
-        aria-hidden="true"
-      />
+      <span className="size-2 rounded-full bg-[#ffd84a]" aria-hidden="true" />
       <span>
-        Prossima gara · {team(next.e)} · {d.weekday} {d.day} {d.month}
+        <span className={`${LABEL} mr-1.5 text-[#ffd84a]`}>Prossima gara</span>
+        {team(next.e)} · {d.weekday} {d.day} {d.month}
       </span>
-      <span
-        className="font-uv text-[20px] leading-none tabular-nums text-[#ffd600]"
-        aria-hidden="true"
-      >
+      <span className="text-[19px] font-bold leading-none tabular-nums text-white" aria-hidden="true">
         {left.days > 0 ? `${left.days}g ` : ""}
         {left.hh}:{left.mm}:
         <span key={left.ss} className="scd-tick">
@@ -641,9 +399,10 @@ export function TeamChips({
   onPick: (g: PublicGroup | undefined) => void;
   onFollow: (id: string) => void;
 }) {
+  const chip = (on: boolean) => (on ? "scd-band border-[#13254d] text-white" : "border-[#d6deeb] bg-white text-[#14264d] hover:border-[#0457af]");
   return (
     <div
-      className="scd-scroll-x -mx-4 flex gap-[8px] overflow-x-auto px-4 pb-[4px] pt-[2px] lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0"
+      className="scd-scroll-x -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 pt-0.5 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0"
       role="group"
       aria-label="Squadre: tocca per filtrare, stella per seguire"
       data-testid="cal-team-chips"
@@ -652,7 +411,7 @@ export function TeamChips({
         type="button"
         aria-pressed={!selectedId}
         onClick={() => onPick(undefined)}
-        className={`scd-focus flex h-[44px] shrink-0 items-center rounded-full px-[16px] text-[14px] font-bold ${!selectedId ? "bg-[#0b2a5b] text-white" : "bg-white text-[#0b2a5b] shadow-[0_1px_3px_rgb(11_42_91/0.14)]"}`}
+        className={`scd-focus flex h-11 shrink-0 items-center rounded-full border px-4 font-display text-[14px] font-semibold ${chip(!selectedId)}`}
       >
         Tutte
       </button>
@@ -660,40 +419,23 @@ export function TeamChips({
         const on = selectedId === g.id;
         const mine = followed.includes(g.id);
         return (
-          <span
-            key={g.id}
-            className={`flex h-[44px] shrink-0 items-center rounded-full ${on ? "bg-[#0b2a5b] text-white" : "bg-white text-[#0b2a5b] shadow-[0_1px_3px_rgb(11_42_91/0.14)]"}`}
-          >
+          <span key={g.id} className={`flex h-11 shrink-0 items-center rounded-full border ${chip(on)}`}>
             <button
               type="button"
               onClick={() => onFollow(g.id)}
               aria-pressed={mine}
-              aria-label={
-                mine ? `Non seguire più ${g.label}` : `Segui ${g.label}`
-              }
-              className="scd-focus grid size-[44px] place-items-center rounded-full"
+              aria-label={mine ? `Non seguire più ${g.label}` : `Segui ${g.label}`}
+              className="scd-focus grid size-11 place-items-center rounded-full"
             >
-              <Star
-                className="size-[18px]"
-                fill={mine ? "#ffd600" : "none"}
-                stroke={
-                  mine ? (on ? "#ffd600" : "#8a6d00") : on ? "#fff" : "#4a5d7a"
-                }
-                strokeWidth={2.2}
-                aria-hidden="true"
-              />
+              <Star className="size-[17px]" fill={mine ? "#ffd84a" : "none"} stroke={mine ? (on ? "#ffd84a" : "#8a6d00") : on ? "#fff" : "#62728f"} strokeWidth={2.2} aria-hidden="true" />
             </button>
             <button
               type="button"
               aria-pressed={on}
               onClick={() => onPick(on ? undefined : g)}
-              className="scd-focus -ml-1 flex h-[44px] items-center gap-[7px] rounded-full pr-[14px] text-[14px] font-bold"
+              className="scd-focus -ml-1.5 flex h-11 items-center gap-1.5 rounded-full pr-4 font-display text-[14px] font-semibold"
             >
-              <span
-                className="size-[10px] shrink-0 rounded-full ring-2 ring-white"
-                style={{ background: g.color }}
-                aria-hidden="true"
-              />
+              <span className="size-[9px] shrink-0 rounded-full ring-2 ring-white" style={{ background: g.color }} aria-hidden="true" />
               <span className="whitespace-nowrap">{label(g)}</span>
             </button>
           </span>
