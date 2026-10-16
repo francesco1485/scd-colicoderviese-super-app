@@ -760,6 +760,9 @@ Backlog cloud B7. Motori: PERSONE (una famiglia o un nonno che chiede la strada 
 - Test `club-directions.test.ts` (16): domanda "come arrivo al campo?" con via, comune e link Maps di Colico e Dervio; riconoscimento domande; trasferte escluse; niente link senza via; stesso link nel contesto di Vera.
 - Revisione 1: scd-sicurezza PASS (nota: "dove" generico non deve dare le vie); scd-revisore BLOCK (e-mail/PEC/sede legale, "come vengo iscritto", pulmino/kit, campo di un altro comune) → corretto: serve un luogo fisico nostro, esclusi contatti, iscrizioni, pulmini, kit/maglie, trasferte, partite senza "in casa" e "campo di <altro comune>"; il "dove" generico del motore a regole rimanda a Impianti e Calendario; 17 casi negativi e 3 test su `answerPublic` (niente modello né contesto per la strada; safeguarding prima; contatti al modello).
 - Gate: tsc, vitest 167 file / 1854 test, build, test:bundle 11/11, test:manifest PASS, test:claude-hooks 8/8.
+- Revisione 2: scd-revisore PASS (note: "campo di calcio/allenamento" letto come comune → va al modello, che ha le vie nel contesto; aggiungere un caso di disagio vero al test di precedenza), scd-sicurezza PASS (nessun ReDoS, input ≤ 400 caratteri).
+- Stato: DONE, commit `c78af3f` + `ddc022e`, **pubblicato** 16/10 03:14 (Render `dep-db8nk83l550s73ehpfb0`, live). Controllo sul sito reale 390/1440 su /impianti e /: HTTP 200, nessun errore in console, nessuno scroll orizzontale, link "Portami qui con Maps" identici a prima.
+
 
 ## 16/10/2026 · Planning annuale 2026/27 in /gestionale/planning (chat PC, ramo feat/pc-planning-annuale)
 
@@ -829,6 +832,17 @@ Francesco 16/10/2026 08:53 (UD-159) «le attività le decido nel gestionale io e
 - Orchestra (a67b01b): agenti, PIPELINE, registro comandi e tavola gestionali (solo documenti e istruzioni agenti; permessi degli agenti solo ridotti).
 - Controlli: scd-revisore PASS e scd-sicurezza PASS sul rilascio 641030b.
 
+## B8 — Anteprime dei link: titolo, descrizione, immagine e indirizzo canonico per ogni pagina pubblica · 2026-10-16
+
+Backlog cloud B8. Motori: PERSONE (un link girato su WhatsApp mostra il nome giusto della pagina e lo stemma, non il generico "Super App") e SOLDI (/sponsor, /card e /sostieni si presentano bene quando un partner o un genitore li inoltra). Misura: 0 pagine pubbliche con il titolo generico (test `public-meta.test.ts`).
+- Prima: nessuna delle 15 pagine pubbliche senza pulsante di condivisione aveva og:image, og:url o indirizzo canonico; fantacalcio, guida e Top 11 ereditavano anche og:title e og:description generici del frame ("S.C.D. ColicoDerviese — Super App"). TanStack sostituisce i meta per nome/proprietà ma concatena i link: il canonico sta solo nelle pagine, mai nel frame.
+- `lib/share.ts`: `PUBLIC_PAGES` (home, calendario, eventi, lezioni tecnico-coordinative, impianti, società, kit, tifosi, comunicazioni, Top 11, rassegna stampa, fantacalcio, guida, card, fornitori) con i testi che ogni pagina aveva già; immagine sempre lo stemma ufficiale (`CREST_SHARE_IMAGE`) o la locandina ufficiale della Christmas Lario Cup; `canonicalUrl()` (origine ufficiale, solo percorso, senza ?lang= né #) e `pageHead()` (meta + link canonico). Anche le pagine C3 (sponsor, sostieni ×4, tornei, Christmas Lario Cup, lotteria interna) e /card/<tipo> passano da `pageHead()`; og:url = indirizzo canonico.
+- Fuori perimetro e non toccate (chat PC o safeguarding): /contatti, /elimina-account, /entra, /installa, /partner, /privacy, /safeguarding — elencate nel test con il motivo.
+- Test `public-meta.test.ts`: ogni pagina pubblica usa la propria voce del registro, titoli e indirizzi canonici unici, mai il titolo generico, og:image esistente in public/, un solo canonico, ogni prefisso di `PUBLIC_PREFIXES` coperto o assegnato ad altri. Controllo SSR locale: un `<link rel="canonical">` per pagina, anche dopo l'idratazione.
+- Nessun cambiamento visivo (solo `<head>`): controllo locale 390/1440 di /, /calendario, /kit, /card/sostenitore, /eventi/christmas-lario-cup, /sponsor: HTTP 200, nessun errore in console, nessuno scroll orizzontale.
+- Gate: tsc 0, vitest 185 file / 2679 test, build 0, test:bundle 11/11, test:manifest PASS, test:claude-hooks PASS.
+- Revisione 1: scd-revisore PASS, scd-sicurezza PASS (solo note basse). Note applicate: le versioni ?lang=de/en della Christmas Lario Cup sono canoniche di sé stesse (hreflang coerente); pagina lotteria non pubblicata e card inesistente senza canonico (noindex); og:description della Top 11 "votata da chi ha un account del club"; `siteUrl` documentato come origine configurata, mai un'intestazione della richiesta. Nota: in home `twitter:card` passa a "summary" (stemma quadrato).
+
 ## 16/10/2026 14:40 · Chat PC: catalogo ruoli r138 (STAGED, UD-161)
 - Francesco 13:32 (direttori sportivi agonistica e generale, lettori di Dervio), 13:35 (tutti i ruoli FIGC/RASD pronti per inserire il tesserato e «crea ruolo nuovo»), risposte D1 «Chi lo crea» (approva chi crea, sempre in audit), D2 «Sopra il coordinatore», D3 «Sì, crea gli accessi» (responsabile tutela minori solo nel canale Safeguarding, fisioterapista avvisi di salute senza dati di salute).
 - Migrazione r138 scritta e provata in PGlite, NON applicata: 85 ruoli vuoti con la qualifica del Portale Società LND (verificata in sola lettura alle 14:30, nessun nome), 24 qualifiche da allenatore come dato del tecnico, ruoli nuovi solo Presidente/DG; i quattro ruoli nuovi li assegna solo la Direzione.
@@ -836,3 +850,4 @@ Francesco 16/10/2026 08:53 (UD-159) «le attività le decido nel gestionale io e
 - 14:39 Francesco «queste sono tutte le cariche che si possono inserire in organigramma federale» (Anagrafe Federale FIGC, Variazione organigramma): ogni carica è nel catalogo (colonna `figc_labels`, testo esatto FIGC), 23 voci collegate a ruoli già presenti e 33 ruoli nuovi, in tutto 118 ruoli vuoti. Le voci tagliate o nascoste negli screenshot (GAP, «Medi…») sono solo annotate, non diventano ruoli.
 - Revisione: scd-sicurezza PASS (r138Live tolto dallo schema dell'input di chi-fa-cosa, ora arriva solo dal server), scd-revisore PASS con note recepite (caso D1 nel test PGlite, controllo prerequisito `scd_structure_reader_site`).
 - Test PGlite: comando in `supabase/tests/README.md` (`PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r138_position_catalog.pglite.mjs`).
+- 15:05 r138 APPLICATA su SCD PULSE dalla sessione principale dopo «applica» (sha1 70c939be…, 118 righe, probe-r138 ok): i quattro ruoli nuovi si accendono da soli.

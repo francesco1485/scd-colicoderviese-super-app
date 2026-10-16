@@ -2,16 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { PartnerForm } from "@/components/PartnerForm";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 export const Route = createFileRoute("/fornitori")({
-  head: () => ({
-    meta: [
-      { title: "Proponi prodotti o servizi — SCD ColicoDerviese" },
-      { name: "description", content: "Fornitori e aziende: proponi alla S.C.D. ColicoDerviese prodotti, servizi, convenzioni per famiglie e collaborazioni." },
-      { property: "og:title", content: "Proponi il tuo prodotto o servizio alla SCD" },
-      { property: "og:description", content: "Canale dedicato a fornitori e partner della S.C.D. ColicoDerviese." },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.fornitori),
   component: () => (
     <main>
       <PageHero eyebrow="Fornitori & partner" title={<>Proponi il tuo <span className="text-accent">prodotto o servizio</span></>}>

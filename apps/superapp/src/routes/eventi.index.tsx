@@ -7,6 +7,7 @@ import { dayMonth, type Initiative } from "@/lib/initiatives";
 import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { KIND_LABEL, longDay, type PublicLottery } from "@/lib/lottery";
 import { getPublicLottery } from "@/lib/lottery.functions";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 export const Route = createFileRoute("/eventi/")({
   loader: async () => {
@@ -21,22 +22,7 @@ export const Route = createFileRoute("/eventi/")({
     ]);
     return { feed, initiatives: initiatives.items, lottery };
   },
-  head: () => ({
-    meta: [
-      { title: "Eventi — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "Open day, tornei e serate biancoblù pubblicati dalla S.C.D. ColicoDerviese sull'Alto Lago di Como.",
-      },
-      { property: "og:title", content: "Eventi — S.C.D. ColicoDerviese" },
-      {
-        property: "og:description",
-        content:
-          "Open day, tornei e serate biancoblù della S.C.D. ColicoDerviese.",
-      },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.eventi),
   component: Eventi,
 });
 

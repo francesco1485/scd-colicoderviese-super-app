@@ -16,7 +16,7 @@ import { ShareButton } from "@/components/scd/ShareButton";
 import { tournamentText } from "@/lib/cast-live";
 import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { romeDay } from "@/lib/public-window";
-import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { pageHead, SHARE_PAGES } from "@/lib/share";
 import {
   TOURNAMENT_STATUS_LABEL,
   upcomingTournaments,
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/tornei")({
     }));
     return { today };
   },
-  head: () => ({ meta: pageMeta(SHARE_PAGES.tornei) }),
+  head: () => pageHead(SHARE_PAGES.tornei),
   component: TorneiPage,
 });
 

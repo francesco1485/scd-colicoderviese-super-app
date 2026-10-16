@@ -28,7 +28,7 @@ import {
   type PublicItem,
 } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
-import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { pageHead, SHARE_PAGES } from "@/lib/share";
 import { INTERNAL_ONLY } from "@/lib/internal-initiatives";
 import { findTribuneItem, tribuneDraftItem } from "@/lib/tribune-seats";
 
@@ -39,7 +39,7 @@ import { findTribuneItem, tribuneDraftItem } from "@/lib/tribune-seats";
  */
 export const Route = createFileRoute("/sostieni/")({
   loader: () => getGivingPublic(),
-  head: () => ({ meta: pageMeta(SHARE_PAGES.sostieni) }),
+  head: () => pageHead(SHARE_PAGES.sostieni),
   component: SostieniPage,
 });
 

@@ -5,7 +5,7 @@ import { ShareButton } from "@/components/scd/ShareButton";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { CAMPAIGN_COPY, type OfferCampaign } from "@/lib/giving";
 import { getGivingPublic } from "@/lib/giving.functions";
-import { SHARE_PAGES, pageMeta } from "@/lib/share";
+import { pageHead, SHARE_PAGES } from "@/lib/share";
 
 type Search = { campagna?: "palestra" | "infermeria" | undefined };
 
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/sostieni/dona-materiale")({
     campagna: s["campagna"] === "palestra" || s["campagna"] === "infermeria" ? s["campagna"] : undefined,
   }),
   loader: () => getGivingPublic(),
-  head: () => ({ meta: pageMeta(SHARE_PAGES.donaMateriale) }),
+  head: () => pageHead(SHARE_PAGES.donaMateriale),
   component: DonaMaterialePage,
 });
 

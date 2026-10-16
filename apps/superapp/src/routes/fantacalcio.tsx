@@ -31,6 +31,7 @@ import {
   saveFantaRoster,
   type FantaPage,
 } from "@/lib/fanta.functions";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * Fantacalcio SCD (UD-094): free for every account, no money anywhere. Each member picks up to 11 players of the
@@ -39,16 +40,7 @@ import {
  */
 export const Route = createFileRoute("/fantacalcio")({
   loader: () => getFanta(),
-  head: () => ({
-    meta: [
-      { title: "Fantacalcio SCD — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content:
-          "Il fantacalcio gratuito della S.C.D. ColicoDerviese: scegli 11 giocatori di Prima Squadra, Juniores, U16 e U15 e fai punti con le loro partite.",
-      },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.fantacalcio),
   component: FantaRoute,
 });
 

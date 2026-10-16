@@ -7,6 +7,7 @@ import { HallDoors, HallHero } from "@/components/scd/hall";
 import { ClubCrest, SyncPlaceholder } from "@/components/ui-kit";
 import { getClubDirectory } from "@/lib/club.functions";
 import { CLUB_PROFILE, pitchFacts } from "@/lib/club-profile";
+import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
  * Chi siamo, public (UD-100, Direzione 13/10/2026: "Le squadre sono dentro non fuori. Fuori che aspetto creativo
@@ -18,17 +19,7 @@ export const Route = createFileRoute("/societa")({
     const directory = await getClubDirectory();
     return { clubs: directory.clubs };
   },
-  head: () => ({
-    meta: [
-      { title: "Chi siamo — S.C.D. ColicoDerviese" },
-      {
-        name: "description",
-        content: "La S.C.D. ColicoDerviese: il club di calcio di Colico e Dervio sull'Alto Lago di Como, matricola FIGC 26020, società affiliata AC Monza. Identità, campi, documenti e contatti della stagione 2026/27.",
-      },
-      { property: "og:title", content: "Chi siamo — S.C.D. ColicoDerviese" },
-      { property: "og:description", content: "Due paesi, un club: Colico e Dervio, stagione 2026/27." },
-    ],
-  }),
+  head: () => pageHead(PUBLIC_PAGES.societa),
   component: Societa,
 });
 

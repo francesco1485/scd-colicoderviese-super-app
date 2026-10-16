@@ -3,7 +3,7 @@ import { Calendar, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { KitTexture } from "@/components/scd/kit-texture";
 import { ShareButton } from "@/components/scd/ShareButton";
-import { SHARE_PAGES, absoluteUrl, pageMeta } from "@/lib/share";
+import { SHARE_PAGES, absoluteUrl, pageHead } from "@/lib/share";
 
 import {
   LARIO_LANGS,
@@ -23,14 +23,16 @@ export const Route = createFileRoute("/eventi/christmas-lario-cup")({
   validateSearch: (s: Record<string, unknown>): { lang?: "de" | "en" | undefined } =>
     s["lang"] === "de" || s["lang"] === "en" ? { lang: s["lang"] } : {},
   loader: () => ({ serverNow: Date.now() }),
-  head: () => ({
-    meta: pageMeta(SHARE_PAGES.christmasLarioCup),
-    links: [
-      { rel: "alternate", hrefLang: "it", href: absoluteUrl("/eventi/christmas-lario-cup") },
-      { rel: "alternate", hrefLang: "de", href: absoluteUrl("/eventi/christmas-lario-cup?lang=de") },
-      { rel: "alternate", hrefLang: "en", href: absoluteUrl("/eventi/christmas-lario-cup?lang=en") },
-    ],
-  }),
+  // Each language version is its own canonical page (validateSearch allows only de/en), linked by hreflang.
+  head: ({ match }) =>
+    pageHead(SHARE_PAGES.christmasLarioCup, {
+      canonical: match.search.lang ? absoluteUrl(`/eventi/christmas-lario-cup?lang=${match.search.lang}`) : undefined,
+      extraLinks: [
+        { rel: "alternate", hrefLang: "it", href: absoluteUrl("/eventi/christmas-lario-cup") },
+        { rel: "alternate", hrefLang: "de", href: absoluteUrl("/eventi/christmas-lario-cup?lang=de") },
+        { rel: "alternate", hrefLang: "en", href: absoluteUrl("/eventi/christmas-lario-cup?lang=en") },
+      ],
+    }),
   component: ChristmasLarioCup,
 });
 

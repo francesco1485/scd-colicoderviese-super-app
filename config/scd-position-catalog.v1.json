@@ -21,7 +21,7 @@
     "Custom positions: code custom-<slug>, created only by the Presidente or the Direttore Generale (r111 scd_is_role_creator), status PROPOSED until the Direzione approves it (scd_set_position_status), audited in scd_access_audit.",
     "Only ACTIVE positions can be assigned to a person (trigger on scd_structure_roles).",
     "figcLabels = the exact Carica texts of the FIGC Anagrafe Federale organigramma (Variazione organigramma) that this position stands for, VERIFIED 16/10/2026 14:39; [] = not a FIGC carica.",
-    "lndLabel = the qualifica used by the Portale Società LND (Organigramma) for this club, VERIFIED 16/10/2026 14:30 read-only; null = not used on the portal for this club (e.g. segretario, delegato alla sicurezza, addetto stampa stay INFERRED)."
+    "lndLabel = the qualifica used by the Portale Società LND (Organigramma) for this club, VERIFIED 16/10/2026 14:30 read-only; null = not used on the LND portal for this club (segretario and addetto stampa are FIGC cariche; delegato alla sicurezza stays INFERRED)."
   ],
   "sourcesRead": {
     "FIGC_ST": "https://www.figc.it/media/255310/parte2_settore_tecnico_art_16a40__________agg-26-11-2024.pdf",
