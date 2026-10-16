@@ -50,7 +50,7 @@ Quarantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. C
 
 ## Percorso e squadre
 
-Sequenza dall'idea al sito vero, passi obbligatori e squadre in parallelo: vedi `PIPELINE.md`.
+Sequenza dall'idea al sito vero, passi obbligatori, squadre in parallelo e catene per ogni piattaforma del gestionale: vedi `PIPELINE.md`. Registro dei miglioramenti di skill, agenti e plugin: `MIGLIORAMENTI.md`.
 
 ## Squadra di sviluppo ECC (cartella `ecc/`)
 

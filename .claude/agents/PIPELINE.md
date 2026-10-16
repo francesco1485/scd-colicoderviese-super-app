@@ -30,7 +30,37 @@ Decisione di Francesco del 16/10/2026: agenti in sequenza dall'inizio alla fine,
 | Campo | scd-squadre, scd-atleti, scd-impianti, scd-pulmini, scd-tornei | Calendari, allenamenti, mezzi, tornei |
 | Skill | scd-skill | Ogni settimana: nuove skill o migliorie dalle richieste ripetute |
 
-## 3. Regole
+## 3. Catene per ogni piattaforma del gestionale
+
+Francesco 16/10 08:14: agenti in serie presenti in ogni piattaforma del gestionale, per renderla dinamica ed efficiente, che parlano con il gestionale complessivo. Ogni piattaforma ha la stessa catena di cinque anelli:
+
+1. **Ingresso**: legge le novità dalla fonte madre (foglio Drive, posta, Iride, calendario, modulo Tally, app).
+2. **Responsabile**: l'agente della piattaforma decide cosa cambia e prepara le azioni.
+3. **Supporto**: gli agenti vicini completano (soldi, regole, grafica, comunicazione).
+4. **Controllo**: dati veri, regole dei minori, nessun doppione (scd-revisore per ciò che va online).
+5. **Quadro generale**: riporta a scd-regista (oggi) e a scd-azioni (piano), che aggiornano il quadro della Direzione e avvisano le altre piattaforme toccate.
+
+| Piattaforma | Ingresso | Responsabile | Supporto | Parla con |
+| --- | --- | --- | --- | --- |
+| Segreteria e persone | posta, Iride, Tally, portale FIGC | scd-segreteria | scd-tesserati, scd-figc-lnd, scd-documenti | Tesoreria, Squadre, Infermeria |
+| Squadre, allenamenti, calendario | Master Calendario, Quadro allenamenti, C.U. | scd-squadre | scd-atleti, scd-impianti | Pulmini, Impianti, Comunicazioni, Google Calendar |
+| Impianti e rotazione campi | richieste in app, Comuni | scd-impianti | scd-squadre, scd-negoziazione | Squadre, Tornei, Calendar |
+| Pulmini | master flotta, richieste posto | scd-pulmini | scd-squadre | Squadre, Tesoreria, Calendar |
+| Tesoreria e fornitori | gestionale quote, banca, fornitori | scd-tesoreria | scd-cfo | Segreteria, Magazzino, Direzione |
+| Magazzino e kit | ordine kit, consegne | scd-magazzino | scd-tesoreria | Segreteria, Shop |
+| Infermeria e tutela | certificati, appuntamenti (solo numeri) | scd-infermeria | scd-legale | Segreteria, Squadre |
+| Sponsor, partner, LED | CRM, contratti, spot | scd-commerciale | scd-sponsor, scd-ledwall | Comunicazioni, Tesoreria, Tornei |
+| Comunicazioni e social | notizie, gare, iniziative | scd-comunicazione | scd-social, scd-crescita | Tutte le piattaforme pubbliche |
+| Community, fantacalcio, Top 11 | app, eventi | scd-community | scd-relazioni, scd-crescita | Comunicazioni, Club House |
+| Tornei ed eventi | master tornei, iscrizioni | scd-tornei | scd-negoziazione, scd-commerciale | Impianti, Pulmini, Calendar |
+| Documenti e privacy | Drive, consensi | scd-documenti | scd-legale, scd-google | Segreteria, tutte |
+| Fondo solidale, Adotta, lotteria | richieste, donazioni | scd-sociale | scd-tesoreria, scd-legale | Direzione, Comunicazioni |
+| Mondo Google | Gmail, Calendar, Drive, fogli | scd-google | scd-mail, scd-documenti | Tutte le piattaforme |
+| Ingresso richieste (Iride, WhatsApp, telefono) | Iride, centralino | scd-centralino | scd-iride, scd-mail | Segreteria e le piattaforme del tema |
+
+Le piattaforme ancora da costruire (nutrizionista, bandi, planning annuale, affitto campi, live e dirette, acquisti, attività serali) seguono la stessa catena appena nascono.
+
+## 4. Regole
 
 - Un agente lavora solo dentro una chat o un'attività programmata: nessuno gira da solo 24 ore su 24.
 - Nessun agente invia, pubblica, paga o cambia ruoli, permessi, tesseramenti, presenze, documenti sensibili o tutela dei minori: prepara, decide la Direzione.

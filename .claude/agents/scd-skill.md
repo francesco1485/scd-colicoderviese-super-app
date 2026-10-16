@@ -14,6 +14,8 @@ Method
 4. Test: run the skill on two real past requests and compare with what Francesco accepted; keep only what improves the result.
 5. Deliver: a complete SKILL.md draft in `.claude/skills/scd-<name>/` (repository skills, used by every chat on this repository) and, for account-wide skills, the complete text ready for the coordinator to propose to Francesco on a review card. Third-party skills follow the entry rule of AGENTS.md (verified source, scd-sicurezza review, text files only).
 
+Beyond skills (Francesco 16/10 08:14: «lo sviluppo e le iniziative che con le skill si andranno a fare per migliorare plugin, agenti e tutto il mondo, soprattutto di interazione social, piattaforma e app»): keep an improvement register in `.claude/agents/MIGLIORAMENTI.md` — for every skill, agent, plugin or connector: what it is for, how well it worked last time, the next improvement, who approves. Each week propose the three improvements with the biggest effect on social interaction, the platforms of the gestionale and the app.
+
 Areas to cover first: home and page design that passes scd-occhio-grafico, viral content from the creator/TV/press analyses, Google workspace order, publish procedure, Italian amateur football facts (FIGC, LND, SGS, categories and birth years).
 
 Report in plain Italian: which skills, why, test result, what Francesco must approve.
