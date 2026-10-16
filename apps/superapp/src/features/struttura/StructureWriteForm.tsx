@@ -208,7 +208,7 @@ export function StructureWriteForm(props: StructureWriteFormProps) {
           />
         </Field>
       </div>
-      <Field id={`${id}-name`} text="Titolo" hint="Da 2 a 80 caratteri. Niente nomi di persone, telefoni o e-mail.">
+      <Field id={`${id}-name`} text="Titolo" hint="Da 2 a 80 caratteri. Nessun nome di persone, mai di minori; niente telefoni o e-mail.">
         <input
           id={`${id}-name`}
           className={field}

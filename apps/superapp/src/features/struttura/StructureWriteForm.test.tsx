@@ -50,6 +50,7 @@ describe("StructureWriteForm (fail closed)", () => {
     expect(out).toContain("Chiudi senza salvare");
     expect(out).not.toContain("Annulla attività");
     expect(out).toContain("Nessuno per ora");
+    expect(out).toContain("Nessun nome di persone, mai di minori");
     // Labels point at their inputs; the day is bounded like the database (7 days back, one year ahead).
     const ids = [...out.matchAll(/<label for="([^"]+)"/g)].map((m) => m[1]);
     expect(ids.length).toBeGreaterThanOrEqual(8);

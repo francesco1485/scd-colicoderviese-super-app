@@ -64,6 +64,13 @@ describe("r137 structure activities write (STAGED, registry of migrations)", () 
     expect(notify).toMatch(/values \(a\.organization_id, 'G04', 'segreteria', 'ALTRO',/);
     expect(notify).toMatch(/'INTERNO', 'MANUAL'/);
     expect(notify).toMatch(/insert into public\.scd_proposal_events/);
+    // DERVIO notices are generic: the queue is also read by office positions that do not read Dervio (tesoreria).
+    expect(notify).toContain("then 'Struttura Dervio: ' || v_what || ' — apri Attività in struttura'");
+    expect(notify).toContain("case when a.site = 'DERVIO' then '' else coalesce(' Motivo: '");
+    expect(notify).toMatch(/then jsonb_build_object\('action', 'structure_activity_notice', 'change', p_change, 'activityId', a\.id, 'site', a\.site\)\n/);
+    // Registered in the manifest as STAGED.
+    const manifest = readFileSync(path("../../../../SCD_SYSTEM_MANIFEST.json"), "utf8");
+    expect(manifest).toMatch(/"structure_activities_write": "r137 \(2026-10-16, STAGED NOT APPLIED, applied only after Francesco writes «applica r137»/);
     expect(body).not.toMatch(/scd_notification_outbox|recipient_email|net\.http|pg_net/i);
     // Every write function notifies (UD-156: "segreteria sempre informata"), on both sites.
     for (const name of WRITE_FNS) expect(fn(name), name).toMatch(/public\.scd_structure_notify\(v_row, '(CREATE|UPDATE|CANCEL)'/);

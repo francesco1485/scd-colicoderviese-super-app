@@ -42,6 +42,7 @@ import {
   parseStructureWeekResult,
   parseWriteAccess,
   structureCanWrite,
+  structureOrganization,
   structureReadableSites,
   structureWindow,
   structureWriteState,
@@ -145,7 +146,7 @@ export const getStructureBoard = createServerFn({ method: "GET" }).handler(async
     events: cal.events.filter((e) => e.homeAway === "CASA"),
   };
 
-  const org = s.memberships[0] ?? null;
+  const org = structureOrganization(s.memberships, new Set(s.roles));
   // Until the database answers, the same per-site rule on the verified session of the club membership.
   const mirror: StructureSite[] = org
     ? structureReadableSites(
@@ -246,7 +247,7 @@ async function writeContext() {
   const s = await sessionView();
   const roles = s.user ? new Set(s.roles) : null;
   const gate = workAreaView("struttura", { preview: false, sessionRoles: roles });
-  const org = s.memberships[0] ?? null;
+  const org = structureOrganization(s.memberships, new Set(s.roles));
   if (gate.view !== "page" || !s.configured || !s.user || !org) return null;
   const sb = serverSupabase();
   if (!sb) return null;

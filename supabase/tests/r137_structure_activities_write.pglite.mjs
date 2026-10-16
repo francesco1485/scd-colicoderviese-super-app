@@ -32,6 +32,7 @@ const SEG = "10000000-0000-0000-0000-000000000004"; // Segreteria: reads, never 
 const RAB = "10000000-0000-0000-0000-000000000005"; // responsabile attivita di base: reads Dervio, never writes
 const RSC = "10000000-0000-0000-0000-000000000006"; // responsabile struttura Colico: never writes
 const FAM = "10000000-0000-0000-0000-000000000007"; // family
+const TES = "10000000-0000-0000-0000-000000000008"; // tesoreria: reads the work queue (scd_fee_office) but NOT Dervio rows
 
 const setup = `
 create role anon; create role authenticated;
@@ -52,7 +53,7 @@ create function public.scd_fee_office(p_organization_id uuid) returns boolean la
   select public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[])
     or public.scd_has_position(p_organization_id, array['tesoreria','segreteria','segreteria-presenza','segreteria-remoto','direzione','presidente','direttore-generale']) $$;
 insert into public.scd_organizations (id, name) values ('${ORG}', 'S.C.D. ColicoDerviese'), ('${OTHER}', 'Other club');
-insert into auth.users (id) values ('${DIR}'), ('${PRE}'), ('${DG}'), ('${SEG}'), ('${RAB}'), ('${RSC}'), ('${FAM}');
+insert into auth.users (id) values ('${DIR}'), ('${PRE}'), ('${DG}'), ('${SEG}'), ('${RAB}'), ('${RSC}'), ('${FAM}'), ('${TES}');
 insert into public.scd_memberships (organization_id, user_id, role, scope) values
   ('${ORG}', '${DIR}', 'DIRECTION', '{}'),
   ('${ORG}', '${PRE}', 'STAFF', '{"positions":["presidente"]}'),
@@ -60,7 +61,8 @@ insert into public.scd_memberships (organization_id, user_id, role, scope) value
   ('${ORG}', '${SEG}', 'SECRETARIAT', '{}'),
   ('${ORG}', '${RAB}', 'STAFF', '{"positions":["responsabile-attivita-base"]}'),
   ('${ORG}', '${RSC}', 'STAFF', '{"positions":["responsabile-struttura-colico"]}'),
-  ('${ORG}', '${FAM}', 'FAMILY', '{}');
+  ('${ORG}', '${FAM}', 'FAMILY', '{}'),
+  ('${ORG}', '${TES}', 'STAFF', '{"positions":["tesoreria"]}');
 `;
 
 // 0. Fail closed without the work queue (r79): the migration stops and leaves nothing behind.
@@ -143,7 +145,10 @@ assert.equal(ns[0].status, "NEW");
 assert.equal(ns[0].sensitivity, "INTERNO");
 assert.equal(ns[0].source_kind, "MANUAL");
 assert.equal(ns[0].target_ref, c1.id);
-assert.match(ns[0].title, /^Struttura Dervio: nuova attività «Serata soci» \d{2}\/\d{2} 19:00$/);
+assert.equal(ns[0].title, "Struttura Dervio: nuova attività — apri Attività in struttura");
+// Dervio notice is generic (UD-156): no title, time or kind anywhere in the queue row.
+assert.deepEqual(Object.keys(ns[0].suggested).sort(), ["action", "activityId", "change", "site"]);
+assert.equal(JSON.stringify(ns[0]).includes("Serata soci"), false);
 assert.equal(ns[0].suggested.action, "structure_activity_notice");
 assert.equal(ns[0].suggested.change, "CREATE");
 const pev = (await db.query(`select actor, action from public.scd_proposal_events where proposal_id = $1`, [ns[0].id])).rows;
@@ -190,6 +195,10 @@ const night = await create(PRE, draft({ site: "COLICO", area: "CAMPO", kind: "CH
 assert.equal(night.ok, true);
 const n2 = (await db.query(`select to_char(ends_at at time zone 'Europe/Rome', 'YYYY-MM-DD HH24:MI') e from public.scd_structure_activities where id = $1`, [night.id])).rows[0];
 assert.equal(n2.e, `${plusDays(day, 1)} 01:00`);
+// A Colico notice names the activity (Colico readers include the whole office).
+const colicoNotice = (await notices()).find((n) => n.target_ref === night.id);
+assert.match(colicoNotice.title, /^Struttura Colico: nuova attività «Chiusura notte» \d{2}\/\d{2} 22:00$/);
+assert.equal(colicoNotice.suggested.kind, "CHIUSURA");
 assert.equal((await notices()).length, 2);
 
 // 5. Update: only by writers; nothing changed = nothing written; a real change = audit + notice.
@@ -202,7 +211,7 @@ const u1 = await update(DIR, c1.id, draft({ covered: true, start: "20:00" }));
 assert.deepEqual(u1, { ok: true, id: c1.id, noticed: true });
 ns = await notices();
 assert.equal(ns.length, 3);
-assert.ok(ns.some((n) => /^Struttura Dervio: attività modificata «Serata soci» \d{2}\/\d{2} 20:00$/.test(n.title)));
+assert.ok(ns.some((n) => n.title === "Struttura Dervio: attività modificata — apri Attività in struttura"));
 ev = await events();
 const upd = ev.find((e) => e.action === "UPDATE");
 assert.equal(upd.before.covered, false);
@@ -220,10 +229,17 @@ assert.deepEqual(await update(DG, c1.id, draft()), { ok: false, code: "cancelled
 ns = await notices();
 assert.equal(ns.length, 4);
 const cn = ns.find((n) => n.suggested.change === "CANCEL");
-assert.match(cn.title, /^Struttura Dervio: attività annullata «Serata soci»/);
-assert.match(cn.reason, /Motivo: Pioggia prevista$/);
+assert.equal(cn.title, "Struttura Dervio: attività annullata — apri Attività in struttura");
+assert.equal(cn.reason.includes("Pioggia"), false);
 assert.equal((await events()).find((e) => e.action === "CANCEL").reason, "Pioggia prevista");
 assert.equal((await db.query(`select status from public.scd_structure_activities where id = $1`, [c1.id])).rows[0].status, "ANNULLATA");
+
+// 6b. Tesoreria reads the queue but not Dervio: no Dervio title, day or reason reaches it; Colico still does.
+const tesQueue = JSON.stringify((await as(TES, `select public.scd_proposal_queue($1) r`, [ORG]))[0].r);
+assert.ok(tesQueue.includes("Struttura Dervio"));
+for (const leak of ["Serata soci", "Pioggia", "ATTIVITA_SERALE"]) assert.equal(tesQueue.includes(leak), false, leak);
+assert.ok(tesQueue.includes("Chiusura notte"));
+assert.equal((await as(TES, `select public.scd_structure_write_access($1) r`, [ORG]))[0].r.canWrite, false);
 
 // 7. Audit is append-only, even for the owner.
 await assert.rejects(() => db.query(`update public.scd_structure_activity_events set actor = null`), /append-only/);

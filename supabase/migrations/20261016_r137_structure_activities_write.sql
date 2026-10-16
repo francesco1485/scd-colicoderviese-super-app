@@ -28,8 +28,11 @@
 --      nothing. A cancelled activity is never edited again. Rows are never deleted.
 --
 -- No personal data: the responsible is a role id, never a name; title, notes and the cancellation reason refuse
--- e-mail addresses and phone numbers; no minors' data of any kind. The notice carries the activity title, site,
--- kind and start (no person). actor/created_by are kept for audit and never returned.
+-- e-mail addresses and phone numbers; no minors' data of any kind. A COLICO notice carries the activity title,
+-- site, kind and start (no person). A DERVIO notice is generic ("Struttura Dervio: nuova attività — apri Attività in
+-- struttura": no title, day, time, kind or reason) because scd_proposal_queue is also read by office positions that are
+-- not Dervio readers in r135 (e.g. tesoreria); the Segreteria reads the details in the page (UD-156).
+-- actor/created_by are kept for audit and never returned.
 --
 -- Engines: TEMPO (the DG and the Presidente decide in one place; the Segreteria learns of every change without a
 -- phone call) and PERSONE (volunteers and members see the updated week). Measure: activities written per week from
@@ -221,19 +224,25 @@ declare
 begin
   insert into public.scd_proposals (organization_id, machine, area, kind, title, reason, sensitivity, source_kind,
     source_ref, source_at, target_ref, target_label, suggested, due_at)
+  -- DERVIO (UD-156): the queue is also read by office positions that do not read Dervio (e.g. tesoreria), so a
+  -- Dervio notice is generic: no title, day, time, kind or reason; the Segreteria opens Attivita in struttura.
   values (a.organization_id, 'G04', 'segreteria', 'ALTRO',
-    left('Struttura ' || v_site || ': ' || v_what || ' «' || a.title || '» '
-      || to_char(a.starts_at at time zone 'Europe/Rome', 'DD/MM HH24:MI'), 200),
+    case when a.site = 'DERVIO'
+      then 'Struttura Dervio: ' || v_what || ' — apri Attività in struttura'
+      else left('Struttura ' || v_site || ': ' || v_what || ' «' || a.title || '» '
+        || to_char(a.starts_at at time zone 'Europe/Rome', 'DD/MM HH24:MI'), 200) end,
     left('Decisa nel gestionale da Direzione, Presidente o Direttore generale (Attività in struttura). '
       || 'Avviso automatico alla Segreteria: basta prenderne visione.'
-      || coalesce(' Motivo: ' || nullif(btrim(p_reason), ''), ''), 300),
+      || case when a.site = 'DERVIO' then '' else coalesce(' Motivo: ' || nullif(btrim(p_reason), ''), '') end, 300),
     'INTERNO', 'MANUAL',
     'structure:' || a.id::text || ':' || lower(p_change) || ':' || gen_random_uuid()::text,
     now(),
     a.id::text,
     'Attività in struttura · ' || v_site,
-    jsonb_build_object('action', 'structure_activity_notice', 'change', p_change, 'activityId', a.id,
-      'site', a.site, 'kind', a.kind, 'startsAt', a.starts_at),
+    case when a.site = 'DERVIO'
+      then jsonb_build_object('action', 'structure_activity_notice', 'change', p_change, 'activityId', a.id, 'site', a.site)
+      else jsonb_build_object('action', 'structure_activity_notice', 'change', p_change, 'activityId', a.id,
+        'site', a.site, 'kind', a.kind, 'startsAt', a.starts_at) end,
     now() + interval '2 days')
   returning id into v_id;
   insert into public.scd_proposal_events (proposal_id, actor, action, note)

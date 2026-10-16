@@ -409,6 +409,24 @@ export function structureCanWrite(dbRoles: readonly string[], positions: Readonl
 }
 
 /**
+ * Club organization used by the page for BOTH the read and the writes (one selector, never memberships[0] blindly):
+ * the first organization where the caller's roles there make them a writer, otherwise the first where they read at
+ * least one site, otherwise null. The database checks again on every call.
+ */
+export function structureOrganization<M extends { organizationId: string; role: string }>(
+  memberships: readonly M[],
+  positions: ReadonlySet<string>,
+): M | null {
+  const orgs = [...new Set(memberships.map((m) => m.organizationId))];
+  const rolesOf = (id: string) => memberships.filter((m) => m.organizationId === id).map((m) => m.role);
+  const pick = (ok: (roles: string[]) => boolean) => {
+    const id = orgs.find((o) => ok(rolesOf(o)));
+    return id ? (memberships.find((m) => m.organizationId === id) ?? null) : null;
+  };
+  return pick((r) => structureCanWrite(r, positions)) ?? pick((r) => structureReadableSites(r, positions).length > 0);
+}
+
+/**
  * Whether the page offers writing:
  *   "on"          the database (scd_structure_write_access) says this person may write: the form is shown;
  *   "not-applied" the function is missing (r137 not applied): writers by session see "Scrittura non ancora attiva";

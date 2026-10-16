@@ -8,6 +8,7 @@ import {
   isStructureWriteCode,
   parseWriteAccess,
   structureCanWrite,
+  structureOrganization,
   structureWriteState,
   validateCancelReason,
   validateStructureDraft,
@@ -43,6 +44,18 @@ describe("structureCanWrite (UD-159: DG and Presidente decide)", () => {
       expect(structureCanWrite(["STAFF"], new Set([p])), p).toBe(false);
     }
     expect(structureCanWrite([], new Set())).toBe(false);
+  });
+});
+
+describe("structureOrganization (one selector for read and write)", () => {
+  const m = (organizationId: string, role: string) => ({ organizationId, organization: organizationId, role });
+
+  it("prefers the organization where the caller writes, then where they read, never a blind first one", () => {
+    expect(structureOrganization([m("other", "FAMILY"), m("scd", "DIRECTION")], new Set())?.organizationId).toBe("scd");
+    expect(structureOrganization([m("other", "FAMILY"), m("scd", "SECRETARIAT")], new Set())?.organizationId).toBe("scd");
+    expect(structureOrganization([m("a", "SECRETARIAT"), m("b", "DIRECTION")], new Set())?.organizationId).toBe("b");
+    expect(structureOrganization([m("scd", "FAMILY")], new Set())).toBeNull();
+    expect(structureOrganization([], new Set(["presidente"]))).toBeNull();
   });
 });
 
