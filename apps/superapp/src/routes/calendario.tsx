@@ -18,6 +18,7 @@ import {
 } from "@/lib/calendario-live";
 import { romeParts } from "@/lib/home-week";
 import { EMPTY_MESSAGE, WINDOWS, freshnessLabel, resolveAnnata, windowEnd, trainingKeyFor, type WindowDays, type PublicEvent, type PublicGroup } from "@/lib/public-snapshots";
+import { BoardMenuButton } from "@/components/scd/BoardMenuButton";
 
 /*
  * Public page "Calendario live" (board VR-009 screen 2, Francesco 15/10/2026): hero with the lake photo, the official
@@ -263,13 +264,14 @@ function Calendario() {
             </Link>
             <div className="min-w-0 flex-1">
               <p className="m-0 text-[12.5px] font-extrabold uppercase tracking-[0.12em] text-[#ffd600] lg:text-[14px]">Stagione {season}</p>
-              <h1 className="m-0 font-uv text-[38px] uppercase leading-[0.95] lg:text-[64px]">Calendario live</h1>
+              <h1 className="m-0 font-uv text-[31px] uppercase leading-[0.95] min-[400px]:text-[34px] lg:text-[64px]">Calendario live</h1>
               <p className="m-0 mt-1 hidden text-[17px] font-semibold text-white/90 lg:block">Le gare di tutte le squadre ColicoDerviese, in casa e in trasferta.</p>
             </div>
             <button type="button" onClick={() => setFiltersOpen((o) => !o)} aria-expanded={showFilters} aria-controls="cal-filtri" aria-label="Cerca squadra e filtri"
               className="scd-focus grid size-11 shrink-0 place-items-center rounded-full bg-white/12 text-white backdrop-blur-sm hover:bg-white/20">
               <Search className="size-[22px]" strokeWidth={2.4} aria-hidden="true" />
             </button>
+            <BoardMenuButton />
           </div>
           <LiveBanner events={filtered} groups={groups} nowMs={nowMs} />
         </div>
@@ -441,8 +443,8 @@ function Calendario() {
               </button>
               <button type="button" onClick={copyLink} className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#ffd600] px-[12px] text-[13px] font-bold text-[#0b2a5b]"><Link2 className="size-4" aria-hidden="true" /> Copia link {selected ? "annata" : "calendario"}</button>
               {canShare && <button type="button" onClick={shareLink} className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[12px] text-[13px] font-bold"><Share2 className="size-4" aria-hidden="true" /> Condividi</button>}
-              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))} aria-label="Chiedi a Vera, la reception del club" className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[8px] text-[13px] font-bold min-[641px]:hidden">
-                <PersonaAvatar persona="vera" size={24} /> Chiedi a Vera
+              <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vera:open"))} aria-label="Chiedi a Iride, l'assistente AI della segreteria" className="scd-focus inline-flex h-[40px] items-center gap-1.5 rounded-[10px] bg-[#eef3f9] px-[8px] text-[13px] font-bold min-[641px]:hidden">
+                <PersonaAvatar persona="vera" size={24} /> Chiedi a Iride
               </button>
             </div>
             <p role="status" aria-live="polite" className="m-0 mt-[4px] min-h-0 text-[13px] font-semibold text-[#1556c4]">{refreshMsg ?? copied}</p>

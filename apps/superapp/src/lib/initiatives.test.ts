@@ -57,7 +57,7 @@ describe("time-limited initiatives", () => {
 
   it("the list module is never statically imported by app code (stays out of the browser bundle)", () => {
     const offenders = walk(resolve(APP, "src"))
-      // Other server-only modules (*.server.ts, themselves imported dynamically, e.g. vetrina-slots.server.ts) may
+      // Other server-only modules (*.server.ts, themselves imported dynamically) may
       // import it; client-bundle.test.ts checks the built bundle.
       .filter((f) => /\.(tsx?)$/.test(f) && !/\.test\.tsx?$/.test(f) && !/\.server\.ts$/.test(f))
       .filter((f) => /^\s*import\s[^;]*from\s+["'][^"']*initiatives\.server["']/m.test(readFileSync(f, "utf8")));

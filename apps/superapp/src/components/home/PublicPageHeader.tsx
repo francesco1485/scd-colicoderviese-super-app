@@ -4,6 +4,7 @@
  * "Stesse impostazioni grafiche da per tutto" (Direzione 13/10/2026).
  */
 import type { ReactNode } from "react";
+import { BoardMenuButton } from "@/components/scd/BoardMenuButton";
 
 export const PUBLIC_WRAP = "mx-auto w-full max-w-[1280px] px-4 lg:px-8";
 
@@ -40,9 +41,12 @@ export function PublicPageHeader({
         className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgb(7_29_66/0.5),#0b2a5b_92%)] lg:bg-[linear-gradient(90deg,rgb(11_42_91/0.96)_0%,rgb(11_42_91/0.82)_50%,rgb(11_42_91/0.35)_100%)]"
       />
       <div className={`${PUBLIC_WRAP} pb-7 pt-6 lg:pb-12 lg:pt-12`}>
-        <p className="m-0 text-[12px] font-extrabold uppercase tracking-[0.14em] text-[#ffd600]">
-          {eyebrow}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="m-0 text-[12px] font-extrabold uppercase tracking-[0.14em] text-[#ffd600]">
+            {eyebrow}
+          </p>
+          <BoardMenuButton className="-mr-1 -mt-2" />
+        </div>
         <h1 className="m-0 mt-2 font-uv text-[38px] uppercase leading-[0.95] sm:text-[46px] lg:text-[60px]">
           {title}
           {accent && <span className="text-[#ffd600]"> {accent}</span>}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { canCreatePosts, centerTabFor, sessionPositions } from "./access-nav";
+import { canCreatePosts, sessionPositions } from "./access-nav";
 import { ACCESS_MENU, canSeeMenuEntry, menuFor } from "./areas";
 import { sessionRolesFrom, type Membership } from "./session";
 
@@ -32,17 +32,14 @@ const titles = (roles: ReadonlySet<string> | null) =>
   menuFor(roles).map((g) => g.title);
 
 describe("public chrome: anonymous visitors (Direzione rule 2026-10-13)", () => {
-  it("has no positions, no Crea and an 'Entra' centre tab", () => {
+  it("has no positions and no Crea", () => {
     expect(sessionPositions(undefined)).toBeNull();
     expect(sessionPositions(null)).toBeNull();
     expect(
       sessionPositions({ user: null, roles: [], memberships: [] }),
     ).toBeNull();
     expect(canCreatePosts(null)).toBe(false);
-    expect(centerTabFor(undefined)).toBe("entra");
-    expect(centerTabFor({ user: null, roles: [], memberships: [] })).toBe(
-      "entra",
-    );
+    expect(canCreatePosts({ user: null, roles: [], memberships: [] })).toBe(false);
   });
 
   it("sees only open entries in the areas menu, never a reserved one", () => {
@@ -58,10 +55,9 @@ describe("public chrome: signed-in family", () => {
   const s = session("FAMILY");
   const roles = sessionPositions(s)!;
 
-  it("cannot post: the centre tab is 'La mia'", () => {
+  it("cannot post", () => {
     expect(roles.has("famiglia")).toBe(true);
     expect(canCreatePosts(s)).toBe(false);
-    expect(centerTabFor(s)).toBe("mine");
   });
 
   it("sees the family areas and the public ones, no staff or office group", () => {
@@ -77,7 +73,7 @@ describe("public chrome: signed-in family", () => {
 
   it("base access (no position yet) sees the public entries and the family-audience ones only", () => {
     const base = session("USER_BASE");
-    expect(centerTabFor(base)).toBe("mine");
+    expect(canCreatePosts(base)).toBe(false);
     expect(ids(sessionPositions(base))).toEqual([
       "calendario",
       "tornei",
@@ -90,7 +86,6 @@ describe("public chrome: staff and Direzione", () => {
   it("Direzione can post and sees every area of the menu", () => {
     const s = session("DIRECTION");
     expect(canCreatePosts(s)).toBe(true);
-    expect(centerTabFor(s)).toBe("crea");
     expect(ids(sessionPositions(s))).toEqual(
       ACCESS_MENU.flatMap((g) => g.entries.map((e) => e.id)),
     );
@@ -101,7 +96,7 @@ describe("public chrome: staff and Direzione", () => {
 
   it("a mister can post and sees the staff areas without roles, not pulmini or magazzino", () => {
     const s = session("MISTER");
-    expect(centerTabFor(s)).toBe("crea");
+    expect(canCreatePosts(s)).toBe(true);
     const seen = ids(sessionPositions(s));
     expect(seen).toContain("gestionale");
     expect(seen).toContain("quadro");
@@ -114,7 +109,7 @@ describe("public chrome: staff and Direzione", () => {
 
   it("an autista (STAFF with the position in scope) sees pulmini", () => {
     const s = session("STAFF", { positions: ["autista"] });
-    expect(centerTabFor(s)).toBe("crea");
+    expect(canCreatePosts(s)).toBe(true);
     expect(ids(sessionPositions(s))).toContain("pulmini");
   });
 
@@ -131,7 +126,7 @@ describe("public chrome: staff and Direzione", () => {
 
   it("a partner sees the partner area and nothing internal", () => {
     const s = session("USER_BASE", { positions: ["partner"] });
-    expect(centerTabFor(s)).toBe("mine");
+    expect(canCreatePosts(s)).toBe(false);
     expect(ids(sessionPositions(s))).toEqual([
       "calendario",
       "tornei",

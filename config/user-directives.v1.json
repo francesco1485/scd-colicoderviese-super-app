@@ -3353,6 +3353,54 @@
     },
     {
       "sourceDate": "2026-10-15",
+      "sourceTime": "18:40",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-139",
+      "name": "APP_CHAT_IRIDE_AND_CROVI_NO_SKY",
+      "sourceQuoteFragments": [
+        "vera non ce piu ce iride - crovi per i piu giovani",
+        "altra chat gia ha impostato tutto e sa chi è iride e la sua impostazione confrontati e poi continui"
+      ],
+      "context": "Francesco 15/10/2026 18:40 (chat cloud), answer to the question who replaces Sky in the app chat button, then the instruction to align with the PC chat's Iride (UD-155 on branch feat/pc-segreteria-ai: AI secretary, says she is an AI, short and warm). Sky leaves the app (cast decision relayed by the PC chat as UD-151, Sky only on the pitch).",
+      "normalizedCommand": {
+        "rule": "The app chat's visible persona is Iride, the club's AI secretary (persona id 'vera' unchanged), with her approved image; younger members and reserved pages before the session meet Crovi (persona id 'sky' unchanged, neutral 'C' initial until an image is approved); Sky never appears in the app chat. Access rules (resolveChat) are unchanged.",
+        "appliesTo": [
+          "apps/superapp/src/components/SkyChat.tsx",
+          "apps/superapp/src/components/scd/SkyJolly.tsx",
+          "apps/superapp/src/lib/assistant.ts",
+          "apps/superapp/src/lib/assistant-cast.ts",
+          "apps/superapp/src/lib/cast-personas.ts"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "07:20",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-140",
+      "name": "PUBLIC_TRAINING_TIMETABLE_CLUBHOUSE_PULMINO",
+      "sourceQuoteFragments": [
+        "allenamenti visibili a tutti",
+        "Cerchiamo di rendere viva e accattivante anche la parte allenamenti perché è anche lì che possiamo fare cose visto che abbiamo la club haure aperta e anche servizio pulmino",
+        "Orari di tutte le squadre",
+        "Lun–Ven 17:00–21:00",
+        "Servizio e richiesta"
+      ],
+      "context": "Francesco 15/10/2026 (trainings visible to everyone) and 16/10/2026 07:18–07:20 (chat cloud), answers to three questions: what a visitor sees of the trainings, Club House hours, how the minibus is presented. Supersedes UD-100 only for the training timetable; rosters, team pages and member areas stay inside.",
+      "normalizedCommand": {
+        "rule": "The public home shows one training evening of every team at Colico (weekday, time, pitch, team label from the weekly quadro; no names, rosters, rooms, rotations or notes; 'fa fede l'avviso del mister'), the Club House open Monday–Friday 17:00–21:00 during trainings, and the minibus service with its four zones (Lago, Lecco, Valtellina, Chiavenna) and a 'Richiedi il posto' action that leads to sign-up. The /allenamenti page and the full quadro stay members-only.",
+        "appliesTo": [
+          "apps/superapp/src/lib/public-training.ts",
+          "apps/superapp/src/lib/quadro.functions.ts",
+          "apps/superapp/src/components/home/HomeLobby.tsx",
+          "apps/superapp/src/routes/index.tsx"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
       "id": "UD-150",
@@ -3380,6 +3428,55 @@
           "migration": "supabase/migrations/20261015_r131_figc_player_history.sql (STAGED, NOT APPLIED)",
           "manifest_source": "FIGC_STORICO_CALCIATORI"
         }
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "13:22",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-151",
+      "name": "CHARACTER_CAST_BY_AREA_SKY_ONLY_ON_THE_PITCH",
+      "sourceQuoteFragments": [
+        "sky è la nostra mascotte sul campo ideata per lo stile americano del calcio ma non sta nell'app dove arriva il genitore si relaziona col minore dentro, al contrario per una questione di simpatia chiunque trova il crovi all'inizio",
+        "la colicoderviese ha un unico stemma come anche gli altri"
+      ],
+      "context": "Recorded by the cloud chat on 15/10/2026 20:30 from claude.ai project doc claude/SCD_PERSONAGGI_E_LOGHI_2026-10-15.md §1 and §4 (number reserved by the PC chat; the PC registration commit 1430278 is no longer on the remote). Vera in the cast table became Iride on 15/10 18:40 (UD-139).",
+      "normalizedCommand": {
+        "rule": "Sky is the pitch mascot only (field, social, LED), never inside the app; Crovi welcomes at the entrance; Iride (ex Vera, UD-139) in administration; the other characters by area as listed in the project doc. One official crest per club; year-group logos only inside app and gestionale.",
+        "status": "RECORDED"
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "13:54-13:55",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-152",
+      "name": "NO_SHOWCASES_ANYWHERE",
+      "sourceQuoteFragments": [
+        "io non voglio nessuna di queste idee in nessuna vetrina di nessuna app e in nessuna vetrina dei gestionali e dei supporti web link, vetrine di sponsor, tornei e eventi, comunicazione e avatar"
+      ],
+      "context": "Recorded by the cloud chat on 15/10/2026 20:30 from claude.ai project doc claude/SCD_PERSONAGGI_E_LOGHI_2026-10-15.md §0; clarification chosen by Francesco at 13:55: it refers to today's showcases.",
+      "normalizedCommand": {
+        "rule": "No carousels, rotating banners, autoplay video, 'In evidenza' bands, large promotional boxes or 'Chi sei?' tables in any app, gestionale or page. Allowed: the fixed sponsor logo strip at the bottom (once), true information in clear lists, a small still image band only where Francesco's board has one, the real LED wall player.",
+        "status": "RECORDED"
+      }
+    },
+    {
+      "sourceDate": "2026-10-15",
+      "sourceTime": "14:40",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-153",
+      "name": "APPROVED_APP_LOGIC_PHONE_BOARDS_DESKTOP_THREE_COLUMNS",
+      "sourceQuoteFragments": [
+        "la logica è questa"
+      ],
+      "context": "Recorded by the cloud chat on 15/10/2026 20:30 from claude.ai project doc claude/SCD_LOGICA_APPROVATA_2026-10-15.md (Francesco approved the single page 'La logica della Super App' with seven boards and a betting-site layout as structure only); boards registered as VR-025/VR-026 at 19:20-19:22.",
+      "normalizedCommand": {
+        "rule": "Phone = Francesco's boards (VR-025); desktop = top bar with logo and search, left menu, content in the centre, right column with upcoming activities; gestionali on VR-026. Never betting content.",
+        "status": "RECORDED"
       }
     },
     {
@@ -3418,7 +3515,7 @@
     },
     {
       "sourceDate": "2026-10-15",
-      "sourceTime": "17:16-19:06",
+      "sourceTime": "17:16-19:14",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
       "id": "UD-155",
@@ -3436,11 +3533,13 @@
         "va bene procedi (18:52, pagina /installa con Iride, foto e contatto)",
         "Confermo l'eccezione in AGENTS.md (19:01: risposte automatiche di Iride a chi ha scritto per primo)",
         "chi l'ha contattata e cosa voleva… lei deve poter mandare whatsapp a persona che puo rispondere o puo autorizzare… calciatore chiede appuntamento con infermeria, iride manda messaggio a fisioterapista e direttore generale… verificare come si comporta il fisioterapista (19:05)",
-        "se uno contatta per una amichevole da impostare come responsabile lei deve comunicare a direttore sportivo a mister annata e a direttore generale e cosi via ragionando (19:06)"
+        "se uno contatta per una amichevole da impostare come responsabile lei deve comunicare a direttore sportivo a mister annata e a direttore generale e cosi via ragionando (19:06)",
+        "se non trova contatto deve mandare una mail e comunicare chi ha contattata e cosa voleva cosi che resta nella giornata mail lavorativa di chi vede (19:07); ok mail (19:13)",
+        "quelle sono delle idee di gerarchia da avvisare, resta di fatto che qualsiasi cosa resta avvisata sempre nel motore e cervello e gestionale della segreteria che è la macchina principale della struttura (19:14)"
       ],
       "context": "Francesco 15/10/2026 (chat PC). Extends UD-154 from friendlies to every request on every channel. Choices given through the question card at 17:18: automatic replies, small AI budget (about 20-30 EUR/month, today covered by the Make plan credits), contacts saved only after the Segreteria checks them (refined at 18:26, 'ok salva cognome e ruolo': Iride stores at once only what the person declares - name, surname, declared role - and only the Segreteria writes the verified role). At 17:21 asked for a dedicated expert secretary agent; at 17:28 'via'; at 17:30 contacts to Google Contacts of sportclubcolico and the WhatsApp profile as the Segreteria avatar.",
       "normalizedCommand": {
-        "rule": "The AI Segreteria (persona Iride on every channel, Francesco 15/10 17:33 and 18:40; the app chat follows through the cloud chat, UD-139) reads every inbound message of the official channels (WhatsApp Business via Make first, then club mail, then a phone voice assistant), answers ALONE 24/7 from the club knowledge (Google Doc 'SCD · Segreteria AI · Conoscenza') and the public calendar, writes the request and the answer in SCD_INTAKE_LOG with office, type, urgency and 'serve persona', and marks what a person must handle. This is the only exception to the AGENTS.md rule 'messaggi inviati a terzi senza persona': replies to whoever wrote first, within the fixed limits below. The agent scd-iride owns Iride (prompt, knowledge, channels, quality); scd-segreteria is the expert source on rules and deadlines. Staff alerts (19:05-19:06): when a request needs a person, Iride must tell the people who can answer or authorise it, reasoning on the topic (infermeria -> physiotherapist + general manager; friendly to set up -> sporting director + coach of the age group + general manager), from a 'chi fa cosa' sheet confirmed by the Segreteria, track who takes it and remind after a deadline; sending to staff is a new sending channel and starts only after Francesco's OK on the design.",
+        "rule": "The AI Segreteria (persona Iride on every channel, Francesco 15/10 17:33 and 18:40; the app chat follows through the cloud chat, UD-139) reads every inbound message of the official channels (WhatsApp Business via Make first, then club mail, then a phone voice assistant), answers ALONE 24/7 from the club knowledge (Google Doc 'SCD · Segreteria AI · Conoscenza') and the public calendar, writes the request and the answer in SCD_INTAKE_LOG with office, type, urgency and 'serve persona', and marks what a person must handle. This is the only exception to the AGENTS.md rule 'messaggi inviati a terzi senza persona': replies to whoever wrote first, within the fixed limits below. The agent scd-iride owns Iride (prompt, knowledge, channels, quality); scd-segreteria is the expert source on rules and deadlines. Staff alerts (19:05-19:06): when a request needs a person, Iride must tell the people who can answer or authorise it, reasoning on the topic (infermeria -> physiotherapist + general manager; friendly to set up -> sporting director + coach of the age group + general manager), from a 'chi fa cosa' sheet confirmed by the Segreteria, track who takes it and remind after a deadline; sending to staff is a new sending channel and starts only after Francesco's OK on the design. Whatever happens, every request stays recorded in the Segreteria engine (SCD_INTAKE_LOG and the gestionale), the main machine of the club (19:14); the staff alerts are only the hierarchy of who to tell. Active since 19:15 ('ok mail' 19:13): every request that needs a person also sends an internal mail '[Iride] urgency · office · type · name' to the club inbox (who, when, what, Iride's answer; no health data); the INTAKE_LOG row keeps the summary only, no raw message text; the mail intake skips '[Iride]' mails so nothing is logged twice.",
         "scope": "SECRETARIAT_ALL_CHANNELS",
         "engines": "TEMPO (answers at night and on weekends without volunteers, schede already classified), PERSONE (families get an answer in seconds), SOLDI (no lost registration or sponsor request)",
         "status": "WHATSAPP_ACTIVE_MAIL_PHONE_CONTACTS_PENDING",

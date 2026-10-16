@@ -1,7 +1,7 @@
 /**
  * What the public chrome shows a visitor (pure). The Direzione rule of 2026-10-13: an anonymous
- * visitor never sees "Crea" nor the internal areas; the centre tab invites to sign in. A signed-in
- * person who cannot write posts gets "La mia SCD" in the centre; only staff authors get "Crea".
+ * visitor never sees "Crea" nor the internal areas; only staff authors may write posts. The raised
+ * centre tab is gone since the board shell (15/10/2026: five fixed items in the bottom bar).
  * Nothing here grants anything: /crea and every area keep their own server gate.
  */
 import type { SessionView } from "./auth.functions";
@@ -32,12 +32,4 @@ export function canCreatePosts(session: ChromeSession): boolean {
     session.roles.includes("direzione") ||
     session.roles.includes("segreteria");
   return AUTHOR_ROLES.has(org.role) || office;
-}
-
-export type CenterTab = "entra" | "mine" | "crea";
-
-/** Which raised centre tab the public bottom bar shows. */
-export function centerTabFor(session: ChromeSession): CenterTab {
-  if (!session?.user) return "entra";
-  return canCreatePosts(session) ? "crea" : "mine";
 }

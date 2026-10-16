@@ -133,7 +133,7 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
           id="cast-helpers"
           ids={["preparatore-atletico", "mental-coach", "musica-relax"]}
           title="Consigli del giorno"
-          sub="Testi brevi e generali, uguali ogni giorno per tutta la squadra: mai schede, consigli medici o percorsi personali. Per una domanda c'è Vera."
+          sub="Testi brevi e generali, uguali ogni giorno per tutta la squadra: mai schede, consigli medici o percorsi personali. Per una domanda c'è Iride."
           day={today}
         />
         {(clubHouse.state === "ok" || clubHouse.state === "off") && <ClubHouseOrderCard desk={clubHouse} today={today} />}

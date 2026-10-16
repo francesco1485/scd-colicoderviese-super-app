@@ -9,11 +9,11 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, type CSSProperties, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { BottomNav, MenuDrawer, SiteFooter, SiteHeader } from "../components/SiteChrome";
-import { SkyChat } from "../components/SkyChat";
+import { BottomNav, MenuDrawer, SideNav, SiteFooter, SiteHeader } from "../components/SiteChrome";
+import { DESKTOP_CONTENT_CLEARANCE, PHONE_CONTENT_CLEARANCE, SkyChat } from "../components/SkyChat";
 import { PwaManager } from "../components/PwaManager";
 import { SponsorBand } from "../components/SponsorBand";
 import { CookieConsent } from "../components/CookieConsent";
@@ -154,7 +154,7 @@ function RootComponent() {
     return (
       <QueryClientProvider client={queryClient}>
         <Outlet />
-        {/* r99: the same chat, opened only from in-page entry points ("Chiedi a Vera"), no floating launcher. */}
+        {/* r99: the same chat, opened only from in-page entry points ("Chiedi a Iride"), no floating launcher. */}
         <SkyChat interior />
         <CookieConsent interior />
         <PwaManager />
@@ -164,16 +164,44 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Room for the bottom tab bar and the fixed sponsor bar, on every public page (UD-134). */}
-      <div className="sa-shell min-h-dvh overflow-x-clip pb-[calc(4rem+46px+env(safe-area-inset-bottom))] lg:pb-[46px]">
+      {/* Room under the content so the Iride launcher never covers the last row (Francesco 15/10/2026): phones, the
+          bottom tab bar + slim sponsor strip + launcher (PHONE_CONTENT_CLEARANCE); desktop, the sponsor strip (UD-134)
+          + launcher (DESKTOP_CONTENT_CLEARANCE). Desktop: top bar, sticky left sidebar (240px) and the content column,
+          max 1200px (board shell UD-153, Francesco 15/10/2026 14:40; Eurobet as structure reference only). */}
+      <div
+        style={
+          {
+            "--shell-pb": `${PHONE_CONTENT_CLEARANCE}px`,
+            "--shell-pb-lg": `${DESKTOP_CONTENT_CLEARANCE}px`,
+          } as CSSProperties
+        }
+        className="sa-shell min-h-dvh overflow-x-clip pb-[calc(var(--shell-pb)+env(safe-area-inset-bottom))] lg:pb-[var(--shell-pb-lg)]"
+      >
+        {/* WCAG 2.4.1: first focusable element, jumps over header and sidebar to the page content. */}
+        <a
+          href="#contenuto"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-lg focus:bg-[#ffd600] focus:px-4 focus:py-2 focus:text-[15px] focus:font-bold focus:text-[#0b1e3a]"
+        >
+          Vai al contenuto
+        </a>
         <SiteHeader />
-        {/* Technical-cookie notice in the page flow, under the header: nothing floats over the content (UD-135). */}
-        <CookieConsent />
-        {/* "Prossimo appuntamento" strip (not on the home or the calendar, which show it themselves). */}
-        <NextUpBar />
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <SiteFooter />
+        <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)]" data-testid="shell-body">
+          <SideNav />
+          <div className="min-w-0" data-testid="shell-content">
+            {/* Desktop: the right gutter keeps the column clear of the Iride launcher (launcher footprint 80px =
+                48px here + the pages' own 32px); from 1536px the centred column has that margin by itself. */}
+            <div id="contenuto" tabIndex={-1} className="w-full outline-none lg:mx-auto lg:max-w-[1200px] lg:pr-12 2xl:pr-0">
+              {/* "Prossimo appuntamento" strip (not on the home or the calendar, which show it themselves). */}
+              <NextUpBar />
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+              {/* Technical-cookie notice at the end of the page flow: it never pushes the first screen down and nothing
+                  floats over the content (UD-135; handover 15/10 19:55 point 6). */}
+              <CookieConsent />
+            </div>
+            <SiteFooter />
+          </div>
+        </div>
       </div>
       <SponsorBand />
       <BottomNav />
