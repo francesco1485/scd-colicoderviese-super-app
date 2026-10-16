@@ -2503,13 +2503,32 @@
           "directive": "UD-155",
           "persona": "Iride",
           "number": "+39 334 196 1321 (club secretariat, WhatsApp Business coexistence)",
-          "engine": "Make scenario 'SCD · Segreteria AI · WhatsApp' with Make AI Tools",
+          "engine": "Make scenario 7979437 'SCD · Segreteria AI · WhatsApp', module 7 Anthropic Claude Create a Message (claude-haiku-5-5), live v4 since 16/10/2026 18:35 (UD-164)",
           "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
           "owner_agent": ".claude/agents/scd-iride.md",
           "sends": "replies only to whoever wrote first, inside the 24-hour window (AGENTS.md exception, Francesco 19:01)",
           "staff_alerts": "PROPOSED (Francesco 19:05-19:06): utility templates to the people in the 'chi fa cosa' sheet; not active until Francesco approves",
           "groups": "not supported on a coexistence number",
-          "live_changes_require": "Francesco's explicit OK with the diff shown first"
+          "live_changes_require": "Francesco's explicit OK with the diff shown first",
+          "friendly_dg_confirmation": {
+            "directive": "UD-164",
+            "version": "Iride v4",
+            "status": "APPLIED_TO_LIVE_7979437",
+            "applied_at": "2026-10-16T16:35:18Z (Francesco «Sì, accendi v4»; backup of v3 taken first)",
+            "reminder_scenario": "8003125 'SCD · Iride · Promemoria DG' (created INACTIVE, on only with Francesco's OK)",
+            "rule": "friendlies confirmed or refused only by the number whose verified rubrica role is DIRETTORE GENERALE (SÌ/NO AM-nnnn or buttons); the same text from other numbers is logged IGNORATO with no reply",
+            "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
+            "blueprints": [
+              "automations/make/segreteria-ai/blueprint-v4.json",
+              "automations/make/segreteria-ai/promemoria-dg-v4.json"
+            ],
+            "test_report": "automations/make/segreteria-ai/test-v4-risultati.md",
+            "test_copies_off": [
+              "8000995",
+              "8001010"
+            ],
+            "requests_data_store": "221453 'SCD · Richieste in attesa DG' (only CONTATORE record; retention VERIFIED «Fine stagione» + «Sì, cancella tutto»: every AM- request, IN_ATTESA_DG included, deleted from 30 June by the reminder scenario, never the CONTATORE, UD-164)"
+          }
         }
       }
     },
