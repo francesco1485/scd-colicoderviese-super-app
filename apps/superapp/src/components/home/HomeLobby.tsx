@@ -8,20 +8,21 @@
  *      15:05). "Registrati gratis" is a small link, not a big bar.
  *   3. Oggi in campo — the training evening (UD-140, timetable only) with "In corso" on the session running now and the
  *      Club House hours.
- *   4. Servizi e club — Club Shop (four kits), Club House, Pulmini, Crea il tuo campione.
- *   5. Dal club — three items of the day's palinsesto (lib/vetrina), static.
+ *   4. Servizi e club — Kit, Club House, Pulmini, Tornei ed eventi.
+ *   5. In primo piano — organized slides (HomeSlides): avatar, Iride 24 ore su 24, the day's palinsesto.
  *   Side tool: the calendar is small and collateral (desktop: month with game days; phone: the week), plus the
  *   countdown to the next home game.
  * Data: public calendar and the training timetable only. No minor named, no mascot, no photo of the pitch.
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Bus, CalendarDays, ChevronRight, Coffee, Pause, Play, Shirt, UserRound } from "lucide-react";
+import { ArrowRight, Bus, CalendarDays, ChevronRight, Coffee, Pause, Play, Trophy } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { loginSearch } from "@/components/scd/AccessMenu";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { useMinuteClock } from "@/lib/use-minute-clock";
+import { HomeSlides } from "@/components/home/HomeSlides";
 import { venueShort } from "@/components/home/HomeSections";
 import { groupShort } from "@/lib/board-data";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
@@ -433,20 +434,17 @@ function Services() {
           }
         />
         <ServiceCard
-          to="/accedi"
-          search={loginSearch("/la-mia-scd/campione")}
-          testid="home-avatar"
-          kicker="Nuovo"
-          title="Crea il tuo campione"
-          text="Soprannome, numero e la divisa del club."
-          cta="Inizia"
+          to="/eventi"
+          testid="home-eventi"
+          kicker="Tornei ed eventi"
+          title="Christmas Lario Cup"
+          text="Martedì 8 dicembre, edizione maschile e femminile."
+          cta="Scopri"
           art={
             <span className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_30%_30%,#7fd0ff,#0457af_45%,#13254d)]">
               <span className="grid place-items-center gap-1 text-center font-display text-[24px] font-bold uppercase leading-[0.9] text-white lg:text-[28px]">
-                <UserRound className="size-7" aria-hidden="true" />
-                <span>
-                  Il tuo <span className="text-[#ffd23f]">avatar</span>
-                </span>
+                <Trophy className="size-7 text-[#ffd84a]" aria-hidden="true" />
+                <span>8 dicembre</span>
               </span>
             </span>
           }
@@ -556,60 +554,6 @@ function WeekDays({ events, today }: { events: readonly PublicEvent[]; today: st
   );
 }
 
-/* ------------------------------------------------------------ 5. dal club */
-
-/** Visual of a palinsesto item (the kit uses the official render, never the supplier price list). */
-function PostMedia({ s }: { s: VetrinaSlot }) {
-  const v = s.id === "kit-2026-27" ? { kind: "image" as const, src: KIT_FULL, alt: "Kit ufficiale ColicoDerviese 2026/27", fit: "contain" as const, position: "center" } : s.visual;
-  if (v.kind === "image")
-    return (
-      <span className={`relative block aspect-[16/10] w-full overflow-hidden ${v.fit === "contain" ? "bg-[radial-gradient(circle_at_60%_35%,#3f7fe6,#13254d_72%)]" : "bg-[#13254d]"}`}>
-        <img src={v.src} alt={v.alt} loading="lazy" decoding="async" className={`size-full ${v.fit === "contain" ? "object-contain p-3" : "object-cover"}`} style={{ objectPosition: v.position ?? "center" }} />
-      </span>
-    );
-  if (v.kind === "portrait")
-    return (
-      <span className="grid aspect-[16/10] w-full place-items-center bg-[linear-gradient(150deg,#0457af,#13254d)]">
-        <img src={v.src} alt={v.alt} loading="lazy" decoding="async" className="size-[100px] rounded-full object-cover ring-4 ring-white/70" />
-      </span>
-    );
-  return (
-    <span aria-hidden="true" className="relative grid aspect-[16/10] w-full content-end overflow-hidden bg-[radial-gradient(90%_140%_at_100%_0%,#2f6fdc,#173168_55%,#0f1d3d)] p-4">
-      <span className="absolute -right-2 -top-3 font-display text-[130px] font-bold leading-none text-white/10">{v.big}</span>
-      <span className="relative max-w-[85%] font-display text-[26px] font-bold uppercase leading-[0.95] text-white">{s.title}</span>
-    </span>
-  );
-}
-
-function News({ slots }: { slots: readonly VetrinaSlot[] }) {
-  if (slots.length === 0) return null;
-  return (
-    <section aria-labelledby="home-news-t" data-testid="home-news">
-      <Heading id="home-news-t" sub="Tornei, iniziative e novità: cambiano ogni giorno">
-        Dal club
-      </Heading>
-      <ul className="m-0 grid list-none gap-3 p-0 lg:grid-cols-3 lg:gap-4">
-        {slots.map((s) => (
-          <li key={s.id}>
-            <Link to={s.href as never} search={s.search as never} {...(s.hash ? { hash: s.hash } : {})} className={`${CARD} scd-focus grid h-full hover:border-[#0457af]`} data-slot={s.id}>
-              <PostMedia s={s} />
-              <span className="grid gap-1 p-3.5">
-                <span className={`${LABEL} text-[#0457af]`}>{s.kicker}</span>
-                <span className="font-display text-[17px] font-bold leading-tight text-[#14264d]">{s.title}</span>
-                <span className="line-clamp-3 text-[13.5px] leading-snug text-[#52627f]">{s.text}</span>
-                <span className="mt-1 inline-flex items-center gap-1 font-display text-[14px] font-semibold text-[#0457af]">
-                  {s.cta}
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 /* ---------------------------------------------------------------- page */
 
 export function HomeLobby({
@@ -638,7 +582,7 @@ export function HomeLobby({
         seen.add(fam);
         return true;
       })
-      .slice(0, 3);
+      .slice(0, 4);
   }, [vetrina]);
   return (
     <div data-testid="home-lobby">
@@ -648,8 +592,8 @@ export function HomeLobby({
         <div className="grid min-w-0 gap-5 lg:gap-7">
           <WeekDays events={calendar.events} today={today} />
           <TodayOnPitch day={training} today={today} nowMs={nowMs} />
+          <HomeSlides slots={slots} />
           <Services />
-          <News slots={slots} />
         </div>
         <MonthCard events={calendar.events} today={today} nowMs={nowMs} groups={calendar.groups} />
       </div>

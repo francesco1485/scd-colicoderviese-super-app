@@ -60,3 +60,16 @@ describe("home lobby helpers", () => {
     expect(nextHome([], now)).toBeNull();
   });
 });
+
+describe("home slides", () => {
+  it("wraps the slide index both ways and shows only back-view avatar bases", async () => {
+    const { nextIndex, publicAvatarBases } = await import("./HomeSlides");
+    expect(nextIndex(0, 5)).toBe(1);
+    expect(nextIndex(4, 5)).toBe(0);
+    expect(nextIndex(0, 5, -1)).toBe(4);
+    expect(nextIndex(3, 0)).toBe(0);
+    const b = publicAvatarBases();
+    expect(b.length).toBeGreaterThan(0);
+    expect(b.every((x) => x.view === "BACK")).toBe(true);
+  });
+});
