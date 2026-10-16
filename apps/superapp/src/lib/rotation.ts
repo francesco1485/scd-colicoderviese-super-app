@@ -6,8 +6,11 @@
  * simulates scenarios that move youth 11v11 home matches from Colico to Dervio.
  *
  * Everything here is a SIMULATION: no match is moved for real. On 2026-10-11
- * the club decided to evaluate rotations with simulations before any notice to
- * the Comune di Dervio. Team names only, never names of minors.
+ * the club decided to evaluate rotations with simulations. On 2026-10-16 the DG
+ * decided that the Comune di Dervio is already informed with the season programme
+ * (no per-match notice to the Comune); a weather move from Dervio back to Colico
+ * is notified to FIGC (LND/SGS) and the opponent club only. Team names only,
+ * never names of minors.
  *
  * Board sources: Visual Master VR-022 `Rotazione-campi.dc.html`, `Rotazione-Dervio.dc.html`.
  */
@@ -79,8 +82,18 @@ export const DEFAULT_DURATION: Readonly<Record<MatchFormat, number>> = {
 export const DEFAULT_BUFFER_MIN = 15;
 export const DEFAULT_START_DATE = "2026-11-15";
 export const DEFAULT_MAX_DERVIO_PER_DAY = 2;
-/** The Comune di Dervio wants the notice at least one month before. */
-export const NOTICE_DAYS = 30;
+/**
+ * The team playing at Dervio is notified 14 days before (DG 2026-10-16, same value as
+ * `DEFAULT_LEAD_DAYS.teamNotice` in `dervio-rotation.ts`). There is NO per-match notice to
+ * the Comune di Dervio: it was informed with the season programme («Comune lasciamo stare
+ * per ora, avvisato sul programma»).
+ */
+export const TEAM_NOTICE_DAYS = 14;
+/** Who is notified when bad weather moves a Dervio match back to Colico (DG 2026-10-16). */
+export const RAIN_MOVE_NOTICE_TO = "FIGC (LND/SGS) e squadra avversaria";
+/** The Comune di Dervio position, as shown to users (DG 2026-10-16). */
+export const COMUNE_DERVIO_NOTE =
+  "Comune di Dervio già informato con il programma stagionale: nessun avviso gara per gara.";
 /** Matches ending after this minute need lights at Dervio (17:00). */
 export const LIGHTS_AFTER_MIN = 17 * 60;
 
@@ -444,7 +457,7 @@ export interface Issue {
 
 export interface DervioMatch {
   match: RotationMatch;
-  /** Last day for the notice to the Comune (30 days before). */
+  /** Last day for the notice to the team playing (TEAM_NOTICE_DAYS before). */
   noticeBy: string;
   /** Notice deadline already passed compared with today. */
   late: boolean;
@@ -588,7 +601,7 @@ export function analyse(
       });
     }
     for (const m of dv) {
-      const noticeBy = minusDays(m.date, NOTICE_DAYS);
+      const noticeBy = minusDays(m.date, TEAM_NOTICE_DAYS);
       const late = noticeBy < opts.today;
       const needsLights = !opts.lightsVerified && m.end > LIGHTS_AFTER_MIN;
       const winterGrass = isWinterDay(m.date);
@@ -604,8 +617,8 @@ export function analyse(
         res.lateNotices++;
         issues.push({
           code: "dv-notice-late",
-          severity: "crit",
-          text: `${m.label}: avviso al Comune per il ${shortDate(m.date)} già oltre il mese`,
+          severity: "warn",
+          text: `${m.label}: avviso alla squadra per il ${shortDate(m.date)} già oltre i ${TEAM_NOTICE_DAYS} giorni`,
           matchId: m.id,
         });
       }

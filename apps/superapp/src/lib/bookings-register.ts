@@ -10,14 +10,14 @@
  */
 import {
   BOOKING_KIND_LABEL,
-  NOTICE_DAYS,
+  COMUNE_DERVIO_NOTE,
   PITCHES,
+  RAIN_MOVE_NOTICE_TO,
   ROOMS,
   checkSlot,
   groupByDay,
   hhmm,
   longDay,
-  minusDays,
   pitchUnits,
   roomClashes,
   toMinutes,
@@ -145,14 +145,21 @@ export function bookingToRegistryRow(
     "Approvato da": "",
     "Importo affitto": b.kind === "affitto" ? (b.amount ?? "") : "",
     "Contratto o link": "",
-    "Avviso Comune":
-      b.pitch === "DV"
-        ? `Entro il ${itDate(minusDays(b.date, NOTICE_DAYS))}`
-        : "Non serve",
+    "Avviso Comune": comuneNotice(b.pitch),
     Note: requestNote(b, requestedBy, at),
     Origine: "Super App /gestionale/impianti",
   };
   return REGISTRY_COLUMNS.map((c) => cell(values[c])).join("\t");
+}
+
+/**
+ * Value of the master's "Avviso Comune" column (column name kept: it is the Drive master's).
+ * DG 2026-10-16: the Comune di Dervio was informed with the season programme, so there is no
+ * per-match notice deadline. A booking (ipotesi) is an extra use outside that programme: the
+ * Direzione decides whether to tell the Comune. Colico: not needed.
+ */
+export function comuneNotice(pitch: PitchId): string {
+  return pitch === "DV" ? "Fuori programma: decide la Direzione" : "Non serve";
 }
 
 /* ---------------- Summary for the Direzione ---------------- */
@@ -226,10 +233,13 @@ export function directionBrief(b: Booking, ctx: BriefContext): string {
       `Affitto: importo ${(b.amount ?? "").trim() ? `${(b.amount ?? "").trim()} €` : "—"}; servono accordo scritto e verifica dell'assicurazione dell'ente`,
     );
   if (b.pitch === "DV") {
-    const notice = minusDays(b.date, NOTICE_DAYS);
     lines.push(
-      `Avviso al Comune di Dervio: entro il ${itDate(notice)}${notice < ctx.today ? " (GIÀ IN RITARDO)" : ""}`,
+      `${COMUNE_DERVIO_NOTE} Questo uso è fuori programma: se avvisare il Comune lo decide la Direzione.`,
     );
+    if (b.kind === "gara")
+      lines.push(
+        `Maltempo: se la gara torna a Colico, avviso solo a ${RAIN_MOVE_NOTICE_TO}.`,
+      );
   }
   lines.push(`Richiesto da: ${ctx.requestedBy || "—"}`);
   lines.push(
@@ -402,10 +412,7 @@ export function bookingToProposal(b: Booking, requestedBy = ""): Proposal {
     requestedBy,
     approvedBy: "",
     amount: b.amount ?? "",
-    notice:
-      b.pitch === "DV"
-        ? `Entro il ${itDate(minusDays(b.date, NOTICE_DAYS))}`
-        : "Non serve",
+    notice: comuneNotice(b.pitch),
     note: requestNote(
       b,
       requestedBy,

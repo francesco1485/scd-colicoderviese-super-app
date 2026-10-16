@@ -37,6 +37,7 @@ import {
   GROUP_LABEL,
   LIGHTS_AFTER_MIN,
   PITCHES,
+  TEAM_NOTICE_DAYS,
   daysBetween,
   isWinterDay,
   minusDays,
@@ -389,7 +390,7 @@ export interface ChecklistLeadDays {
 }
 
 export const DEFAULT_LEAD_DAYS: Readonly<ChecklistLeadDays> = {
-  teamNotice: 14,
+  teamNotice: TEAM_NOTICE_DAYS,
   allNotice: 3,
   weatherCheck: 3,
   weatherDecision: 1,

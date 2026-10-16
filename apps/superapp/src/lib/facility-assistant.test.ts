@@ -170,7 +170,8 @@ describe("answers from the engine", () => {
     expect(a.details[0]).toMatch(/^Colico campo 1/);
     expect(a.details[2]).toMatch(/^Dervio campo 1/);
     expect(a.details[2]).toMatch(/erba in inverno/);
-    expect(a.details[2]).toMatch(/avviso al Comune entro il 13\/11/);
+    expect(a.details[2]).toMatch(/fuori dal programma stagionale/);
+    expect(a.details[2]).not.toMatch(/entro il/);
   });
 
   it("lists conflict days from today", () => {
@@ -185,15 +186,20 @@ describe("answers from the engine", () => {
   });
 
   it("notice: none when nothing is at Dervio, dates when the scenario moves matches", () => {
-    expect(answerQuestion("Quando devo avvisare il Comune?", CTX).text).toMatch(
-      /nessuna gara è a Dervio/,
+    const none = answerQuestion("Quando devo avvisare il Comune?", CTX);
+    expect(none.text).toMatch(/nessuna gara è a Dervio/);
+    expect(none.text).toMatch(/già informato con il programma stagionale/);
+    expect(none.details.join(" ")).toMatch(
+      /Se piove e la gara torna a Colico: avviso solo a FIGC \(LND\/SGS\) e squadra avversaria/,
     );
+    expect(none.details.join(" ")).not.toMatch(/30 giorni|un mese/);
     const auto = PRESETS.find((p) => p.id === "auto")!;
     const a = answerQuestion(
       "quando devo avvisare il Comune per le gare a Dervio?",
       ctxFor({ auto: true, modes: auto.modes }),
     );
-    expect(a.text).toMatch(/Primo avviso al Comune entro il \d{2}\/\d{2}/);
+    expect(a.text).toMatch(/Primo avviso alla squadra entro il \d{2}\/\d{2}/);
+    expect(a.text).not.toMatch(/avviso al Comune/);
     expect(a.text).toMatch(/nessuna gara è spostata davvero/);
     expect(a.details.length).toBeGreaterThan(0);
   });
