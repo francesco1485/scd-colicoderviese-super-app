@@ -232,7 +232,7 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
   },
   infermeria: {
     id: "infermeria", label: "Infermeria", path: pathOf("infermeria"), railId: "infermeria",
-    description: "Scadenze dei certificati per squadra, registro infortuni con rientro in campo, cassette di primo soccorso e defibrillatori per sede. Solo staff sanitario e Direzione.",
+    description: "Scadenze dei certificati per squadra (sola lettura), cassette di primo soccorso e defibrillatori per sede. Solo staff sanitario e Direzione.",
     sources: ["supabase", "sanitario", "impianti", "inserimenti"],
     insertRoles: ["Staff sanitario", "Direzione"],
   },

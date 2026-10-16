@@ -38,6 +38,8 @@ export interface SectionDef {
   base?: boolean;
   levels: readonly Level[];
   perimeters: readonly Perimeter[];
+  /** Perimeters offered in the grants page when some catalogue perimeters open nothing (e.g. Infermeria). */
+  uiPerimeters?: readonly Perimeter[];
   sensitive?: boolean;
   hardBlocked?: boolean;
   directionOnly?: boolean;
@@ -103,6 +105,14 @@ export function isGrantable(s: SectionDef | undefined): boolean {
     s.levels.length > 0 &&
     s.perimeters.length > 0,
   );
+}
+
+/**
+ * Perimeters the grants page offers: the catalogue ones, narrowed by uiPerimeters when a perimeter opens nothing
+ * (Infermeria: OWN_CHILDREN and SELF stay in the database catalogue but are never offered).
+ */
+export function offeredPerimeters(s: Pick<SectionDef, "perimeters" | "uiPerimeters">): readonly Perimeter[] {
+  return s.uiPerimeters ? s.perimeters.filter((p) => s.uiPerimeters!.includes(p)) : s.perimeters;
 }
 
 export const GRANTABLE_SECTIONS: readonly SectionDef[] = SECTIONS.filter((s) =>
@@ -442,10 +452,11 @@ export type Draft = Readonly<Record<string, DraftRow>>;
 
 /** Default level/perimeter offered when a row is ticked by hand: the lowest level, the narrowest useful perimeter. */
 export function defaultRow(s: SectionDef, target: TargetFacts): DraftRow {
+  const offered = offeredPerimeters(s);
   const perimeter: Perimeter =
-    target.minor === true && s.perimeters.includes("SELF")
+    target.minor === true && offered.includes("SELF")
       ? "SELF"
-      : (s.perimeters[0] ?? "ALL");
+      : (offered[0] ?? "ALL");
   return {
     sectionCode: s.code,
     level: s.levels[0] ?? "READ",

@@ -1,10 +1,13 @@
 /**
  * Infermeria on the server. Gate: work area "infermeria" (registry roles responsabile-infermeria and Direzione),
- * then the database (r136 scd_health_staff) decides again on every read and write. Fail-closed:
+ * then the database (r136 scd_health_staff) decides again on every read and write. Fail-closed, unknown never zero:
  * - while r136 is not applied the new sections answer engine "not-applied" and the page says
  *   "Funzione in preparazione: serve applicare r136"; the certificate board falls back to the r66 register, which
  *   the database opens only to Direzione and Segreteria;
+ * - the database answering null (no infermeria access) is "denied": values stay null, never 0;
+ * - any other failure is "error" ("Lettura non riuscita, riprova");
  * - no health value is ever logged, echoed in an error or cached: errors become fixed Italian sentences.
+ * The injuries register is deferred until the consent design (UD-043): nothing here reads or writes injuries.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -13,21 +16,15 @@ import { workAreaView, type WorkAreaGate } from "./access";
 import { sessionView } from "./auth.functions";
 import { toCertRow, type CertDbRow, type CertRow } from "./certificates";
 import {
-  BODY_AREAS,
-  INJURY_STATUSES,
-  RTP_STEPS,
   SITES,
   aedProblem,
-  injuryProblem,
   isHealthSite,
   kitProblem,
+  onePerAthlete,
   shortName,
-  toInjuryRow,
   type AedRow,
   type HealthEngine,
   type HealthSite,
-  type InjuryDbRow,
-  type InjuryRow,
   type KitRow,
 } from "./health-areas";
 import { stagingPreviewEnabled } from "./impianti-access";
@@ -38,13 +35,17 @@ export interface InfermeriaData {
   gate: WorkAreaGate;
   today: string;
   connected: boolean;
-  certs: { state: "ok" | "unavailable"; source: "r136" | "r66" | null; rows: CertRow[] };
+  /**
+   * ok: rows read; denied: the database gives this caller no certificates (OWN_SITE grant, no access);
+   * error: reading failed; unavailable: nothing read (no session, or r136 missing and r66 refused).
+   */
+  certs: { state: "ok" | "denied" | "error" | "unavailable"; source: "r136" | "r66" | null; rows: CertRow[] };
   engine: HealthEngine;
   board: {
     canWrite: boolean;
     canWriteSites: HealthSite[];
-    seesInjuries: boolean;
-    injuries: InjuryRow[];
+    seesCertificates: boolean;
+    sites: HealthSite[];
     kits: KitRow[];
     aeds: AedRow[];
   } | null;
@@ -76,10 +77,8 @@ function parseBoard(raw: unknown): InfermeriaData["board"] {
   return {
     canWrite: r["canWrite"] === true,
     canWriteSites: (Array.isArray(r["canWriteSites"]) ? (r["canWriteSites"] as unknown[]) : []).filter(isHealthSite),
-    seesInjuries: r["seesInjuries"] === true,
-    injuries: arr("injuries")
-      .map((x) => toInjuryRow(x as unknown as InjuryDbRow))
-      .filter((x): x is InjuryRow => x !== null),
+    seesCertificates: r["seesCertificates"] === true,
+    sites: (Array.isArray(r["sites"]) ? (r["sites"] as unknown[]) : []).filter(isHealthSite),
     kits: arr("kits").flatMap((k) => {
       const site = k["site"];
       if (!isHealthSite(site)) return [];
@@ -105,61 +104,39 @@ export const getInfermeria = createServerFn({ method: "GET" }).handler(async ():
     sb.rpc("scd_infermeria_certificate_board", { p_organization_id: org.organizationId }),
   ]);
 
+  const engine: HealthEngine = board.error
+    ? isMissingObjectError(board.error) ? "not-applied" : "error"
+    : board.data === null || board.data === undefined ? "denied" : "applied";
+  const parsed = engine === "applied" ? parseBoard(board.data) : null;
+  const toRows = (data: unknown) => onePerAthlete(((data ?? []) as CertDbRow[]).map(toCertRow).map((r) => ({ ...r, name: shortName(r.name) })));
+
   let certs: InfermeriaData["certs"] = { state: "unavailable", source: null, rows: [] };
   if (!certs136.error) {
-    certs = { state: "ok", source: "r136", rows: ((certs136.data ?? []) as CertDbRow[]).map(toCertRow).map((r) => ({ ...r, name: shortName(r.name) })) };
+    // The r136 board answers an empty list to whoever is not whole-club health staff: that is "denied", not zero.
+    certs = engine === "applied" && parsed?.seesCertificates
+      ? { state: "ok", source: "r136", rows: toRows(certs136.data) }
+      : engine === "error" ? { state: "error", source: null, rows: [] } : { state: "denied", source: null, rows: [] };
   } else if (isMissingObjectError(certs136.error)) {
     // r136 not applied: the r66 register (Direzione / Segreteria only in the database).
     const r66 = await sb.rpc("scd_certificate_register", { p_organization_id: org.organizationId });
-    if (!r66.error) certs = { state: "ok", source: "r66", rows: ((r66.data ?? []) as CertDbRow[]).map(toCertRow).map((r) => ({ ...r, name: shortName(r.name) })) };
+    if (!r66.error) certs = { state: "ok", source: "r66", rows: toRows(r66.data) };
+  } else {
+    certs = { state: "error", source: null, rows: [] };
   }
 
-  const engine: HealthEngine = !board.error ? "applied" : isMissingObjectError(board.error) ? "not-applied" : "unknown";
-  return { ...base, connected: true, certs, engine, board: engine === "applied" ? parseBoard(board.data) : null };
+  return { ...base, connected: true, certs, engine, board: parsed };
 });
 
 /** Fixed sentences: a database message is never shown (it could carry values). */
 function explain(error: { code?: string; message: string }): string {
   if (isMissingObjectError(error)) return "Funzione in preparazione: serve applicare r136";
   if (error.code === "42501" || /forbidden/.test(error.message)) return "Non hai l'abilitazione per modificare questa parte dell'infermeria.";
-  if (/return to play incomplete/.test(error.message)) return "Per segnare Rientrato servono tutti i passi del rientro in campo.";
-  if (/date out of range/.test(error.message)) return "Data fuori intervallo: controlla l'anno.";
-  if (/athlete not found|injury not found/.test(error.message)) return "Scheda non trovata: ricarica la pagina.";
   if (/invalid entry/.test(error.message)) return "Controlla i campi: qualcosa non è nell'elenco.";
   return "Salvataggio non riuscito, riprova.";
 }
 
 const ISO = /^(\d{4}-\d{2}-\d{2})?$/;
 const enumOf = <T extends { id: string }>(xs: readonly T[]) => z.enum(xs.map((x) => x.id) as [string, ...string[]]);
-
-const InjuryInput = z.object({
-  id: z.string().uuid().nullable(),
-  athleteId: z.string().uuid(),
-  occurredOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  bodyArea: enumOf(BODY_AREAS),
-  status: enumOf(INJURY_STATUSES),
-  steps: z.array(enumOf(RTP_STEPS)).max(RTP_STEPS.length),
-});
-
-export const saveInjury = createServerFn({ method: "POST" })
-  .inputValidator((d: z.input<typeof InjuryInput>) => InjuryInput.parse(d))
-  .handler(async ({ data }): Promise<SaveOutcome> => {
-    const { gate, org, sb } = await context();
-    if (gate.view !== "page" || !sb || !org) return { ok: false, message: "Entra con un account dello staff sanitario." };
-    const invalid = injuryProblem(data, todayRome());
-    if (invalid) return { ok: false, message: invalid };
-    const { error } = await sb.rpc("scd_infermeria_injury_save", {
-      p_organization_id: org.organizationId,
-      p_id: data.id,
-      p_athlete_id: data.athleteId,
-      p_occurred_on: data.occurredOn,
-      p_body_area: data.bodyArea,
-      p_status: data.status,
-      p_rtp_steps: data.steps,
-    });
-    if (error) return { ok: false, message: explain(error) };
-    return { ok: true, message: "Salvato." };
-  });
 
 const KitInput = z.object({
   site: enumOf(SITES),

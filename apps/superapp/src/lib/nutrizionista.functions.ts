@@ -4,7 +4,10 @@
  *   checks the nutrizione access again);
  * - family view: general guidance for the age groups of the caller's OWN circle only (scd_my_family, scoped to
  *   auth.uid() in the database), and the consultation request (r136 scd_nutrition_request → existing work queue).
- * Nothing personal is stored: no plan, no diet, no health detail. Unknown or failing states are shown as such.
+ * Requests are RISERVATO and excluded from the office work queue: only the nutritionist (and Direzione) reads them and
+ * the nutritionist calls the parent back.
+ * Nothing personal is stored: no plan, no diet, no health detail. Unknown or failing states are shown as such:
+ * denied (null from the database) and error are never shown as zero.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -83,7 +86,9 @@ export const getNutrition = createServerFn({ method: "GET" }).handler(async (): 
 
   if (view === "staff") {
     const { data, error } = await sb.rpc("scd_nutrition_requests", { p_organization_id: org.organizationId });
-    if (error) return { ...base, connected: true, engine: isMissingObjectError(error) ? "not-applied" : "unknown" };
+    if (error) return { ...base, connected: true, engine: isMissingObjectError(error) ? "not-applied" : "error" };
+    // Null = the database gives this caller no nutrition access: "denied", never "0 requests".
+    if (data === null || data === undefined) return { ...base, connected: true, engine: "denied" };
     const parsed = parseRequests(data);
     return { ...base, connected: true, engine: "applied", canWrite: parsed.canWrite, requests: parsed.items };
   }

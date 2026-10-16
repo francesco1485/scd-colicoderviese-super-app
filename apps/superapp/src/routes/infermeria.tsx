@@ -8,7 +8,8 @@ import { getWorkAreaGate } from "@/lib/work-areas.functions";
 /**
  * Infermeria (board Infermeria.dc.html, structure VR-026): reserved to the staff with the infermeria grant
  * (responsabile-infermeria) and the Direzione, behind the work-area gate. Certificate expiry board (read-only, from the
- * certificate register), injuries log with return-to-play checklist, first-aid kits and defibrillators per site.
+ * certificate register, one row per athlete), first-aid kits and defibrillators per site. The injuries register is
+ * deferred until the consent design (UD-043).
  * Closed gate: only the access screen renders and nothing is read. Health data never leaves this page: no public
  * output, no log, no work-queue title. Until r136 is applied the new sections say so.
  */

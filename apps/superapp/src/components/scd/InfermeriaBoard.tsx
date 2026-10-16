@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, ChevronDown, HeartPulse, Plus, ShieldCheck, TriangleAlert } from "lucide-react";
+import { Check, HeartPulse, Plus, ShieldCheck, TriangleAlert } from "lucide-react";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
 import { AcanforaCard } from "@/components/scd/AcanforaCard";
@@ -8,74 +8,71 @@ import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { EmptyState, SourcesBox, WorkAreaShell } from "@/components/scd/work-area-ui";
 import { TODO_LABEL, certCounts, certTodo, teamProgress, type CertRow, type CertTodo } from "@/lib/certificates";
 import {
-  BODY_AREAS,
   CHECK_LABEL,
-  INJURY_STATUSES,
+  HEALTH_DENIED,
   R136_PENDING,
-  RTP_STEPS,
+  READ_FAILED,
+  SAVED_RELOAD,
   SITES,
   aedState,
-  injuryCounts,
-  injuryProblem,
+  engineText,
   kitState,
   labelOf,
-  normalizeSteps,
-  sortInjuries,
   type AedRow,
   type CheckState,
   type HealthSite,
-  type InjuryRow,
-  type InjuryStatus,
   type KitRow,
-  type RtpStep,
 } from "@/lib/health-areas";
-import { getInfermeria, saveAed, saveInjury, saveKit, type InfermeriaData } from "@/lib/infermeria.functions";
+import { getInfermeria, saveAed, saveKit, type InfermeriaData } from "@/lib/infermeria.functions";
 import { itDate } from "@/lib/people";
 
 const TODO_TONE: Record<CertTodo, ChipTone> = { manca: "mute", scaduto: "crit", "in-scadenza": "warn", "da-controllare": "info", "a-posto": "ok" };
 const CHECK_TONE: Record<CheckState, ChipTone> = { mai: "mute", scaduto: "crit", "in-scadenza": "warn", ok: "ok" };
-const STATUS_TONE: Record<InjuryStatus, ChipTone> = { FERMO: "crit", IN_RECUPERO: "warn", RIENTRATO: "ok" };
 
 const field = "h-11 w-full rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[16px] text-[var(--in-ink)] outline-none focus:border-[var(--in-info)]";
 const primary = "scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--in-info)] px-4 text-[15px] font-bold text-white disabled:opacity-50";
 const ghost = "scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[#e7f0fb] px-4 text-[15px] font-semibold text-[#0b2a5b]";
 
 /**
- * Infermeria board (staff with the infermeria grant and Direzione). VR-026 structure: KPI strip, main column with
+ * Infermeria board (staff with the infermeria access and Direzione). VR-026 structure: KPI strip, main column with
  * the work lists, side column with the emergency card and Dottor Acanfora's general first aid.
- * Health data stays inside this page: names are first name + initial, the body area is a category, no notes.
+ * No health data of minors: certificate expiry dates (read-only), first-aid kits and defibrillators. The injuries
+ * register is deferred until the consent design (UD-043). Unknown is never shown as zero.
  */
 export function InfermeriaBoard({ initial, preview }: { initial: InfermeriaData; preview: boolean }) {
   const [data, setData] = useState(initial);
+  const [notice, setNotice] = useState<string | null>(null);
   const reload = useServerFn(getInfermeria);
-  const refresh = () => reload().then(setData).catch(() => undefined);
+  const refresh = () => {
+    setNotice(null);
+    reload().then(setData).catch(() => setNotice(SAVED_RELOAD));
+  };
   const counts = useMemo(() => certCounts(data.certs.rows, data.today), [data]);
   const teams = useMemo(() => teamProgress(data.certs.rows, data.today), [data]);
   const certOk = data.certs.state === "ok";
   const board = data.board;
-  const inj = board ? injuryCounts(board.injuries) : null;
   const equipmentDue = board
     ? board.kits.filter((k) => kitState(k, data.today) !== "ok").length + board.aeds.filter((a) => aedState(a, data.today) !== "ok").length
     : null;
+  const stateText = engineText(data.engine);
 
   return (
     <WorkAreaShell
       id="infermeria"
       preview={preview}
       editable={data.engine === "applied"}
-      status={data.engine === "applied" ? undefined : <Chip tone="warn">{R136_PENDING}</Chip>}
+      status={data.engine === "applied" || !stateText ? undefined : <Chip tone={data.engine === "not-applied" ? "warn" : "crit"}>{stateText}</Chip>}
       highlights={[
         { value: certOk ? counts.total - counts.manca - counts.scaduto : null, label: `atleti su ${certOk ? counts.total : "—"} con certificato valido` },
         { value: certOk ? counts.scaduto + counts.manca : null, label: "certificati scaduti o senza data" },
-        { value: board?.seesInjuries && inj ? inj.fermi + inj.inRecupero : null, label: "infortuni aperti" },
         { value: equipmentDue, label: "cassette e DAE da controllare" },
       ]}
-      note={<>Qui non si scrivono diagnosi, sintomi o terapie: solo zona del corpo, date e passi del rientro.</>}
+      note={<>Qui non ci sono dati di salute: solo scadenze dei certificati, cassette e defibrillatori.</>}
     >
+      {notice && <p role="status" className="m-0 mb-3 rounded-xl bg-[var(--in-info-bg)] px-3.5 py-3 text-[14.5px] font-semibold text-[var(--in-info)]">{notice}</p>}
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
           <CertificatesCard data={data} teams={teams} />
-          <InjuriesCard data={data} onSaved={refresh} />
           <EquipmentCard data={data} onSaved={refresh} />
           <AcanforaCard />
           <SourcesBox id="infermeria" />
@@ -92,6 +89,13 @@ function Pending({ children }: { children?: ReactNode }) {
   return <EmptyState title={R136_PENDING}>{children ?? "La Direzione deve dare l'OK (\"applica\") alla migrazione r136. Fino ad allora qui non si salva niente."}</EmptyState>;
 }
 
+/** The empty state for a section the database did not open: r136 missing, access denied, or a failed read. */
+function EngineState({ engine, pending }: { engine: InfermeriaData["engine"]; pending?: ReactNode }) {
+  if (engine === "not-applied") return <Pending>{pending}</Pending>;
+  if (engine === "denied") return <EmptyState title="Non hai l'abilitazione">{HEALTH_DENIED}</EmptyState>;
+  return <EmptyState title={READ_FAILED}>Non siamo riusciti a leggere questa parte. Ricarica la pagina tra poco.</EmptyState>;
+}
+
 function CertificatesCard({ data, teams }: { data: InfermeriaData; teams: ReturnType<typeof teamProgress> }) {
   const [team, setTeam] = useState<string | null>(null);
   const todo = useMemo(
@@ -104,6 +108,10 @@ function CertificatesCard({ data, teams }: { data: InfermeriaData; teams: Return
         {data.certs.state !== "ok" ? (
           !data.connected ? (
             <EmptyState title="Collegamento al database non attivo">Entra con un account dello staff sanitario.</EmptyState>
+          ) : data.certs.state === "denied" ? (
+            <EmptyState title="Non hai l'abilitazione">Le scadenze dei certificati le vede chi ha l'Infermeria su tutta la società e la Direzione.</EmptyState>
+          ) : data.certs.state === "error" ? (
+            <EmptyState title={READ_FAILED}>Non siamo riusciti a leggere i certificati. Ricarica la pagina tra poco.</EmptyState>
           ) : (
             <Pending>Con r136 lo staff sanitario vede le scadenze; oggi le vedono solo Direzione e Segreteria.</Pending>
           )
@@ -164,169 +172,10 @@ function CertLine({ row, today }: { row: CertRow; today: string }) {
   );
 }
 
-function InjuriesCard({ data, onSaved }: { data: InfermeriaData; onSaved: () => void }) {
-  const board = data.board;
-  const [open, setOpen] = useState<string | null>(null);
-  const athletes = useMemo(() => {
-    const m = new Map<string, { id: string; name: string; team: string | null }>();
-    for (const r of data.certs.rows) if (!m.has(r.athleteId)) m.set(r.athleteId, { id: r.athleteId, name: r.name, team: r.teamName });
-    return [...m.values()].sort((a, b) => a.name.localeCompare(b.name, "it"));
-  }, [data]);
-  const rows = board ? sortInjuries(board.injuries) : [];
-  return (
-    <Card
-      id="inf-infortuni"
-      title="Infortuni e rientro in campo"
-      sub="Chi è fermo, da quando, e i passi per tornare a giocare."
-      aside={board?.seesInjuries && board.canWrite ? (
-        <button type="button" className={ghost} onClick={() => setOpen(open === "new" ? null : "new")} aria-expanded={open === "new"}>
-          <Plus className="size-4" aria-hidden="true" /> Nuovo
-        </button>
-      ) : undefined}
-    >
-      <div className="px-4 pb-4 sm:px-[18px]">
-        {data.engine !== "applied" ? (
-          <Pending />
-        ) : !board?.seesInjuries ? (
-          <EmptyState title="Registro infortuni non abilitato">Il registro lo vede chi ha l'abilitazione Infermeria su tutta la società.</EmptyState>
-        ) : (
-          <>
-            {open === "new" && <InjuryForm athletes={athletes} today={data.today} onDone={() => { setOpen(null); onSaved(); }} />}
-            {rows.length === 0 ? (
-              <p className="m-0 text-[14.5px] text-[var(--in-sub)]">Nessun infortunio registrato.</p>
-            ) : (
-              <ul className="m-0 list-none divide-y divide-[var(--in-line)] p-0" data-testid="inf-injuries">
-                {rows.map((r) => (
-                  <li key={r.id}>
-                    <button type="button" onClick={() => setOpen(open === r.id ? null : r.id)} aria-expanded={open === r.id} className={`scd-focus grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-2 py-2.5 text-left ${open === r.id ? "bg-[var(--in-info-bg)]" : "hover:bg-[#f7fbff]"}`}>
-                      <span className="min-w-0">
-                        <b className="block truncate text-[15.5px]">{r.name}</b>
-                        <small className="block truncate text-[13px] text-[var(--in-sub)]">
-                          {r.teamName ?? "Senza squadra"} · {labelOf(BODY_AREAS, r.bodyArea)} · dal {itDate(r.occurredOn)} · rientro {r.steps.length}/{RTP_STEPS.length}
-                        </small>
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Chip tone={STATUS_TONE[r.status]}>{labelOf(INJURY_STATUSES, r.status)}</Chip>
-                        <ChevronDown className={`size-4 text-[var(--in-sub)] transition-transform ${open === r.id ? "rotate-180" : ""}`} aria-hidden="true" />
-                      </span>
-                    </button>
-                    {open === r.id && (board.canWrite ? (
-                      <InjuryForm athletes={athletes} today={data.today} row={r} onDone={() => { setOpen(null); onSaved(); }} />
-                    ) : (
-                      <StepsList steps={r.steps} />
-                    ))}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </div>
-    </Card>
-  );
-}
-
-function StepsList({ steps }: { steps: readonly RtpStep[] }) {
-  return (
-    <ol className="m-0 grid gap-1 px-2 pb-3 pl-6 text-[14px]">
-      {RTP_STEPS.map((s) => (
-        <li key={s.id} className={steps.includes(s.id) ? "font-semibold text-[var(--in-ok)]" : "text-[var(--in-sub)]"}>{s.label}</li>
-      ))}
-    </ol>
-  );
-}
-
-function InjuryForm({ athletes, today, row, onDone }: { athletes: ReadonlyArray<{ id: string; name: string; team: string | null }>; today: string; row?: InjuryRow | undefined; onDone: () => void }) {
-  const save = useServerFn(saveInjury);
-  const [athleteId, setAthleteId] = useState(row?.athleteId ?? "");
-  const [occurredOn, setOccurredOn] = useState(row?.occurredOn ?? today);
-  const [bodyArea, setBodyArea] = useState<string>(row?.bodyArea ?? "");
-  const [status, setStatus] = useState<string>(row?.status ?? "FERMO");
-  const [steps, setSteps] = useState<RtpStep[]>(row?.steps ?? []);
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-  const input = { athleteId, occurredOn, bodyArea, status, steps };
-  const problem = injuryProblem(input, today);
-
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    if (problem || busy) return;
-    setBusy(true);
-    setMsg(null);
-    try {
-      const r = await save({ data: { id: row?.id ?? null, athleteId, occurredOn, bodyArea: bodyArea as InjuryRow["bodyArea"], status: status as InjuryStatus, steps } });
-      if (r.ok) onDone();
-      else setMsg(r.message);
-    } catch {
-      setMsg("Salvataggio non riuscito, riprova.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form onSubmit={submit} className="my-2 grid gap-3 rounded-[12px] border border-[var(--in-line)] bg-white p-3" data-testid="inf-injury-form">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="grid gap-1 text-[14px] font-semibold">
-          Atleta
-          <select value={athleteId} onChange={(e) => setAthleteId(e.target.value)} className={field} disabled={Boolean(row)}>
-            <option value="">Scegli…</option>
-            {athletes.map((a) => (
-              <option key={a.id} value={a.id}>{a.name}{a.team ? ` · ${a.team}` : ""}</option>
-            ))}
-          </select>
-        </label>
-        <label className="grid gap-1 text-[14px] font-semibold">
-          Data
-          <input type="date" value={occurredOn} max={today} onChange={(e) => setOccurredOn(e.target.value)} className={field} />
-        </label>
-        <label className="grid gap-1 text-[14px] font-semibold">
-          Zona del corpo
-          <select value={bodyArea} onChange={(e) => setBodyArea(e.target.value)} className={field}>
-            <option value="">Scegli…</option>
-            {BODY_AREAS.map((b) => (
-              <option key={b.id} value={b.id}>{b.label}</option>
-            ))}
-          </select>
-        </label>
-        <label className="grid gap-1 text-[14px] font-semibold">
-          Stato
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className={field}>
-            {INJURY_STATUSES.map((s) => (
-              <option key={s.id} value={s.id}>{s.label}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <fieldset className="m-0 grid gap-1.5 border-0 p-0">
-        <legend className="mb-1 text-[14px] font-semibold">Rientro in campo</legend>
-        {RTP_STEPS.map((s) => (
-          <label key={s.id} className="flex min-h-11 items-center gap-2 text-[14.5px]">
-            <input
-              type="checkbox"
-              className="size-5 accent-[var(--in-info)]"
-              checked={steps.includes(s.id)}
-              onChange={(e) => setSteps(normalizeSteps(e.target.checked ? [...steps, s.id] : steps.filter((x) => x !== s.id)))}
-            />
-            {s.label}
-          </label>
-        ))}
-      </fieldset>
-      {problem && athleteId && bodyArea && <p className="m-0 text-[14px] font-semibold text-[var(--in-crit)]" role="alert">{problem}</p>}
-      <div className="flex flex-wrap items-center gap-2">
-        <button type="submit" className={primary} disabled={Boolean(problem) || busy}>
-          <Check className="size-4" aria-hidden="true" /> {busy ? "Salvo…" : "Salva"}
-        </button>
-        {msg && <span className="text-[14px] font-semibold text-[var(--in-crit)]" role="status">{msg}</span>}
-      </div>
-    </form>
-  );
-}
-
 function EquipmentCard({ data, onSaved }: { data: InfermeriaData; onSaved: () => void }) {
   const board = data.board;
   const [form, setForm] = useState<null | { kind: "kit"; row?: KitRow | undefined } | { kind: "aed"; row?: AedRow | undefined }>(null);
-  const sites: HealthSite[] = board ? (board.seesInjuries ? SITES.map((s) => s.id) : [...new Set([...board.kits.map((k) => k.site), ...board.aeds.map((a) => a.site), ...board.canWriteSites])]) : [];
+  const sites: HealthSite[] = board ? SITES.map((s) => s.id).filter((id) => board.sites.includes(id)) : [];
   return (
     <Card
       id="inf-dotazioni"
@@ -341,7 +190,7 @@ function EquipmentCard({ data, onSaved }: { data: InfermeriaData; onSaved: () =>
     >
       <div className="px-4 pb-4 sm:px-[18px]">
         {data.engine !== "applied" || !board ? (
-          <Pending />
+          <EngineState engine={data.engine} />
         ) : (
           <>
             {form?.kind === "kit" && <KitForm sites={board.canWriteSites} row={form.row} onDone={() => { setForm(null); onSaved(); }} onCancel={() => setForm(null)} />}

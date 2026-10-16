@@ -1,4 +1,4 @@
-// r136 Infermeria and Nutrizionista — behaviour test on an in-memory Postgres (PGlite), no remote database touched.
+// r136 Infermeria and Nutrizionista (injuries register deferred, UD-043) — behaviour test on an in-memory Postgres (PGlite), no remote database touched.
 // Run from the repository root (PGlite is not a dependency of the app, so it is installed in a throwaway folder):
 //   npm install --prefix /tmp/scd-pglite @electric-sql/pglite@0.5.10
 //   PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r136_infermeria_nutrizione.pglite.mjs
@@ -34,6 +34,9 @@ const U = {
   grantAll: "10000000-0000-0000-0000-000000000007", // r100 grant infermeria ALL
   grantSite: "10000000-0000-0000-0000-000000000008", // r100 grant infermeria OWN_SITE Dervio
   mister: "10000000-0000-0000-0000-000000000009",
+  unverified: "10000000-0000-0000-0000-00000000000a", // r100 grant ALL but identity link not verified
+  dirPos: "10000000-0000-0000-0000-00000000000b", // STAFF with position "direzione"
+  tes: "10000000-0000-0000-0000-00000000000c", // Tesoreria position: RISERVATO reader of the office queue
 };
 const P = {
   famA: "20000000-0000-0000-0000-00000000000a",
@@ -42,9 +45,11 @@ const P = {
   kidB: "20000000-0000-0000-0000-00000000000d",
   grantAll: "20000000-0000-0000-0000-00000000000e",
   grantSite: "20000000-0000-0000-0000-00000000000f",
+  unverified: "20000000-0000-0000-0000-000000000010",
 };
 const ATH = { kidA: "30000000-0000-0000-0000-00000000000b", kidB: "30000000-0000-0000-0000-00000000000d" };
 const TEAM = "40000000-0000-0000-0000-000000000001";
+const TEAM2 = "40000000-0000-0000-0000-000000000002";
 
 await db.exec(`
 create role anon; create role authenticated;
@@ -94,24 +99,30 @@ insert into public.scd_memberships (organization_id, user_id, role, scope) value
   ('${ORG}', '${U.seg}', 'SECRETARIAT', '{}'),
   ('${ORG}', '${U.grantAll}', 'STAFF', '{}'),
   ('${ORG}', '${U.grantSite}', 'STAFF', '{}'),
-  ('${ORG}', '${U.mister}', 'MISTER', '{}');
+  ('${ORG}', '${U.mister}', 'MISTER', '{}'),
+  ('${ORG}', '${U.unverified}', 'STAFF', '{}'),
+  ('${ORG}', '${U.dirPos}', 'STAFF', '{"positions":["direzione"]}'),
+  ('${ORG}', '${U.tes}', 'SECRETARIAT', '{"positions":["tesoreria"]}');
 insert into public.scd_people (id, organization_id, first_name, last_name, birth_date) values
   ('${P.famA}', '${ORG}', 'Anna', 'Verdi', '1985-03-01'),
   ('${P.kidA}', '${ORG}', 'Luca', 'Verdi', '2014-05-01'),
   ('${P.famB}', '${ORG}', 'Bruno', 'Neri', '1982-03-01'),
   ('${P.kidB}', '${ORG}', 'Marco', 'Neri', '2012-05-01'),
   ('${P.grantAll}', '${ORG}', 'Carla', 'Blu', '1980-01-01'),
-  ('${P.grantSite}', '${ORG}', 'Dario', 'Gialli', '1979-01-01');
+  ('${P.grantSite}', '${ORG}', 'Dario', 'Gialli', '1979-01-01'),
+  ('${P.unverified}', '${ORG}', 'Elena', 'Rosa', '1978-01-01');
 insert into public.scd_athletes (id, organization_id, person_id, medical_certificate_expires_at) values
   ('${ATH.kidA}', '${ORG}', '${P.kidA}', current_date + 10),
   ('${ATH.kidB}', '${ORG}', '${P.kidB}', null);
-insert into public.scd_teams values ('${TEAM}', '${ORG}', '2014', 'Esordienti 2014');
-insert into public.scd_team_memberships values ('${ATH.kidA}', '${TEAM}', null), ('${ATH.kidB}', '${TEAM}', null);
+insert into public.scd_teams values ('${TEAM}', '${ORG}', '2014', 'Esordienti 2014'), ('${TEAM2}', '${ORG}', '2015', 'Esordienti 2015');
+-- kid A plays in two teams: the certificate board still lists them once.
+insert into public.scd_team_memberships values ('${ATH.kidA}', '${TEAM}', null), ('${ATH.kidA}', '${TEAM2}', null), ('${ATH.kidB}', '${TEAM}', null);
 insert into public.scd_identity_links values
   ('${ORG}', '${U.famA}', '${P.famA}', 'AUTO_VERIFIED'),
   ('${ORG}', '${U.famB}', '${P.famB}', 'AUTO_VERIFIED'),
   ('${ORG}', '${U.grantAll}', '${P.grantAll}', 'VERIFIED_BY_STAFF'),
-  ('${ORG}', '${U.grantSite}', '${P.grantSite}', 'VERIFIED_BY_STAFF');
+  ('${ORG}', '${U.grantSite}', '${P.grantSite}', 'VERIFIED_BY_STAFF'),
+  ('${ORG}', '${U.unverified}', '${P.unverified}', 'PENDING');
 insert into public.scd_families values ('50000000-0000-0000-0000-00000000000a', '${ORG}'), ('50000000-0000-0000-0000-00000000000b', '${ORG}');
 insert into public.scd_family_members values
   ('50000000-0000-0000-0000-00000000000a', '${P.famA}', true, 'GENITORE'),
@@ -121,7 +132,9 @@ insert into public.scd_family_members values
 insert into public.scd_person_grants (organization_id, person_id, section_code, level, perimeter, site) values
   ('${ORG}', '${P.grantAll}', 'infermeria', 'WRITE', 'ALL', null),
   ('${ORG}', '${P.grantSite}', 'infermeria', 'WRITE', 'OWN_SITE', 'DERVIO'),
-  ('${ORG}', '${P.famA}', 'infermeria', 'READ', 'OWN_CHILDREN', null);
+  ('${ORG}', '${P.famA}', 'infermeria', 'READ', 'OWN_CHILDREN', null),
+  ('${ORG}', '${P.unverified}', 'infermeria', 'WRITE', 'ALL', null),
+  ('${ORG}', '${P.unverified}', 'nutrizione', 'WRITE', 'ALL', null);
 `);
 await db.exec(readFileSync(R79, "utf8"));
 const sql = readFileSync(MIG, "utf8");
@@ -149,12 +162,16 @@ ok(cat.rows.some((r) => r.code === "nutrizione" && r.sensitive), "nutrizione in 
 ok(cat.rows.some((r) => r.code === "proposte"), "r101 entries kept");
 ok(cat.rows.some((r) => r.code === "salute-minori"), "hard block kept");
 
+// Injuries register deferred (UD-043 consent design): no table, no function.
+const injObjs = await db.query(`select (select count(*)::int from pg_class where relname like '%injur%') + (select count(*)::int from pg_proc where proname like '%injur%') as n`);
+ok(injObjs.rows[0].n === 0, "no injury table or function");
+
 // RLS on the new tables, no policies, no table grants to app roles.
-const rls = await db.query(`select relname, relrowsecurity from pg_class where relname in ('scd_health_injuries','scd_first_aid_kits','scd_aed_devices')`);
-ok(rls.rows.length === 3 && rls.rows.every((r) => r.relrowsecurity), "RLS on");
-const pol = await db.query(`select count(*)::int n from pg_policies where tablename in ('scd_health_injuries','scd_first_aid_kits','scd_aed_devices')`);
+const rls = await db.query(`select relname, relrowsecurity from pg_class where relname in ('scd_first_aid_kits','scd_aed_devices')`);
+ok(rls.rows.length === 2 && rls.rows.every((r) => r.relrowsecurity), "RLS on");
+const pol = await db.query(`select count(*)::int n from pg_policies where tablename in ('scd_first_aid_kits','scd_aed_devices')`);
 ok(pol.rows[0].n === 0, "no policies");
-const tg = await db.query(`select count(*)::int n from information_schema.role_table_grants where table_name in ('scd_health_injuries','scd_first_aid_kits','scd_aed_devices') and grantee in ('anon','authenticated')`);
+const tg = await db.query(`select count(*)::int n from information_schema.role_table_grants where table_name in ('scd_first_aid_kits','scd_aed_devices') and grantee in ('anon','authenticated')`);
 ok(tg.rows[0].n === 0, "no table grants");
 
 // Access helper.
@@ -173,40 +190,24 @@ ok(!(await staff(null, "infermeria")), "anonymous has nothing");
 ok(!(await staff(U.inf, "nutrizione")), "infermeria position does not open nutrizione");
 ok(await staff(U.nut, "nutrizione", "WRITE"), "nutrizionista position");
 ok(!(await staff(U.dir, "salute-minori")), "unknown / protected section");
+ok(!(await staff(U.unverified, "infermeria")), "grant through an unverified identity link opens nothing");
+ok(!(await staff(U.unverified, "nutrizione")), "unverified link: no nutrizione either");
+ok(await staff(U.dirPos, "infermeria", "WRITE") && (await staff(U.dirPos, "nutrizione", "WRITE")), "position direzione, like the app");
+ok(!(await staff(U.tes, "infermeria")) && !(await staff(U.tes, "nutrizione")), "Tesoreria has no health access");
 
 // Certificate board: staff only, names shortened.
 const certs = await as(U.inf, `select * from public.scd_infermeria_certificate_board($1)`, [ORG]);
-ok(certs.length === 2, "two athletes");
+ok(certs.length === 2, "two athletes, one row each even with two teams");
+ok(certs.find((r) => r.athlete_id === ATH.kidA)?.team_code === "2014", "first current team by code");
 ok(certs.every((r) => /^\S+ [A-Z]\.$/.test(r.display_name)), "first name + initial");
-for (const u of [U.famA, U.seg, U.mister, null]) ok((await as(u, `select * from public.scd_infermeria_certificate_board($1)`, [ORG])).length === 0, `no certificates for ${u}`);
+for (const u of [U.famA, U.seg, U.mister, U.grantSite, U.unverified, null]) ok((await as(u, `select * from public.scd_infermeria_certificate_board($1)`, [ORG])).length === 0, `no certificates for ${u}`);
 
 // Board: null for everybody without access.
-for (const u of [U.famA, U.famB, U.seg, U.mister, U.nut, null]) ok((await one(u, `select public.scd_infermeria_board($1) as b`, [ORG])).b === null, `no board for ${u}`);
+for (const u of [U.famA, U.famB, U.seg, U.mister, U.nut, U.unverified, null]) ok((await one(u, `select public.scd_infermeria_board($1) as b`, [ORG])).b === null, `no board for ${u}`);
 
-// Injuries: write by staff, validation, return to play.
-const save = `select public.scd_infermeria_injury_save($1, $2, $3, $4::date, $5, $6, $7::text[]) as id`;
 const today = new Date().toISOString().slice(0, 10);
-const inj = (await one(U.inf, save, [ORG, null, ATH.kidA, today, "GINOCCHIO", "FERMO", "{STOP}"])).id;
-ok(Boolean(inj), "injury saved");
-await fails(U.famA, save, [ORG, null, ATH.kidA, today, "GINOCCHIO", "FERMO", "{}"], /forbidden/);
-await fails(U.seg, save, [ORG, null, ATH.kidA, today, "GINOCCHIO", "FERMO", "{}"], /forbidden/);
-await fails(U.grantSite, save, [ORG, null, ATH.kidA, today, "GINOCCHIO", "FERMO", "{}"], /forbidden/);
-await fails(U.inf, save, [ORG, null, ATH.kidA, today, "distorsione al crociato", "FERMO", "{}"], /invalid entry/);
-await fails(U.inf, save, [ORG, null, ATH.kidA, "2099-01-01", "PIEDE", "FERMO", "{}"], /date out of range/);
-await fails(U.inf, save, [ORG, inj, ATH.kidA, today, "GINOCCHIO", "RIENTRATO", "{STOP,VIA_LIBERA_MEDICO}"], /return to play incomplete/);
-await fails(U.inf, save, [ORG, null, ATH.kidA, today, "PIEDE", "FERMO", "{ANTIDOLORIFICO}"], /invalid entry/);
-await as(U.inf, save, [ORG, inj, ATH.kidA, today, "GINOCCHIO", "RIENTRATO", "{OK_STAFF_MISTER,STOP,VIA_LIBERA_MEDICO,LAVORO_DIFFERENZIATO,ALLENAMENTO_SQUADRA}"]);
-const board = (await one(U.inf, `select public.scd_infermeria_board($1) as b`, [ORG])).b;
-ok(board.seesInjuries && board.injuries.length === 1, "board lists the injury");
-ok(board.injuries[0].short_name === "Luca V.", "short name only");
-ok(board.injuries[0].status === "RIENTRATO" && board.injuries[0].rtp_steps.length === 5, "rientrato with all steps");
-ok(!JSON.stringify(board).includes("Verdi"), "no surname in the board");
-// Error messages never carry values.
-try {
-  await as(U.inf, save, [ORG, null, ATH.kidA, today, "Luca ha la febbre", "FERMO", "{}"]);
-} catch (e) {
-  ok(!String(e.message).includes("febbre") && !String(e.detail ?? "").includes("febbre"), "no value echoed in errors");
-}
+const fullBoard = (await one(U.inf, `select public.scd_infermeria_board($1) as b`, [ORG])).b;
+ok(fullBoard.seesCertificates === true && !("injuries" in fullBoard) && !("seesInjuries" in fullBoard), "board: certificates flag, no injuries");
 
 // Kits and defibrillators: site perimeter.
 const kit = `select public.scd_infermeria_kit_save($1, $2, $3, $4::date, $5::date) as id`;
@@ -218,7 +219,7 @@ await fails(U.inf, kit, [ORG, "COLICO", "Borsa campo A", "2026-12-01", "2026-11-
 ok(Boolean((await one(U.inf, aed, [ORG, "COLICO", "DAE spogliatoi", "2027-03-01", "2028-01-01", today])).id), "AED Colico");
 await fails(U.famA, aed, [ORG, "COLICO", "DAE spogliatoi", null, null, null], /forbidden/);
 const siteBoard = (await one(U.grantSite, `select public.scd_infermeria_board($1) as b`, [ORG])).b;
-ok(siteBoard && !siteBoard.seesInjuries && siteBoard.injuries.length === 0, "site grant sees no injuries");
+ok(siteBoard && siteBoard.seesCertificates === false, "site grant: no certificates (flag false, not an empty list)");
 ok(siteBoard.kits.length === 1 && siteBoard.kits[0].site === "DERVIO", "site grant sees only its site kits");
 ok(siteBoard.aeds.length === 0, "site grant sees only its site AEDs");
 ok(JSON.stringify(siteBoard.canWriteSites) === JSON.stringify(["DERVIO"]), "writes only its site");
@@ -230,14 +231,26 @@ ok((await one(U.famB, req, [ORG, P.kidA])).r === "NOT_ALLOWED", "a family cannot
 ok((await one(U.mister, req, [ORG, P.kidA])).r === "NOT_ALLOWED", "a mister cannot ask for an athlete");
 ok((await one(U.famA, req, [ORG, P.kidA])).r === "RECEIVED", "own child");
 ok((await one(U.famA, req, [ORG, P.kidA])).r === "ALREADY", "one open request per child");
-const q = await db.query(`select title, area, kind, reason, suggested from public.scd_proposals where area = 'nutrizione'`);
+const q = await db.query(`select title, area, kind, reason, suggested, sensitivity from public.scd_proposals where area = 'nutrizione'`);
 ok(q.rows.length === 1, "one queue item");
+ok(q.rows[0].sensitivity === "RISERVATO", "nutrition request is RISERVATO");
+ok(/la nutrizionista ricontatta il genitore/.test(q.rows[0].reason) && !/segreteria/.test(q.rows[0].reason), "the nutritionist calls back");
 ok(q.rows[0].title === "Richiesta consulenza nutrizionista · Esordienti 2014", "title is team only");
 ok(!/Luca|Verdi|Anna/.test(JSON.stringify(q.rows[0])), "no names in the queue item");
 ok((await one(U.famB, req, [ORG, P.kidB])).r === "RECEIVED", "other family, own child");
 
+// Office work queue: nutrition requests never appear, not even to Direzione or a RISERVATO reader.
+await db.exec(`insert into public.scd_proposals (organization_id, machine, area, kind, title, source_kind, source_ref)
+  values ('${ORG}', 'M16', 'segreteria', 'RICHIESTA', 'Richiesta ordinaria', 'MANUAL', 'test:office-1')`);
+for (const u of [U.seg, U.tes, U.dir]) {
+  const oq = (await one(u, `select public.scd_proposal_queue($1) as q`, [ORG])).q;
+  ok(oq && oq.items.some((i) => i.area === "segreteria"), `office queue still works for ${u}`);
+  ok(!oq.items.some((i) => i.area === "nutrizione") && !JSON.stringify(oq).includes("nutrizionista"), `no nutrition request in the office queue for ${u}`);
+}
+ok((await one(U.famA, `select public.scd_proposal_queue($1) as q`, [ORG])).q === null, "families get no office queue");
+
 // Staff list: nutrition staff only, contact is the adult requester.
-for (const u of [U.famA, U.famB, U.seg, U.inf, U.mister, null]) ok((await one(u, `select public.scd_nutrition_requests($1) as l`, [ORG])).l === null, `no request list for ${u}`);
+for (const u of [U.famA, U.famB, U.seg, U.tes, U.inf, U.mister, U.unverified, null]) ok((await one(u, `select public.scd_nutrition_requests($1) as l`, [ORG])).l === null, `no request list for ${u}`);
 const list = (await one(U.nut, `select public.scd_nutrition_requests($1) as l`, [ORG])).l;
 ok(list.items.length === 2, "two open requests");
 ok(list.items.some((i) => i.contact === "Anna V.") && !JSON.stringify(list).includes("Luca"), "adult contact, never the child");
@@ -270,5 +283,11 @@ await fails(U.famA, guard, [ORG, U.famB, "{nutrizionista}"], /not allowed/);
 const anonExec = await db.query(`select p.proname from pg_proc p where p.proname like any(array['scd_infermeria_%','scd_nutrition_%','scd_health_%'])
   and has_function_privilege('anon', p.oid, 'execute')`);
 ok(anonExec.rows.length === 0, `anon executes nothing: ${anonExec.rows.map((r) => r.proname)}`);
+const authHelpers = await db.query(`select p.proname from pg_proc p where p.proname in ('scd_health_staff','scd_health_short_name')
+  and has_function_privilege('authenticated', p.oid, 'execute')`);
+ok(authHelpers.rows.length === 0, `helpers not callable by authenticated: ${authHelpers.rows.map((r) => r.proname)}`);
+const authEntry = await db.query(`select count(*)::int n from pg_proc p where p.proname in ('scd_infermeria_board','scd_infermeria_certificate_board','scd_nutrition_request','scd_nutrition_requests')
+  and has_function_privilege('authenticated', p.oid, 'execute')`);
+ok(authEntry.rows[0].n === 4, "entry points callable by authenticated");
 
 console.log(`r136 PGlite: ${checks} checks passed`);

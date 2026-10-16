@@ -12,7 +12,10 @@ import {
   NUTRITION_GROUPS,
   NUTRITION_GUIDANCE,
   R136_PENDING,
+  READ_FAILED,
   REQUEST_STATUS_LABEL,
+  SAVED_RELOAD,
+  engineText,
   groupsForFamily,
   type ConsultOutcome,
   type NutritionGroupId,
@@ -24,8 +27,9 @@ import { getWorkAreaGate } from "@/lib/work-areas.functions";
 /**
  * Nutrizionista (DG 15/10/2026): Era's general guidance by age group and consultation requests. Reserved:
  * - families and athletes see ONLY the guidance of their own children's age groups and can ask for a consultation
- *   (it lands in the existing work queue as "Richiesta consulenza nutrizionista · squadra", nothing else);
- * - the nutritionist and the Direzione see the open requests.
+ *   (it is filed RISERVATO as "Richiesta consulenza nutrizionista · squadra", nothing else, and never shown in the
+ *   office work queue);
+ * - the nutritionist and the Direzione see the open requests; the nutritionist calls the parent back.
  * Public visitors get the access screen and nothing is read. No personal plan, diet or therapy, ever.
  */
 export const Route = createFileRoute("/nutrizionista")({
@@ -117,7 +121,7 @@ function FamilyView({ data }: { data: NutritionData }) {
               {data.children.length === 0 && <li className="text-[14px] text-[var(--in-sub)]">Nessuno.</li>}
             </ul>
           </Card>
-          <Card id="nut-consulenza" title="Chiedi una consulenza" sub="La società vi ricontatta per fissarla con la nutrizionista.">
+          <Card id="nut-consulenza" title="Chiedi una consulenza" sub="La nutrizionista del club vi ricontatta per fissarla.">
             <div className="grid gap-3 px-4 pb-4 sm:px-[18px]">
               {data.children.length > 0 ? (
                 <>
@@ -158,12 +162,20 @@ function StaffView({ initial, preview }: { initial: NutritionData; preview: bool
 
   async function act(id: string, action: "take" | "close") {
     setMsg(null);
+    let r: Awaited<ReturnType<typeof update>>;
     try {
-      const r = await update({ data: { id, action } });
-      setMsg(r.message);
-      if (r.ok) setData(await reload());
+      r = await update({ data: { id, action } });
     } catch {
       setMsg("Operazione non riuscita, riprova.");
+      return;
+    }
+    setMsg(r.message);
+    if (!r.ok) return;
+    try {
+      setData(await reload());
+    } catch {
+      // Saved in the database, only the refresh failed: say so instead of "non riuscita".
+      setMsg(SAVED_RELOAD);
     }
   }
 
@@ -172,13 +184,13 @@ function StaffView({ initial, preview }: { initial: NutritionData; preview: bool
       id="nutrizionista"
       preview={preview}
       editable={applied}
-      status={applied ? undefined : <Chip tone="warn">{R136_PENDING}</Chip>}
+      status={applied || !engineText(data.engine) ? undefined : <Chip tone={data.engine === "not-applied" ? "warn" : "crit"}>{engineText(data.engine)}</Chip>}
       highlights={[
         { value: applied ? data.requests.length : null, label: "richieste di consulenza aperte" },
         { value: applied ? data.requests.filter((r) => r.status === "NEW").length : null, label: "nuove, da prendere in carico" },
         { value: applied ? data.requests.filter((r) => r.mine).length : null, label: "prese in carico da te" },
       ]}
-      note={<>Nella coda di lavoro compare solo "richiesta consulenza nutrizionista · squadra".</>}
+      note={<>Le richieste sono riservate: non compaiono nella coda dell'ufficio, solo qui. Si vede la squadra e il genitore da richiamare.</>}
     >
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
@@ -186,8 +198,12 @@ function StaffView({ initial, preview }: { initial: NutritionData; preview: bool
             <div className="px-4 pb-4 sm:px-[18px]">
               {!data.connected ? (
                 <EmptyState title="Collegamento al database non attivo">Entra con l'account della nutrizionista o della Direzione.</EmptyState>
-              ) : !applied ? (
+              ) : data.engine === "not-applied" ? (
                 <EmptyState title={R136_PENDING}>La Direzione deve dare l'OK ("applica") alla migrazione r136. Fino ad allora le famiglie non possono inviare richieste.</EmptyState>
+              ) : data.engine === "denied" ? (
+                <EmptyState title="Non hai l'abilitazione">Le richieste di consulenza le vedono la nutrizionista e la Direzione. Chiedi alla Direzione se ti serve.</EmptyState>
+              ) : !applied ? (
+                <EmptyState title={READ_FAILED}>Non siamo riusciti a leggere le richieste. Ricarica la pagina tra poco.</EmptyState>
               ) : data.requests.length === 0 ? (
                 <p className="m-0 text-[14.5px] text-[var(--in-sub)]">Nessuna richiesta aperta.</p>
               ) : (
@@ -197,7 +213,7 @@ function StaffView({ initial, preview }: { initial: NutritionData; preview: bool
                       <span className="min-w-0">
                         <b className="block text-[15px]">{r.title}</b>
                         <small className="block text-[13px] text-[var(--in-sub)]">
-                          {r.createdAt ? `arrivata il ${itDate(r.createdAt.slice(0, 10))}` : ""} · da richiamare: {r.contact ?? "genitore (chiedi alla segreteria)"}
+                          {r.createdAt ? `arrivata il ${itDate(r.createdAt.slice(0, 10))}` : ""} · da richiamare: {r.contact ?? "genitore, recapito non noto: chiedilo alla Direzione"}
                         </small>
                       </span>
                       <span className="flex items-center gap-2">

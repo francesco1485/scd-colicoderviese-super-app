@@ -431,7 +431,7 @@ function GestionalePage() {
                       to="/infermeria"
                       className="scd-focus font-semibold text-[var(--in-info)] underline-offset-4 hover:underline"
                     >
-                      Infermeria: certificati, infortuni, cassette e DAE
+                      Infermeria: certificati, cassette e DAE
                     </Link>
                     <Link
                       to="/nutrizionista"

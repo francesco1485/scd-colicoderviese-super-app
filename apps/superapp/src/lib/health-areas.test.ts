@@ -7,32 +7,30 @@ import { workAreaView } from "./access";
 import { canSeeMenuEntry, findArea, WORK_AREA_IDS } from "./areas";
 import { tipProblems } from "./era-nutrition-tips";
 import {
-  BODY_AREAS,
   CONSULT_MESSAGE,
-  INJURY_STATUSES,
+  HEALTH_DENIED,
   NUTRITION_DISCLAIMER,
   NUTRITION_GROUPS,
   NUTRITION_GUIDANCE,
   R136_PENDING,
-  RTP_STEPS,
+  READ_FAILED,
+  SAVED_RELOAD,
+  SITES,
   aedState,
   asConsultOutcome,
   consultTitle,
   dueState,
+  engineText,
   familyChildren,
   groupsForFamily,
   guidanceProblems,
-  injuryCounts,
-  injuryProblem,
   kitProblem,
-  normalizeSteps,
   nutritionGroupFor,
   nutritionView,
+  onePerAthlete,
   shortName,
-  sortInjuries,
-  toInjuryRow,
 } from "./health-areas";
-import { findSection } from "./person-grants";
+import { defaultRow, findSection, offeredPerimeters } from "./person-grants";
 import { KNOWN_POSITIONS, landingFor } from "./session";
 
 const repo = (p: string) => fileURLToPath(new URL(`../../../../${p}`, import.meta.url));
@@ -70,6 +68,14 @@ describe("output guard of the nutrition copy (Era guard + no therapy)", () => {
 
   it("consultation messages never promise a diagnosis or a plan", () => {
     for (const m of Object.values(CONSULT_MESSAGE)) expect(m).not.toMatch(/dieta|piano|diagnos|terapi|farmac/i);
+  });
+
+  it("the nutritionist calls the parent back, never the secretariat", () => {
+    expect(CONSULT_MESSAGE.RECEIVED).toMatch(/ricontatta la nutrizionista/);
+    for (const m of Object.values(CONSULT_MESSAGE)) expect(m).not.toMatch(/segreteria/i);
+    expect(src("routes/nutrizionista.tsx")).not.toMatch(/ricontatta la segreteria|La società vi ricontatta|chiedi alla segreteria/);
+    expect(SQL).toMatch(/la nutrizionista ricontatta il genitore/);
+    expect(SQL).not.toMatch(/la segreteria ricontatta/);
   });
 });
 
@@ -188,38 +194,70 @@ describe("guards: public sees nothing, families never enter the infermeria", () 
     expect(findSection("nutrizione")).toMatchObject({ area: "nutrizionista", path: "/nutrizionista", sensitive: true, perimeters: ["ALL"] });
     expect(findSection("salute-minori")?.hardBlocked).toBe(true);
   });
+
+  it("grants page offers only the infermeria perimeters that open something", () => {
+    const inf = findSection("infermeria")!;
+    expect(inf.perimeters).toEqual(["ALL", "OWN_SITE", "OWN_CHILDREN", "SELF"]); // r100 catalogue unchanged
+    expect(offeredPerimeters(inf)).toEqual(["ALL", "OWN_SITE"]);
+    expect(defaultRow(inf, { minor: false }).perimeter).toBe("ALL");
+    expect(offeredPerimeters(findSection("famiglia")!)).toEqual(findSection("famiglia")!.perimeters);
+  });
+
+  it("an unknown position gets a clear sentence (Nutrizionista before r136)", () => {
+    const fn = src("lib/access-admin.functions.ts");
+    expect(fn).toMatch(/unknown position"\)\)\s*return "Il database non riconosce uno degli incarichi scelti \(per «Nutrizionista» serve la migrazione r136\)/);
+  });
 });
 
-describe("injuries and return to play", () => {
-  const ok = { athleteId: "a", occurredOn: "2026-10-10", bodyArea: "GINOCCHIO", status: "FERMO", steps: ["STOP"] };
-
-  it("accepts a valid entry and refuses free text, future dates and unknown steps", () => {
-    expect(injuryProblem(ok, TODAY)).toBeNull();
-    expect(injuryProblem({ ...ok, bodyArea: "lesione al crociato" }, TODAY)).toMatch(/zona del corpo/);
-    expect(injuryProblem({ ...ok, occurredOn: "2026-10-20" }, TODAY)).toMatch(/futuro/);
-    expect(injuryProblem({ ...ok, occurredOn: "2024-01-01" }, TODAY)).toMatch(/lontana/);
-    expect(injuryProblem({ ...ok, steps: ["ANTIDOLORIFICO"] }, TODAY)).toMatch(/non valido/);
-    expect(injuryProblem({ ...ok, athleteId: "" }, TODAY)).toMatch(/atleta/);
+describe("injuries register deferred (UD-043 consent design)", () => {
+  it("no injury table, function, read, card or KPI anywhere", () => {
+    const sqlCode = SQL.split("\n").filter((l) => !l.trimStart().startsWith("--")).join("\n");
+    expect(sqlCode).not.toMatch(/injur/i);
+    expect(SQL).toMatch(/INJURIES REGISTER DEFERRED until the consent design \(UD-043/);
+    for (const f of ["lib/health-areas.ts", "lib/infermeria.functions.ts", "components/scd/InfermeriaBoard.tsx"]) {
+      const code = src(f).split("\n").filter((l) => !/^\s*(\*|\/\/|\/\*)/.test(l)).join("\n");
+      expect(code, f).not.toMatch(/injur|infortun|rtp_steps|RTP_STEPS|BODY_AREAS/i);
+    }
   });
 
-  it("Rientrato only with every step ticked", () => {
-    expect(injuryProblem({ ...ok, status: "RIENTRATO" }, TODAY)).toMatch(/tutti i passi/);
-    expect(injuryProblem({ ...ok, status: "RIENTRATO", steps: RTP_STEPS.map((s) => s.id).reverse() }, TODAY)).toBeNull();
-    expect(normalizeSteps(["OK_STAFF_MISTER", "STOP", "STOP", "X"])).toEqual(["STOP", "OK_STAFF_MISTER"]);
+  it("the infermeria grant never promises minors' health data", () => {
+    const sections = JSON.parse(readFileSync(repo("config/scd-sections.v1.json"), "utf8")) as { sections: Array<{ code: string; sees?: string; label: string }> };
+    const inf = sections.sections.find((x) => x.code === "infermeria")!;
+    expect(inf.sees).toMatch(/mai dati di salute dei minori/);
+    expect(`${inf.label} ${inf.sees}`).not.toMatch(/infortun|rientro in campo/i);
+  });
+});
+
+describe("unknown is never zero", () => {
+  it("each engine state has its own sentence", () => {
+    expect(engineText("not-applied")).toBe(R136_PENDING);
+    expect(engineText("denied")).toBe(HEALTH_DENIED);
+    expect(engineText("error")).toBe(READ_FAILED);
+    expect(engineText("applied")).toBeNull();
+    expect(new Set([R136_PENDING, HEALTH_DENIED, READ_FAILED]).size).toBe(3);
+    expect(HEALTH_DENIED).toMatch(/Non hai l'abilitazione/);
+    expect(READ_FAILED).toBe("Lettura non riuscita, riprova");
+    expect(SAVED_RELOAD).toBe("Salvato, ricarica la pagina");
   });
 
-  it("parses database rows defensively and sorts open cases first", () => {
-    const base = { id: "1", athlete_id: "a", short_name: "Luca Verdi", team_name: null, occurred_on: "2026-10-01", body_area: "PIEDE", status: "RIENTRATO", rtp_steps: [], updated_at: null };
-    expect(toInjuryRow({ ...base, body_area: "testa rotta" })).toBeNull();
-    expect(toInjuryRow(base)?.name).toBe("Luca V.");
-    const rows = [
-      { status: "RIENTRATO" as const, occurredOn: "2026-10-12" },
-      { status: "FERMO" as const, occurredOn: "2026-10-01" },
-      { status: "IN_RECUPERO" as const, occurredOn: "2026-10-05" },
-      { status: "FERMO" as const, occurredOn: "2026-10-09" },
-    ];
-    expect(sortInjuries(rows).map((r) => `${r.status}:${r.occurredOn}`)).toEqual(["FERMO:2026-10-09", "FERMO:2026-10-01", "IN_RECUPERO:2026-10-05", "RIENTRATO:2026-10-12"]);
-    expect(injuryCounts(rows)).toEqual({ fermi: 2, inRecupero: 1, rientrati: 1 });
+  it("null from the database becomes 'denied', a generic error becomes 'error'", () => {
+    const inf = src("lib/infermeria.functions.ts");
+    expect(inf).toMatch(/board\.data === null \|\| board\.data === undefined \? "denied" : "applied"/);
+    expect(inf).toMatch(/isMissingObjectError\(board\.error\) \? "not-applied" : "error"/);
+    const nut = src("lib/nutrizionista.functions.ts");
+    expect(nut).toMatch(/if \(data === null \|\| data === undefined\) return \{ \.\.\.base, connected: true, engine: "denied" \};/);
+    expect(nut).toMatch(/isMissingObjectError\(error\) \? "not-applied" : "error"/);
+  });
+
+  it("a failed reload after a save says it was saved", () => {
+    expect(src("components/scd/InfermeriaBoard.tsx")).toMatch(/catch\(\(\) => setNotice\(SAVED_RELOAD\)\)/);
+    expect(src("routes/nutrizionista.tsx")).toMatch(/setMsg\(SAVED_RELOAD\)/);
+  });
+
+  it("certificates: one row per athlete, so KPIs never double count", () => {
+    const rows = [{ athleteId: "a", teamCode: "2014" }, { athleteId: "a", teamCode: "2015" }, { athleteId: "b", teamCode: "2014" }];
+    expect(onePerAthlete(rows)).toEqual([{ athleteId: "a", teamCode: "2014" }, { athleteId: "b", teamCode: "2014" }]);
+    expect(SQL).toMatch(/select distinct on \(a\.id\)/);
   });
 });
 
@@ -240,6 +278,10 @@ describe("kits and defibrillators", () => {
     expect(kitProblem({ site: "COLICO", kit: "x", lastCheck: "", nextCheck: "" })).toMatch(/caratteri/);
     expect(kitProblem({ site: "COLICO", kit: "Borsa", lastCheck: "2026-11-01", nextCheck: "2026-10-01" })).toMatch(/dopo/);
   });
+
+  it("mirrors the sites of the database", () => {
+    expect(SQL).toContain(`site in (${SITES.map((x) => `'${x.id}'`).join(",")})`);
+  });
 });
 
 describe("work queue title (nutrition requests)", () => {
@@ -254,15 +296,15 @@ describe("work queue title (nutrition requests)", () => {
 });
 
 describe("migration r136 (staged, never applied by an agent)", () => {
-  it("is written, not applied, and never targets the other project", () => {
-    expect(SQL).toMatch(/STAGED: written, NOT applied/);
+  it("is written, applied only by a person, and never targets the other project", () => {
+    expect(SQL).toMatch(/STAGED: written, NOT applied by an agent/);
     expect(SQL).toMatch(/"applica"/);
     expect(SQL.match(/dfnwzwutvnwiitiffwvr/g)?.length ?? 0).toBe(1); // only the "never run on" warning
     expect(SQL).toMatch(/Never run on dfnwzwutvnwiitiffwvr/);
   });
 
-  it("creates the three tables with RLS on, no policies and no table grants", () => {
-    for (const t of ["scd_health_injuries", "scd_first_aid_kits", "scd_aed_devices"]) {
+  it("creates the two tables with RLS on, no policies and no table grants", () => {
+    for (const t of ["scd_first_aid_kits", "scd_aed_devices"]) {
       expect(SQL).toMatch(new RegExp(`create table if not exists public\\.${t} \\(`));
       expect(SQL).toMatch(new RegExp(`alter table public\\.${t} enable row level security;`));
       expect(SQL).toMatch(new RegExp(`revoke all on table public\\.${t} from public, anon, authenticated;`));
@@ -272,24 +314,17 @@ describe("migration r136 (staged, never applied by an agent)", () => {
   });
 
   it("stores no free text: no note, diagnosis, symptom or therapy column", () => {
-    const tables = SQL.match(/create table if not exists public\.scd_(health_injuries|first_aid_kits|aed_devices) \([\s\S]*?\n\);/g) ?? [];
-    expect(tables).toHaveLength(3);
+    const tables = SQL.match(/create table if not exists public\.scd_\w+ \([\s\S]*?\n\);/g) ?? [];
+    expect(tables).toHaveLength(2);
     for (const t of tables) expect(t).not.toMatch(/\b(note|notes|diagnos\w*|symptom\w*|sintom\w*|therap\w*|terapi\w*|description|comment)\b/i);
-  });
-
-  it("mirrors the fixed lists of the app", () => {
-    const list = (xs: ReadonlyArray<{ id: string }>) => xs.map((x) => `'${x.id}'`).join(",");
-    expect(SQL).toContain(`body_area in (${list(BODY_AREAS)})`);
-    expect(SQL).toContain(`status in (${list(INJURY_STATUSES)})`);
-    expect(SQL).toContain(`array[${list(RTP_STEPS)}]::text[]`);
   });
 
   it("every function is SECURITY DEFINER with a fixed search_path and checks access first", () => {
     const fns = [...SQL.matchAll(/create or replace function public\.(scd_\w+)\(/g)].map((m) => m[1]!);
-    expect(fns).toEqual(expect.arrayContaining(["scd_health_staff", "scd_infermeria_certificate_board", "scd_infermeria_board", "scd_infermeria_injury_save", "scd_infermeria_kit_save", "scd_infermeria_aed_save", "scd_nutrition_request", "scd_nutrition_requests", "scd_nutrition_request_update"]));
+    expect(fns).toEqual(expect.arrayContaining(["scd_health_staff", "scd_infermeria_certificate_board", "scd_infermeria_board", "scd_infermeria_kit_save", "scd_infermeria_aed_save", "scd_nutrition_request", "scd_nutrition_requests", "scd_nutrition_request_update", "scd_proposal_queue"]));
     for (const f of fns.filter((f) => f !== "scd_section_catalog" && f !== "scd_health_short_name"))
       expect(SQL, f).toMatch(new RegExp(`function public\\.${f}\\([\\s\\S]*?security definer\\s+set search_path to 'public'`));
-    for (const f of ["scd_infermeria_injury_save", "scd_infermeria_kit_save", "scd_infermeria_aed_save", "scd_nutrition_request_update"])
+    for (const f of ["scd_infermeria_kit_save", "scd_infermeria_aed_save", "scd_nutrition_request_update"])
       expect(SQL, f).toMatch(new RegExp(`function public\\.${f}\\([\\s\\S]*?begin\\s+if not public\\.scd_health_staff`));
   });
 
@@ -299,18 +334,40 @@ describe("migration r136 (staged, never applied by an agent)", () => {
     expect(own).not.toMatch(/raise exception '[^']*%/);
     expect(SQL).not.toMatch(/raise (notice|log|info|warning)/i);
     expect(SQL).not.toMatch(/grant execute[^;]*\banon\b/);
-    expect(SQL).toMatch(/revoke all on function public\.scd_health_staff\(uuid, text, text, text\) from public, anon;/);
+    expect(SQL).toMatch(/revoke all on function public\.scd_health_staff\(uuid, text, text, text\) from public, anon, authenticated;/);
+    expect(SQL).toMatch(/revoke all on function public\.scd_health_short_name\(text, text, text\) from public, anon, authenticated;/);
+    expect(SQL).not.toMatch(/grant execute on function public\.scd_health_(staff|short_name)/);
   });
 
-  it("goes through the existing work-queue intake, inserts no seed rows", () => {
+  it("goes through the existing work-queue intake as RISERVATO, inserts no seed rows", () => {
     expect(SQL).toMatch(/public\.scd_proposal_ingest\(p_organization_id/);
+    expect(SQL).toMatch(/'sensitivity', 'RISERVATO',/);
     expect(SQL).not.toMatch(/insert into public\.scd_proposals/);
-    expect(SQL).not.toMatch(/insert into public\.scd_(health_injuries|first_aid_kits|aed_devices)[^;]*values\s*\('/i);
+    expect(SQL).not.toMatch(/insert into public\.scd_(first_aid_kits|aed_devices)[^;]*values\s*\('/i);
+  });
+
+  it("recreates the office queue identical to r79 except the nutrizione filter", () => {
+    const fn = (sql: string) => sql.match(/create or replace function public\.scd_proposal_queue\(p_organization_id uuid\)[\s\S]*?\n\$\$;/)![0];
+    const r79 = fn(readFileSync(repo("supabase/migrations/20261012_r79_proposals.sql"), "utf8"));
+    const r136 = fn(SQL);
+    const added = r136.split("\n").filter((l) => !r79.split("\n").includes(l));
+    expect(added).toEqual(["          and q.area <> 'nutrizione' -- r136", "                             and d.area <> 'nutrizione' -- r136"]);
+    expect(r79.split("\n").filter((l) => !r136.split("\n").includes(l))).toEqual([]);
+  });
+
+  it("health staff: verified identity links only, Direzione like the app", () => {
+    const staff = SQL.match(/create or replace function public\.scd_health_staff\([\s\S]*?\n\$\$;/)![0];
+    expect(staff).toMatch(/l\.link_state in \('AUTO_VERIFIED', 'VERIFIED_BY_STAFF'\)/);
+    expect(staff).not.toMatch(/link_state <> 'REVOKED'/);
+    expect(staff).toMatch(/array\['direzione', 'responsabile-infermeria'\]/);
+    expect(staff).toMatch(/array\['direzione', 'nutrizionista'\]/);
   });
 
   it("has a PGlite behaviour test next to it", () => {
     const t = readFileSync(repo("supabase/tests/r136_infermeria_nutrizione.pglite.mjs"), "utf8");
     expect(t).toMatch(/a family cannot ask for another child/);
     expect(t).toMatch(/no board for/);
+    expect(t).toMatch(/no nutrition request in the office queue/);
+    expect(t).toMatch(/nutrition request is RISERVATO/);
   });
 });

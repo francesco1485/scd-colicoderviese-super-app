@@ -434,7 +434,7 @@ export const ACCESS_MENU: readonly MenuGroup[] = [
       {
         id: "infermeria",
         label: "Infermeria",
-        blurb: "Certificati, infortuni, cassette e DAE",
+        blurb: "Certificati, cassette e DAE",
         icon: "plus",
         reserved: true,
       },

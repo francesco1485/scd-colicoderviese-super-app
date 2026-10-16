@@ -1,49 +1,21 @@
 /**
  * Infermeria and Nutrizionista (DG 15/10/2026 14:33 "infermeria, nutrizionista"; 16/10 "a pieno regime").
  * Pure rules shared by the pages (/infermeria, /nutrizionista), the server functions and the tests.
- * The database (supabase/migrations/20261016_r136_infermeria_nutrizione.sql, STAGED NOT APPLIED) enforces the same
- * fixed lists and access rules; these mirrors keep the screen honest and are pinned to the SQL by the tests.
+ * The database (supabase/migrations/20261016_r136_infermeria_nutrizione.sql; "Applica r136" 16/10/2026) enforces the
+ * same fixed lists and access rules; these mirrors keep the screen honest and are pinned to the SQL by the tests.
  *
- * Health data rules (AGENTS.md principle 1, scd-sections "salute-minori" hard block):
- * - no diagnosis, symptom, therapy or free-text note is ever stored: only a body-area CATEGORY from a fixed list,
- *   the date, the status and the return-to-play steps;
+ * Health data rules (AGENTS.md principle 1, scd-sections "salute-minori" hard block, UD-043 / UD-047):
+ * - the injuries register is DEFERRED until the consent design (minors' health data only to the person, the parent
+ *   and the club doctor, with consent): Francesco 16/10/2026 "Senza infortuni per ora";
+ * - the Infermeria holds certificate expiry dates (read-only), first-aid kits and defibrillators: no diagnosis,
+ *   symptom, therapy or free-text note is ever stored;
  * - names are first name + surname initial;
  * - nothing here is logged, sent to the public pages or written in work-queue titles.
  * Engines: TEMPO (hours of the staff and secretariat), PERSONE (families trust the club with their children).
  */
 import { tipProblems } from "./era-nutrition-tips";
 
-/* ------------------------------------------------------------------ infermeria: injuries */
-
-export const BODY_AREAS = [
-  { id: "TESTA_COLLO", label: "Testa e collo" },
-  { id: "SPALLA_BRACCIO", label: "Spalla e braccio" },
-  { id: "MANO_POLSO", label: "Mano e polso" },
-  { id: "TRONCO_SCHIENA", label: "Tronco e schiena" },
-  { id: "ANCA_COSCIA", label: "Anca e coscia" },
-  { id: "GINOCCHIO", label: "Ginocchio" },
-  { id: "GAMBA_CAVIGLIA", label: "Gamba e caviglia" },
-  { id: "PIEDE", label: "Piede" },
-  { id: "ALTRO", label: "Altra zona" },
-] as const;
-export type BodyArea = (typeof BODY_AREAS)[number]["id"];
-
-export const INJURY_STATUSES = [
-  { id: "FERMO", label: "Fermo" },
-  { id: "IN_RECUPERO", label: "In recupero" },
-  { id: "RIENTRATO", label: "Rientrato" },
-] as const;
-export type InjuryStatus = (typeof INJURY_STATUSES)[number]["id"];
-
-/** Return-to-play checklist: every step is ticked before the status can be "Rientrato". */
-export const RTP_STEPS = [
-  { id: "STOP", label: "Fermo dal gioco e famiglia avvisata" },
-  { id: "VIA_LIBERA_MEDICO", label: "Via libera del medico (certificato o visita)" },
-  { id: "LAVORO_DIFFERENZIATO", label: "Lavoro differenziato senza contatto" },
-  { id: "ALLENAMENTO_SQUADRA", label: "Allenamento completo con la squadra" },
-  { id: "OK_STAFF_MISTER", label: "Via libera finale di staff sanitario e mister" },
-] as const;
-export type RtpStep = (typeof RTP_STEPS)[number]["id"];
+/* ------------------------------------------------------------------ infermeria: sites and names */
 
 export const SITES = [
   { id: "COLICO", label: "Colico" },
@@ -52,86 +24,13 @@ export const SITES = [
 export type HealthSite = (typeof SITES)[number]["id"];
 
 const ids = <T extends { id: string }>(xs: readonly T[]) => xs.map((x) => x.id) as string[];
-export const isBodyArea = (x: unknown): x is BodyArea => typeof x === "string" && ids(BODY_AREAS).includes(x);
-export const isInjuryStatus = (x: unknown): x is InjuryStatus => typeof x === "string" && ids(INJURY_STATUSES).includes(x);
-export const isRtpStep = (x: unknown): x is RtpStep => typeof x === "string" && ids(RTP_STEPS).includes(x);
 export const isHealthSite = (x: unknown): x is HealthSite => typeof x === "string" && ids(SITES).includes(x);
 
 export const labelOf = <T extends { id: string; label: string }>(xs: readonly T[], id: string | null | undefined): string =>
   xs.find((x) => x.id === id)?.label ?? "—";
 
-/** Ordered, de-duplicated steps (the order of RTP_STEPS), unknown ids dropped. */
-export function normalizeSteps(steps: readonly string[]): RtpStep[] {
-  const set = new Set(steps);
-  return RTP_STEPS.map((s) => s.id).filter((id) => set.has(id));
-}
-
-export interface InjuryInput {
-  athleteId: string;
-  occurredOn: string;
-  bodyArea: string;
-  status: string;
-  steps: readonly string[];
-}
-
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const dayNumber = (iso: string) => Math.floor(Date.parse(`${iso}T12:00:00Z`) / 86_400_000);
-
-/** First problem of an injury entry in plain Italian (null when valid). Same rules as scd_infermeria_injury_save. */
-export function injuryProblem(i: InjuryInput, todayIso: string): string | null {
-  if (!i.athleteId) return "Scegli l'atleta.";
-  if (!ISO_DATE.test(i.occurredOn) || Number.isNaN(Date.parse(i.occurredOn))) return "Scrivi la data dell'infortunio.";
-  const d = dayNumber(i.occurredOn);
-  const t = dayNumber(todayIso);
-  if (d > t) return "La data non può essere nel futuro.";
-  if (t - d > 400) return "Data troppo lontana: controlla l'anno.";
-  if (!isBodyArea(i.bodyArea)) return "Scegli la zona del corpo dall'elenco.";
-  if (!isInjuryStatus(i.status)) return "Scegli lo stato.";
-  if (i.steps.some((s) => !isRtpStep(s))) return "Passo del rientro non valido.";
-  if (i.status === "RIENTRATO" && normalizeSteps(i.steps).length !== RTP_STEPS.length)
-    return "Per segnare Rientrato servono tutti i passi del rientro in campo.";
-  return null;
-}
-
-export interface InjuryRow {
-  id: string;
-  athleteId: string;
-  /** First name + surname initial (from the database). */
-  name: string;
-  teamName: string | null;
-  occurredOn: string;
-  bodyArea: BodyArea;
-  status: InjuryStatus;
-  steps: RtpStep[];
-  updatedAt: string | null;
-}
-
-export interface InjuryDbRow {
-  id: string;
-  athlete_id: string;
-  short_name: string | null;
-  team_name: string | null;
-  occurred_on: string;
-  body_area: string;
-  status: string;
-  rtp_steps: string[] | null;
-  updated_at: string | null;
-}
-
-export function toInjuryRow(r: InjuryDbRow): InjuryRow | null {
-  if (!isBodyArea(r.body_area) || !isInjuryStatus(r.status)) return null;
-  return {
-    id: r.id,
-    athleteId: r.athlete_id,
-    name: shortName(r.short_name),
-    teamName: r.team_name,
-    occurredOn: r.occurred_on,
-    bodyArea: r.body_area,
-    status: r.status,
-    steps: normalizeSteps(r.rtp_steps ?? []),
-    updatedAt: r.updated_at,
-  };
-}
 
 /** "Mario R." from "Mario Rossi" (public-name rule); the database already shortens, this is the second lock. */
 export function shortName(full: string | null | undefined): string {
@@ -143,26 +42,10 @@ export function shortName(full: string | null | undefined): string {
   return /^[A-ZÀ-Ý]\.$/.test(parts[parts.length - 1]!) ? `${first} ${parts[parts.length - 1]}` : `${first} ${initial}.`;
 }
 
-export interface InjuryCounts {
-  fermi: number;
-  inRecupero: number;
-  rientrati: number;
-}
-
-export function injuryCounts(rows: readonly Pick<InjuryRow, "status">[]): InjuryCounts {
-  const c = { fermi: 0, inRecupero: 0, rientrati: 0 };
-  for (const r of rows) {
-    if (r.status === "FERMO") c.fermi += 1;
-    else if (r.status === "IN_RECUPERO") c.inRecupero += 1;
-    else c.rientrati += 1;
-  }
-  return c;
-}
-
-/** Open cases first (Fermo, then In recupero), most recent first; Rientrato last. */
-export function sortInjuries<T extends Pick<InjuryRow, "status" | "occurredOn">>(rows: readonly T[]): T[] {
-  const rank: Record<InjuryStatus, number> = { FERMO: 0, IN_RECUPERO: 1, RIENTRATO: 2 };
-  return [...rows].sort((a, b) => rank[a.status] - rank[b.status] || b.occurredOn.localeCompare(a.occurredOn));
+/** One row per athlete (first row wins): the database already answers so, this keeps KPIs from double counting. */
+export function onePerAthlete<T extends { athleteId: string }>(rows: readonly T[]): T[] {
+  const seen = new Set<string>();
+  return rows.filter((r) => (seen.has(r.athleteId) ? false : (seen.add(r.athleteId), true)));
 }
 
 /* ------------------------------------------------------------------ infermeria: kits and defibrillators */
@@ -245,9 +128,25 @@ export function aedProblem(a: { site: string; device: string; padsExpiry: string
 
 /* ------------------------------------------------------------------ engine state */
 
-export type HealthEngine = "applied" | "not-applied" | "unknown";
+/**
+ * What the database answered. Unknown is never shown as zero:
+ * - "applied": data read; - "not-applied": r136 functions missing; - "denied": the database said no (null);
+ * - "error": any other failure; - "unknown": nothing was read (no session, staging preview).
+ */
+export type HealthEngine = "applied" | "not-applied" | "denied" | "error" | "unknown";
 
 export const R136_PENDING = "Funzione in preparazione: serve applicare r136";
+export const HEALTH_DENIED = "Non hai l'abilitazione per questa parte: chiedila alla Direzione.";
+export const READ_FAILED = "Lettura non riuscita, riprova";
+export const SAVED_RELOAD = "Salvato, ricarica la pagina";
+
+/** The sentence for an engine state that is not "applied" (null when there is nothing to say). */
+export function engineText(engine: HealthEngine): string | null {
+  if (engine === "not-applied") return R136_PENDING;
+  if (engine === "denied") return HEALTH_DENIED;
+  if (engine === "error") return READ_FAILED;
+  return null;
+}
 
 /* ------------------------------------------------------------------ nutrizionista */
 
@@ -357,9 +256,9 @@ export function asConsultOutcome(v: unknown): ConsultOutcome {
 }
 
 export const CONSULT_MESSAGE: Readonly<Record<ConsultOutcome, string>> = {
-  RECEIVED: "Richiesta inviata alla società. Vi ricontatta la segreteria per fissare la consulenza con la nutrizionista.",
-  ALREADY: "C'è già una richiesta aperta per questo ragazzo: la società la sta seguendo.",
-  LIMIT: "Avete già inviato diverse richieste oggi. Riprovate domani o scrivete alla segreteria.",
+  RECEIVED: "Richiesta inviata. Vi ricontatta la nutrizionista del club per fissare la consulenza.",
+  ALREADY: "C'è già una richiesta aperta per questo ragazzo: la nutrizionista la sta seguendo.",
+  LIMIT: "Avete già inviato diverse richieste oggi. Riprovate domani.",
   NOT_ALLOWED: "Potete chiedere la consulenza solo per i vostri figli.",
   NOT_SIGNED_IN: "Entrate con il vostro account per chiedere una consulenza.",
   NOT_APPLIED: R136_PENDING,

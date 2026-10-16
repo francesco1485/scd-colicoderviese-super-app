@@ -1,22 +1,29 @@
 -- r136: Infermeria and Nutrizionista (DG 15/10/2026 14:33 "infermeria, nutrizionista"; 16/10 06:23 "a pieno regime").
--- STAGED: written, NOT applied. Apply only after the explicit "applica" of the Direzione.
+-- STAGED: written, NOT applied by an agent. Apply only after the explicit "applica" of the Direzione
+-- (Francesco 16/10/2026 07:04 "Applica r136", then "Senza infortuni per ora": the main session applies this file).
 -- Requires r59/r61 (people, athletes, families, identity links), r66 (certificate register), r74 (scd_has_position),
--- r79 (scd_proposals, scd_proposal_ingest) and r100 (scd_person_grants, scd_level_rank) applied.
+-- r79 (scd_proposals, scd_proposal_ingest, scd_proposal_queue) and r100 (scd_person_grants, scd_level_rank) applied.
 -- Apply after r101: section 1 recreates scd_section_catalog() with every r101 entry identical and appends
 -- "nutrizione". If r101 is ever applied after r136, run r136 again (the whole file is idempotent).
 --
--- What it adds (no existing table or row is changed, no row is inserted; two existing functions, the catalogue and
--- the access guard, are recreated with their previous content plus one entry each):
+-- INJURIES REGISTER DEFERRED until the consent design (UD-043, UD-047: minors' health data only to the person, the
+-- parent and the club doctor, with consent). This file creates no injury table and no injury function.
+--
+-- What it adds (no existing table or row is changed, no row is inserted; three existing functions are recreated with
+-- their previous content plus one change each: the catalogue (+ "nutrizione"), the access guard (+ position
+-- "nutrizionista") and the office work queue scd_proposal_queue (nutrition requests excluded)):
 --   1. the "nutrizione" section in the catalogue (config/scd-sections.v1.json);
---   2. scd_health_staff(): who works in the Infermeria / Nutrizionista (Direzione membership, position
---      responsabile-infermeria / nutrizionista, or an active r100 grant with perimeter ALL, or OWN_SITE for the site);
+--   2. scd_health_staff(): who works in the Infermeria / Nutrizionista (Direzione membership or position "direzione",
+--      position responsabile-infermeria / nutrizionista, or an active r100 grant of a verified identity link with
+--      perimeter ALL, or OWN_SITE for the site);
 --   3. Infermeria tables with RLS on and no policies (read and written only through the functions below):
---      scd_health_injuries (athlete, date, body-area CATEGORY from a fixed list, status, return-to-play steps),
 --      scd_first_aid_kits (site, kit, last and next check), scd_aed_devices (site, device, pads and battery expiry);
---   4. scd_infermeria_certificate_board / _board / _injury_save / _kit_save / _aed_save;
---   5. Nutrizionista: scd_nutrition_request (families, own circle only, through scd_proposal_ingest: the work-queue
---      title is only "Richiesta consulenza nutrizionista · <squadra>") and scd_nutrition_requests / _request_update
---      for the nutrition staff. No personal plan, diet or health detail is stored anywhere.
+--   4. scd_infermeria_certificate_board (read-only, one row per athlete) / _board / _kit_save / _aed_save;
+--   5. Nutrizionista: scd_nutrition_request (families, own circle only, through scd_proposal_ingest as RISERVATO:
+--      the work-queue title is only "Richiesta consulenza nutrizionista · <squadra>") and scd_nutrition_requests /
+--      _request_update for the nutrition staff; scd_proposal_queue (r79) recreated identical except that area
+--      'nutrizione' is excluded, so the office queue never shows them. No personal plan, diet or health detail is
+--      stored anywhere.
 --   6. scd_access_admin_guard (r87) recreated identical plus the assignable position "nutrizionista";
 --
 -- Health data rules: no free text, no diagnosis, symptom or therapy column; names returned as first name + surname
@@ -81,6 +88,8 @@ $cat$::jsonb) as x(code text, levels jsonb, perimeters jsonb, base boolean, hard
 $$;
 
 -- 2. Who works in the health areas. p_site narrows OWN_SITE grants (kits and defibrillators of one site).
+-- Same people the app lets in (work areas "infermeria" / "nutrizionista"): Direzione (membership role or position
+-- "direzione") and the area position. r100 grants count only through a VERIFIED identity link.
 create or replace function public.scd_health_staff(p_organization_id uuid, p_section text, p_level text default 'READ', p_site text default null)
 returns boolean
 language plpgsql
@@ -101,14 +110,15 @@ begin
     return true;
   end if;
   if public.scd_has_position(p_organization_id,
-       case p_section when 'infermeria' then array['responsabile-infermeria'] else array['nutrizionista'] end) then
+       case p_section when 'infermeria' then array['direzione', 'responsabile-infermeria'] else array['direzione', 'nutrizionista'] end) then
     return true;
   end if;
   return exists (
     select 1
     from public.scd_person_grants g
     join public.scd_identity_links l
-      on l.organization_id = g.organization_id and l.person_id = g.person_id and l.user_id = v_uid and l.link_state <> 'REVOKED'
+      on l.organization_id = g.organization_id and l.person_id = g.person_id and l.user_id = v_uid
+     and l.link_state in ('AUTO_VERIFIED', 'VERIFIED_BY_STAFF')
     join public.scd_memberships m
       on m.organization_id = g.organization_id and m.user_id = v_uid and m.active
     where g.organization_id = p_organization_id
@@ -137,24 +147,6 @@ as $$
 $$;
 
 -- 3. Infermeria tables. RLS on, no policies, no grants: only the SECURITY DEFINER functions below touch them.
-create table if not exists public.scd_health_injuries (
-  id uuid primary key default gen_random_uuid(),
-  organization_id uuid not null references public.scd_organizations(id) on delete cascade,
-  athlete_id uuid not null references public.scd_athletes(id) on delete cascade,
-  occurred_on date not null,
-  body_area text not null check (body_area in ('TESTA_COLLO','SPALLA_BRACCIO','MANO_POLSO','TRONCO_SCHIENA','ANCA_COSCIA','GINOCCHIO','GAMBA_CAVIGLIA','PIEDE','ALTRO')),
-  status text not null default 'FERMO' check (status in ('FERMO','IN_RECUPERO','RIENTRATO')),
-  rtp_steps text[] not null default '{}'
-    check (rtp_steps <@ array['STOP','VIA_LIBERA_MEDICO','LAVORO_DIFFERENZIATO','ALLENAMENTO_SQUADRA','OK_STAFF_MISTER']::text[]),
-  check (status <> 'RIENTRATO' or rtp_steps @> array['STOP','VIA_LIBERA_MEDICO','LAVORO_DIFFERENZIATO','ALLENAMENTO_SQUADRA','OK_STAFF_MISTER']::text[]),
-  created_by uuid,
-  created_at timestamptz not null default now(),
-  updated_by uuid,
-  updated_at timestamptz not null default now()
-);
-create index if not exists scd_health_injuries_org_idx on public.scd_health_injuries (organization_id, status, occurred_on desc);
-alter table public.scd_health_injuries enable row level security;
-
 create table if not exists public.scd_first_aid_kits (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.scd_organizations(id) on delete cascade,
@@ -183,12 +175,12 @@ create table if not exists public.scd_aed_devices (
 );
 alter table public.scd_aed_devices enable row level security;
 
-revoke all on table public.scd_health_injuries from public, anon, authenticated;
 revoke all on table public.scd_first_aid_kits from public, anon, authenticated;
 revoke all on table public.scd_aed_devices from public, anon, authenticated;
 
--- 4a. Certificate expiry board for the Infermeria: the same rows as scd_certificate_register (r66), names shortened,
--- read-only (dates are still corrected only in /segreteria/certificati).
+-- 4a. Certificate expiry board for the Infermeria: the same data as scd_certificate_register (r66), ONE row per
+-- athlete (first current team by code, so counts are never doubled), names shortened, read-only (dates are still
+-- corrected only in /segreteria/certificati). Whole-club health staff only (no OWN_SITE).
 create or replace function public.scd_infermeria_certificate_board(p_organization_id uuid)
 returns table (
   athlete_id uuid,
@@ -208,32 +200,40 @@ stable
 security definer
 set search_path to 'public'
 as $$
-  select
-    a.id,
-    public.scd_health_short_name(p.first_name, p.last_name, p.display_name),
-    extract(year from p.birth_date)::integer,
-    public.scd_is_minor(p.birth_date),
-    t.code,
-    t.name,
-    a.registration_status,
-    a.medical_certificate_expires_at,
-    a.medical_certificate_status,
-    a.medical_certificate_kind,
-    a.medical_certificate_checked_at
-  from public.scd_athletes a
-  join public.scd_people p on p.id = a.person_id
-  left join public.scd_team_memberships tm
-    on tm.athlete_id = a.id and (tm.valid_to is null or tm.valid_to >= current_date)
-  left join public.scd_teams t on t.id = tm.team_id
-  where a.organization_id = p_organization_id
-    and p.status <> 'ARCHIVED'
-    and p.left_at is null
-    and public.scd_health_staff(p_organization_id, 'infermeria', 'READ', null)
-  order by t.code nulls last, p.last_name, p.first_name;
+  select x.athlete_id, x.display_name, x.birth_year, x.is_minor, x.team_code, x.team_name, x.registration_status,
+         x.expires_at, x.status, x.kind, x.checked_at
+  from (
+    select distinct on (a.id)
+      a.id as athlete_id,
+      public.scd_health_short_name(p.first_name, p.last_name, p.display_name) as display_name,
+      extract(year from p.birth_date)::integer as birth_year,
+      public.scd_is_minor(p.birth_date) as is_minor,
+      t.code as team_code,
+      t.name as team_name,
+      a.registration_status,
+      a.medical_certificate_expires_at as expires_at,
+      a.medical_certificate_status as status,
+      a.medical_certificate_kind as kind,
+      a.medical_certificate_checked_at as checked_at,
+      p.last_name as sort_last,
+      p.first_name as sort_first
+    from public.scd_athletes a
+    join public.scd_people p on p.id = a.person_id
+    left join public.scd_team_memberships tm
+      on tm.athlete_id = a.id and (tm.valid_to is null or tm.valid_to >= current_date)
+    left join public.scd_teams t on t.id = tm.team_id
+    where a.organization_id = p_organization_id
+      and p.status <> 'ARCHIVED'
+      and p.left_at is null
+      and public.scd_health_staff(p_organization_id, 'infermeria', 'READ', null)
+    order by a.id, t.code nulls last
+  ) x
+  order by x.team_code nulls last, x.sort_last, x.sort_first;
 $$;
 
--- 4b. The Infermeria board: injuries (perimeter ALL only), kits and defibrillators (ALL or the granted site).
--- Null when the caller has no infermeria access at all.
+-- 4b. The Infermeria board: kits and defibrillators (ALL or the granted site). seesCertificates is true only for the
+-- whole-club health staff (the certificate board answers nothing to an OWN_SITE grant). Null when the caller has no
+-- infermeria access at all: the app shows "Non hai l'abilitazione", never zero.
 create or replace function public.scd_infermeria_board(p_organization_id uuid)
 returns jsonb
 language plpgsql
@@ -258,22 +258,8 @@ begin
     'canWrite', public.scd_health_staff(p_organization_id, 'infermeria', 'WRITE', null),
     'canWriteSites', to_jsonb(array(select s from unnest(array['COLICO','DERVIO']) s
                                     where public.scd_health_staff(p_organization_id, 'infermeria', 'WRITE', s))),
-    'seesInjuries', v_all,
-    'injuries', case when not v_all then '[]'::jsonb else coalesce((
-      select jsonb_agg(jsonb_build_object(
-        'id', i.id, 'athlete_id', i.athlete_id,
-        'short_name', public.scd_health_short_name(p.first_name, p.last_name, p.display_name),
-        'team_name', (select t.name from public.scd_team_memberships tm join public.scd_teams t on t.id = tm.team_id
-                      where tm.athlete_id = i.athlete_id and (tm.valid_to is null or tm.valid_to >= current_date)
-                      order by t.code limit 1),
-        'occurred_on', i.occurred_on, 'body_area', i.body_area, 'status', i.status,
-        'rtp_steps', to_jsonb(i.rtp_steps), 'updated_at', i.updated_at)
-        order by i.occurred_on desc)
-      from public.scd_health_injuries i
-      join public.scd_athletes a on a.id = i.athlete_id
-      join public.scd_people p on p.id = a.person_id
-      where i.organization_id = p_organization_id
-        and (i.status <> 'RIENTRATO' or i.updated_at > now() - interval '60 days')), '[]'::jsonb) end,
+    'seesCertificates', v_all,
+    'sites', to_jsonb(v_sites),
     'kits', coalesce((
       select jsonb_agg(jsonb_build_object('id', k.id, 'site', k.site, 'kit', k.kit, 'last_check', k.last_check, 'next_check', k.next_check)
         order by k.site, k.kit)
@@ -289,64 +275,7 @@ begin
 end;
 $$;
 
--- 4c. Injury entry (insert when p_id is null, else update). WRITE with perimeter ALL. No free text exists.
-create or replace function public.scd_infermeria_injury_save(
-  p_organization_id uuid,
-  p_id uuid,
-  p_athlete_id uuid,
-  p_occurred_on date,
-  p_body_area text,
-  p_status text,
-  p_rtp_steps text[]
-)
-returns uuid
-language plpgsql
-volatile
-security definer
-set search_path to 'public'
-as $$
-declare
-  v_id uuid;
-  v_steps text[] := coalesce(p_rtp_steps, '{}');
-begin
-  if not public.scd_health_staff(p_organization_id, 'infermeria', 'WRITE', null) then
-    raise exception 'forbidden' using errcode = '42501';
-  end if;
-  if p_occurred_on is null or p_occurred_on > current_date or p_occurred_on < current_date - 400 then
-    raise exception 'date out of range' using errcode = '22023';
-  end if;
-  if not exists (select 1 from public.scd_athletes a where a.id = p_athlete_id and a.organization_id = p_organization_id) then
-    raise exception 'athlete not found' using errcode = '22023';
-  end if;
-  -- Validate here so that a constraint error (whose DETAIL would echo the row) is never raised.
-  if p_body_area is null or p_body_area not in ('TESTA_COLLO','SPALLA_BRACCIO','MANO_POLSO','TRONCO_SCHIENA','ANCA_COSCIA','GINOCCHIO','GAMBA_CAVIGLIA','PIEDE','ALTRO')
-     or p_status is null or p_status not in ('FERMO','IN_RECUPERO','RIENTRATO')
-     or not v_steps <@ array['STOP','VIA_LIBERA_MEDICO','LAVORO_DIFFERENZIATO','ALLENAMENTO_SQUADRA','OK_STAFF_MISTER']::text[] then
-    raise exception 'invalid entry' using errcode = '22023';
-  end if;
-  if p_status = 'RIENTRATO' and not v_steps @> array['STOP','VIA_LIBERA_MEDICO','LAVORO_DIFFERENZIATO','ALLENAMENTO_SQUADRA','OK_STAFF_MISTER']::text[] then
-    raise exception 'return to play incomplete' using errcode = '22023';
-  end if;
-  v_steps := array(select distinct s from unnest(v_steps) s order by s);
-  if p_id is null then
-    insert into public.scd_health_injuries (organization_id, athlete_id, occurred_on, body_area, status, rtp_steps, created_by, updated_by)
-    values (p_organization_id, p_athlete_id, p_occurred_on, p_body_area, coalesce(p_status, 'FERMO'), v_steps, auth.uid(), auth.uid())
-    returning id into v_id;
-  else
-    update public.scd_health_injuries
-       set athlete_id = p_athlete_id, occurred_on = p_occurred_on, body_area = p_body_area, status = p_status,
-           rtp_steps = v_steps, updated_by = auth.uid(), updated_at = now()
-     where id = p_id and organization_id = p_organization_id
-    returning id into v_id;
-    if v_id is null then
-      raise exception 'injury not found' using errcode = '22023';
-    end if;
-  end if;
-  return v_id;
-end;
-$$;
-
--- 4d. First-aid kit check (upsert on site + kit). WRITE for that site.
+-- 4c. First-aid kit check (upsert on site + kit). WRITE for that site.
 create or replace function public.scd_infermeria_kit_save(
   p_organization_id uuid,
   p_site text,
@@ -379,7 +308,7 @@ begin
 end;
 $$;
 
--- 4e. Defibrillator (DAE / BLSD) check (upsert on site + device). WRITE for that site.
+-- 4d. Defibrillator (DAE / BLSD) check (upsert on site + device). WRITE for that site.
 create or replace function public.scd_infermeria_aed_save(
   p_organization_id uuid,
   p_site text,
@@ -415,7 +344,8 @@ $$;
 
 -- 5a. Consultation request from a family or an adult athlete, ONLY for a person of the caller's own circle
 -- (themself or a person of a family where they are guardian). Goes to the existing work queue through
--- scd_proposal_ingest (r79). Title: team only. No child name, no health detail, no note.
+-- scd_proposal_ingest (r79) as RISERVATO, area 'nutrizione': the office queue (scd_proposal_queue, recreated in 5d)
+-- never shows it; only the nutrition staff reads it (5b). Title: team only. No child name, no health detail, no note.
 -- Answers RECEIVED | ALREADY (an open request exists for that person) | LIMIT (3 per requester per day)
 -- | NOT_ALLOWED | NOT_SIGNED_IN.
 create or replace function public.scd_nutrition_request(p_organization_id uuid, p_person_id uuid)
@@ -467,7 +397,8 @@ begin
     'area', 'nutrizione',
     'kind', 'RICHIESTA',
     'title', 'Richiesta consulenza nutrizionista · ' || coalesce(nullif(trim(v_team), ''), 'squadra non indicata'),
-    'reason', 'Richiesta dalla famiglia nell''app: la segreteria ricontatta il genitore.',
+    'reason', 'Richiesta dalla famiglia nell''app: la nutrizionista ricontatta il genitore.',
+    'sensitivity', 'RISERVATO',
     'sourceKind', 'MANUAL',
     'sourceRef', v_ref_prefix || to_char(now(), 'YYYYMMDDHH24MISSUS'),
     'suggested', jsonb_build_object('action', 'contact_family', 'requester', v_uid))));
@@ -502,7 +433,7 @@ begin
                       join public.scd_people p on p.id = l.person_id
                       where l.organization_id = q.organization_id
                         and l.user_id::text = q.suggested ->> 'requester'
-                        and l.link_state <> 'REVOKED'
+                        and l.link_state in ('AUTO_VERIFIED', 'VERIFIED_BY_STAFF')
                         and coalesce(public.scd_is_minor(p.birth_date), false) = false
                       order by l.person_id limit 1))
         order by q.created_at)
@@ -546,6 +477,52 @@ begin
   return true;
 end;
 $$;
+
+-- 5d. Office work queue (r79 scd_proposal_queue) recreated IDENTICAL to r79 except for the two lines marked
+-- "r136": nutrition requests (area 'nutrizione') never appear in the office queue, not even to RISERVATO readers;
+-- they are read only through scd_nutrition_requests (5b). The last-50 decisions window excludes them as well.
+create or replace function public.scd_proposal_queue(p_organization_id uuid)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path to 'public'
+as $$
+declare
+  v_reserved boolean;
+begin
+  if not public.scd_fee_office(p_organization_id) then
+    return null;
+  end if;
+  v_reserved := public.scd_proposal_reserved_reader(p_organization_id);
+  return jsonb_build_object(
+    'me', auth.uid(),
+    'canReadReserved', v_reserved,
+    'items', coalesce((select jsonb_agg(row_to_json(x)::jsonb order by x.open desc, x.due_at nulls last, x.created_at)
+      from (
+        select q.id, q.machine, q.area, q.kind, q.title, q.reason, q.sensitivity, q.source_kind as "sourceKind",
+          q.source_url as "sourceUrl", q.source_at as "sourceAt", q.source_mailbox as "mailbox",
+          q.target_ref as "targetRef", q.target_label as "targetLabel", q.suggested, q.confidence, q.status,
+          q.assignee = auth.uid() as "mine", q.assignee is not null as "assigned", q.due_at, q.snooze_until as "snoozeUntil",
+          q.duplicate_of as "duplicateOf", q.decided_at as "decidedAt", q.decision_note as "decisionNote", q.created_at,
+          q.status in ('NEW','IN_PROGRESS','NEEDS_INFO') or (q.status = 'SNOOZED' and q.snooze_until <= now()) as open,
+          fp.status_group as "targetState"
+        from public.scd_proposals q
+        left join public.scd_fee_positions fp
+          on q.machine = 'M3' and fp.organization_id = q.organization_id and fp.source_record_id = q.target_ref and fp.active
+        where q.organization_id = p_organization_id
+          and q.area <> 'nutrizione' -- r136
+          and (q.sensitivity <> 'RISERVATO' or v_reserved)
+          and (q.status in ('NEW','IN_PROGRESS','NEEDS_INFO','SNOOZED')
+               or q.id in (select id from public.scd_proposals d where d.organization_id = p_organization_id
+                             and d.area <> 'nutrizione' -- r136
+                             and d.status in ('ACCEPTED','REJECTED','DUPLICATE') order by d.decided_at desc nulls last limit 50))
+      ) x), '[]'::jsonb)
+  );
+end;
+$$;
+revoke all on function public.scd_proposal_queue(uuid) from public, anon;
+grant execute on function public.scd_proposal_queue(uuid) to authenticated;
 
 -- 6. The "nutrizionista" position becomes assignable (Direzione and Segreteria, like responsabile-infermeria):
 -- scd_access_admin_guard recreated IDENTICAL to r87 except for the one appended position. It opens nothing by itself:
@@ -599,12 +576,12 @@ begin
 end;
 $$;
 
--- Grants: helpers private, entry points for signed-in users only (each checks access itself).
-revoke all on function public.scd_health_staff(uuid, text, text, text) from public, anon;
-revoke all on function public.scd_health_short_name(text, text, text) from public, anon;
+-- Grants: helpers private (callable only from the SECURITY DEFINER functions above, never through the API),
+-- entry points for signed-in users only (each checks access itself).
+revoke all on function public.scd_health_staff(uuid, text, text, text) from public, anon, authenticated;
+revoke all on function public.scd_health_short_name(text, text, text) from public, anon, authenticated;
 revoke all on function public.scd_infermeria_certificate_board(uuid) from public, anon;
 revoke all on function public.scd_infermeria_board(uuid) from public, anon;
-revoke all on function public.scd_infermeria_injury_save(uuid, uuid, uuid, date, text, text, text[]) from public, anon;
 revoke all on function public.scd_infermeria_kit_save(uuid, text, text, date, date) from public, anon;
 revoke all on function public.scd_infermeria_aed_save(uuid, text, text, date, date, date) from public, anon;
 revoke all on function public.scd_nutrition_request(uuid, uuid) from public, anon;
@@ -612,7 +589,6 @@ revoke all on function public.scd_nutrition_requests(uuid) from public, anon;
 revoke all on function public.scd_nutrition_request_update(uuid, uuid, text) from public, anon;
 grant execute on function public.scd_infermeria_certificate_board(uuid) to authenticated;
 grant execute on function public.scd_infermeria_board(uuid) to authenticated;
-grant execute on function public.scd_infermeria_injury_save(uuid, uuid, uuid, date, text, text, text[]) to authenticated;
 grant execute on function public.scd_infermeria_kit_save(uuid, text, text, date, date) to authenticated;
 grant execute on function public.scd_infermeria_aed_save(uuid, text, text, date, date, date) to authenticated;
 grant execute on function public.scd_nutrition_request(uuid, uuid) to authenticated;
