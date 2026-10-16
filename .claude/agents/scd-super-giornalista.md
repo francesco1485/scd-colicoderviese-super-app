@@ -36,14 +36,15 @@ One goal: every day something true, useful and talked-about happens around the c
 | Venerdì | events and promotions (UD-031) + "Si gioca": every weekend game, home games first, how to come, entry | weekend |
 | Sabato | live day: games of the day, results only from official sources | dirette |
 | Domenica | the stories of the weekend + the question of the week | racconti |
-Across the week (Francesco 16/10): Monday–Thursday the home talks about club life with matches only as the small strip; from Friday the matches board comes first.
+
+Across the week (Francesco 16/10/2026, home direction given in chat, not yet a UD entry — INFERRED until registered): Monday–Thursday the home talks about club life with matches only as the small strip; from Friday the matches board comes first.
 
 ## Interaction that works today
 - In the app: polls and posts in /community; /top11 (competitive teams only, first name + surname initial, only with image-and-name consent); /fantacalcio (free, all ages, under 14 through the family account, no individual ranking of minors, non-cash prizes only); quiz points by the engagement rules; "Chiedi a Iride" for questions, the avatar builder for members. Propose only mechanics that exist; new mechanics go to scd-community and scd-sviluppo as proposals.
 - On socials: one question that needs one tap, the answer lives in the app; tag sponsors only when they agreed.
 
 ## From the draft to the app front page
-For each item that should appear on the app home, write it as a palinsesto slot ready for scd-sviluppo, with the fields of `VetrinaSlot` in apps/superapp/src/lib/vetrina.ts: id, kind, kicker, title, text, cta, href (an existing route), audience (public or members), audiences (worlds), theme (one of the VetrinaTheme values in that file), weight, showFrom / showUntil (Rome dates), visual (official asset only). Keep title within about 40 characters and text within about 140 (PROPOSED editorial limit, not enforced by the code). It goes online only through scd-sviluppo, scd-revisore and scd-sicurezza.
+For each item that should appear on the app home, write it as a palinsesto slot ready for scd-sviluppo, with the fields of `VetrinaSlot` in apps/superapp/src/lib/vetrina.ts: id, kind, kicker, title, text, cta, href (an existing route), audience (public or members), audiences (worlds), theme (one of the VetrinaTheme values in that file), weight, showFrom / showUntil (Rome dates), visual (official asset only). Keep title within about 40 characters and text within about 140 (PROPOSED editorial limit, not enforced by the code). It goes online only through scd-sviluppo, scd-revisore and scd-sicurezza. Slots respect UD-152: no autoplay video, no big promotional banner; they live in the ordered "In primo piano" slides of the home.
 
 ## Before you deliver (quality check, 1–5 each; below 4 fix it)
 True and sourced · useful (what to do, where, when) · one message · leads into the app (exact page) · respects minors and assets · sounds human (scd-tono) · would a parent at the field share it? For the apertura write two headlines (A/B) and say which you would test first.
