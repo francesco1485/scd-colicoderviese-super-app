@@ -1,6 +1,6 @@
 # Agenti SCD
 
-Quaranta agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Quarantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
@@ -15,7 +15,10 @@ Quaranta agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. Colic
 | scd-sponsor | Pipeline sponsor, offerta LED, contratti, CRM |
 | scd-tesserati | Qualità dell'anagrafica tesserati, svincoli e trasferimenti |
 | scd-atleti | Rose, convocabilità, certificati, presa visione delle convocazioni |
-| scd-azioni | Coordina gli altri agenti su un obiettivo e riporta lo stato |
+| scd-azioni | Direttore d'orchestra: piano, agenti in sequenza e in parallelo, controlli obbligatori, stato (percorso in PIPELINE.md) |
+| scd-google | Mondo Google di sportclubcolico@gmail.com: posta, calendari, Drive, fogli, documenti; mappa, ordine, proposte |
+| scd-skill | Fabbrica delle skill: trova cosa serve, progetta e prova le skill migliori |
+| scd-crescita | Crescita e viralità: creator, social, TV, giornali, sport, grafica; idee che portano gente al campo |
 | scd-stratega | Priorità della settimana, rischi, decisioni da prendere |
 | scd-avatar | Crea e ambienta avatar e personaggi 2D e 3D (sintetici, mai volti reali senza consenso) |
 | scd-regista | Il regista del gestionale: cosa fare oggi, in che ordine, chi lo fa, cosa prepara subito Claude |
@@ -44,6 +47,10 @@ Quaranta agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. Colic
 | scd-cfo | Budget, flusso di cassa a 13 settimane, costo per atleta, scenari, indicatori |
 | scd-commerciale | SCD GROW: listino diritti, proposte, metodo di vendita, rinnovi, ritorno per gli sponsor |
 | scd-negoziazione | Comuni, federazione, scuole, partner: mappa dei rapporti, schede incontro, trattative |
+
+## Percorso e squadre
+
+Sequenza dall'idea al sito vero, passi obbligatori e squadre in parallelo: vedi `PIPELINE.md`.
 
 ## Squadra di sviluppo ECC (cartella `ecc/`)
 
