@@ -385,7 +385,7 @@ export function SimulazioneTab({
               checked={model.lightsVerified}
               onChange={(e) => model.setLightsVerified(e.target.checked)}
             />{" "}
-            Luci di Dervio verificate
+            Luci di Dervio disponibili (Direzione, 16/10)
           </label>
           <label className="flex min-h-11 items-center gap-2">
             <input
@@ -429,8 +429,12 @@ export function SimulazioneTab({
           />
           <Kpi
             tone={r.lightsNeeded ? "warn" : "plain"}
-            value={String(r.lightsNeeded)}
-            label="usi serali a Dervio con luci da verificare"
+            value={model.lightsVerified ? "Sì" : String(r.lightsNeeded)}
+            label={
+              model.lightsVerified
+                ? "luci di Dervio disponibili per le gare serali"
+                : "usi serali a Dervio con luci da verificare"
+            }
           />
           <Kpi
             tone={r.winterGrass ? "warn" : "plain"}

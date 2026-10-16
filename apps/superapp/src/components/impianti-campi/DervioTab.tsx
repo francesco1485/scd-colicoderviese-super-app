@@ -354,10 +354,11 @@ export function DervioTab({
             aria-hidden="true"
           />
           <p className="m-0 text-[14px] leading-snug text-[var(--in-sub)]">
-            <b className="text-[var(--in-ink)]">Erba naturale.</b> Niente tornei
-            invernali a Dervio e controllo del meteo e del fondo prima di
-            confermare una gara. La capienza per formato va verificata sulle
-            misure 96 × 48. Luci per le gare serali da verificare.
+            <b className="text-[var(--in-ink)]">Erba naturale.</b> Dervio si usa
+            anche in inverno; se piove la gara torna a Colico (meteo controllato
+            3 giorni prima, decisione il giorno prima). La capienza per formato
+            va verificata sulle misure 96 × 48. Luci disponibili per le gare
+            serali.
           </p>
         </section>
         <SimulationNote>

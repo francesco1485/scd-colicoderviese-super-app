@@ -94,6 +94,11 @@ export const RAIN_MOVE_NOTICE_TO = "FIGC (LND/SGS) e squadra avversaria";
 /** The Comune di Dervio position, as shown to users (DG 2026-10-16). */
 export const COMUNE_DERVIO_NOTE =
   "Comune di Dervio già informato con il programma stagionale: nessun avviso gara per gara.";
+/**
+ * Lights at Dervio are available for evening matches (DG 2026-10-16 «luci Dervio ok»): the
+ * simulation starts with lights verified; the toggle stays to test the opposite case.
+ */
+export const DERVIO_LIGHTS_OK = true;
 /** Matches ending after this minute need lights at Dervio (17:00). */
 export const LIGHTS_AFTER_MIN = 17 * 60;
 

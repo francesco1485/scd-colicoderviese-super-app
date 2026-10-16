@@ -3695,6 +3695,27 @@
         "engines": "PERSONE and TEMPO",
         "status": "PUBLISHED_PER_FRANCESCO_2026-10-16_1152"
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "11:52-11:54",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "sourceQuoteFragments": [
+        "comune lasciamo stare per ora avvisato sul programma, importante solo figc e squadra avversaria in caso di spostamento a colico per mal tempo",
+        "luci Dervio ok",
+        "inverno si ma se piove no"
+      ],
+      "id": "UD-162",
+      "name": "DERVIO_NO_PER_MATCH_COMUNE_NOTICE_LIGHTS_OK_WINTER_UNLESS_RAIN",
+      "context": "Francesco (DG) 16/10/2026, chat PC, Dervio rotation decisions (time window as recorded in lib/dervio-rotation.ts). UD-161 is reserved by branch feat/pc-r138-catalogo-ruoli, so this entry takes UD-162. Implemented on branch feat/pc-comune-preavviso: lib/rotation.ts (TEAM_NOTICE_DAYS, RAIN_MOVE_NOTICE_TO, COMUNE_DERVIO_NOTE, DERVIO_LIGHTS_OK), facility-assistant, bookings-register, impianti texts, visual-master boards Rotazione-Dervio and Segreteria. Open question to Francesco: whether the referee stays in the rain-move notice of lib/dervio-rotation.ts.",
+      "normalizedCommand": {
+        "rule": "The Comune di Dervio is already informed with the season programme: no per-match notice to the Comune (the old 30-day rule is removed). When bad weather moves a Dervio match back to Colico, notify FIGC (LND/SGS) and the opponent club. Dervio lights are available for evening matches. Dervio is used in winter too; if it rains the match moves to Colico (weather check 3 days before, decision the day before). Bookings outside the programme at Dervio (rentals, tournaments): the Direzione decides whether to inform the Comune.",
+        "scope": "DERVIO_ROTATION_NOTICES_LIGHTS_WINTER",
+        "engines": "TEMPO (no useless 30-day Comune chase for the Segreteria; one clear rule for weather moves)",
+        "measure": "0 app texts asking for the 30-day Comune notice (tests rotation, facility-assistant, bookings-register, impianti-planning); FIGC and opponent notices closed by the weather-decision day (dervio-rotation checklist)",
+        "status": "IMPLEMENTED_ON_BRANCH_NOT_PUBLISHED"
+      }
     }
   ],
   "completionGate": {
