@@ -571,7 +571,7 @@ describe("dervioChecklist", () => {
     expect(byId(done, "u16-time-note").status).toBe("done");
   });
 
-  it("rain move back to Colico adds FIGC (LND/SGS) and opponent + referee items on T-1", () => {
+  it("rain move back to Colico adds FIGC (LND/SGS) and opponent club items on T-1, never the referee", () => {
     const items = dervioChecklist({
       matchDate: "2026-11-07",
       today: "2026-11-06",
@@ -584,12 +584,16 @@ describe("dervioChecklist", () => {
       owner: "segreteria",
     });
     expect(byId(items, "lnd-sgs-field-change").label).toContain("FIGC");
-    expect(byId(items, "opponent-referee-notice")).toMatchObject({
+    expect(byId(items, "opponent-notice")).toMatchObject({
       kind: "conditional",
       dueDate: "2026-11-06",
       status: "due-today",
     });
-    expect(byId(items, "opponent-referee-notice").label).toContain("avversaria");
+    expect(byId(items, "opponent-notice").label).toContain("avversaria");
+    // DG 2026-10-16 15:18 «no va avvisato la figc»: the club never notifies the referee.
+    expect(byId(items, "opponent-notice").label).not.toMatch(/arbitr/i);
+    expect(byId(items, "lnd-sgs-field-change").label).toMatch(/FIGC \(LND\/SGS\), che avvisa l'arbitro/);
+    expect(items.filter((i) => /all'arbitro|e all.arbitro/i.test(i.label))).toEqual([]);
   });
 
   it("rain rule saying 'valuta cambio giorno' shows the rain-move items; dry or missing does not", () => {
@@ -598,7 +602,7 @@ describe("dervioChecklist", () => {
     const withRain = dervioChecklist({ matchDate: "2026-11-07", today: "2026-11-04", rain: wet });
     expect(withRain.filter((i) => i.kind === "conditional").map((i) => i.id)).toEqual([
       "lnd-sgs-field-change",
-      "opponent-referee-notice",
+      "opponent-notice",
     ]);
     const dry = rainDecision("2026-11-07", { date: "2026-11-07", precipitationProbability: 5 });
     const missing = rainDecision("2026-11-07", null);
@@ -640,7 +644,7 @@ describe("dervioChecklist", () => {
       done: new Set<ChecklistItemId>(["lnd-sgs-field-change"]),
     });
     expect(byId(viaSet, "lnd-sgs-field-change").status).toBe("done");
-    expect(byId(viaSet, "opponent-referee-notice").status).toBe("overdue");
+    expect(byId(viaSet, "opponent-notice").status).toBe("overdue");
   });
 
   it("weather decision is not applicable on a synthetic pitch, kept when surface is unknown", () => {

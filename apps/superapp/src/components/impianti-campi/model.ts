@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import snapshot from "@/data/calendario-snapshot.json";
 import {
+  DERVIO_LIGHTS_OK,
   DEFAULT_OPTIONS,
   PRESETS,
   analyse,
@@ -62,7 +63,7 @@ export function useImpiantiModel(): ImpiantiModel {
   const [today] = useState(() => clubToday());
   const [preset, setPreset] = useState<PresetId>("now");
   const [options, setOpts] = useState<ScenarioOptions>(DEFAULT_OPTIONS);
-  const [lightsVerified, setLightsVerified] = useState(false);
+  const [lightsVerified, setLightsVerified] = useState(DERVIO_LIGHTS_OK);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [storageOk, setStorageOk] = useState(true);
   const [loaded, setLoaded] = useState(false);

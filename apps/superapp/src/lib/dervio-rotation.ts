@@ -16,8 +16,9 @@
  *   checklist carries the note "anticipare orario U16 (sabato)" (no automatic change).
  * - «inverno sì ma se piove no»: winter grass matches are kept (flag only); the rain rule decides.
  * - «Comune lasciamo stare per ora»: the Comune was informed with the season programme, so no
- *   weekly Comune item (only a note). FIGC (LND/SGS) and the opponent (+ referee) are notified
- *   only when the rain rule moves the match back to Colico (conditional items).
+ *   weekly Comune item (only a note). When the rain rule moves the match back to Colico, only
+ *   FIGC (LND/SGS) and the opponent club are notified (conditional items). «no va avvisato la
+ *   figc» (15:18): the club does not notify the referee, FIGC does.
  *
  * Constraints already in `rotation.ts` are reused, not duplicated: lights after 17:00
  * (`LIGHTS_AFTER_MIN`, issue `dv-lights`), winter on natural grass (`isWinterDay`, issue
@@ -37,6 +38,7 @@ import {
   GROUP_LABEL,
   LIGHTS_AFTER_MIN,
   PITCHES,
+  TEAM_NOTICE_DAYS,
   daysBetween,
   isWinterDay,
   minusDays,
@@ -345,7 +347,7 @@ export type ChecklistItemId =
   /** Conditional: only when the rain rule moves the match back to Colico. */
   | "lnd-sgs-field-change"
   /** Conditional: only when the rain rule moves the match back to Colico. */
-  | "opponent-referee-notice"
+  | "opponent-notice"
   /** Note: only when U16 Élite plays at Dervio. */
   | "u16-time-note"
   /** Note: the Comune was informed with the season programme (no weekly notice). */
@@ -384,12 +386,12 @@ export interface ChecklistLeadDays {
   allNotice: number;
   weatherCheck: number;
   weatherDecision: number;
-  /** FIGC (LND/SGS) and opponent + referee after a rain move: default the decision day (T-1). */
+  /** FIGC (LND/SGS) and opponent club after a rain move: default the decision day (T-1). */
   rainMoveNotice: number;
 }
 
 export const DEFAULT_LEAD_DAYS: Readonly<ChecklistLeadDays> = {
-  teamNotice: 14,
+  teamNotice: TEAM_NOTICE_DAYS,
   allNotice: 3,
   weatherCheck: 3,
   weatherDecision: 1,
@@ -429,7 +431,7 @@ export interface ChecklistInput {
   surface?: PitchSurface;
   /**
    * Result of the rain rule for this match. When it says "valuta-cambio-giorno" the
-   * rain-move items (FIGC, opponent + referee) appear, to be ready for the T-1 decision.
+   * rain-move items (FIGC, opponent club) appear, to be ready for the T-1 decision.
    */
   rain?: RainDecision | null;
   /** The Direzione decided to move the match back to Colico for bad weather. */
@@ -465,12 +467,12 @@ const ITEM_META: Readonly<
     kind: "task",
   },
   "lnd-sgs-field-change": {
-    label: "Maltempo, gara spostata a Colico: comunicazione del cambio campo a FIGC (LND/SGS)",
+    label: "Maltempo, gara spostata a Colico: comunicazione del cambio campo a FIGC (LND/SGS), che avvisa l'arbitro",
     owner: "segreteria",
     kind: "conditional",
   },
-  "opponent-referee-notice": {
-    label: "Maltempo, gara spostata a Colico: avviso alla squadra avversaria e all'arbitro",
+  "opponent-notice": {
+    label: "Maltempo, gara spostata a Colico: avviso alla squadra avversaria",
     owner: "segreteria",
     kind: "conditional",
   },
@@ -494,7 +496,7 @@ export const CHECKLIST_ORDER: readonly ChecklistItemId[] = [
   "club-page",
   "weather-decision",
   "lnd-sgs-field-change",
-  "opponent-referee-notice",
+  "opponent-notice",
   "u16-time-note",
   "comune-season-note",
 ];
@@ -534,7 +536,7 @@ export function dervioChecklist(input: ChecklistInput): ChecklistItem[] {
     "weather-check": due(lead.weatherCheck),
     "weather-decision": due(lead.weatherDecision),
     "lnd-sgs-field-change": due(lead.rainMoveNotice),
-    "opponent-referee-notice": due(lead.rainMoveNotice),
+    "opponent-notice": due(lead.rainMoveNotice),
     "u16-time-note": null,
     "comune-season-note": null,
   };
