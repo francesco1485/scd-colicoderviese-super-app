@@ -40,7 +40,6 @@ export async function moderate(input: {
     system: MODERATION_RULES,
     user: moderationUserMessage(input),
     maxTokens: 300,
-    temperature: 0,
     timeoutMs: 12_000,
   });
   if (out.ok) return parseModerationAnswer(out.text);

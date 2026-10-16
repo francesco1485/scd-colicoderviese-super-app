@@ -119,13 +119,22 @@ async function modelAnswer(
     system: systemPrompt(persona, level, ctx, area),
     user: userPrompt(message),
     maxTokens: 450,
-    temperature: 0.2,
     timeoutMs: AI_TIMEOUT_MS,
     ...(deps.fetchImpl ? { fetchImpl: deps.fetchImpl } : {}),
   });
   const ms = (deps.now ?? Date.now)() - t0;
   if (!out.ok) {
-    log("fallback", { persona, area, level, reason: out.reason, status: out.reason === "http" ? out.status : null, ms });
+    const http = out.reason === "http" ? out : null;
+    log("fallback", {
+      persona,
+      area,
+      level,
+      reason: out.reason,
+      status: http ? http.status : null,
+      ...(http?.errorType ? { errType: http.errorType } : {}),
+      ...(http?.errorMessage ? { errMsg: JSON.stringify(http.errorMessage) } : {}),
+      ms,
+    });
     return null;
   }
   // Strict guard everywhere except staff reading the Cervellone (INTERNO / RISERVATO) without an area.
