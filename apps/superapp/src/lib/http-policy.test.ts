@@ -95,7 +95,8 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(configuredSiteUrl({ SCD_SITE_URL: "http://app.example.it" })).toBeNull();
     expect(configuredSiteUrl({ SCD_SITE_URL: "https://evil.example/path" })).toBeNull();
     expect(demoRedirect("/core/famiglia", true)).toBe("/aree");
-    expect(demoRedirect("/grow", true)).toBe("/sponsor");
+    // /grow is the gated GROW hub (same access as /crm), no longer a demo screen.
+    expect(demoRedirect("/grow", true)).toBeNull();
     expect(demoRedirect("/shop", true)).toBe("/sponsor");
     expect(demoRedirect("/shop", false)).toBeNull();
     expect(demoRedirect("/core", false)).toBeNull();
