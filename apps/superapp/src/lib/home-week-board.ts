@@ -128,3 +128,14 @@ export function weekRangeLabel(today: string): string {
 export function gamesLabel(n: number): string {
   return n === 1 ? "1 gara" : `${n} gare`;
 }
+
+/**
+ * Home mode by Rome weekday (Francesco 16/10/2026 06:21): Monday–Thursday the club's week (only the small ticker of
+ * the next games), Friday–Sunday "si gioca" (the full match board to bring people to the field).
+ */
+export type HomeMode = "settimana" | "partite";
+
+export function homeMode(today: string): HomeMode {
+  const wd = new Date(`${today}T12:00:00Z`).getUTCDay();
+  return wd === 5 || wd === 6 || wd === 0 ? "partite" : "settimana";
+}

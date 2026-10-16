@@ -4,7 +4,10 @@
  * who decide and spend (parents, grandparents, fans, sponsors): they must find their kid's group at once, know when and
  * where it plays, feel proud and have fun; the kids must feel protagonists on and off the pitch.
  *
- * Order (Eurobet structure, Skores-style match board, light everyday palette):
+ * Two modes by Rome weekday (06:21, lib/home-week-board homeMode): Monday–Thursday the club's week — the small
+ * ticker of the next games, then the palinsesto first; Friday–Sunday "si gioca" — the full match board after the ticker.
+ * Order on match days (Eurobet structure, Skores-style match board, light everyday palette):
+ *   0. the ticker of the next games (pauses on hover, focus and tap; static with reduced motion);
  *   1. the three credentials at the top, reasoned and linked where useful (LND CR Lombardia, AC Monza);
  *   2. "In campo questa settimana": a slim scoreboard with every game in a long list — time or LIVE minute, annata
  *      and birth years, crests, competition, home/away — plus "come to the field" facts; a tap opens the week calendar;
@@ -17,7 +20,7 @@
  */
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight, Download, ExternalLink, LogIn, MapPinned, MessageCircle, UserPlus, type LucideIcon } from "lucide-react";
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { useMinuteClock } from "@/components/home/HomeBoard";
@@ -28,7 +31,7 @@ import { matchClock } from "@/lib/calendario-live";
 import { CLUB_CREDENTIALS, type CredentialId } from "@/lib/club-credentials";
 import { crestFor } from "@/lib/crests";
 import { homeTown } from "@/lib/home-matchday";
-import { weekBoardEvents, weekGroups } from "@/lib/home-week-board";
+import { homeMode, weekBoardEvents, weekGroups } from "@/lib/home-week-board";
 import { SEGRETERIA_WHATSAPP } from "@/lib/install-link";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
@@ -82,6 +85,55 @@ function OpponentCrest({ name, size }: { name: string; size: number }) {
   const { src, label } = crestFor(name);
   if (!src) return <span aria-hidden="true" className="block rounded-full bg-[#eef3f9] ring-1 ring-[#dfe7f2]" style={{ width: size, height: size }} />;
   return <img src={src} alt={`Stemma ${label}`} width={size} height={size} loading="lazy" decoding="async" className="object-contain" style={{ width: size, height: size }} />;
+}
+
+/* ------------------------------------------------------------ 0. ticker */
+
+const WD3 = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"] as const;
+
+/** Small bar that scrolls the next games (Francesco 16/10 06:21); pauses on hover, focus and tap, still with reduced motion. */
+function Ticker({ events, groups }: { events: readonly PublicEvent[]; groups: readonly PublicGroup[] }) {
+  const [paused, setPaused] = useState(false);
+  const groupOf = useMemo(() => new Map(groups.map((g) => [g.id, g])), [groups]);
+  if (events.length === 0) return null;
+  const items = events.map((e) => {
+    const g = groupOf.get(e.group);
+    const d = new Date(`${e.date}T12:00:00Z`);
+    const opp = e.opponent ? crestFor(e.opponent).label : "da definire";
+    return { e, g, when: `${WD3[d.getUTCDay()]} ${d.getUTCDate()} · ${e.time || "--:--"}`, text: `${groupShort(g, e.category)} ${e.homeAway === "CASA" ? "vs" : "@"} ${opp}` };
+  });
+  const row = (dup: boolean) =>
+    items.map(({ e, g, when, text }) => (
+      <li key={`${dup ? "d" : "o"}-${e.id}`} className={dup ? "scd-ticker-dup" : undefined} aria-hidden={dup || undefined}>
+        <Link
+          to="/calendario"
+          search={{ annata: e.group, vista: "settimana" }}
+          tabIndex={dup ? -1 : undefined}
+          className="scd-focus inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-md px-3 text-[13px] text-[#23406e] hover:text-[#0b1e3a]"
+        >
+          <span aria-hidden="true" className="size-2 rounded-full" style={{ background: g?.color ?? "#668196" }} />
+          <span className="font-extrabold tabular-nums text-[#1556c4]">{when}</span>
+          <span className="font-semibold">{text}</span>
+          {e.homeAway === "CASA" && <span className="rounded-[4px] bg-[#ffd600] px-1 text-[10px] font-extrabold uppercase text-[#061a3d]">Casa</span>}
+        </Link>
+      </li>
+    ));
+  return (
+    <section aria-label="Prossime gare" className={`${PANEL} flex items-stretch overflow-hidden`} data-testid="home-ticker">
+      <span className="flex shrink-0 items-center bg-[#0b2a5b] px-3 text-[11px] font-extrabold uppercase tracking-[0.08em] text-white">Prossime gare</span>
+      <div
+        className="scd-ticker min-w-0 flex-1 overflow-hidden"
+        data-paused={paused}
+        onPointerDown={() => setPaused((p) => !p)}
+        style={{ ["--ticker-s" as string]: `${Math.max(20, items.length * 6)}s` }}
+      >
+        <ul className="scd-ticker-track m-0 flex w-max list-none p-0">
+          {row(false)}
+          {row(true)}
+        </ul>
+      </div>
+    </section>
+  );
 }
 
 /* ------------------------------------------------------------ 1. credits */
@@ -435,13 +487,24 @@ export function HomeLobby({
   const nowMs = useMinuteClock(serverNow);
   const week = useMemo(() => weekBoardEvents(calendar.events, today), [calendar.events, today]);
   const slots = (vetrina?.tutti ?? []).slice(0, 5);
+  const mode = homeMode(today);
   return (
     <div className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-7 pt-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start lg:gap-7 lg:pt-6`} data-testid="home-lobby">
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-7 lg:gap-9">
+        <Ticker events={week} groups={calendar.groups} />
         <Credentials />
-        <MatchBoard events={week} groups={calendar.groups} today={today} nowMs={nowMs} />
-        <Teams calendar={calendar} today={today} />
-        <Magazine slots={slots} />
+        {mode === "partite" ? (
+          <>
+            <MatchBoard events={week} groups={calendar.groups} today={today} nowMs={nowMs} />
+            <Teams calendar={calendar} today={today} />
+            <Magazine slots={slots} />
+          </>
+        ) : (
+          <>
+            <Magazine slots={slots} />
+            <Teams calendar={calendar} today={today} />
+          </>
+        )}
         <div className="grid gap-3 lg:hidden">
           <JoinPanel />
           <ul className="m-0 grid list-none gap-2.5 p-0">

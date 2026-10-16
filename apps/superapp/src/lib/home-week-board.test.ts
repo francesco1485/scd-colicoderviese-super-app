@@ -65,3 +65,13 @@ describe("home week board", () => {
     expect(gamesLabel(6)).toBe("6 gare");
   });
 });
+
+describe("home mode", () => {
+  it("is the club's week Monday–Thursday and match time Friday–Sunday", async () => {
+    const { homeMode } = await import("./home-week-board");
+    expect(homeMode("2026-10-12")).toBe("settimana"); // lunedì
+    expect(homeMode("2026-10-15")).toBe("settimana"); // giovedì
+    expect(homeMode("2026-10-16")).toBe("partite"); // venerdì
+    expect(homeMode("2026-10-18")).toBe("partite"); // domenica
+  });
+});

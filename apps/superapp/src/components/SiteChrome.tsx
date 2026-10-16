@@ -195,7 +195,7 @@ function HeaderSearch() {
   return (
     <form
       role="search"
-      className="relative hidden w-full max-w-[520px] lg:block"
+      className="relative hidden w-full max-w-[300px] lg:block xl:max-w-[340px]"
       onSubmit={(e) => {
         e.preventDefault();
         const first = results[0];
@@ -266,6 +266,42 @@ function HeaderSearch() {
   );
 }
 
+/**
+ * Desktop centre tabs in the style of a Facebook page (Francesco 16/10/2026 06:21: «una barra in alto stile pagina
+ * interna Facebook»): big icons, the active one underlined; labels as tooltip and accessible name.
+ */
+const TOP_TABS: readonly { to: string; label: string; icon: LucideIcon; match: (p: string) => boolean }[] = [
+  { to: "/", label: "Home", icon: House, match: (p) => p === "/" },
+  { to: "/calendario", label: "Partite", icon: CalendarDays, match: (p) => p.startsWith("/calendario") },
+  { to: "/eventi", label: "Eventi e tornei", icon: Trophy, match: (p) => p.startsWith("/eventi") || p.startsWith("/tornei") },
+  { to: "/community", label: "Comunità", icon: MessagesSquare, match: (p) => p.startsWith("/community") },
+  { to: "/sponsor", label: "Sponsor", icon: Handshake, match: (p) => p.startsWith("/sponsor") },
+];
+
+function TopTabs() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <nav aria-label="Sezioni principali" className="hidden h-full flex-1 items-stretch justify-center gap-1 lg:flex" data-testid="top-tabs">
+      {TOP_TABS.map((t) => {
+        const on = t.match(pathname);
+        return (
+          <Link
+            key={t.to}
+            to={t.to as never}
+            title={t.label}
+            aria-label={t.label}
+            aria-current={on ? "page" : undefined}
+            className={`scd-focus relative grid w-[84px] place-items-center rounded-[10px] transition-colors duration-150 xl:w-[104px] ${on ? "text-[#ffd600]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+          >
+            <t.icon className="size-[26px]" strokeWidth={on ? 2.4 : 1.9} aria-hidden="true" />
+            {on && <span aria-hidden="true" className="absolute inset-x-2 bottom-0 h-[3px] rounded-t-full bg-[#ffd600]" />}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
 export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const board = isBoardRoute(pathname);
@@ -285,7 +321,8 @@ export function SiteHeader() {
           <Wordmark />
         </Link>
         <HeaderSearch />
-        <div className="ml-auto flex shrink-0 items-center gap-2 lg:gap-3">
+        <TopTabs />
+        <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0 lg:gap-3">
           {/* Desktop account button; on phones the same menu opens from the Profilo tab and the access screens. */}
           <div className="hidden lg:block">
             <AccessMenu />
