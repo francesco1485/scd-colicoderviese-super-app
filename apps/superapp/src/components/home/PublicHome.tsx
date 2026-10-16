@@ -32,13 +32,14 @@ type PublicCalendar = Awaited<ReturnType<typeof getPublicCalendarSnapshot>>;
 
 export function PublicHome({
   calendar,
+  vetrina,
   feed = null,
   notice = null,
   nowMs,
   today,
 }: {
   calendar: PublicCalendar;
-  /** Vetrina picks of the day: still loaded for the LED wall day, never rendered on the home (UD-152, 15/10 13:54). */
+  /** Palinsesto of the day (lib/vetrina): "Dal club" magazine (Francesco 16/10 05:59 «la pagina iniziale è una vetrina di bellezza e notizie e iniziative e idee e giochi»), static, changes daily, never a carousel. */
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>>;
   /** R20 public feed (alerts and weekend results); null when R20 did not answer in time. */
   feed?: PublicFeed | null;
@@ -69,7 +70,7 @@ export function PublicHome({
       </h1>
       <UrgentNotices items={alerts} />
       <ClubNoticeCard notice={notice} />
-      <HomeLobby calendar={calendar} nowMs={nowMs} today={today} />
+      <HomeLobby calendar={calendar} vetrina={vetrina} nowMs={nowMs} today={today} />
       <WeekendResults rows={results} />
     </main>
   );

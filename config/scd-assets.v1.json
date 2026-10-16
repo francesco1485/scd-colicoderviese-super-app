@@ -406,7 +406,8 @@
       "LED_DEMO_VIDEO": "VIDEO",
       "VIDEO_POSTER": "PHOTO",
       "LED_BOARD_STILL": "PHOTO",
-      "PARTNER_KIT_MOCKUP_BASE": "PHOTO"
+      "PARTNER_KIT_MOCKUP_BASE": "PHOTO",
+      "OFFICIAL_KIT_RENDER": "CUTOUT"
     },
     "runtime_roots": [
       "apps/superapp/public/media/",
@@ -2661,6 +2662,17 @@
       "derived_from": "Supplied by the SCD Direzione on 2026-10-15 16:33 (fornito dalla Direzione SCD 15/10/2026): castello-cantu.png (original sha256 b883426d57b6cd21)",
       "transform": "KEEP_ENHANCE: crop uniform white/transparent frame only (4% padding), downscale to max 256 px, lossless WebP; no redraw, no colour change",
       "vector_status": "RESEARCH_REAL_ASSET"
+    },
+    {
+      "path": "apps/superapp/public/media/kit/kit-2026-27-blu.webp",
+      "class": "OFFICIAL_KIT_RENDER",
+      "status": "VERIFIED",
+      "asset_decision": "KEEP_ENHANCE",
+      "source": "Drive SCD OPERATIONS - WEB APP / ASSET UFFICIALI, file KIT_BLU_VISUAL.png (id 1IbfGcn_uzG8v6AH_97WG5lQNg6gUvHYq), 2048x2048 PNG with alpha: official 2026/27 blue kit render (front and back)",
+      "git_blob_sha": "fcbe73b4b5e5c42b6ba5a0e74d43d3ef03f7db09",
+      "transform": "trimmed to the alpha bounding box and resized to 1400 px, WebP with alpha (quality 86); no redraw",
+      "use": "public home 'Dal club' tile of the kit slot (components/home/HomeLobby.tsx)",
+      "note": "Francesco 15/10/2026 22:04: «in drive c'è un catalogo pieno di immagini»; used as the official kit image instead of the supplier price list"
     }
   ],
   "vector_research": [

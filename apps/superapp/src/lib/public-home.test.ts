@@ -100,8 +100,12 @@ describe("public home v5", () => {
     // Opponent crest only from the verified registry: empty disc when unknown, never an invented crest.
     expect(lobby).toMatch(/const \{ src, label \} = crestFor\(name\);\s*if \(!src\) return <span aria-hidden="true"/);
     expect(lobby).not.toMatch(/publicTeamCrest|team-crest/);
-    // Filters are real buttons with aria-pressed; one static banner, no slider, no hero art, no mascot.
-    expect(lobby).toMatch(/aria-pressed=\{on\}/);
+    // 16/10 05:59: the three credentials at the top (CR Lombardia and Monza linked), the Skores-style week board with
+    // birth years, the teams with championship and next game; no slider, no hero art, no mascot.
+    expect(lobby).toContain('data-testid="home-credentials"');
+    expect(lobby).toContain('"https://www.crlombardia.it/"');
+    expect(lobby).toContain('data-testid="home-board"');
+    expect(lobby).toContain('data-testid="home-teams"');
     expect(lobby).not.toMatch(/setInterval|Carousel|slide|HeroArt|SkyJolly|PersonaAvatar/i);
   });
 
@@ -253,7 +257,7 @@ describe("public home v5", () => {
     expect(chat).not.toMatch(/crovi-cameo|CroviActor|cameoLine/);
   });
 
-  it("UD-116 + Eurobet footer (22:04): reduced footer (credits band, logo, contacts, app + social, legal links), no link index", () => {
+  it("UD-116 + light footer (16/10 05:59): reduced footer (logo, contacts, app + social, credits sentence, legal links), no link index", () => {
     const chrome = code("src/components/SiteChrome.tsx");
     const footer = chrome.slice(chrome.indexOf("export function SiteFooter"));
     expect(footer).not.toMatch(/LINK_GROUPS|Tutto sul club|footer-group-/);
@@ -269,7 +273,7 @@ describe("public home v5", () => {
       /openCookiePrefs/,
       /to="\/safeguarding"/,
       /href="\/elimina-account"/,
-      /<ClubCredentials variant="bar"/,
+      /\{CREDENTIALS_SENTENCE\}/,
     ])
       expect(footer).toMatch(must);
   });

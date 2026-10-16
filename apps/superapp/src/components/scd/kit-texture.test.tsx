@@ -59,8 +59,8 @@ describe("kit 2026/27 texture on shared hero bands (Direzione 13/10/2026)", () =
     expect(src("../../routes/calendario.tsx")).toContain('<KitTexture motif="mountains-lake" overlay />');
     expect(src("../../routes/societa.tsx")).toMatch(/<HallHero\s+motif="forte"/);
     expect(src("../../routes/eventi.index.tsx")).toMatch(/<PageHero motif="mountains-lake"/);
-    // Eurobet rebuild (15/10 22:04): no hero art on the home; the match banner carries the kit monogram texture.
+    // Home (16/10 05:59): no hero art; the official kit render lives in the "Dal club" kit tile.
     expect(src("../home/HomeLobby.tsx")).not.toMatch(/HeroArt/);
-    expect(src("../home/HomeLobby.tsx")).toContain('<KitTexture motif="monogram" overlay />');
+    expect(src("../home/HomeLobby.tsx")).toContain("/media/kit/kit-2026-27-blu.webp");
   });
 });
