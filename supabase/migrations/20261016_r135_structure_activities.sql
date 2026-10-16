@@ -47,7 +47,7 @@ create table if not exists public.scd_structure_activities (
   title text not null
     check (char_length(btrim(title)) between 2 and 80
       and title !~ '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
-      and title !~ '(\+|00)?[0-9]([ -]?[0-9]){8,}'),
+      and title !~ '(\+|00)?[0-9]([ ./-]?[0-9]){8,}'),
   starts_at timestamptz not null,
   ends_at timestamptz not null,
   -- position id of the registry (e.g. responsabile-struttura-colico), never a person's name
@@ -58,7 +58,7 @@ create table if not exists public.scd_structure_activities (
   notes text
     check (notes is null or (char_length(notes) <= 300
       and notes !~ '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
-      and notes !~ '(\+|00)?[0-9]([ -]?[0-9]){8,}')),
+      and notes !~ '(\+|00)?[0-9]([ ./-]?[0-9]){8,}')),
   created_by uuid default auth.uid(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -81,7 +81,7 @@ as $$
   select public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[])
     or public.scd_has_position(p_organization_id, array['presidente','direttore-generale','coordinatore-attivita-sportiva','responsabile-attivita-base','responsabile-struttura','responsabile-struttura-colico','responsabile-struttura-dervio','responsabile-campi','responsabile-club-house']);
 $$;
-revoke all on function public.scd_structure_reader(uuid) from public, anon;
+revoke all on function public.scd_structure_reader(uuid) from public, anon, authenticated;
 
 -- ---------------------------------------------------------------- 3. read a range (at most 42 days)
 create or replace function public.scd_structure_week(p_organization_id uuid, p_from date, p_to date)

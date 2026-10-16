@@ -138,7 +138,10 @@ export interface WeekDay {
 }
 
 export interface StructureKpi {
-  /** Everything in the week at both sites: trainings, home matches and (when readable) r135 activities. */
+  /**
+   * Known activity in the week at both sites: trainings (Colico only, the Quadro has no Dervio rows), home matches and
+   * (when readable) r135 activities. Not the total of the week: Dervio trainings are unknown.
+   */
   activities: number;
   /** Shifts without anyone on them; null while r135 is not readable. */
   uncoveredShifts: number | null;
@@ -287,7 +290,38 @@ export function structureWindow(today: string): { from: string; to: string } {
   return { from: weekRange(today, WEEK_OFFSET_MIN).from, to: weekRange(today, WEEK_OFFSET_MAX).to };
 }
 
-/** Count of items of one site in the week (for the site switch). */
+/** Count of known, not cancelled items of one site in the week (raw number, not a display value: see siteBadge). */
 export function siteCount(week: StructureWeek, site: StructureSite): number {
   return week.sites[site].reduce((n, d) => n + d.items.filter((i) => !i.cancelled).length, 0);
+}
+
+/** Sites whose trainings are not in the Quadro settimanale: their activity count is never complete. */
+export const SITES_WITHOUT_TRAININGS: readonly StructureSite[] = ["DERVIO"];
+
+export interface SiteBadge {
+  /** Visible value: a number of known activities, or "—" when the activity of the site is not known. */
+  value: string;
+  /** Visible qualifier next to the number ("solo gare", "parziale"), or null when the count is complete. */
+  note: string | null;
+  /** Screen-reader text that completes the badge (e.g. "dato non completo"), or null. */
+  srText: string | null;
+}
+
+/**
+ * Badge of the site switch. Colico shows its count (Quadro trainings, home matches, r135 rows when readable).
+ * Dervio has no training rows in the Quadro, so its activity is unknown: it never shows 0. Without any known item it
+ * shows "—" ("dato non completo"); with home matches only it shows the number with "solo gare"; with other known rows
+ * (r135) it shows the number with "parziale" because the trainings are still missing.
+ */
+export function siteBadge(week: StructureWeek, site: StructureSite): SiteBadge {
+  const n = siteCount(week, site);
+  if (!SITES_WITHOUT_TRAININGS.includes(site)) return { value: String(n), note: null, srText: null };
+  if (n === 0) return { value: "—", note: null, srText: "dato non completo" };
+  const live = week.sites[site].flatMap((d) => d.items).filter((i) => !i.cancelled);
+  const onlyMatches = live.every((i) => i.kind === "GARA");
+  return {
+    value: String(n),
+    note: onlyMatches ? "solo gare" : "parziale",
+    srText: "dato non completo: allenamenti non presenti nel quadro",
+  };
 }

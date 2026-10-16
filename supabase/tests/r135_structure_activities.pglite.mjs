@@ -83,6 +83,9 @@ const w = (i, v) => base.map((x, j) => (j === i ? v : x));
 await bad(w(10, "chiamare mario.rossi@example.com"));
 await bad(w(10, "tel 333 123 4567"));
 await bad(w(4, "Chiama 3331234567"));
+await bad(w(10, "tel 333.123.4567"));
+await bad(w(10, "tel 333/123/4567"));
+await bad(w(4, "Chiama 0341-93.12.34"));
 await bad(w(1, "LECCO"));
 await bad(w(2, "BAR"));
 await bad(w(3, "PARTITA"));
@@ -120,5 +123,17 @@ const g = await db.query(`select has_function_privilege('anon', 'public.scd_stru
   has_table_privilege('authenticated', 'public.scd_structure_activities', 'select') c,
   has_table_privilege('anon', 'public.scd_structure_activities', 'select') d`);
 assert.deepEqual(g.rows[0], { a: false, b: true, c: false, d: false });
+
+// The reader check is internal: neither anon nor authenticated may call it directly (only scd_structure_week does)
+const r = await db.query(`select has_function_privilege('anon', 'public.scd_structure_reader(uuid)', 'execute') a,
+  has_function_privilege('authenticated', 'public.scd_structure_reader(uuid)', 'execute') b`);
+assert.deepEqual(r.rows[0], { a: false, b: false });
+
+// As the real authenticated role: the week still answers (SECURITY DEFINER), the reader is refused
+await db.exec(`select set_config('request.jwt.claim.sub', '${DIR}', false); set role authenticated;`);
+assert.equal((await db.query(call, [ORG, "2026-10-12", "2026-10-18"])).rows[0].r.length, 3);
+await assert.rejects(() => db.query(`select public.scd_structure_reader($1) as ok`, [ORG]), (e) => e.code === "42501");
+await assert.rejects(() => db.query(`select count(*) from public.scd_structure_activities`), (e) => e.code === "42501");
+await db.exec(`reset role;`);
 
 console.log("r135 structure activities: all assertions passed");

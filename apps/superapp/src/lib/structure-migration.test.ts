@@ -55,11 +55,22 @@ describe("r135 structure activities (staged, not applied)", () => {
       expect(f[0], f[1]).toMatch(/set search_path to 'public'/);
       expect(body, f[1]).toMatch(new RegExp(`revoke all on function public\\.${f[1]}\\([^)]*\\) from public, anon`));
     }
+    // The reader is an internal check: not callable by authenticated either (only through scd_structure_week).
+    expect(body).toContain("revoke all on function public.scd_structure_reader(uuid) from public, anon, authenticated;");
+    expect(body).not.toMatch(/grant execute on function public\.scd_structure_reader/i);
     const week = fns.find((f) => f[1] === "scd_structure_week")![0];
     expect(week).toMatch(/security definer/);
     expect(week).toMatch(/auth\.uid\(\) is null or not public\.scd_structure_reader/);
     expect(week).toMatch(/p_to - p_from > 42/);
     expect(week).not.toMatch(/created_by/);
+  });
+
+  it("refuses phone numbers written with spaces, dots, slashes or dashes in title and notes", () => {
+    const phone = "'(\\+|00)?[0-9]([ ./-]?[0-9]){8,}'";
+    expect(body.split(phone).length - 1).toBe(2);
+    const re = /(\+|00)?[0-9]([ ./-]?[0-9]){8,}/;
+    for (const t of ["333 123 4567", "333.123.4567", "333/123/4567", "0341-93.12.34", "+393331234567"]) expect(t).toMatch(re);
+    for (const t of ["Apertura 07:30", "Serata soci 2026", "Campo 1 e 2"]) expect(t).not.toMatch(re);
   });
 
   it("keeps the vocabularies equal to lib/structure-activities.ts", () => {
@@ -85,7 +96,7 @@ describe("r135 structure activities (staged, not applied)", () => {
     for (const col of ["title", "notes"]) {
       const def = body.match(new RegExp(`\\n  ${col} text[\\s\\S]*?\\)\\),?\\n`))?.[0] ?? "";
       expect(def, col).toContain("!~ '[A-Za-z0-9._%+-]+@");
-      expect(def, col).toContain("!~ '(\\+|00)?[0-9]([ -]?[0-9]){8,}'");
+      expect(def, col).toContain("!~ '(\\+|00)?[0-9]([ ./-]?[0-9]){8,}'");
     }
     expect(body).not.toMatch(/birth|codice_fiscale|phone|email text|person_id|athlete/i);
   });

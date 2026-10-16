@@ -38,6 +38,21 @@ export interface StructureBoard {
 
 export const STRUCTURE_OFF = "Funzione in preparazione: serve applicare r135.";
 
+export const STRUCTURE_DENIED = "Lettura non riuscita: serve un accesso Direzione, Segreteria o responsabile della struttura.";
+export const STRUCTURE_READ_FAILED = "Lettura non riuscita, riprova più tardi";
+
+/**
+ * Message for a failed read of r135. Only insufficient_privilege (42501, raised by scd_structure_week for a caller
+ * who is not a reader) is a permission problem; anything else is a generic failure. Server side, only the error code
+ * is logged: never the message, details or hint (they may carry identifiers).
+ */
+export function structureReadError(error: { code?: string | null } | null | undefined): string {
+  const code = typeof error?.code === "string" && error.code ? error.code : "unknown";
+  if (code === "42501") return STRUCTURE_DENIED;
+  console.warn(`[struttura] scd_structure_week non riuscita: codice ${code}`);
+  return STRUCTURE_READ_FAILED;
+}
+
 /** Board of a closed gate: nothing read, nothing serialised. */
 export function emptyStructureBoard(gate: WorkAreaGate): StructureBoard {
   return {
@@ -77,6 +92,6 @@ export const getStructureBoard = createServerFn({ method: "GET" }).handler(async
   const win = structureWindow(base.today);
   const { data, error } = await sb.rpc("scd_structure_week", { p_organization_id: org.organizationId, p_from: win.from, p_to: win.to });
   if (machineMissing(error)) return { ...open, connected: true };
-  if (error) return { ...open, connected: true, ready: true, error: "Lettura non riuscita: serve un accesso Direzione, Segreteria o responsabile della struttura." };
+  if (error) return { ...open, connected: true, ready: true, error: structureReadError(error) };
   return { ...open, connected: true, ready: true, activities: parseStructureActivities(data) };
 });

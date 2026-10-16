@@ -26,11 +26,12 @@ import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import {
   KIND_LABEL,
   SITE_LABEL,
+  SITES_WITHOUT_TRAININGS,
   STRUCTURE_SITES,
   WEEK_OFFSET_MAX,
   WEEK_OFFSET_MIN,
   buildStructureWeek,
-  siteCount,
+  siteBadge,
   type StructureSite,
   type WeekItem,
   type WeekItemKind,
@@ -79,7 +80,9 @@ const dayTitle = (iso: string) => {
   return `${p.weekday.charAt(0)}${p.weekday.slice(1).toLowerCase()} ${p.day} ${p.month.toLowerCase()}`;
 };
 const timeRange = (i: WeekItem) => (i.start ? (i.end ? `${i.start}–${i.end}` : i.start) : "ora —");
-const count = (n: number) => (n === 1 ? "1 attività" : `${n} attività`);
+/** Day count; a site without Quadro trainings (Dervio) never says "0 attività": with nothing known it is "—". */
+const count = (n: number, site: StructureSite) =>
+  n === 0 && SITES_WITHOUT_TRAININGS.includes(site) ? "attività non note" : n === 1 ? "1 attività" : `${n} attività`;
 
 function StrutturaPage({ data }: { data: StructureBoard }) {
   const [site, setSite] = useState<StructureSite>("COLICO");
@@ -129,26 +132,30 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
       )}
 
       <section aria-label="Numeri della settimana" className="grid grid-cols-3 gap-2 lg:gap-[18px]">
-        <KpiTile icon={CalendarDays} value={week.kpi.activities} label="attività in settimana" sub="Colico e Dervio" />
+        <KpiTile icon={CalendarDays} value={week.kpi.activities} label="attività note in settimana" sub="allenamenti solo Colico" />
         <KpiTile icon={Users} value={week.kpi.uncoveredShifts} label="turni scoperti" sub={notReady ? "da attivare (r135)" : "senza nessuno"} warn />
         <KpiTile icon={Moon} value={week.kpi.clubHouseEvenings} label="serate Club House" sub={notReady ? "da attivare (r135)" : "in settimana"} />
       </section>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div role="tablist" aria-label="Sede" className="inline-flex rounded-full border border-[#b9d5ef] bg-white p-1">
+        <div role="group" aria-label="Sede" className="inline-flex rounded-full border border-[#b9d5ef] bg-white p-1">
           {STRUCTURE_SITES.map((s) => {
             const on = s === site;
+            const badge = siteBadge(week, s);
             return (
               <button
                 key={s}
                 type="button"
-                role="tab"
-                aria-selected={on}
+                aria-pressed={on}
                 onClick={() => setSite(s)}
                 className={`scd-focus inline-flex h-10 items-center gap-2 rounded-full px-4 text-[15px] font-semibold transition-colors duration-150 ${on ? "bg-[var(--in-info)] text-white" : "text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"}`}
               >
                 {SITE_LABEL[s]}
-                <span className={`rounded-full px-1.5 text-[12.5px] ${on ? "bg-white/20" : "bg-[var(--in-info-bg)]"}`}>{siteCount(week, s)}</span>
+                <span className={`rounded-full px-1.5 text-[12.5px] ${on ? "bg-white/20" : "bg-[var(--in-info-bg)]"}`}>
+                  {badge.value}
+                  {badge.note && <span className="ml-1 font-medium">{badge.note}</span>}
+                  {badge.srText && <span className="sr-only"> ({badge.srText})</span>}
+                </span>
               </button>
             );
           })}
@@ -189,7 +196,7 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
           {/* Phone (VR-025): week strip, selected day in a blue circle, rows with a coloured bar. */}
-          <Card id="str-giorno" title={`${SITE_LABEL[site]} · settimana ${week.label}`} className="lg:hidden">
+          <Card id="str-giorno" title={<WeekTitle site={site} label={week.label} />} className="lg:hidden">
             <ol className="m-0 grid list-none grid-cols-7 gap-1 px-3 pb-3 pt-1" aria-label="Giorni della settimana">
               {days.map((d) => {
                 const p = dateParts(d.date);
@@ -201,7 +208,7 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
                       type="button"
                       onClick={() => setPicked(d.date)}
                       aria-pressed={on}
-                      aria-label={`${dayTitle(d.date)}: ${count(live)}`}
+                      aria-label={`${dayTitle(d.date)}: ${count(live, site)}`}
                       className="scd-focus flex w-full flex-col items-center gap-1 rounded-xl py-1"
                     >
                       <span className="text-[12px] font-semibold uppercase text-[var(--in-sub)]">{p.weekday.slice(0, 3)}</span>
@@ -218,14 +225,14 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
             </ol>
             <div className="flex items-baseline justify-between border-t border-[var(--in-line)] px-4 pb-1 pt-3">
               <h3 className="m-0 text-[16px] font-bold">{dayTitle(selectedDay.date)}</h3>
-              <span className="text-[13.5px] text-[var(--in-sub)]">{count(selectedDay.items.filter((i) => !i.cancelled).length)}</span>
+              <span className="text-[13.5px] text-[var(--in-sub)]">{count(selectedDay.items.filter((i) => !i.cancelled).length, site)}</span>
             </div>
             <DayList items={selectedDay.items} site={site} notReady={notReady} />
           </Card>
 
           {/* Desktop (VR-026): seven columns for the chosen site. */}
-          <Card id="str-settimana" title={`${SITE_LABEL[site]} · settimana ${week.label}`} sub="Barra blu: allenamento · gialla: gara in casa · azzurra: turno, apertura, chiusura · blu notte: attività serale" className="hidden lg:block">
-            <ol className="m-0 grid list-none grid-cols-7 gap-2 px-4 pb-4 pt-1" aria-live="polite">
+          <Card id="str-settimana" title={<WeekTitle site={site} label={week.label} />} sub="Barra blu: allenamento · gialla: gara in casa · azzurra: turno, apertura, chiusura · blu notte: attività serale" className="hidden lg:block">
+            <ol className="m-0 grid list-none grid-cols-7 gap-2 px-4 pb-4 pt-1" aria-label="Giorni della settimana">
               {days.map((d) => (
                 <li key={d.date} className="flex min-w-0 flex-col gap-1.5">
                   <h3 className={`m-0 flex items-center gap-1 px-0.5 pb-1 text-[14px] font-bold ${d.date === data.today ? "text-[var(--in-info)]" : ""}`}>
@@ -262,7 +269,7 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
           </Card>
           <Card id="str-legenda" title="Cosa conta" className="hidden lg:block">
             <ul className="m-0 list-none px-4 pb-4 text-[14px] leading-snug sm:px-[18px]">
-              <li className="py-1"><b>Attività in settimana</b>: allenamenti, gare in casa e attività registrate nelle due sedi, annullate escluse.</li>
+              <li className="py-1"><b>Attività note in settimana</b>: allenamenti (solo Colico: il quadro non ha Dervio), gare in casa e attività registrate nelle due sedi, annullate escluse. Per Dervio il numero non è completo: "—" se non c'è nulla di noto, "solo gare" se ci sono solo gare in casa.</li>
               <li className="py-1"><b>Turni scoperti</b>: turni volontari, aperture e chiusure senza nessuno.</li>
               <li className="py-1"><b>Serate Club House</b>: sere con un'attività al Club House dalle 18:00.</li>
             </ul>
@@ -271,6 +278,15 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
         </div>
       </div>
     </WorkAreaShell>
+  );
+}
+
+/** Card title: the week label is the only live region, so changing week or site is announced once, not the whole grid. */
+function WeekTitle({ site, label }: { site: StructureSite; label: string }) {
+  return (
+    <span aria-live="polite" aria-atomic="true">
+      {SITE_LABEL[site]} · settimana {label}
+    </span>
   );
 }
 

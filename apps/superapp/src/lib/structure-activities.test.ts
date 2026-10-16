@@ -6,6 +6,7 @@ import {
   buildStructureWeek,
   homeVenue,
   parseStructureActivities,
+  siteBadge,
   siteCount,
   structureWindow,
   type StructureActivity,
@@ -130,6 +131,53 @@ describe("week grouping of Attività in struttura", () => {
     const shift = w.sites.COLICO.flatMap((d) => d.items).find((i) => i.kind === "APERTURA")!;
     expect(shift).toMatchObject({ covered: false, start: "07:30", responsibleRole: "responsabile-club-house" });
     expect(w.sites.COLICO.flatMap((d) => d.items).find((i) => i.kind === "TURNO_VOLONTARIO")!.cancelled).toBe(true);
+  });
+
+  it("Dervio with no home matches never yields 0 as a display value (its trainings are unknown)", () => {
+    const slots = [slot("LUNEDÌ", "17:00–18:30", "U12")];
+    for (const activities of [null, []] as const) {
+      const w = buildStructureWeek({ today: TODAY, offset: 0, slots, events: [], activities });
+      const b = siteBadge(w, "DERVIO");
+      expect(b.value).toBe("—");
+      expect(b.value).not.toBe("0");
+      expect(b.srText).toBe("dato non completo");
+      expect(b.note).toBeNull();
+      // Colico is complete for what the Quadro knows: its number shows as it is.
+      expect(siteBadge(w, "COLICO")).toEqual({ value: "1", note: null, srText: null });
+    }
+    // An away match or a match at Colico does not make Dervio known.
+    const w = buildStructureWeek({
+      today: TODAY,
+      offset: 0,
+      slots: [],
+      events: [event({ id: "A", homeAway: "FUORI", venue: "DERVIO - CAMPO 1" }), event({ id: "B" })],
+      activities: [],
+    });
+    expect(siteBadge(w, "DERVIO").value).toBe("—");
+    expect(siteBadge(w, "COLICO").value).toBe("1");
+  });
+
+  it("Dervio with home matches shows the number with 'solo gare'; with r135 rows it is 'parziale'", () => {
+    const events = [event({ id: "B", venue: "DERVIO - CAMPO 1", date: "2026-10-18", time: "10:30" })];
+    const onlyMatches = buildStructureWeek({ today: TODAY, offset: 0, slots: [], events, activities: null });
+    expect(siteBadge(onlyMatches, "DERVIO")).toEqual({ value: "1", note: "solo gare", srText: "dato non completo: allenamenti non presenti nel quadro" });
+    const mixed = buildStructureWeek({
+      today: TODAY,
+      offset: 0,
+      slots: [],
+      events,
+      activities: [act({ id: "88888888-8888-4888-8888-888888888888", site: "DERVIO" })],
+    });
+    expect(siteBadge(mixed, "DERVIO")).toMatchObject({ value: "2", note: "parziale" });
+    // A cancelled Dervio row alone does not turn "—" into a number.
+    const cancelled = buildStructureWeek({
+      today: TODAY,
+      offset: 0,
+      slots: [],
+      events: [],
+      activities: [act({ id: "99999999-9999-4999-8999-999999999999", site: "DERVIO", status: "ANNULLATA" })],
+    });
+    expect(siteBadge(cancelled, "DERVIO").value).toBe("—");
   });
 
   it("an applied but empty register gives real zeros", () => {
