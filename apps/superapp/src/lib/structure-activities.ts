@@ -24,19 +24,50 @@ export type StructureStatus = (typeof STRUCTURE_STATUSES)[number];
 /** Kinds that are duty shifts: they count as "scoperti" while nobody has taken them. */
 export const SHIFT_KINDS: readonly StructureKind[] = ["TURNO_VOLONTARIO", "APERTURA", "CHIUSURA"];
 
-/** Who may read r135 (mirror of scd_structure_reader in the SQL, kept equal by a test). */
+/**
+ * Who may read r135, per site (mirror of scd_structure_reader_site in the SQL, kept equal by a test).
+ * The roles read every site. COLICO: the positions of the registry area "struttura". DERVIO: only the positions
+ * Francesco named (UD-156, 16/10/2026 06:57 "Dervio decido io e responsabile attività di base e coordinatore attività
+ * sportiva e presidente e segreteria sempre informata"); the Segreteria reads through its role.
+ */
 export const STRUCTURE_READER_ROLES = ["DIRECTION", "SECRETARIAT"] as const;
-export const STRUCTURE_READER_POSITIONS = [
-  "presidente",
-  "direttore-generale",
-  "coordinatore-attivita-sportiva",
-  "responsabile-attivita-base",
-  "responsabile-struttura",
-  "responsabile-struttura-colico",
-  "responsabile-struttura-dervio",
-  "responsabile-campi",
-  "responsabile-club-house",
-] as const;
+export const STRUCTURE_READER_POSITIONS_BY_SITE = {
+  COLICO: [
+    "presidente",
+    "direttore-generale",
+    "coordinatore-attivita-sportiva",
+    "responsabile-attivita-base",
+    "responsabile-struttura",
+    "responsabile-struttura-colico",
+    "responsabile-struttura-dervio",
+    "responsabile-campi",
+    "responsabile-club-house",
+  ],
+  DERVIO: ["presidente", "direttore-generale", "coordinatore-attivita-sportiva", "responsabile-attivita-base"],
+} as const satisfies Record<StructureSite, readonly string[]>;
+/** Positions that read at least one site (the "any site" gate scd_structure_reader and the registry area). */
+export const STRUCTURE_READER_POSITIONS: readonly string[] = [
+  ...new Set(STRUCTURE_SITES.flatMap((s) => [...STRUCTURE_READER_POSITIONS_BY_SITE[s]])),
+];
+
+/**
+ * Sites whose r135 rows a caller reads, from the coarse database roles of the club membership and the positions of
+ * the session. Same rule as scd_structure_reader_site; used only while the database cannot answer (r135 not applied,
+ * preview): when r135 answers, its readableSites wins.
+ */
+export function structureReadableSites(dbRoles: readonly string[], positions: ReadonlySet<string>): StructureSite[] {
+  const role = dbRoles.some((r) => (STRUCTURE_READER_ROLES as readonly string[]).includes(r));
+  return STRUCTURE_SITES.filter((s) => role || STRUCTURE_READER_POSITIONS_BY_SITE[s].some((p) => positions.has(p)));
+}
+
+/**
+ * Sites the page opens. Colico's known data (Quadro trainings, home matches) is opened by the area gate itself, so
+ * Colico is always open on the page (its r135 rows still come only from the database check). Dervio is reserved
+ * (UD-156): open only to its readers; for everybody else the selector is disabled and says "riservato".
+ */
+export function viewableSites(readable: readonly StructureSite[]): StructureSite[] {
+  return STRUCTURE_SITES.filter((s) => s === "COLICO" || readable.includes(s));
+}
 
 /** Window read by the page: from the Monday of last week to the Sunday three weeks ahead (35 days, r135 allows 42). */
 export const WEEK_OFFSET_MIN = -1;
@@ -79,6 +110,18 @@ const ROLE_ID = /^[a-z0-9-]{2,60}$/;
 const oneOf = <T extends string>(list: readonly T[], v: unknown): v is T => typeof v === "string" && (list as readonly string[]).includes(v);
 const validIso = (v: unknown): v is string => typeof v === "string" && !Number.isNaN(new Date(v).getTime());
 const text = (v: unknown, max: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);
+
+/**
+ * Answer of scd_structure_week: { readableSites, activities }. Rows of a site not in readableSites are dropped (the
+ * database already filters them; this is a second lock). Anything malformed reads as "no site, no row".
+ */
+export function parseStructureWeekResult(input: unknown): { readableSites: StructureSite[]; activities: StructureActivity[] } {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return { readableSites: [], activities: [] };
+  const raw = (input as Record<string, unknown>)["readableSites"];
+  const readableSites = STRUCTURE_SITES.filter((s) => Array.isArray(raw) && raw.includes(s));
+  const activities = parseStructureActivities((input as Record<string, unknown>)["activities"]).filter((a) => readableSites.includes(a.site));
+  return { readableSites, activities };
+}
 
 /** Rows of scd_structure_week: anything malformed is dropped (the browser never sees raw database output). */
 export function parseStructureActivities(input: unknown): StructureActivity[] {
@@ -150,6 +193,8 @@ export interface StructureKpi {
 }
 
 export interface StructureWeek {
+  /** Sites the page opens (viewableSites): items of the other sites are not in `sites` nor in the KPIs. */
+  viewable: StructureSite[];
   from: string;
   to: string;
   label: string;
@@ -209,6 +254,8 @@ export function buildStructureWeek(input: {
   slots: readonly TrainingSlot[];
   events: readonly PublicEvent[];
   activities: readonly StructureActivity[] | null;
+  /** Sites the caller may see (viewableSites); nothing of the other sites enters the week or its KPIs. */
+  viewable: readonly StructureSite[];
 }): StructureWeek {
   const w = weekRange(input.today, input.offset);
   const days = Array.from({ length: 7 }, (_, i) => addDays(w.from, i));
@@ -260,23 +307,26 @@ export function buildStructureWeek(input: {
   const own = (input.activities ?? []).map(activityItem).filter((x): x is WeekItem => x !== null && x.date >= w.from && x.date <= w.to);
   items.push(...own);
 
+  const viewable = STRUCTURE_SITES.filter((s) => input.viewable.includes(s));
+  const seen = items.filter((i) => viewable.includes(i.site));
   const sites = Object.fromEntries(
     STRUCTURE_SITES.map((site) => [
       site,
-      days.map((date) => ({ date, items: items.filter((i) => i.site === site && i.date === date).sort(byTime) })),
+      days.map((date) => ({ date, items: seen.filter((i) => i.site === site && i.date === date).sort(byTime) })),
     ]),
   ) as Record<StructureSite, WeekDay[]>;
 
-  const live = own.filter((i) => !i.cancelled);
+  const live = own.filter((i) => !i.cancelled && viewable.includes(i.site));
   const ready = input.activities !== null;
   return {
+    viewable,
     from: w.from,
     to: w.to,
     label: w.label,
     days,
     sites,
     kpi: {
-      activities: items.filter((i) => !i.cancelled).length,
+      activities: seen.filter((i) => !i.cancelled).length,
       uncoveredShifts: ready ? live.filter((i) => isShift(i.kind) && i.covered === false).length : null,
       clubHouseEvenings: ready
         ? new Set(live.filter((i) => i.area === "CLUB_HOUSE" && (i.kind === "ATTIVITA_SERALE" || i.start >= "18:00")).map((i) => i.date)).size
@@ -298,8 +348,11 @@ export function siteCount(week: StructureWeek, site: StructureSite): number {
 /** Sites whose trainings are not in the Quadro settimanale: their activity count is never complete. */
 export const SITES_WITHOUT_TRAININGS: readonly StructureSite[] = ["DERVIO"];
 
+/** Visible word of a site the caller may not see (UD-156): never 0, never "—". */
+export const SITE_RESERVED = "riservato";
+
 export interface SiteBadge {
-  /** Visible value: a number of known activities, or "—" when the activity of the site is not known. */
+  /** Visible value: a number of known activities, "—" when the activity of the site is not known, "riservato". */
   value: string;
   /** Visible qualifier next to the number ("solo gare", "parziale"), or null when the count is complete. */
   note: string | null;
@@ -311,9 +364,13 @@ export interface SiteBadge {
  * Badge of the site switch. Colico shows its count (Quadro trainings, home matches, r135 rows when readable).
  * Dervio has no training rows in the Quadro, so its activity is unknown: it never shows 0. Without any known item it
  * shows "—" ("dato non completo"); with home matches only it shows the number with "solo gare"; with other known rows
- * (r135) it shows the number with "parziale" because the trainings are still missing.
+ * (r135) it shows the number with "parziale" because the trainings are still missing. A site the caller may not see
+ * (Dervio outside its readers, UD-156) shows "riservato".
  */
 export function siteBadge(week: StructureWeek, site: StructureSite): SiteBadge {
+  if (!week.viewable.includes(site)) {
+    return { value: SITE_RESERVED, note: null, srText: "sede riservata a Direzione, Segreteria, presidente, coordinatore attività sportiva e responsabile attività di base" };
+  }
   const n = siteCount(week, site);
   if (!SITES_WITHOUT_TRAININGS.includes(site)) return { value: String(n), note: null, srText: null };
   if (n === 0) return { value: "—", note: null, srText: "dato non completo" };

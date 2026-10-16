@@ -4,7 +4,8 @@
  * The page gate is the shared work-area gate (registry area "struttura"). The quadro of the trainings comes from
  * getTrainingQuadro (server only, UD-100) and the home matches from the calendar snapshot. r135 is read with the
  * caller's own Supabase session (publishable key + cookies): scd_structure_week checks roles and positions by itself,
- * nothing here trusts the browser. Until r135 is applied every read fails closed: `ready: false`, the page says
+ * nothing here trusts the browser. Per site (UD-156): Dervio rows only for Direzione, Segreteria, presidente, DG,
+ * coordinatore attività sportiva and responsabile attività di base; the answer says which sites the caller reads. Until r135 is applied every read fails closed: `ready: false`, the page says
  * "Funzione in preparazione: serve applicare r135" and the shift KPIs stay unknown, never zero. Nothing is written.
  */
 import { createServerFn } from "@tanstack/react-start";
@@ -16,7 +17,13 @@ import { stagingPreviewEnabled } from "./impianti-access";
 import { loadCalendar, type PublicEvent, type TrainingSlot } from "./public-snapshots";
 import { getTrainingQuadro } from "./quadro.functions";
 import { machineMissing } from "./request-machine.functions";
-import { parseStructureActivities, structureWindow, type StructureActivity } from "./structure-activities";
+import {
+  parseStructureWeekResult,
+  structureReadableSites,
+  structureWindow,
+  type StructureActivity,
+  type StructureSite,
+} from "./structure-activities";
 import { serverSupabase } from "./supabase.server";
 
 export interface StructureBoard {
@@ -28,6 +35,13 @@ export interface StructureBoard {
   /** False while r135 is not applied: activities is then null. */
   ready: boolean;
   activities: StructureActivity[] | null;
+  /**
+   * Sites whose r135 rows the caller reads (UD-156: Dervio only for Direzione, Segreteria, presidente, DG, coordinatore
+   * attività sportiva, responsabile attività di base). From scd_structure_week when it answers; otherwise from the
+   * same rule on the verified session (structureReadableSites). Empty without a session (preview): Dervio stays
+   * reserved. The page opens Colico through the area gate and Dervio only when listed here.
+   */
+  readableSites: StructureSite[];
   error: string | null;
   slots: TrainingSlot[];
   quadroUTC: string;
@@ -61,6 +75,7 @@ export function emptyStructureBoard(gate: WorkAreaGate): StructureBoard {
     connected: false,
     ready: false,
     activities: null,
+    readableSites: [],
     error: null,
     slots: [],
     quadroUTC: "",
@@ -87,11 +102,22 @@ export const getStructureBoard = createServerFn({ method: "GET" }).handler(async
   };
 
   const org = s.memberships[0] ?? null;
+  // Until the database answers, the same per-site rule on the verified session of the club membership.
+  const mirror: StructureSite[] = org
+    ? structureReadableSites(
+        s.memberships.filter((m) => m.organizationId === org.organizationId).map((m) => m.role),
+        new Set(s.roles),
+      )
+    : [];
   const sb = s.configured && s.user && org ? serverSupabase() : null;
-  if (!sb || !org) return open;
+  if (!sb || !org) return { ...open, readableSites: mirror };
   const win = structureWindow(base.today);
   const { data, error } = await sb.rpc("scd_structure_week", { p_organization_id: org.organizationId, p_from: win.from, p_to: win.to });
-  if (machineMissing(error)) return { ...open, connected: true };
-  if (error) return { ...open, connected: true, ready: true, error: structureReadError(error) };
-  return { ...open, connected: true, ready: true, activities: parseStructureActivities(data) };
+  if (machineMissing(error)) return { ...open, connected: true, readableSites: mirror };
+  if (error) {
+    // 42501: the database says the caller reads no site; any other failure keeps the session rule.
+    return { ...open, connected: true, ready: true, readableSites: error.code === "42501" ? [] : mirror, error: structureReadError(error) };
+  }
+  const read = parseStructureWeekResult(data);
+  return { ...open, connected: true, ready: true, activities: read.activities, readableSites: read.readableSites };
 });

@@ -32,6 +32,7 @@ import {
   WEEK_OFFSET_MIN,
   buildStructureWeek,
   siteBadge,
+  viewableSites,
   type StructureSite,
   type WeekItem,
   type WeekItemKind,
@@ -89,9 +90,11 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
   const [offset, setOffset] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
 
+  const viewable = useMemo(() => viewableSites(data.readableSites), [data.readableSites]);
   const week = useMemo(
-    () => buildStructureWeek({ today: data.today, offset, slots: data.slots, events: data.events, activities: data.ready ? data.activities : null }),
-    [data, offset],
+    () =>
+      buildStructureWeek({ today: data.today, offset, slots: data.slots, events: data.events, activities: data.ready ? data.activities : null, viewable }),
+    [data, offset, viewable],
   );
   const selected = picked && week.days.includes(picked) ? picked : week.days.includes(data.today) ? data.today : week.days[0]!;
   const days = week.sites[site];
@@ -140,18 +143,21 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div role="group" aria-label="Sede" className="inline-flex rounded-full border border-[#b9d5ef] bg-white p-1">
           {STRUCTURE_SITES.map((s) => {
-            const on = s === site;
+            const open = viewable.includes(s);
+            const on = open && s === site;
             const badge = siteBadge(week, s);
             return (
               <button
                 key={s}
                 type="button"
                 aria-pressed={on}
-                onClick={() => setSite(s)}
-                className={`scd-focus inline-flex h-10 items-center gap-2 rounded-full px-4 text-[15px] font-semibold transition-colors duration-150 ${on ? "bg-[var(--in-info)] text-white" : "text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"}`}
+                disabled={!open}
+                title={open ? undefined : "Sede riservata: Direzione, Segreteria, presidente, coordinatore attività sportiva, responsabile attività di base"}
+                onClick={() => open && setSite(s)}
+                className={`scd-focus inline-flex h-10 items-center gap-2 rounded-full px-4 text-[15px] font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:text-[var(--in-sub)] ${on ? "bg-[var(--in-info)] text-white" : open ? "text-[var(--in-info)] hover:bg-[var(--in-info-bg)]" : ""}`}
               >
                 {SITE_LABEL[s]}
-                <span className={`rounded-full px-1.5 text-[12.5px] ${on ? "bg-white/20" : "bg-[var(--in-info-bg)]"}`}>
+                <span className={`rounded-full px-1.5 text-[12.5px] ${on ? "bg-white/20" : open ? "bg-[var(--in-info-bg)]" : "bg-[#eef1f5] font-medium"}`}>
                   {badge.value}
                   {badge.note && <span className="ml-1 font-medium">{badge.note}</span>}
                   {badge.srText && <span className="sr-only"> ({badge.srText})</span>}
@@ -272,6 +278,7 @@ function StrutturaPage({ data }: { data: StructureBoard }) {
               <li className="py-1"><b>Attività note in settimana</b>: allenamenti (solo Colico: il quadro non ha Dervio), gare in casa e attività registrate nelle due sedi, annullate escluse. Per Dervio il numero non è completo: "—" se non c'è nulla di noto, "solo gare" se ci sono solo gare in casa.</li>
               <li className="py-1"><b>Turni scoperti</b>: turni volontari, aperture e chiusure senza nessuno.</li>
               <li className="py-1"><b>Serate Club House</b>: sere con un'attività al Club House dalle 18:00.</li>
+              <li className="py-1"><b>Dervio riservato</b>: la sede di Dervio la vedono Direzione, Segreteria, presidente, coordinatore attività sportiva e responsabile attività di base. Per gli altri i numeri contano solo Colico.</li>
             </ul>
           </Card>
           <SourcesBox id="struttura" />

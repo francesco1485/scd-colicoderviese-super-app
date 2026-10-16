@@ -16,8 +16,21 @@
 -- no minors' data of any kind. created_by is kept for audit and never returned by the read function.
 --
 -- Who reads (mirror of apps/superapp/src/lib/structure-activities.ts STRUCTURE_READER_ROLES and
--- STRUCTURE_READER_POSITIONS, kept equal by a test): Direzione and Segreteria roles, and the positions of the area
--- registry entry "struttura" (config/superapp-areas.v1.json). Nobody else, never anon.
+-- STRUCTURE_READER_POSITIONS_BY_SITE, kept equal by a test), per site:
+--   COLICO: Direzione and Segreteria roles, and the positions of the area registry entry "struttura"
+--           (config/superapp-areas.v1.json).
+--   DERVIO: Direzione and Segreteria roles, and only the positions presidente, direttore-generale,
+--           coordinatore-attivita-sportiva, responsabile-attivita-base. Francesco (DG), 16/10/2026 06:57 (UD-156):
+--           "Dervio decido io e responsabile attivita di base e coordinatore attivita sportiva e presidente e
+--           segreteria sempre informata". responsabile-struttura-dervio, responsabile-campi and the other structure
+--           positions do NOT read Dervio rows.
+-- scd_structure_reader is the "any site" gate; scd_structure_week returns only the rows of the sites the caller
+-- reads and says which sites they are (readableSites). Nobody else, never anon.
+--
+-- RULE for the future write path (not part of r135, UD-156 "segreteria sempre informata"): every insert, change or
+-- cancellation of a DERVIO row must notify the Segreteria (in-app notification / request queue, no e-mail to third
+-- parties). It is implemented together with the write function and its form; a write function without it is
+-- refused in review.
 -- RLS is enabled with NO policies and no grants to anon/authenticated: the only door is the SECURITY DEFINER read
 -- function below (explicit role check, fixed search_path, bounded date range). Writes are NOT part of r135: rows
 -- are added by the Direzione (SQL editor) until a write function with its form is approved.
@@ -32,6 +45,7 @@
 --   begin;
 --   drop function if exists public.scd_structure_week(uuid, date, date);
 --   drop function if exists public.scd_structure_reader(uuid);
+--   drop function if exists public.scd_structure_reader_site(uuid, text);
 --   drop table if exists public.scd_structure_activities;
 --   commit;
 
@@ -71,15 +85,34 @@ create index if not exists scd_structure_activities_site_idx
 alter table public.scd_structure_activities enable row level security;
 revoke all on table public.scd_structure_activities from anon, authenticated;
 
--- ---------------------------------------------------------------- 2. who may read (staff only)
+-- ---------------------------------------------------------------- 2. who may read, per site (staff only)
+create or replace function public.scd_structure_reader_site(p_organization_id uuid, p_site text)
+returns boolean
+language sql
+stable
+set search_path to 'public'
+as $$
+  select case p_site
+    when 'COLICO' then
+      public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[])
+      or public.scd_has_position(p_organization_id, array['presidente','direttore-generale','coordinatore-attivita-sportiva','responsabile-attivita-base','responsabile-struttura','responsabile-struttura-colico','responsabile-struttura-dervio','responsabile-campi','responsabile-club-house'])
+    when 'DERVIO' then
+      public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[])
+      or public.scd_has_position(p_organization_id, array['presidente','direttore-generale','coordinatore-attivita-sportiva','responsabile-attivita-base'])
+    else false
+  end;
+$$;
+revoke all on function public.scd_structure_reader_site(uuid, text) from public, anon, authenticated;
+
+-- Any site: the gate of scd_structure_week.
 create or replace function public.scd_structure_reader(p_organization_id uuid)
 returns boolean
 language sql
 stable
 set search_path to 'public'
 as $$
-  select public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[])
-    or public.scd_has_position(p_organization_id, array['presidente','direttore-generale','coordinatore-attivita-sportiva','responsabile-attivita-base','responsabile-struttura','responsabile-struttura-colico','responsabile-struttura-dervio','responsabile-campi','responsabile-club-house']);
+  select public.scd_structure_reader_site(p_organization_id, 'COLICO')
+    or public.scd_structure_reader_site(p_organization_id, 'DERVIO');
 $$;
 revoke all on function public.scd_structure_reader(uuid) from public, anon, authenticated;
 
@@ -91,6 +124,8 @@ stable
 security definer
 set search_path to 'public'
 as $$
+declare
+  v_sites text[];
 begin
   if auth.uid() is null or not public.scd_structure_reader(p_organization_id) then
     raise exception 'not allowed' using errcode = '42501';
@@ -98,25 +133,31 @@ begin
   if p_from is null or p_to is null or p_to < p_from or p_to - p_from > 42 then
     raise exception 'invalid range' using errcode = '22023';
   end if;
-  return coalesce((
-    select jsonb_agg(jsonb_build_object(
-        'id', a.id,
-        'site', a.site,
-        'area', a.area,
-        'kind', a.kind,
-        'title', a.title,
-        'startsAt', a.starts_at,
-        'endsAt', a.ends_at,
-        'responsibleRole', a.responsible_role,
-        'covered', a.covered,
-        'status', a.status,
-        'notes', a.notes
-      ) order by a.starts_at, a.site, a.area)
-    from public.scd_structure_activities a
-    where a.organization_id = p_organization_id
-      and a.starts_at >= (p_from::timestamp at time zone 'Europe/Rome')
-      and a.starts_at < ((p_to + 1)::timestamp at time zone 'Europe/Rome')
-  ), '[]'::jsonb);
+  select coalesce(array_agg(x.site order by x.ord), array[]::text[]) into v_sites
+    from (values ('COLICO', 1), ('DERVIO', 2)) as x(site, ord)
+    where public.scd_structure_reader_site(p_organization_id, x.site);
+  return jsonb_build_object(
+    'readableSites', to_jsonb(v_sites),
+    'activities', coalesce((
+      select jsonb_agg(jsonb_build_object(
+          'id', a.id,
+          'site', a.site,
+          'area', a.area,
+          'kind', a.kind,
+          'title', a.title,
+          'startsAt', a.starts_at,
+          'endsAt', a.ends_at,
+          'responsibleRole', a.responsible_role,
+          'covered', a.covered,
+          'status', a.status,
+          'notes', a.notes
+        ) order by a.starts_at, a.site, a.area)
+      from public.scd_structure_activities a
+      where a.organization_id = p_organization_id
+        and a.site = any(v_sites)
+        and a.starts_at >= (p_from::timestamp at time zone 'Europe/Rome')
+        and a.starts_at < ((p_to + 1)::timestamp at time zone 'Europe/Rome')
+    ), '[]'::jsonb));
 end;
 $$;
 revoke all on function public.scd_structure_week(uuid, date, date) from public, anon;
