@@ -209,14 +209,22 @@ export function canonicalUrl(path: string, siteUrl?: string | null): string {
 
 export type LinkEntry = { rel: string; href: string; hrefLang?: string };
 
-/** Full head() result for a public page: its own meta (title, description, Open Graph, Twitter) + canonical link. */
+/**
+ * Full head() result for a public page: its own meta (title, description, Open Graph, Twitter) + canonical link.
+ * `canonical`: an absolute URL built by the route from validated values only (e.g. a language variant), or false for a
+ * page that must not declare one (noindex, not found). `siteUrl` is a configured origin, never a request header.
+ */
 export function pageHead(
   page: PageMetaInput,
-  options: { siteUrl?: string | null; extraMeta?: MetaEntry[]; extraLinks?: LinkEntry[] } = {},
+  options: { siteUrl?: string | null; extraMeta?: MetaEntry[]; extraLinks?: LinkEntry[]; canonical?: string | false | undefined } = {},
 ): { meta: MetaEntry[]; links: LinkEntry[] } {
+  const href = options.canonical === undefined ? canonicalUrl(page.path, options.siteUrl) : options.canonical;
+  const meta = pageMeta(page, options.siteUrl).map((m) =>
+    href && "property" in m && m.property === "og:url" ? { property: "og:url", content: href } : m,
+  );
   return {
-    meta: [...pageMeta(page, options.siteUrl), ...(options.extraMeta ?? [])],
-    links: [{ rel: "canonical", href: canonicalUrl(page.path, options.siteUrl) }, ...(options.extraLinks ?? [])],
+    meta: [...meta, ...(options.extraMeta ?? [])],
+    links: [...(href ? [{ rel: "canonical", href }] : []), ...(options.extraLinks ?? [])],
   };
 }
 
@@ -305,7 +313,7 @@ export const PUBLIC_PAGES = {
     title: "Top 11 della settimana — S.C.D. ColicoDerviese",
     description:
       "La Top 11 della settimana votata da chi ha un account del club S.C.D. ColicoDerviese: Prima Squadra, Juniores, U16 e U15 insieme.",
-    ogDescription: "Prima Squadra, Juniores, U16 e U15: la Top 11 votata dal club.",
+    ogDescription: "Prima Squadra, Juniores, U16 e U15: la Top 11 votata da chi ha un account del club.",
     image: CREST_SHARE_IMAGE,
   },
   rassegnaStampa: {

@@ -162,7 +162,7 @@ describe("C3 routes", () => {
 
   it("the lottery keeps noindex before publication but always carries Open Graph", () => {
     const src = read("src/routes/eventi.lotteria-dello-sport.tsx");
-    expect(src).toMatch(/pageHead\(page, \{ extraMeta:/);
+    expect(src).toMatch(/pageHead\(page, l \? \{\} : \{ extraMeta: \[\{ name: "robots", content: "noindex" \}\], canonical: false \}\)/);
     expect(src).toMatch(/name: "robots", content: "noindex"/);
   });
 });

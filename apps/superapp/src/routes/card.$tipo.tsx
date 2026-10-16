@@ -16,7 +16,7 @@ export const Route = createFileRoute("/card/$tipo")({
   },
   head: ({ loaderData }) => {
     const t = loaderData ? clubCard(loaderData.id) : null;
-    if (!t) return pageHead(PUBLIC_PAGES.card);
+    if (!t) return pageHead(PUBLIC_PAGES.card, { extraMeta: [{ name: "robots", content: "noindex" }], canonical: false });
     const title = `Card ${t.label} 2026/27 — S.C.D. ColicoDerviese`;
     return pageHead({
       path: `/card/${t.id}`,

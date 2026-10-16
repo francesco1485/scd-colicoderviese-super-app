@@ -23,8 +23,10 @@ export const Route = createFileRoute("/eventi/christmas-lario-cup")({
   validateSearch: (s: Record<string, unknown>): { lang?: "de" | "en" | undefined } =>
     s["lang"] === "de" || s["lang"] === "en" ? { lang: s["lang"] } : {},
   loader: () => ({ serverNow: Date.now() }),
-  head: () =>
+  // Each language version is its own canonical page (validateSearch allows only de/en), linked by hreflang.
+  head: ({ match }) =>
     pageHead(SHARE_PAGES.christmasLarioCup, {
+      canonical: match.search.lang ? absoluteUrl(`/eventi/christmas-lario-cup?lang=${match.search.lang}`) : undefined,
       extraLinks: [
         { rel: "alternate", hrefLang: "it", href: absoluteUrl("/eventi/christmas-lario-cup") },
         { rel: "alternate", hrefLang: "de", href: absoluteUrl("/eventi/christmas-lario-cup?lang=de") },

@@ -147,6 +147,20 @@ describe("canonicalUrl", () => {
 });
 
 describe("pageHead options", () => {
+  it("a noindex page declares no canonical link", () => {
+    const head = pageHead(PUBLIC_PAGES.card, { extraMeta: [{ name: "robots", content: "noindex" }], canonical: false });
+    expect(head.links.filter((l) => l.rel === "canonical")).toHaveLength(0);
+    expect(head.meta).toContainEqual({ name: "robots", content: "noindex" });
+  });
+
+  it("a language variant is its own canonical and og:url", () => {
+    const href = "https://app.colicoderviese.it/eventi/christmas-lario-cup?lang=de";
+    const head = pageHead(SHARE_PAGES.christmasLarioCup, { canonical: href });
+    expect(head.links).toContainEqual({ rel: "canonical", href });
+    expect(entry(head.meta, "og:url")?.content).toBe(href);
+    expect(read("src/routes/eventi.christmas-lario-cup.tsx")).toMatch(/canonical: match\.search\.lang \?/);
+  });
+
   it("appends extra meta and links after the canonical", () => {
     const head = pageHead(PUBLIC_PAGES.kit, {
       extraMeta: [{ name: "robots", content: "noindex" }],

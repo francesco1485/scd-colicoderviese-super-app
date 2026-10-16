@@ -58,7 +58,7 @@ export const Route = createFileRoute("/eventi/lotteria-dello-sport")({
           description: `${l.beneficiary} Giornata dello sport: ${l.sportDay ? longDay(l.sportDay) : "data da definire"}.`,
         }
       : SHARE_PAGES.lotteria;
-    return pageHead(page, { extraMeta: l ? [] : [{ name: "robots", content: "noindex" }] });
+    return pageHead(page, l ? {} : { extraMeta: [{ name: "robots", content: "noindex" }], canonical: false });
   },
   component: LotteriaPublic,
 });
