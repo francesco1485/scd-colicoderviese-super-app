@@ -6,7 +6,6 @@ import { resolve } from "node:path";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({ pathname: "/famiglia" }));
 
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to, className, onClick }: { children: React.ReactNode; to: string; className?: string; onClick?: () => void }) => (
@@ -14,18 +13,15 @@ vi.mock("@tanstack/react-router", () => ({
       {children}
     </a>
   ),
-  useRouterState: ({ select }: { select: (s: { location: { pathname: string } }) => unknown }) =>
-    select({ location: { pathname: state.pathname } }),
 }));
 
-import { GuideTourHost } from "./GuideTour";
-import { cardsFor } from "@/lib/guide-content";
+import { GuideTourAuto, GuideTourHost } from "./GuideTour";
+import { tourCardsFor } from "@/lib/guide-content";
 import { TOUR_STORAGE_PREFIX, hasSeenTour, markTourSeen, requestTour, resetTourMemory, type TourStorage } from "@/lib/guide-tour";
 
 beforeEach(() => {
   resetTourMemory();
   window.localStorage.clear();
-  state.pathname = "/famiglia";
 });
 afterEach(() => {
   cleanup();
@@ -34,7 +30,7 @@ afterEach(() => {
 
 describe("GuideTourHost", () => {
   it("opens on the portal home the first time and «Salta» closes it for good", () => {
-    render(<GuideTourHost />);
+    render(<><GuideTourAuto role="famiglie" /><GuideTourHost /></>);
     const tour = screen.getByTestId("guide-tour");
     expect(tour.getAttribute("data-role")).toBe("famiglie");
     expect(screen.getByRole("dialog").getAttribute("aria-modal")).toBe("false");
@@ -42,13 +38,13 @@ describe("GuideTourHost", () => {
     expect(screen.queryByTestId("guide-tour")).toBeNull();
     expect(window.localStorage.getItem(`${TOUR_STORAGE_PREFIX}famiglie`)).toBe("1");
     cleanup();
-    render(<GuideTourHost />);
+    render(<><GuideTourAuto role="famiglie" /><GuideTourHost /></>);
     expect(screen.queryByTestId("guide-tour")).toBeNull();
   });
 
   it("walks through the cards, ends with «Rivedi quando vuoi da Guida» and closes with Fatto", () => {
-    render(<GuideTourHost />);
-    const n = cardsFor("famiglie").length;
+    render(<><GuideTourAuto role="famiglie" /><GuideTourHost /></>);
+    const n = tourCardsFor("famiglie").length;
     for (let i = 0; i < n; i++) fireEvent.click(screen.getByTestId("guide-tour-next"));
     expect(screen.getByTestId("guide-tour").textContent).toMatch(/Rivedi quando vuoi da Guida/);
     fireEvent.click(screen.getByTestId("guide-tour-done"));
@@ -57,23 +53,21 @@ describe("GuideTourHost", () => {
   });
 
   it("Esc closes the tour", () => {
-    render(<GuideTourHost />);
+    render(<><GuideTourAuto role="famiglie" /><GuideTourHost /></>);
     act(() => {
       fireEvent.keyDown(window, { key: "Escape" });
     });
     expect(screen.queryByTestId("guide-tour")).toBeNull();
   });
 
-  it("does not open on pages that are not a portal home", () => {
-    state.pathname = "/calendario";
+  it("never opens by itself: only a page trigger or a request opens it", () => {
     render(<GuideTourHost />);
     expect(screen.queryByTestId("guide-tour")).toBeNull();
   });
 
   it("opens any role on request, even after it was seen (Rivedi il tour)", () => {
-    state.pathname = "/guida";
     markTourSeen("mister");
-    render(<GuideTourHost />);
+    render(<><GuideTourAuto role="mister" /><GuideTourHost /></>);
     expect(screen.queryByTestId("guide-tour")).toBeNull();
     act(() => requestTour("mister"));
     expect(screen.getByTestId("guide-tour").getAttribute("data-role")).toBe("mister");
@@ -86,10 +80,10 @@ describe("GuideTourHost", () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new Error("blocked");
     });
-    render(<GuideTourHost />);
+    render(<><GuideTourAuto role="famiglie" /><GuideTourHost /></>);
     fireEvent.click(screen.getByTestId("guide-tour-skip"));
     cleanup();
-    render(<GuideTourHost />);
+    render(<><GuideTourAuto role="famiglie" /><GuideTourHost /></>);
     expect(screen.queryByTestId("guide-tour")).toBeNull();
   });
 });

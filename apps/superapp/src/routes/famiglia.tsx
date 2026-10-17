@@ -4,6 +4,7 @@ import { CalendarDays, Check, MapPin, Shirt } from "lucide-react";
 import { useId, useState } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { CastHelpersCard } from "@/components/scd/CastPresence";
 import { ClubHouseOrderCard } from "@/components/scd/ClubHouseOrderCard";
 import { EraNutritionCard } from "@/components/scd/EraNutritionCard";
@@ -143,6 +144,7 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
           </div>
         </Card>
       </div>
+      <GuideTourAuto role="famiglie" />
     </InteriorShell>
   );
 }

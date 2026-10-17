@@ -1,18 +1,18 @@
 /**
- * First-access guided tour (UD-172). Opens once per device and role on the home of a portal (tourRoleForPath), or on
- * demand from /guida («Rivedi il tour»). Never blocks the page: a bottom sheet on phones, a side card on desktop, no
+ * First-access guided tour (UD-172). Opens once per device and role when a signed-in portal mounts <GuideTourAuto>,
+ * or on demand from /guida («Rivedi il tour»). Never blocks the page: a bottom sheet on phones, a side card on desktop, no
  * backdrop. «Salta» is always visible; Esc and a tap outside close it; Tab stays inside the open card; with
  * prefers-reduced-motion the cards swap instantly (motion-safe classes only). Texts come from lib/guide-content.ts.
  */
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, BookOpen, X } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
-import { ROLE_LABEL, TOUR_END, cardsFor, tourRoleForPath, type GuideRole } from "@/lib/guide-content";
-import { TOUR_OPEN_EVENT, hasSeenTour, markTourSeen, roleFromTourEvent } from "@/lib/guide-tour";
+import { ROLE_LABEL, TOUR_END, tourCardsFor, type GuideRole } from "@/lib/guide-content";
+import { TOUR_OPEN_EVENT, markTourSeen, requestFirstTour, roleFromTourEvent, takePendingTour } from "@/lib/guide-tour";
 
 export function GuideTour({ role, onClose }: { role: GuideRole; onClose: () => void }) {
-  const cards = cardsFor(role);
+  const cards = tourCardsFor(role);
   const total = cards.length + 1;
   const [step, setStep] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -136,21 +136,18 @@ export function GuideTour({ role, onClose }: { role: GuideRole; onClose: () => v
 }
 
 /**
- * Mounted once in the root document. Shows the tour of the portal home the visitor is on, the first time only, and
- * opens any role's tour when /guida asks for it (requestTour).
+ * Mounted once in the root document. It never opens by URL: pages ask for it with <GuideTourAuto> in their signed-in
+ * branch (first access), and /guida with requestTour («Rivedi il tour»).
  */
 export function GuideTourHost() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [role, setRole] = useState<GuideRole | null>(null);
 
   useEffect(() => {
-    const r = tourRoleForPath(pathname);
-    if (r && !hasSeenTour(r)) setRole(r);
-  }, [pathname]);
-
-  useEffect(() => {
+    const first = takePendingTour();
+    if (first) setRole(first);
     const onOpen = (e: Event) => {
       const r = roleFromTourEvent(e);
+      takePendingTour();
       if (r) setRole(r);
     };
     window.addEventListener(TOUR_OPEN_EVENT, onOpen);
@@ -160,4 +157,12 @@ export function GuideTourHost() {
   const onClose = useCallback(() => setRole(null), []);
   if (!role) return null;
   return <GuideTour key={role} role={role} onClose={onClose} />;
+}
+
+/** First-access trigger: mount ONLY where the visitor is signed in with that role (or on a public page). */
+export function GuideTourAuto({ role }: { role: GuideRole }) {
+  useEffect(() => {
+    requestFirstTour(role);
+  }, [role]);
+  return null;
 }

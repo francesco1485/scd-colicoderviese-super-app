@@ -35,6 +35,8 @@ export interface GuideCard {
   /** Route must exist (tested). Cards "in-arrivo" have no action. */
   action?: GuideAction;
   status: "live" | "in-arrivo";
+  /** false = only in /guida, not in the first-access tour (the tour keeps 3–6 cards per role). */
+  inTour?: boolean;
 }
 
 export type FaqTopic = "app" | "squadre" | "pulmini" | "documenti" | "figc" | "lnd" | "sgs" | "tutela-minori";
@@ -72,7 +74,7 @@ export const ROLE_LABEL: Record<GuideRole, string> = {
 
 export const ROLE_INTRO: Record<GuideRole, string> = {
   famiglie: "Per genitori e tutori: allenamenti, convocazioni, pulmino e documenti.",
-  calciatori: "Per chi gioca. Sotto i 14 anni leggi la guida insieme alla tua famiglia.",
+  calciatori: "Per chi gioca. Se sei minorenne, leggila insieme alla tua famiglia.",
   mister: "Per chi allena una squadra: rosa, convocazioni e campi.",
   dirigenti: "Per dirigenti, responsabili e Direzione: richieste, campi e scadenze.",
   tifosi: "Per chi segue il club: partite, notizie e come entrare in società.",
@@ -129,6 +131,16 @@ export const GUIDE_CARDS: readonly GuideCard[] = [
     status: "live",
   },
 
+  {
+    id: "famiglie-registrati",
+    role: "famiglie",
+    title: "Registrati passo per passo",
+    body: "Scrivi nome, cognome, data di nascita, e-mail e telefono, poi scegli la password. Ti arriva una e-mail di conferma. La Segreteria controlla chi sei e ti attiva.",
+    action: { label: "Registrati", to: "/registrati" },
+    status: "live",
+    inTour: false,
+  },
+
   // Calciatori
   {
     id: "calciatori-squadra",
@@ -142,7 +154,7 @@ export const GUIDE_CARDS: readonly GuideCard[] = [
     id: "calciatori-convocazione",
     role: "calciatori",
     title: "Presa visione o impedimento",
-    body: "Se sei convocato, ci sei. Tocca «Presa visione». Se hai un impedimento vero, segnalalo e decide il mister. Sotto i 14 anni lo fa la tua famiglia.",
+    body: "Se sei convocato, ci sei. Tocca «Presa visione». Se hai un impedimento vero, segnalalo e decide il mister.",
     action: { label: "Vedi le convocazioni", to: "/famiglia" },
     status: "live",
   },
@@ -211,6 +223,25 @@ export const GUIDE_CARDS: readonly GuideCard[] = [
     status: "in-arrivo",
   },
 
+  {
+    id: "mister-togliere",
+    role: "mister",
+    title: "Togliere un ragazzo",
+    body: "Togli la spunta e conferma. La convocazione resta nello storico come ritirata e sparisce dalla pagina della famiglia.",
+    action: { label: "Apri la scrivania", to: "/gestionale/mister" },
+    status: "live",
+    inTour: false,
+  },
+  {
+    id: "mister-distinta",
+    role: "mister",
+    title: "La distinta di gara",
+    body: "Alla gara scegli tra i convocati chi va in lista, con numeri, capitano e vice. Poi il dirigente la riporta sul portale LND o la stampa.",
+    action: { label: "Apri la scrivania", to: "/gestionale/mister" },
+    status: "live",
+    inTour: false,
+  },
+
   // Dirigenti e responsabili
   {
     id: "dirigenti-richieste",
@@ -251,6 +282,52 @@ export const GUIDE_CARDS: readonly GuideCard[] = [
     body: "Scorciatoie verso le pagine di lavoro e le richieste di accesso in attesa. Ruoli e permessi li assegnano solo Direzione e Presidente.",
     action: { label: "Apri la Direzione", to: "/direzione" },
     status: "live",
+  },
+
+  {
+    id: "dirigenti-richieste-accesso",
+    role: "dirigenti",
+    title: "Richieste di accesso",
+    body: "In Segreteria, Persone: controlla chi è la persona, collegala alla scheda giusta e autorizza l'accesso.",
+    action: { label: "Apri Persone", to: "/segreteria/persone" },
+    status: "live",
+    inTour: false,
+  },
+  {
+    id: "dirigenti-senza-squadra",
+    role: "dirigenti",
+    title: "Atleti senza squadra",
+    body: "Filtra «Senza squadra», apri la scheda e tocca «Conferma e assegna». Il mister lo vede subito nella rosa e lo storico resta.",
+    action: { label: "Apri Persone", to: "/segreteria/persone" },
+    status: "live",
+    inTour: false,
+  },
+  {
+    id: "dirigenti-permessi",
+    role: "dirigenti",
+    title: "Permessi su misura",
+    body: "In Direzione, Accessi: ruolo, aree e squadre in più, sospensione. Ogni modifica resta nello storico.",
+    action: { label: "Apri gli accessi", to: "/direzione/accessi" },
+    status: "live",
+    inTour: false,
+  },
+  {
+    id: "dirigenti-compensi",
+    role: "dirigenti",
+    title: "Compensi e rimborsi",
+    body: "La Direzione fissa l'accordo, la Tesoreria segna presenze e rimborsi e chiude il mese. I bonifici si fanno in banca: l'app non paga e non conserva IBAN.",
+    action: { label: "Apri i compensi", to: "/tesoreria/compensi" },
+    status: "live",
+    inTour: false,
+  },
+  {
+    id: "dirigenti-cervellone",
+    role: "dirigenti",
+    title: "Il Cervellone",
+    body: "Cerca in documenti, posta catalogata, economia e storia del club, con le scadenze in vista. Ognuno vede solo il livello del proprio ruolo.",
+    action: { label: "Apri il Cervellone", to: "/direzione/cervellone" },
+    status: "live",
+    inTour: false,
   },
 
   // Tifosi e soci
@@ -580,9 +657,14 @@ export const FAQ_ENTRIES: readonly FaqEntry[] = [
   },
 ];
 
-/** Cards of one role, in tour order. */
+/** Every card of one role, as shown in /guida. */
 export function cardsFor(role: GuideRole): GuideCard[] {
   return GUIDE_CARDS.filter((c) => c.role === role);
+}
+
+/** The cards of the first-access tour of one role (3–6, tested). */
+export function tourCardsFor(role: GuideRole): GuideCard[] {
+  return cardsFor(role).filter((c) => c.inTour !== false);
 }
 
 export function isGuideRole(value: unknown): value is GuideRole {
@@ -622,30 +704,6 @@ export function searchCards(query: string, cards: readonly GuideCard[] = GUIDE_C
     const hay = fold(`${c.title} ${c.body}`);
     return words.every((w) => hay.includes(w));
   });
-}
-
-/**
- * Portal → role of the first-access tour. Only the home of each portal opens the tour, so a deep page is never
- * covered. /la-mia-scd is the personal area of every member: the athlete tour opens there (INFERRED, to confirm with
- * the Direzione); /community is the supporters' door.
- */
-const TOUR_PORTALS: ReadonlyArray<readonly [string, GuideRole]> = [
-  ["/famiglia", "famiglie"],
-  ["/la-mia-scd", "calciatori"],
-  ["/gestionale/mister", "mister"],
-  ["/direzione", "dirigenti"],
-  ["/gestionale", "dirigenti"],
-  ["/community", "tifosi"],
-];
-
-export function tourRoleForPath(pathname: string): GuideRole | null {
-  const p = pathname.replace(/\/+$/, "") || "/";
-  for (const [path, role] of TOUR_PORTALS) if (p === path) return role;
-  return null;
-}
-
-export function tourPortalPaths(): string[] {
-  return TOUR_PORTALS.map(([p]) => p);
 }
 
 /** Every route the module points to (tested against the route tree). */

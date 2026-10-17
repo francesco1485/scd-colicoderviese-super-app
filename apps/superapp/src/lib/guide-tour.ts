@@ -47,12 +47,34 @@ export function markTourSeen(role: GuideRole, storage: TourStorage | null = brow
 /** Test helper: forget the in-memory flags. */
 export function resetTourMemory(): void {
   memory.clear();
+  pending = null;
 }
 
-/** Ask the mounted tour host to open the tour of a role. */
+let pending: GuideRole | null = null;
+
+/**
+ * Ask the tour host to open the tour of a role. The request is also kept until the host takes it, so a page that
+ * mounts before the host's listener (effects run child-first) is not lost.
+ */
 export function requestTour(role: GuideRole): void {
   if (typeof window === "undefined") return;
+  pending = role;
   window.dispatchEvent(new CustomEvent(TOUR_OPEN_EVENT, { detail: { role } }));
+}
+
+/** The host takes the pending request once (on mount or on the event). */
+export function takePendingTour(): GuideRole | null {
+  const r = pending;
+  pending = null;
+  return r;
+}
+
+/**
+ * First-access request from an authenticated page: opens the tour only if this device has not seen it for the role.
+ * Pages mount it only in their signed-in branch, never on access screens (scd-revisore, PR #178).
+ */
+export function requestFirstTour(role: GuideRole): void {
+  if (!hasSeenTour(role)) requestTour(role);
 }
 
 export function roleFromTourEvent(e: Event): GuideRole | null {

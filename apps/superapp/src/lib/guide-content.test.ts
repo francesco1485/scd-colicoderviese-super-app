@@ -14,8 +14,7 @@ import {
   itDay,
   searchCards,
   searchFaq,
-  tourPortalPaths,
-  tourRoleForPath,
+  tourCardsFor,
 } from "./guide-content";
 
 const APP = resolve(__dirname, "../..");
@@ -35,11 +34,12 @@ const TEXTS: string[] = [
 ];
 
 describe("guide cards (UD-172)", () => {
-  it("has 3 to 6 cards for each role, with unique ids and anchors", () => {
+  it("has 3 to 6 tour cards for each role (at most 12 in /guida), with unique ids and anchors", () => {
     for (const r of GUIDE_ROLES) {
-      const list = cardsFor(r);
-      expect(list.length, r).toBeGreaterThanOrEqual(3);
-      expect(list.length, r).toBeLessThanOrEqual(6);
+      const tour = tourCardsFor(r);
+      expect(tour.length, r).toBeGreaterThanOrEqual(3);
+      expect(tour.length, r).toBeLessThanOrEqual(6);
+      expect(cardsFor(r).length, r).toBeLessThanOrEqual(12);
     }
     const ids = GUIDE_CARDS.map((c) => c.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -168,14 +168,15 @@ describe("helpers", () => {
     expect(searchCards("convoca").some((c) => c.id === "mister-convocazioni")).toBe(true);
   });
 
-  it("maps only portal homes to a tour role, and those routes exist", () => {
-    expect(tourRoleForPath("/famiglia")).toBe("famiglie");
-    expect(tourRoleForPath("/famiglia/")).toBe("famiglie");
-    expect(tourRoleForPath("/gestionale/mister")).toBe("mister");
-    expect(tourRoleForPath("/gestionale/impianti")).toBeNull();
-    expect(tourRoleForPath("/guida")).toBeNull();
-    expect(tourRoleForPath("/")).toBeNull();
-    for (const p of tourPortalPaths()) expect(routes.has(p), p).toBe(true);
+  it("keeps the steps of the old guide (scd-revisore PR #178)", () => {
+    const ids = new Set(GUIDE_CARDS.map((c) => c.id));
+    for (const id of ["famiglie-registrati", "mister-togliere", "mister-distinta", "dirigenti-richieste-accesso", "dirigenti-senza-squadra", "dirigenti-permessi", "dirigenti-compensi", "dirigenti-cervellone"]) {
+      expect(ids.has(id), id).toBe(true);
+    }
+  });
+
+  it("states no unsourced age rule for athletes", () => {
+    for (const c of GUIDE_CARDS) expect(c.body, c.id).not.toMatch(/sotto i \d+ anni/i);
   });
 
   it("formats the verification day", () => {
