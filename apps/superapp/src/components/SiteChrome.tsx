@@ -392,6 +392,56 @@ export function SiteHeader() {
   );
 }
 
+/**
+ * «Le tue aree» bar (Francesco DG 17/10/2026 19:09: «il dirigente deve vedere le barre a cui può accedere … barra in
+ * alto che gli fa vedere le sue barre dove può premere ed entrare, al di là delle tre linette»). Phone and tablet: one
+ * row of buttons under the top bar with every reserved area the person's positions open (same list as the desktop
+ * sidebar, which already shows them), led by a yellow «Le tue aree · N» button that opens the full menu. Navigation only: every area keeps its own gate.
+ * Hidden when signed out, when the person has no reserved area, and on board screens (they have their own header).
+ */
+export function MyAreasBar() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { session } = useSession();
+  const areas = workAreasFor(session);
+  if (!areas.length || isBoardRoute(pathname)) return null;
+  return (
+    <nav
+      aria-label="Le tue aree"
+      className="scd-pub border-b border-[#d7e3f2] bg-white font-text lg:hidden"
+      data-testid="my-areas-bar"
+    >
+      <div className="flex items-center gap-2 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <button
+          type="button"
+          onClick={openAccessMenu}
+          className="scd-focus sticky left-0 z-[1] inline-flex min-h-11 shrink-0 flex-col items-start justify-center rounded-[12px] bg-[#ffd600] px-3 text-left leading-none text-[#0b1e3a] shadow-[6px_0_10px_-4px_rgb(255_255_255)]"
+          aria-label={`Le tue aree: ${areas.length}. Apri l'elenco completo`}
+        >
+          <span className="text-[10.5px] font-extrabold uppercase tracking-[0.1em]">Le tue aree</span>
+          <span className="mt-0.5 text-[15px] font-extrabold">{areas.length} →</span>
+        </button>
+        {areas.map(({ entry, link }) => {
+          const Icon = AREA_ICON[entry.icon];
+          const active = isActive(pathname, link.path);
+          return (
+            <Link
+              key={entry.id}
+              to={link.href as never}
+              aria-current={active ? "page" : undefined}
+              className={`scd-focus inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full px-3.5 text-[14px] font-bold transition-colors duration-150 ${
+                active ? "bg-[#ffd600] text-[#0b1e3a]" : "bg-[#0b2a5b] text-white hover:bg-[#123a78]"
+              }`}
+            >
+              <Icon className="size-[18px] shrink-0" strokeWidth={2} aria-hidden="true" />
+              {entry.label}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
 /** Desktop left sidebar (Eurobet structure, SCD colours): sticky under the top bar, active section in yellow. */
 export function SideNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

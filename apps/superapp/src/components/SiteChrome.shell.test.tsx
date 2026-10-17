@@ -51,6 +51,7 @@ import { sessionRolesFrom, type Membership } from "@/lib/session";
 
 import {
   BottomNav,
+  MyAreasBar,
   SIDEBAR_SECTIONS,
   SideNav,
   SiteHeader,
@@ -169,6 +170,36 @@ describe("desktop sidebar (Eurobet structure, SCD colours)", () => {
     for (const a of direction) expect(a.entry.reserved).toBe(true);
     state.session = session("DIRECTION");
     expect(renderToStaticMarkup(<SideNav />)).toContain('data-testid="side-work-areas"');
+  });
+});
+
+describe("«Le tue aree» bar on phones (Francesco 17/10/2026 19:09)", () => {
+  it("is hidden for guests and for people without reserved areas", () => {
+    expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
+    state.session = session("FAMILY");
+    const family = workAreasFor(session("FAMILY"));
+    const html = renderToStaticMarkup(<MyAreasBar />);
+    if (family.length === 0) expect(html).toBe("");
+    else expect(html).toContain('data-testid="my-areas-bar"');
+  });
+
+  it("shows a dirigente every area they can open, led by the count that opens the full menu", () => {
+    state.session = session("DIRECTION");
+    state.pathname = "/";
+    const html = renderToStaticMarkup(<MyAreasBar />);
+    expect(html).toContain('data-testid="my-areas-bar"');
+    expect(html).toContain('aria-label="Le tue aree"');
+    const links = hrefs(html);
+    for (const a of workAreasFor(session("DIRECTION"))) expect(links).toContain(a.link.href);
+    expect(html).not.toMatch(/aria-current="page"/);
+    expect(html).toContain(`aria-label="Le tue aree: ${workAreasFor(session("DIRECTION")).length}. Apri l&#x27;elenco completo"`);
+    expect(html).toContain("lg:hidden");
+  });
+
+  it("stays out of board screens, which have their own header", () => {
+    state.session = session("DIRECTION");
+    state.pathname = "/calendario";
+    expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
   });
 });
 
