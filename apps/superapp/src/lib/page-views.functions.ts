@@ -2,10 +2,10 @@
  * "Numeri dell'app" on the server (UD-167, migration r141 STAGED: NOT APPLIED).
  *
  * trackPageView: +1 for a public page, called fire-and-forget by the browser tracker (components/PageViewTracker.tsx).
- * It uses a STATELESS Supabase client with the publishable key (no cookies read or written, so it never touches the
- * visitor's session) and calls scd_track_page_view, which validates everything again. It does nothing when Supabase
- * is not configured, on the dev server or in the staging preview, and swallows every error: until r141 is applied the
- * call simply fails and nothing happens.
+ * It calls recordPageView (page-views.server.ts), which applies a per-IP rate limit and uses the service-role client
+ * (scd_track_page_view is executable by service_role only and validates everything again). It is off without
+ * SCD_SUPABASE_SECRET_KEY, on the dev server and in the staging preview, and swallows every error: until r141 is
+ * applied the call simply fails and nothing happens.
  *
  * getAppStats: the Direzione's read (scd_app_stats checks the role in the database). Until r141 answers, the page
  * says "Funzione in preparazione" and shows no number (unknown is never zero).

@@ -2139,7 +2139,7 @@
         "status": "STAGED_INACTIVE_UNTIL_R141_APPLIED",
         "approval": "Francesco 16/10/2026 22:34 «area dove dobbiamo sapere quanti accessi sono stati fatti, quanti sono arrivati sopra all'app… capiamo come migliorare» (UD-167); migration r141 not applied; consent mode DECIDED by Francesco 16/10/2026 23:35: option A, cookieless anonymous totals without consent",
         "title": "Numeri dell'app: anonymous daily totals of the public pages (page, source, device) for the Direzione, to understand how families and fans reach the app",
-        "endpoint": "Supabase SCD PULSE scd_track_page_view (anon/authenticated, via server function trackPageView) and scd_app_stats (Direzione); no direct table access",
+        "endpoint": "Supabase SCD PULSE scd_track_page_view (service_role only, called by the server function trackPageView) and scd_app_stats (Direzione); no direct table access",
         "authority_domains": [
           "PUBLIC_PAGE_VIEW_TOTALS"
         ],
