@@ -1,22 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, ChevronDown, HeartHandshake, MonitorPlay } from "lucide-react";
+import { ArrowRight, HeartHandshake, Lightbulb, MonitorPlay } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { CastPresence } from "@/components/scd/CastPresence";
 import { EneaGuide } from "@/components/scd/EneaGuide";
-import { SponsorLogo } from "@/components/scd/Logos";
 import { METAL_CARD, METAL_LABEL, METAL_WRAP, MetalHeading } from "@/components/scd/MetalPageHeader";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PartnerForm } from "@/components/PartnerForm";
 import { PartnerPackages } from "@/components/PartnerPackages";
+import { SponsorIdeas } from "@/components/SponsorIdeas";
+import { SponsorWall } from "@/components/SponsorWall";
 import { SponsorLedwallLive } from "@/components/SponsorLedwallLive";
 import { SponsorProcess } from "@/components/SponsorProcess";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { romeDay } from "@/lib/public-window";
 import { pageHead, SHARE_PAGES } from "@/lib/share";
-import { parsePackageParam } from "@/lib/sponsor-packages";
+import { parseChoiceParam } from "@/lib/sponsor-ideas";
 import { reachFacts, reachValue } from "@/lib/sponsor-reach";
-import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
 
 /**
  * /sponsor — «Diventa partner» (Francesco 17/10/2026 08:22: «la piattaforma sponsor… fa pietà… migliorala»; IDEE
@@ -25,13 +25,17 @@ import { SPONSORS, sponsorLabel } from "@/lib/sponsors";
  *
  * Order: hero with the one action «Diventa partner» → Enea (one reason + one action) → why it pays (documented numbers
  * or «da confermare», lib/sponsor-reach.ts) → the partners already with us (lib/sponsors.ts, official logos in colour)
- * → the LED wall live → the packages (lib/sponsor-packages.ts) with the three steps → FAQ → the proposal form.
- * Never a price, a discount or an audience number that is not documented.
+ * (tap a logo: its card, lib/sponsor-profiles.ts) → the LED wall live → the four packages as «idee di
+ * sponsorizzazione» (lib/sponsor-packages.ts) with the three steps → «Idee da sponsorizzare» (lib/sponsor-ideas.ts)
+ * → Sostieni → FAQ → the proposal form. Never a price, an amount, a discount or an audience number that is not
+ * documented (Francesco 17/10/2026 09:42: «prezzi non esposti perché li fa al momento il Presidente»): where a price
+ * would be, «Proposta su misura: la definisce il Presidente con te».
  */
 export const Route = createFileRoute("/sponsor")({
-  // ?pacchetto=<id>: a listino package preselected in the proposal form (only known ids, see sponsor-packages.ts).
+  // ?pacchetto=<id>: a package or an idea preselected in the proposal form (only known ids: sponsor-packages.ts,
+  // sponsor-ideas.ts).
   validateSearch: (s: Record<string, unknown>): { pacchetto?: string | undefined } => {
-    const pacchetto = parsePackageParam(s["pacchetto"]);
+    const pacchetto = parseChoiceParam(s["pacchetto"]);
     return pacchetto ? { pacchetto } : {};
   },
   // Rome day of the server for Enea and the Volto sponsor presence: rendered on the server, reused on hydration.
@@ -39,9 +43,6 @@ export const Route = createFileRoute("/sponsor")({
   head: () => pageHead(SHARE_PAGES.sponsor),
   component: Sponsor,
 });
-
-/** Logos shown before «Vedi tutte»: progressive disclosure, no wall of 37 tiles on a phone. */
-const WALL_FIRST = 12;
 
 function SponsorHero() {
   return (
@@ -66,6 +67,10 @@ function SponsorHero() {
           <a href="#proposta" className="scd-gold scd-focus inline-flex min-h-12 items-center gap-2 rounded-[12px] px-5 font-display text-[16px] font-bold" data-testid="sponsor-hero-cta">
             Diventa partner
             <ArrowRight className="size-5" aria-hidden="true" />
+          </a>
+          <a href="#idee" className="scd-focus inline-flex min-h-12 items-center gap-2 rounded-[12px] bg-white/10 px-4 font-display text-[15px] font-semibold text-white shadow-[inset_0_0_0_2px_rgb(255_255_255/0.45)] hover:bg-white/20">
+            <Lightbulb className="size-5" aria-hidden="true" />
+            Le idee
           </a>
           <a href="#ledwall" className="scd-focus inline-flex min-h-12 items-center gap-2 rounded-[12px] bg-white/10 px-4 font-display text-[15px] font-semibold text-white shadow-[inset_0_0_0_2px_rgb(255_255_255/0.45)] hover:bg-white/20">
             <MonitorPlay className="size-5" aria-hidden="true" />
@@ -98,38 +103,6 @@ function WhyItPays() {
   );
 }
 
-function SponsorWall() {
-  const [all, setAll] = useState(false);
-  const shown = all ? SPONSORS : SPONSORS.slice(0, WALL_FIRST);
-  return (
-    <section aria-labelledby="con-noi-t" data-testid="sponsor-wall">
-      <MetalHeading id="con-noi-t" sub={`${SPONSORS.length} aziende del territorio nella stagione 2026/27, loghi originali`}>
-        Già con noi
-      </MetalHeading>
-      <ul className="m-0 grid list-none grid-cols-3 gap-2 p-0 sm:grid-cols-4 lg:grid-cols-6" id="sponsor-wall-list">
-        {shown.map((s) => (
-          <li key={s.slug} className="flex h-[64px] items-center justify-center rounded-[10px] border border-[#e3eaf4] bg-white px-2 lg:h-[76px]" title={sponsorLabel(s)}>
-            <SponsorLogo sponsor={s} box={{ w: 96, h: 40 }} />
-          </li>
-        ))}
-      </ul>
-      {SPONSORS.length > WALL_FIRST && (
-        <button
-          type="button"
-          onClick={() => setAll((v) => !v)}
-          aria-expanded={all}
-          aria-controls="sponsor-wall-list"
-          className="scd-focus mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-md font-display text-[15px] font-semibold text-[#0457af]"
-          data-testid="sponsor-wall-toggle"
-        >
-          {all ? "Mostra meno" : `Vedi tutte le ${SPONSORS.length} aziende`}
-          <ChevronDown className={`size-4 transition-transform motion-reduce:transition-none ${all ? "rotate-180" : ""}`} aria-hidden="true" />
-        </button>
-      )}
-    </section>
-  );
-}
-
 function Sponsor() {
   const { day } = Route.useLoaderData();
   const { pacchetto } = Route.useSearch();
@@ -139,7 +112,7 @@ function Sponsor() {
   useEffect(() => {
     if (pacchetto) setPick(pacchetto);
   }, [pacchetto]);
-  /** "Chiedi questo pacchetto": preselect in the form, keep it in the URL (shareable), scroll to the form. */
+  /** «Parliamone» on a package or idea: preselect in the form, keep it in the URL (shareable), scroll to the form. */
   const choose = (id: string) => {
     setPick(id);
     void navigate({ search: { pacchetto: id }, replace: true, resetScroll: false });
@@ -165,6 +138,8 @@ function Sponsor() {
 
       <div className={`${METAL_WRAP} mt-10 grid gap-8 lg:mt-14 lg:gap-12`}>
         <PartnerPackages onChoose={choose} />
+
+        <SponsorIdeas onChoose={choose} />
 
         <section className="scd-band-azzurro flex flex-col gap-3 rounded-[14px] p-5 text-white sm:flex-row sm:items-center" aria-labelledby="sostieni-title" data-testid="sponsor-sostieni">
           <HeartHandshake className="size-8 flex-none text-[#ffe27a]" aria-hidden="true" />

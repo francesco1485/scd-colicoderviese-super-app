@@ -7,7 +7,7 @@ import {
   PACKAGE_STEPS,
   PARTNER_PACKAGES,
   formatAudienceNumbers,
-  formatPackagePrice,
+  PROPOSAL_ON_MEASURE,
   hypeWordsIn,
   packageById,
   packageRequestNote,
@@ -16,7 +16,7 @@ import {
 } from "./sponsor-packages";
 
 const copyOf = (p: (typeof PARTNER_PACKAGES)[number]) =>
-  [p.title, p.summary, p.audience, p.audienceNumbers ?? "", p.link?.label ?? "", ...p.benefits].join(" \n ");
+  [p.title, p.summary, p.audience, p.audienceNumbers ?? "", p.link?.label ?? "", p.story, ...p.placements, ...p.benefits].join(" \n ");
 
 describe("PARTNER_PACKAGES", () => {
   it("has 4 to 5 packages, each with id, title, summary, audience and at least 3 benefits", () => {
@@ -42,12 +42,20 @@ describe("PARTNER_PACKAGES", () => {
     expect(PARTNER_PACKAGES[0]?.id).toBe("ledwall");
   });
 
-  it("no price is a number while it is da_approvare, and today every price waits for approval", () => {
+  it("no price field at all: the Presidente defines every proposal (Francesco 17/10/2026 09:42)", () => {
+    for (const p of [...PARTNER_PACKAGES, SEAT_PACKAGE_INTERNAL]) {
+      expect(Object.keys(p)).not.toContain("price");
+      expect(Object.keys(p).some((k) => /price|prezz|euro|amount|sconto|discount/i.test(k)), p.id).toBe(false);
+    }
+    expect(PROPOSAL_ON_MEASURE).toBe("Proposta su misura: la definisce il Presidente con te");
+  });
+
+  it("each package is an idea: 2 to 4 places where the brand appears and one story line", () => {
     for (const p of PARTNER_PACKAGES) {
-      expect(p.price.kind).toBe("da_approvare");
-      expect(Object.keys(p.price)).toEqual(["kind"]);
-      for (const v of Object.values(p.price)) expect(typeof v).not.toBe("number");
-      expect(formatPackagePrice(p.price)).toBe("Prezzo su richiesta · in approvazione");
+      expect(p.placements.length, p.id).toBeGreaterThanOrEqual(2);
+      expect(p.placements.length, p.id).toBeLessThanOrEqual(4);
+      expect(p.story.length, p.id).toBeGreaterThan(30);
+      expect(p.story.length, p.id).toBeLessThan(160);
     }
   });
 
@@ -89,12 +97,6 @@ describe("helpers", () => {
     expect(hypeWordsIn("Un'occasione Straordinaria e unica")).toEqual(["straordinari", "unica"]);
     expect(hypeWordsIn("Comunica con le famiglie")).toEqual([]);
     expect(FORBIDDEN_HYPE_STEMS).toContain("incredibil");
-  });
-
-  it("formatPackagePrice renders an approved euro price (for later use)", () => {
-    expect(formatPackagePrice({ kind: "euro", from: 1500 })).toBe("da € 1.500");
-    expect(formatPackagePrice({ kind: "euro", from: 500, to: 900 })).toBe("€ 500 – € 900");
-    expect(formatPackagePrice({ kind: "euro", from: 500, to: 500 })).toBe("da € 500");
   });
 
   it("parsePackageParam accepts only known requestable ids", () => {
