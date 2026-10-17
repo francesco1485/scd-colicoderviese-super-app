@@ -8,7 +8,7 @@ Solo ruolo del rapporto e ruolo del referente, mai nomi di persone (il repositor
 | FIGC Delegazione Sondrio | attività di base e Piccoli Amici (codice PA «Sondrio»: da verificare) | referente della Delegazione → nome in Rubrica staff (SCD PULSE scd_structure_roles, privata) | VERIFIED 11:07 |
 | AC Monza (affiliazione 2026/27) | società affiliata; canale ufficiale: gruppo WhatsApp «Affiliate Ac Monza 2026/2027» (59 società) | responsabile affiliazione → nome in Rubrica staff (SCD PULSE scd_structure_roles, privata) | VERIFIED 11:07–11:09 |
 | Comune di Colico | impianti di Colico | da indicare | da anagrafare |
-| Comune di Dervio | campo di Dervio; programma d'uso con preavviso di un mese; rotazione gare | da indicare | da anagrafare |
+| Comune di Dervio | campo di Dervio; Comune informato con il programma della stagione: nessun preavviso per singola gara; se una gara si sposta a Colico per maltempo si avvisano FIGC e squadra avversaria (Direzione 16/10/2026) | da indicare | da anagrafare |
 | Polizia Locale Colico / Dervio | eventi e viabilità | da indicare | da anagrafare |
 | Pro Loco Colico / Dervio | eventi del territorio | da indicare | da anagrafare |
 | Croce Rossa Colico / Dervio | presidio sanitario eventi | da indicare | da anagrafare |
