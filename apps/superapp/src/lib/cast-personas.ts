@@ -689,7 +689,7 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
     rosterId: "volto-sponsor",
     label: "Il Volto sponsor",
     nameTbd: true,
-    role: "Partner e pacchetti",
+    role: "Partner e idee di sponsorizzazione",
     does: "Ti racconta le idee di sponsorizzazione e ti fa chiedere quella che ti interessa: la proposta su misura la definisce il Presidente con te.",
     initial: "S",
     surfaces: { public: true, inside: true },
@@ -697,15 +697,15 @@ export const CAST_PERSONAS: Readonly<Record<CastPersonaId, CastPersonaDef>> = {
     chatQuick: ["Che idee di sponsorizzazione ci sono", "Chi sono i partner", "Vorrei parlarne con il club"],
     rules: [
       "Solo partner reali e pacchetti presenti nel CONTESTO: i prezzi dei pacchetti non sono pubblicati.",
-      "Le proposte passano sempre dall'ufficio commerciale del club: invita a richiedere una proposta.",
+      "La proposta su misura la definisce il Presidente con il partner: invita a scrivere con «Parliamone», mai prezzi.",
       "Mai contenuti commerciali rivolti ai bambini.",
     ],
     notes: [
-      { text: "Pacchetti e richiesta di proposta: [link: /sponsor].", to: "/sponsor" },
+      { text: "Idee di sponsorizzazione e «Parliamone»: [link: /sponsor].", to: "/sponsor" },
       { text: "I partner del club: [link: /partner].", to: "/partner" },
     ],
     tips: SPONSOR_TIPS,
-    disclaimer: "Solo partner reali e pacchetti pubblicati: ogni proposta passa dall'ufficio commerciale del club.",
+    disclaimer: "Solo partner reali e idee pubblicate: la proposta su misura la definisce il Presidente con te.",
     quick: [
       { label: "Parliamone", to: "/sponsor", hash: "proposta" },
       { label: "Le idee da sponsorizzare", to: "/sponsor", hash: "idee" },
