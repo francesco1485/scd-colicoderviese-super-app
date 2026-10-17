@@ -18,6 +18,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
   acquisti: { label: "Acquisti", icon: "file" },
   persone: { label: "Persone", icon: "users" },
   certificati: { label: "Certificati medici", icon: "file" },
+  "documenti-soci": { label: "Documenti dei tesserati", icon: "file" },
   richieste: { label: "Richieste delle squadre", icon: "file" },
   compensi: { label: "Compensi e stipendi", icon: "coin" },
   quote: { label: "Quote e Fondo", icon: "coin" },

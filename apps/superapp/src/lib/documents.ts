@@ -119,6 +119,24 @@ export function openHref(d: LibraryDoc): string | null {
   return appCopy(d)?.file ?? d.link;
 }
 
+/**
+ * «Documenti della tua area» on /documenti for signed-in people outside the office: the r81 catalogue rows the
+ * database already filtered for their audience (family, athlete, staff, mister), sorted by title, with where they open.
+ * Nothing disappears when the page turned into «I miei documenti» (Francesco 16/10/2026).
+ */
+export interface AreaDocLink {
+  ref: string;
+  title: string;
+  href: string | null;
+  due: string | null;
+}
+export function yourAreaDocs(lib: Library | null): AreaDocLink[] {
+  if (!lib || lib.audiences.length === 0) return [];
+  return [...lib.items]
+    .sort((a, b) => a.title.localeCompare(b.title, "it"))
+    .map((d) => ({ ref: d.ref, title: d.title, href: openHref(d), due: d.due }));
+}
+
 export interface AreaGroup {
   area: string;
   label: string;

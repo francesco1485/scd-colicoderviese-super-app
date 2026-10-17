@@ -94,6 +94,7 @@ import { Route as LedwallPlayerRouteImport } from './routes/ledwall.player'
 import { Route as QuadroIndexRouteImport } from './routes/quadro.index'
 import { Route as QuadroRotazioneCampiRouteImport } from './routes/quadro.rotazione-campi'
 import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.certificati'
+import { Route as SegreteriaDocumentiRouteImport } from './routes/segreteria_.documenti'
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
 import { Route as SegreteriaRichiesteRouteImport } from './routes/segreteria_.richieste'
 import { Route as SegreteriaStoriaRouteImport } from './routes/segreteria_.storia'
@@ -564,6 +565,11 @@ const SegreteriaCertificatiRoute = SegreteriaCertificatiRouteImport.update({
   path: '/segreteria/certificati',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SegreteriaDocumentiRoute = SegreteriaDocumentiRouteImport.update({
+  id: '/segreteria_/documenti',
+  path: '/segreteria/documenti',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SegreteriaPersoneRoute = SegreteriaPersoneRouteImport.update({
   id: '/segreteria_/persone',
   path: '/segreteria/persone',
@@ -863,6 +869,7 @@ export interface FileRoutesByFullPath {
   '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
+  '/segreteria/documenti': typeof SegreteriaDocumentiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/segreteria/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria/storia': typeof SegreteriaStoriaRoute
@@ -990,6 +997,7 @@ export interface FileRoutesByTo {
   '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria/certificati': typeof SegreteriaCertificatiRoute
+  '/segreteria/documenti': typeof SegreteriaDocumentiRoute
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/segreteria/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria/storia': typeof SegreteriaStoriaRoute
@@ -1119,6 +1127,7 @@ export interface FileRoutesById {
   '/ledwall/player': typeof LedwallPlayerRoute
   '/quadro/rotazione-campi': typeof QuadroRotazioneCampiRoute
   '/segreteria_/certificati': typeof SegreteriaCertificatiRoute
+  '/segreteria_/documenti': typeof SegreteriaDocumentiRoute
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
   '/segreteria_/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria_/storia': typeof SegreteriaStoriaRoute
@@ -1249,6 +1258,7 @@ export interface FileRouteTypes {
     | '/ledwall/player'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
+    | '/segreteria/documenti'
     | '/segreteria/persone'
     | '/segreteria/richieste'
     | '/segreteria/storia'
@@ -1376,6 +1386,7 @@ export interface FileRouteTypes {
     | '/ledwall/player'
     | '/quadro/rotazione-campi'
     | '/segreteria/certificati'
+    | '/segreteria/documenti'
     | '/segreteria/persone'
     | '/segreteria/richieste'
     | '/segreteria/storia'
@@ -1504,6 +1515,7 @@ export interface FileRouteTypes {
     | '/ledwall/player'
     | '/quadro/rotazione-campi'
     | '/segreteria_/certificati'
+    | '/segreteria_/documenti'
     | '/segreteria_/persone'
     | '/segreteria_/richieste'
     | '/segreteria_/storia'
@@ -1633,6 +1645,7 @@ export interface RootRouteChildren {
   LedwallPlayerRoute: typeof LedwallPlayerRoute
   QuadroRotazioneCampiRoute: typeof QuadroRotazioneCampiRoute
   SegreteriaCertificatiRoute: typeof SegreteriaCertificatiRoute
+  SegreteriaDocumentiRoute: typeof SegreteriaDocumentiRoute
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
   SegreteriaRichiesteRoute: typeof SegreteriaRichiesteRoute
   SegreteriaStoriaRoute: typeof SegreteriaStoriaRoute
@@ -2274,6 +2287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SegreteriaCertificatiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/segreteria_/documenti': {
+      id: '/segreteria_/documenti'
+      path: '/segreteria/documenti'
+      fullPath: '/segreteria/documenti'
+      preLoaderRoute: typeof SegreteriaDocumentiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/segreteria_/persone': {
       id: '/segreteria_/persone'
       path: '/segreteria/persone'
@@ -2664,6 +2684,7 @@ const rootRouteChildren: RootRouteChildren = {
   LedwallPlayerRoute: LedwallPlayerRoute,
   QuadroRotazioneCampiRoute: QuadroRotazioneCampiRoute,
   SegreteriaCertificatiRoute: SegreteriaCertificatiRoute,
+  SegreteriaDocumentiRoute: SegreteriaDocumentiRoute,
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
   SegreteriaRichiesteRoute: SegreteriaRichiesteRoute,
   SegreteriaStoriaRoute: SegreteriaStoriaRoute,

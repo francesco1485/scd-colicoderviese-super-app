@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { appCopy, audienceError, filterDocs, groupByArea, needsPublic, openHref, parseLibrary, upcoming, type LibraryDoc } from "./documents";
+import { appCopy, audienceError, filterDocs, groupByArea, needsPublic, openHref, parseLibrary, upcoming, yourAreaDocs, type LibraryDoc } from "./documents";
 
 const TODAY = "2026-10-12";
 
@@ -70,5 +70,26 @@ describe("grouping, filters and deadlines", () => {
     expect(needsPublic(["ATLETI"], { sensitivity: "PUBBLICO" })).toBe(false);
     expect(audienceError("needs_public")).toMatch(/pubblico/);
     expect(audienceError("x")).toMatch(/Riprova/);
+  });
+});
+
+describe("Documenti della tua area (r81 under «I miei documenti»)", () => {
+  it("lists the audience's documents sorted by title with where they open, nothing for no audience", () => {
+    const lib = parseLibrary({
+      audiences: ["STAFF"],
+      canEdit: false,
+      items: [
+        { ref: "b", title: "Piano allenamenti", area: "ORGANIZZAZIONE_ORGANIGRAMMA", link: "https://drive.google.com/x", audiences: ["STAFF"], sensitivity: "INTERNO" },
+        { ref: "a", title: "Codice unico di condotta", area: "ORGANIZZAZIONE_ORGANIGRAMMA", link: null, audiences: ["STAFF"], sensitivity: "PUBBLICO" },
+        { ref: "c", title: "Verbale interno", area: "ORGANIZZAZIONE_ORGANIGRAMMA", link: "http://insecure", audiences: ["STAFF"], sensitivity: "INTERNO" },
+      ],
+    });
+    const out = yourAreaDocs(lib);
+    expect(out.map((d) => d.ref)).toEqual(["a", "b", "c"]);
+    expect(out[0]!.href).toMatch(/\.pdf$/);
+    expect(out[1]!.href).toBe("https://drive.google.com/x");
+    expect(out[2]!.href).toBeNull();
+    expect(yourAreaDocs(null)).toEqual([]);
+    expect(yourAreaDocs({ audiences: [], canEdit: false, items: lib!.items })).toEqual([]);
   });
 });

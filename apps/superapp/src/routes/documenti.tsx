@@ -25,6 +25,9 @@ import {
   type LibraryDoc,
 } from "@/lib/documents";
 import { getDocLibrary, setDocAudiences, type LibraryData } from "@/lib/documents.functions";
+import { getMyDocuments, type MyDocumentsData } from "@/lib/my-documents.functions";
+import { MyDrawer } from "@/components/scd/MyDocuments";
+import { YourAreaDocs } from "@/components/scd/YourAreaDocs";
 import { itDay } from "@/lib/fees";
 
 function romeToday(): string {
@@ -32,27 +35,78 @@ function romeToday(): string {
 }
 
 /**
- * Documenti (r81, telaio T4, UD-085). One library for everyone: the database returns only the documents meant
- * for the caller (famiglie, atleti, staff, dirigenti, ufficio). Signed out: the public club documents.
+ * Documenti. Signed out: the public club regulations (CLUB_DOCUMENTS). Signed in: «I miei documenti» (r144,
+ * Francesco 16/10/2026): the caller's own documents and those of the minors they are guardian of — accepted on the
+ * enrolment form, delivered (with status) and requested by the Segreteria — with upload to the club Drive. The club
+ * catalogue (r81, scd_doc_library) stays: a secondary tab for Direzione and office; for everyone else a short
+ * «Documenti della tua area» list under the personal section (the docs of their audience, linking to where they open).
  */
 export const Route = createFileRoute("/documenti")({
   loader: async () => {
-    const [session, data] = await Promise.all([getSession(), getDocLibrary()]);
-    return { roles: session.roles, badge: session.badge, signedIn: session.user !== null, data, today: romeToday() };
+    const session = await getSession();
+    const signedIn = session.user !== null;
+    const office = OFFICE_POSITIONS.some((r) => session.roles.includes(r));
+    const [mine, library] = await Promise.all([
+      signedIn ? getMyDocuments() : Promise.resolve(null),
+      signedIn ? getDocLibrary() : Promise.resolve(null),
+    ]);
+    return { roles: session.roles, badge: session.badge, signedIn, mine, library, office, today: romeToday() };
   },
   head: () => ({
     meta: [
       { title: "Documenti — SCD ColicoDerviese" },
-      { name: "description", content: "Regolamenti, moduli e documenti della S.C.D. ColicoDerviese, ognuno per chi deve leggerlo." },
+      { name: "description", content: "Regolamenti del club e, dopo l'accesso, i tuoi documenti: firmati all'iscrizione, consegnati e richiesti dalla Segreteria." },
     ],
   }),
   component: DocumentsRoute,
 });
 
+const OFFICE_POSITIONS = ["direzione", "segreteria", "tesoreria"];
+
 function DocumentsRoute() {
   const d = Route.useLoaderData();
-  if (!d.signedIn || !d.data.connected) return <PublicDocuments />;
-  return <LibraryPage initial={d.data} roles={d.roles} badge={d.badge} today={d.today} />;
+  if (!d.signedIn || !d.mine || !d.mine.connected) return <PublicDocuments />;
+  return <SignedInDocuments mine={d.mine} library={d.library} office={d.office} roles={d.roles} badge={d.badge} today={d.today} />;
+}
+
+function SignedInDocuments({ mine, library, office, roles, badge, today }: {
+  mine: MyDocumentsData; library: LibraryData | null; office: boolean; roles: string[]; badge: string | null; today: string;
+}) {
+  const catalogue = office && library !== null && library.connected;
+  const [tab, setTab] = useState<"miei" | "catalogo">("miei");
+  const lamp = mine.lamp;
+  return (
+    <InteriorShell
+      title={tab === "miei" ? "I miei documenti" : "Catalogo del club"}
+      path="/documenti"
+      roles={new Set(roles)}
+      roleLabel={badge ?? "Area riservata"}
+      {...(tab === "miei" && lamp ? { highlights: [
+        { value: lamp.expired, label: "scaduti" },
+        { value: lamp.expiring, label: "in scadenza" },
+        { value: lamp.requests, label: "richieste" },
+      ] } : {})}
+    >
+      {catalogue && (
+        <div className="mb-4 flex gap-1.5" role="group" aria-label="Documenti">
+          {([["miei", "I miei documenti"], ["catalogo", "Catalogo del club"]] as const).map(([id, label]) => (
+            <button key={id} type="button" aria-pressed={tab === id} onClick={() => setTab(id)}
+              className={`scd-focus inline-flex h-11 items-center rounded-full border px-4 text-[15px] font-semibold ${tab === id ? "border-[#0b3d7a] bg-[#0b3d7a] text-white" : "border-[var(--in-line)] bg-white"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+      {tab === "miei" || !catalogue || !library ? (
+        <div className="flex flex-col gap-[18px]">
+          <MyDrawer data={mine} />
+          {!catalogue && <YourAreaDocs library={library} today={today} />}
+        </div>
+      ) : (
+        <LibraryBody initial={library} today={today} />
+      )}
+    </InteriorShell>
+  );
 }
 
 function PublicDocuments() {
@@ -100,7 +154,7 @@ function PublicDocuments() {
 const btnGhost = "scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-[var(--in-line)] bg-white px-4 text-[15px] font-semibold disabled:opacity-50";
 const btnMain = "scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[#F8D000] px-4 text-[15px] font-bold text-[#062a52] disabled:opacity-50";
 
-function LibraryPage({ initial, roles, badge, today }: { initial: LibraryData; roles: string[]; badge: string | null; today: string }) {
+function LibraryBody({ initial, today }: { initial: LibraryData; today: string }) {
   const [items, setItems] = useState(initial.library?.items ?? []);
   const [filter, setFilter] = useState<DocFilter>("tutti");
   const [q, setQ] = useState("");
@@ -115,17 +169,7 @@ function LibraryPage({ initial, roles, badge, today }: { initial: LibraryData; r
   const current = items.find((d) => d.ref === editing) ?? null;
 
   return (
-    <InteriorShell
-      title="Documenti"
-      path="/documenti"
-      roles={new Set(roles)}
-      roleLabel={badge ?? "Area riservata"}
-      highlights={[
-        { value: items.length, label: "documenti per te" },
-        { value: items.filter((d) => d.due !== null && d.due >= today).length, label: "con scadenza" },
-        { value: items.filter((d) => d.sensitivity === "PUBBLICO").length, label: "pubblici" },
-      ]}
-    >
+    <>
       <div className="flex flex-col gap-[18px]">
         {initial.error ? (
           <EmptyState title="Dati non disponibili">{initial.error}</EmptyState>
@@ -200,7 +244,7 @@ function LibraryPage({ initial, roles, badge, today }: { initial: LibraryData; r
         <AudienceDialog d={current} onClose={() => setEditing(null)}
           onSaved={(aud, sens) => setItems((prev) => prev.map((x) => (x.ref === current.ref ? { ...x, audiences: aud, sensitivity: sens } : x)))} />
       )}
-    </InteriorShell>
+    </>
   );
 }
 

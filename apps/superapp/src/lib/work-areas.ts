@@ -43,7 +43,8 @@ export type WorkAreaId =
   | "planning"
   | "struttura"
   | "intake"
-  | "rubrica";
+  | "rubrica"
+  | "documenti-soci";
 
 export interface DriveMaster {
   key: string;
@@ -143,6 +144,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     id: "richieste", label: "Richieste delle squadre", path: pathOf("richieste"), railId: "segreteria",
     description: "Amichevoli chieste dalle squadre: dal messaggio alla bozza, la conferma entro 15 giorni, il calendario e il modulo federale da firmare.",
     sources: ["supabase", "calendario", "inserimenti"],
+    insertRoles: ["Segreteria", "Direzione"],
+  },
+  "documenti-soci": {
+    id: "documenti-soci", label: "Documenti dei tesserati", path: pathOf("documenti-soci"), railId: "segreteria",
+    description: "Documenti caricati dalle famiglie da verificare e documenti da chiedere: il file resta nel Drive del club, qui l'elenco e lo stato. Segreteria e Direzione; la Tesoreria vede solo l'ISEE.",
+    sources: ["supabase", "iscrizioni", "inserimenti"],
     insertRoles: ["Segreteria", "Direzione"],
   },
   lotteria: {
