@@ -21,6 +21,7 @@ Stato: Pronta · Serve ok (migrazione, spesa, servizio nuovo o messaggi a terzi)
 | I-261017-12 | 04 Sponsor | Pagina «Diventa partner» con 3 pacchetti + report mensile dichiarato «calcolato» | `ricerche/calcio-lombardia-idee.md` top 6 | SOLDI | M | 4.5 | Pronta |
 | I-261017-13 | 05 Tornei | Torneo giovanile estivo dedicato a un luogo storico (es. «Coppa Forte Montecchio»): nome da decidere | `ricerche/storia-territorio.md` idea 1 | PERSONE | M | 2 | Serve ok (decisione di Francesco) |
 | I-261017-14 | 19 Convenzioni | Convenzioni con il territorio: Forte Montecchio Nord, battelli, scuole vela e windsurf | `ricerche/storia-territorio.md` idea 6 | SOLDI | M | 2 | Serve ok (contatti con terzi) |
+| I-261017-16 | 14 Avatar | **Comando UD-144**: avatar 3D su pedana del club che ruota (trascinabile, pausa, fermo con «riduci movimento»), tre stili: Iperrealistico, Cartoon, terzo da confermare; mai da foto di bambini né somigliante a persone famose | Francesco 17/10 07:42 «importante e fondamentale» | PERSONE | L | 3 | Pronta (priorità alta: prima del resto su #14) |
 | I-261017-15 | 17 Iscriviti | Pagina «Percorso ragazze» + modulo «Provaci con noi» senza dati sensibili al primo passo | `ricerche/calcio-lombardia-idee.md` top 10 | PERSONE | M | 3 | Pronta |
 
 Le ricerche complete stanno in `docs/piattaforme/ricerche/`.

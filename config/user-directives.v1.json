@@ -3916,6 +3916,25 @@
       }
     },
     {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "07:42",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-144",
+      "name": "AVATAR_3D_ROTATING_PEDESTAL_THREE_STYLES",
+      "sourceQuoteFragments": [
+        "Un comando importante e fondamentale che devi fare all'agente avatar crea il tuo avatar deve essere su una pedana e ruotare perché sono in tre D",
+        "quindi uno irrealistico altro carbonato e uno senza foto di bimbo personaggi famosi"
+      ],
+      "normalizedCommand": {
+        "rule": "'Crea il tuo avatar' always shows the avatar in 3D standing on a club pedestal (SCD palette, club crest only) that rotates slowly; drag or swipe turns it by hand; pause button; with reduced motion it stays still on a front pose. Three styles to choose from: 1) Iperrealistico (photorealistic but synthetic, not resembling any real person), 2) Cartoon (animated-film style, original character, no copyrighted character), 3) third style to confirm with Francesco (INFERRED reading: 'senza foto' = built only from choices, no photo). Never generated from photos of children, never resembling famous people (existing moderation in lib/avatar-studio.ts stays). Same pedestal and rotation for the cast (Vera, Garrison, Enea, Sky, Crovi) and for avatar cards and the LED wall.",
+        "scope": "SUPER_APP Crea il tuo avatar / Crea il tuo campione (/la-mia-scd/campione), scd-avatar agent, cards and LED wall",
+        "supersedes": "none; extends UD-102 and the avatar rules (no photo stored, under 14 parent activates)",
+        "implementationStatus": "NOT_IMPLEMENTED",
+        "implementation": "backlog docs/piattaforme/IDEE.md I-261017-16 (platform 14 Avatar); 3D with three.js / React Three Fiber, glTF under 2 MB, 60 fps on a mid phone, poster fallback"
+      }
+    },
+    {
       "sourceDate": "2026-10-16",
       "sourceTime": "22:40",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
