@@ -1,5 +1,5 @@
 /**
- * Area squadra (UD-181, Francesco DG 17/10/2026 12:36): pure helpers shared by the Area partite, the Area allenamenti,
+ * Area squadra (UD-183, Francesco DG 17/10/2026 12:36): pure helpers shared by the Area partite, the Area allenamenti,
  * the family card and the Segreteria monthly check. The database (r117, r118) decides who may read and write; these
  * helpers only shape input and output, and compute the «Provvisorio» state of the mister's tabellino.
  *

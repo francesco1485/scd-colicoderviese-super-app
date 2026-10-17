@@ -1,4 +1,4 @@
--- r118: Area allenamenti + verifica mensile della Segreteria (UD-181, Francesco DG 17/10/2026 12:36).
+-- r118: Area allenamenti + verifica mensile della Segreteria (UD-183, Francesco DG 17/10/2026 12:36).
 -- STAGED: NOT APPLIED. Apply on SCD PULSE (ndevtxxijbcnskgysdit) only after Francesco writes "applica r118", after r117.
 -- Never on dfnwzwutvnwiitiffwvr.
 --

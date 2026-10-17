@@ -15,7 +15,7 @@ import { AREA_ALLENAMENTI_LIVE } from "@/lib/team-area";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /**
- * Area allenamenti per squadra (UD-181): the weekly quadro (Drive snapshot, the public timetable) plus, with r118,
+ * Area allenamenti per squadra (UD-183): the weekly quadro (Drive snapshot, the public timetable) plus, with r118,
  * the mister's sessions (theme, private notes, a note shared with the team, Google Meet link for a «live»),
  * attendance present / absent / justified and the «dinamiche di gioco» library. Same access as the Mister area.
  */

@@ -1,5 +1,5 @@
 /**
- * Verifica mensile della Segreteria (UD-181): for each team and month, what is missing in the Area squadra.
+ * Verifica mensile della Segreteria (UD-183): for each team and month, what is missing in the Area squadra.
  * Pure function: the server feeds it the official calendar copy, the match status rows of r117
  * (scd_staff_match_status) and the training sessions of r118 (scd_office_training_month). Nothing is invented:
  * a match with no row in the database simply has everything to fill in.

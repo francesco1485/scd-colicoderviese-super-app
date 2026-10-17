@@ -956,7 +956,7 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - «Iscrivi la squadra» apre il sito dell'organizzatore (https, nuova scheda, `rel="noopener noreferrer"`). Nessun numero di telefono nei testi.
 - Revisioni scd-revisore + scd-sicurezza: PASS × 2.
 
-## 2026-10-17 — chat cloud — Area partite e Area allenamenti per squadra + verifica mensile della Segreteria (UD-181, Francesco 12:36)
+## 2026-10-17 — chat cloud — Area partite e Area allenamenti per squadra + verifica mensile della Segreteria (UD-183, Francesco 12:36)
 
 - Audit prima di costruire: esistevano già convocazione (r62/r67/r68/r69, presa visione o impedimento), distinta SCD (r70), tabellino con gol/assist/minuti/cartellini per id di rosa (r92, alimenta il Fantacalcio), tabelle allenamenti e presenze (r53, chiuse e vuote), bucket privato `scd-private` (r75), coda `scd_notification_outbox` (r104). Tutto riusato ed esteso, nessun registro doppio; i campi LND ufficiali su `scd_matches` restano al lavoro r115.
 - `r117_area_partite.sql` (STAGED, non applicata): resoconto, formazione e marcatori avversari come testo, risultato ufficiale LND scritto da Segreteria/Direzione (tabellino «Provvisorio» finché non coincide, calcolato), referto e distinte di entrambe le squadre in `scd-private/<org>/match/<id>/`, motivo dell'impedimento (senza categoria salute), stato di molte gare per elenco e verifica.

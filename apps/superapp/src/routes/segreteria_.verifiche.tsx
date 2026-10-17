@@ -17,7 +17,7 @@ function todayRome(): string {
 }
 
 /**
- * Verifica mensile della Segreteria (UD-181): for each team, the matches of the month without convocazione, distinta,
+ * Verifica mensile della Segreteria (UD-183): for each team, the matches of the month without convocazione, distinta,
  * tabellino, resoconto or referto, and the trainings without attendance. Nothing is sent by itself: the Segreteria
  * reads the list and presses «Crea le richieste»; the teams answer «integrato» or «giustifica» in their area.
  */

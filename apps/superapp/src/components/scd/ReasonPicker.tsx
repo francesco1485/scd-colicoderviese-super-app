@@ -3,7 +3,7 @@ import { useId } from "react";
 import { NO_HEALTH_HINT, REASON_CODES, REASON_LABEL, REASON_NOTE_MAX, type ReasonCode } from "@/lib/team-area";
 
 /**
- * Reason of an impediment or of an advance absence notice (UD-181): one category and a short note.
+ * Reason of an impediment or of an advance absence notice (UD-183): one category and a short note.
  * There is no health category on purpose, and the hint says so in plain words.
  */
 export function ReasonPicker({

@@ -21,7 +21,7 @@ import { getTeamMatchStatus, type MatchStatus } from "@/lib/team-area.functions"
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /**
- * Area partite per squadra (UD-181). Every match of the season of the chosen team, from the official calendar copy;
+ * Area partite per squadra (UD-183). Every match of the season of the chosen team, from the official calendar copy;
  * per match the team staff does convocazione (r62), distinta (r70), tabellino (r92) and, with r117, resoconto,
  * opponents, referto and distinte of both teams. Same access as the Mister area: the database checks the team scope.
  * No team list is hard-coded: the teams are the calendar groups, so a team created later appears by itself.

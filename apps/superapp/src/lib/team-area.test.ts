@@ -24,7 +24,7 @@ import {
 const r117 = readFileSync(resolve(__dirname, "../../../../supabase/migrations/20261017_r117_area_partite.sql"), "utf8");
 const r118 = readFileSync(resolve(__dirname, "../../../../supabase/migrations/20261017_r118_area_allenamenti.sql"), "utf8");
 
-describe("Area squadra helpers (UD-181)", () => {
+describe("Area squadra helpers (UD-183)", () => {
   it("stays off until «applica r117 / r118»", () => {
     expect(AREA_PARTITE_LIVE).toBe(false);
     expect(AREA_ALLENAMENTI_LIVE).toBe(false);

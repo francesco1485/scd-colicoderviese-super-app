@@ -35,7 +35,7 @@ const base = (over: Partial<MonthlyInput> = {}): MonthlyInput => ({
 const m = (id: string, date: string, group = "u15", type = "CAMPIONATO", opponent = "ESEMPIO CALCIO"): CalendarMatch => ({ id, date, group, type, opponent });
 const complete = (id: string): MatchStatusRow => ({ sourceRecordId: id, callupsSent: 18, sheetStatus: "READY", tabellino: true, hasSummary: true, hasReferto: true });
 
-describe("monthly check (UD-181)", () => {
+describe("monthly check (UD-183)", () => {
   it("has a planned schedule that is NOT active", () => {
     expect(MONTHLY_CHECK_PLAN.cron).toBe("0 8 1 * *");
     expect(MONTHLY_CHECK_PLAN.timezone).toBe("Europe/Rome");

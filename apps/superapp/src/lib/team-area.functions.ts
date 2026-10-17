@@ -1,5 +1,5 @@
 /**
- * Area squadra on the server (UD-181; r117 Area partite, r118 Area allenamenti e verifica mensile).
+ * Area squadra on the server (UD-183; r117 Area partite, r118 Area allenamenti e verifica mensile).
  * Every call runs with the caller's own Supabase session: the database functions decide who may read or write
  * (team scope scd_my_team_ids, family circle scd_my_family, office roles). Inputs are validated with zod; match
  * details come from the official calendar copy on the server, never from the browser.
