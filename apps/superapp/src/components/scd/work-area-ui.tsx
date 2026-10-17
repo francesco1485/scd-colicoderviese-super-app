@@ -4,6 +4,7 @@
  * "Inserimenti a Sky" sheet and the honest empty state. Read-only: nothing is written anywhere.
  */
 import { MemberServicesBar } from "@/components/scd/MemberServicesBar";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { Check, ClipboardCopy, ExternalLink, FileSpreadsheet, Info, Plus, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 
@@ -104,6 +105,8 @@ export function WorkAreaShell({
         </div>
         {children}
       </div>
+      {/* UD-172: the mister desk is reached only past the work-area gate; no tour in the staging preview. */}
+      {id === "mister" && !preview && <GuideTourAuto role="mister" />}
     </InteriorShell>
   );
 }

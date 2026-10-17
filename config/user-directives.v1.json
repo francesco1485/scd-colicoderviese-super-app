@@ -4116,7 +4116,7 @@
         "scope": "SUPER_APP all portals",
         "supersedes": "none",
         "implementationStatus": "IN_PROGRESS",
-        "implementation": ".claude/agents/scd-guide.md; .claude/skills/scd-guida-interattiva/SKILL.md"
+        "implementation": ".claude/agents/scd-guide.md; .claude/skills/scd-guida-interattiva/SKILL.md; v1 apps/superapp/src/lib/guide-content.ts (cards), apps/superapp/src/components/guide/GuideTour.tsx (first-access tour), apps/superapp/src/routes/guida.tsx"
       }
     },
     {
@@ -4134,7 +4134,7 @@
         "scope": "SUPER_APP /guida, Iride, cast",
         "supersedes": "none",
         "implementationStatus": "IN_PROGRESS",
-        "implementation": "scd-guide; scd-segreteria and scd-figc-lnd verify federal answers"
+        "implementation": "scd-guide; scd-segreteria and scd-figc-lnd verify federal answers; v1 FAQ_ENTRIES in apps/superapp/src/lib/guide-content.ts, shown in /guida"
       }
     },
     {

@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { DeleteAccountCard } from "@/components/scd/DeleteAccountCard";
 import { JoinClubScreen } from "@/components/scd/JoinClub";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { RequestsToConfirmCard } from "@/components/scd/RequestsToConfirmCard";
 import { FollowButton } from "@/components/universe/Feed";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
@@ -438,6 +439,7 @@ function Inside({
         </Link>
         <DeleteAccountCard email={session.user?.email ?? ""} />
       </div>
+      <GuideTourAuto role="calciatori" />
     </main>
   );
 }
