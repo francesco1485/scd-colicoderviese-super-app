@@ -321,8 +321,8 @@ describe("gestionale", () => {
     });
     expect(u15.split.total).toBe(27);
     expect(u15.split.home + u15.split.away).toBe(27);
-    // Esordienti 2014: no verified link to the quadro -> unknown, never 0.
-    expect(teams.find((t) => t.id === "2014")!.weeklySessions).toBeNull();
+    // Esordienti 2014 = U13 on the board (annata table VERIFIED by the Direzione 17/10/2026): mar + gio.
+    expect(teams.find((t) => t.id === "2014")!.weeklySessions).toBe(2);
     for (const t of teams)
       expect(contrastOnWhite(t.color)).toBeGreaterThanOrEqual(4.5);
   });
