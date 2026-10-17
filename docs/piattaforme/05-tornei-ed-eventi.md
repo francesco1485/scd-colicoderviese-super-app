@@ -1,6 +1,6 @@
 # 05 · Tornei ed eventi
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: primo ciclo 17/10/2026 (ramo feat/cantiere-04-05-sponsor-tornei)
+Responsabile: scd-tornei · Stato: Attiva · Pagina: `/tornei` · `/eventi` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`; rifatta il 17/10/2026, PR #181)
 
 ## Stato reale
 - VERIFIED · `/tornei` rifatta il 17/10/2026: testata con il prossimo torneo e conto alla rovescia dal vivo, «Iscrivi la squadra» (sezione iscrizioni esistente della pagina torneo), condivisione; Enea guida (UD-149); una scheda per torneo pubblicato con annate in fila, 6 icone di servizio (`lib/tournament-hub.ts`: ciò che non è pubblicato resta «da confermare»), squadre confermate («la tua squadra c'è?»), locandina una volta sola e ingrandibile; tornei senza programma in una riga «In arrivo»; fascia «Vivi il Lago» (Colico, Forte Montecchio Nord, Dervio, lago, con fonti); fascia partner verso `/sponsor?pacchetto=tornei#proposta`.

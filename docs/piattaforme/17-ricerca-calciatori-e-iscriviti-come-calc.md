@@ -1,6 +1,6 @@
 # 17 · Ricerca calciatori e iscriviti come calciatore
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-scouting · Stato: In costruzione · Pagina: `/vetta-legnone` (vetrina «Vetta Legnone» in costruzione su un altro ramo) · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

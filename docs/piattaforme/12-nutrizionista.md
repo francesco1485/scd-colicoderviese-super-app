@@ -1,6 +1,6 @@
 # 12 · Nutrizionista
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-nutrizione · Stato: Viva · Pagina: `/nutrizionista` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

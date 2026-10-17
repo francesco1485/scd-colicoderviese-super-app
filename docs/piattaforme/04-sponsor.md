@@ -1,6 +1,6 @@
 # 04 · Sponsor
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: primo ciclo 17/10/2026 (ramo feat/cantiere-04-05-sponsor-tornei)
+Responsabile: scd-sponsor · Stato: Attiva · Pagina: `/sponsor` · `/grow` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`; rifatta il 17/10/2026, PR #181)
 
 ## Stato reale
 - VERIFIED · `/sponsor` rifatta il 17/10/2026: testata «Il tuo marchio, dove il Lario si ritrova» con l'azione unica «Diventa partner», Enea (UD-149) con una ragione e un'azione a rotazione, «Perché conviene» (`lib/sponsor-reach.ts`: numeri solo documentati, pubblico e utenti app «da confermare»), parete «Già con noi» dai loghi originali di `lib/sponsors.ts` (12 visibili, poi «Vedi tutte»), LED wall dal vivo (`SponsorLedwallLive`), 4 pacchetti di `lib/sponsor-packages.ts` in schede a colori con i 3 passi, FAQ, Volto sponsor e modulo `PartnerForm` (#proposta, `?pacchetto=`).

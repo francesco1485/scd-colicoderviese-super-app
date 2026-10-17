@@ -1,6 +1,6 @@
 # 23 · Bandi e ricerca
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-bandi · Stato: In costruzione · Pagina: `/gestionale/piattaforme/bandi-e-ricerca` (pagina di partenza) · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
