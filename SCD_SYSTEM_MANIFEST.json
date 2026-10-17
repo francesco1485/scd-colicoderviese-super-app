@@ -2142,7 +2142,7 @@
         "id": "SCD_NUMERI_APP",
         "kind": "INTERNAL_WORKFLOW",
         "trust": "INTERNAL_VERIFIED",
-        "status": "STAGED_INACTIVE_UNTIL_R141_APPLIED",
+        "status": "STAGED_INACTIVE_UNTIL_R143_APPLIED",
         "approval": "Francesco 16/10/2026 22:34 «area dove dobbiamo sapere quanti accessi sono stati fatti, quanti sono arrivati sopra all'app… capiamo come migliorare» (UD-169); migration r143 not applied; consent mode DECIDED by Francesco 16/10/2026 23:35: option A, cookieless anonymous totals without consent",
         "title": "Numeri dell'app: anonymous daily totals of the public pages (page, source, device) for the Direzione, to understand how families and fans reach the app",
         "endpoint": "Supabase SCD PULSE scd_track_page_view (service_role only, called by the server function trackPageView) and scd_app_stats (Direzione); no direct table access",
@@ -2170,7 +2170,7 @@
           "DO_NOT_TRACK_AND_GPC_RESPECTED",
           "DIREZIONE_ONLY_READ",
           "PURGE_AFTER_25_MONTHS",
-          "UNKNOWN_IS_NOT_ZERO_FUNZIONE_IN_PREPARAZIONE_UNTIL_R141",
+          "UNKNOWN_IS_NOT_ZERO_FUNZIONE_IN_PREPARAZIONE_UNTIL_R143",
           "COOKIELESS_TOTALS_WITHOUT_CONSENT_OPTION_A_DECIDED_2026_10_16"
         ],
         "engines": {

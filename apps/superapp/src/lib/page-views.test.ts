@@ -11,6 +11,12 @@ import {
 } from "./page-views";
 
 describe("normalisePagePath", () => {
+  it("counts only paths equal to or below a public prefix (two-segment prefixes too)", () => {
+    for (const p of ["/squadre/u16", "/squadre/prima/x", "/vetta-legnone", "/classifiche"])
+      expect(normalisePagePath(p), p).toBe(p);
+    for (const p of ["/squadre", "/squadre/u14", "/squadre/carte", "/squadre/primavera"])
+      expect(normalisePagePath(p), p).toBeNull();
+  });
   it("keeps public paths, cuts query and hash, lower-cases, merges slashes", () => {
     expect(normalisePagePath("/")).toBe("/");
     expect(normalisePagePath("/Calendario/?utm_source=ig#oggi")).toBe(

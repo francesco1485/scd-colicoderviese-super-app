@@ -88,6 +88,18 @@ const rows = async () =>
 const views = async (path, source = "direct", device = "phone") =>
   (await db.query(`select coalesce(sum(views), 0)::int n from public.scd_app_page_views_daily where path = $1 and source = $2 and device = $3`, [path, source, device])).rows[0].n;
 
+// 0b. Path-prefix allowlist (two-segment public prefixes): counted vs never counted.
+await db.exec("delete from public.scd_app_page_views_daily");
+for (const p of ["/squadre/u16", "/squadre/prima/x", "/vetta-legnone", "/classifiche"]) {
+  await track(p);
+  assert.equal(await views(p), 1, p);
+}
+for (const p of ["/squadre", "/squadre/u14", "/squadre/carte", "/squadre/primavera"]) {
+  await track(p);
+  assert.equal(await views(p), 0, p);
+}
+await db.exec("delete from public.scd_app_page_views_daily");
+
 // 1. Table locked: RLS on, no policies, anon and authenticated cannot read or write it directly.
 const rls = (await db.query(`select relrowsecurity r from pg_class where oid = 'public.scd_app_page_views_daily'::regclass`)).rows[0].r;
 assert.equal(rls, true);
