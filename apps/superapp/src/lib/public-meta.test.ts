@@ -11,6 +11,7 @@ import {
   type MetaEntry,
   type PageMetaInput,
 } from "./share";
+import { VETTA_SHARE } from "./vetta-legnone";
 
 /**
  * B8 — link previews. Every public page owned by the cloud lane has its own title, description, og:image (official crest
@@ -50,6 +51,7 @@ const ROUTE_HEADS: ReadonlyArray<{ file: string; ref: string; page: PageMetaInpu
   { file: "src/routes/sostieni.fondo-solidale.tsx", ref: "SHARE_PAGES.fondoSolidale", page: SHARE_PAGES.fondoSolidale },
   { file: "src/routes/sostieni.proponi.tsx", ref: "SHARE_PAGES.proponi", page: SHARE_PAGES.proponi },
   { file: "src/routes/tornei.tsx", ref: "SHARE_PAGES.tornei", page: SHARE_PAGES.tornei },
+  { file: "src/routes/vetta-legnone.tsx", ref: "VETTA_SHARE", page: VETTA_SHARE },
   {
     file: "src/routes/eventi.christmas-lario-cup.tsx",
     ref: "SHARE_PAGES.christmasLarioCup",

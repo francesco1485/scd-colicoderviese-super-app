@@ -56,6 +56,12 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(robotsTxt(true, "https://app.example.it")).toContain("Allow: /elimina-account");
   });
 
+  it("keeps the Vetta Legnone showcase public and in the sitemap (platform 17)", () => {
+    expect(isPublicPath("/vetta-legnone")).toBe(true);
+    expect(cacheControlFor("/vetta-legnone")).toBe("public, max-age=0, must-revalidate");
+    expect(sitemapXml("https://app.example.it")).toContain("<loc>https://app.example.it/vetta-legnone</loc>");
+  });
+
   it("allows geolocation only on the Pulmino in diretta driver page (r110)", () => {
     expect(SECURITY_HEADERS["permissions-policy"]).toContain("geolocation=()");
     expect(GEOLOCATION_PREFIXES).toEqual(["/pulmini"]);
