@@ -135,7 +135,7 @@ export function eventPhase(
 /** Giorni, ore, minuti, secondi al via (null se iniziato). */
 export function eventCountdown(
   nowMs: number,
-  start = CHRISTMAS_LARIO_CUP.start,
+  start: string = CHRISTMAS_LARIO_CUP.start,
 ): { d: number; h: number; m: number; s: number } | null {
   const dt = Date.parse(start) - nowMs;
   if (dt <= 0) return null;
