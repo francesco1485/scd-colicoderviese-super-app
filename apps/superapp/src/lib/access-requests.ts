@@ -69,6 +69,61 @@ export const GRANTABLE_ROLES = [
 ] as const;
 export type GrantableRole = (typeof GRANTABLE_ROLES)[number]["id"];
 
+/**
+ * One person, many hats (UD-189, r121). The office ticks everything the person is — parent of one or more children,
+ * athlete, one or more organigram positions — and the app account gets the highest base level among them. The base
+ * level opens nothing by itself (r100: sections are granted one by one by the Direzione); it only says which area the
+ * person lands in. Order = r64 rank (a level only ever goes up).
+ */
+export const BASE_RANK: readonly GrantableRole[] = ["ATHLETE", "FAMILY", "STAFF", "MANAGER", "MISTER"];
+
+/** organigram role_kind (scd_structure_roles) -> base level of the account. */
+export const KIND_BASE: Readonly<Record<string, GrantableRole>> = {
+  ORGANO_SOCIETARIO: "MANAGER",
+  DIRIGENTE: "MANAGER",
+  RESPONSABILE: "MANAGER",
+  MISTER: "MISTER",
+  STAFF: "STAFF",
+  AUTISTA: "STAFF",
+};
+
+export interface HatChoice {
+  parent: boolean;
+  athlete: boolean;
+  /** role_kind of every position ticked (new or already held). */
+  positionKinds: readonly string[];
+}
+
+/** Highest base level among the hats; null when nothing is ticked yet. */
+export function baseRoleFor(h: HatChoice): GrantableRole | null {
+  const hats: GrantableRole[] = [];
+  if (h.athlete) hats.push("ATHLETE");
+  if (h.parent) hats.push("FAMILY");
+  for (const k of h.positionKinds) {
+    const b = KIND_BASE[k];
+    if (b) hats.push(b);
+  }
+  if (!hats.length) return null;
+  return hats.reduce((best, r) => (BASE_RANK.indexOf(r) > BASE_RANK.indexOf(best) ? r : best));
+}
+
+/**
+ * Which ticked card stays when several cards are the same human: the one already holding organigram roles, then the
+ * one with a birth date, then the first ticked. The others are merged into it (r121 scd_merge_people).
+ */
+export function cardToKeep<C extends { personId: string; roleCount: number; birthYear: number | null }>(ticked: readonly C[]): C | null {
+  if (!ticked.length) return null;
+  return [...ticked].sort((a, b) => b.roleCount - a.roleCount || Number(b.birthYear !== null) - Number(a.birthYear !== null))[0] ?? null;
+}
+
+/** Positions only Presidente or Direttore generale assign (r111 scd_is_creator_position). */
+export const CREATOR_POSITIONS: readonly string[] = ["presidente", "direttore-generale"];
+
+/** Codes that describe a tesseramento or a working relationship, not an organigram seat (catalogue note 16/10). */
+export function isSeatPosition(code: string): boolean {
+  return !code.startsWith("rasd-tessera-") && !code.startsWith("ls-");
+}
+
 export const MATCH_LABEL: Readonly<Record<string, string>> = {
   EMAIL: "stessa e-mail",
   NAME_BIRTH: "stesso nome e data di nascita",

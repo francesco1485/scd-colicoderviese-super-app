@@ -4456,6 +4456,84 @@
         "implementationStatus": "IMPLEMENTED",
         "implementation": "branch feat/front-page-switch (PR to staging/superapp); r120 APPLIED 17/10/2026 after «applica r120»; tests lib/front-page.test.ts, supabase/tests/r120_front_page_switch.pglite.mjs"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "17:51",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-189",
+      "name": "ONE_PERSON_MANY_ROLES_IN_ACCESS_APPROVAL",
+      "sourceQuoteFragments": [
+        "QUI SECONDO ME NON VA BENE PERCHE UNO PUO ESSERE PIU COSE COME PREVEDE LO STATUTO E LA LEGGE",
+        "La fai tu",
+        "Sì, unisci"
+      ],
+      "normalizedCommand": {
+        "rule": "When the office verifies an access request, a person is recorded with EVERYTHING they are in the club: the registry cards of the same human (same e-mail, same name + birth date) are merged into one card (scd_merge_people, nothing lost, audited), then parent of one or more children, athlete, and any number of organigram positions from the FIGC/LND/SGS/RASD catalogue (scd_structure_roles with position_code, optional team). The app account gets the highest base level among the hats; sections still open one by one from Direzione → Accessi (r100). A new card is created only when the office says it is really another person. Presidente / Direttore Generale cards and positions are handled only by those two (r111). Minors hold no organigram position. The access-request area moves to the CLOUD chat (17:52).",
+        "scope": "SUPER_APP components/scd/AccessRequestsCard.tsx, lib/access-requests.ts (baseRoleFor, cardToKeep, isSeatPosition), lib/access-requests.functions.ts (approveAccessRequestMulti); SCD PULSE migration r121 (scd_merge_people, scd_approve_access_request_multi, audit MERGE_PEOPLE); data fix: the two cards of the Presidente (tesserati master + registrations) merged after «applica r121»",
+        "supersedes": "the single-card, single-role approval dialog of r64",
+        "engine": "PERSONE",
+        "measure": "duplicate cards with the same e-mail or name + birth date; requests approved with more than one role",
+        "implementationStatus": "IMPLEMENTED_STAGED",
+        "implementation": "branch feat/access-multi-role; r121 STAGED until «applica r121» (before it, simple requests still go through r64); tests lib/access-requests-multi.test.ts, supabase/tests/r121_people_merge_multi_role.pglite.mjs"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "18:00",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-190",
+      "name": "IRIDE_THINKING_SECRETARY_WITH_THE_WHOLE_CLUB_MEMORY",
+      "sourceQuoteFragments": [
+        "POI VA MEGLIO INDOTTRINATA IRIDE E VA BEN CAPITA LA SUA FUNZIONE ALTRIMENTI IL LAVORO DIVENTA PESANTE",
+        "lei di fondo non conosce tutta la memoria della colicoderviese vecchia e nuova e quindi non sa rispondere e non sa parlare",
+        "resta stile un servizio di assistenza ma non è quello il suo lavoro",
+        "il suo lavoro è assistere e fare la segretaria in tutto e per tutto sia di segreteria sportiva esperta che segretaria di front offcie clienti e non",
+        "un entità pensante e contuina evoluzione che lavora da sola anche se nessuno la contatta e quando la contatta si adatta e cerca di risolvere , fare e creare",
+        "idem anche gli aptri dovranno avere questo stampo nel loro cerchio di lavoro e conoscenza",
+        "Questa chat, tutta"
+      ],
+      "normalizedCommand": {
+        "rule": "Iride is the club's secretary, not a customer-service bot: expert sports secretary (FIGC/LND/SGS) and front office for everyone (members, families, sponsors, other clubs, suppliers). She knows the whole memory of the club, old and new (a self-updating 'Libro di Iride' compiled from the existing sources: Cervellone Drive/mail, master sheets, SCD PULSE, repo docs, project docs; never a parallel register; personal and minors' data only as roles/counts in the book, details read live where the role allows). She studies every night (what changed, what she could not answer), works even when nobody contacts her, adapts to who she speaks with, and solves, does and creates. Human ok only for money, minors, roles and messages to many. One Iride for WhatsApp and the app (same text, same knowledge), owned by the CLOUD chat (17:58). Every other role agent gets the same mould inside its own circle of work and knowledge.",
+        "scope": "automations/make/segreteria-ai/* (scenario 7979437), .claude/agents/scd-iride.md and the role agents, apps/superapp/src/lib/assistant*.ts, Iride book compiler, scheduled task «Iride · studio notturno»",
+        "supersedes": "the 6000-character knowledge doc and the 'serve_persona' default of the v4 prompt",
+        "engine": "TEMPO",
+        "measure": "questions answered without a person; open items closed by Iride per day; questions she could not answer, falling week by week",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "branch feat/iride-v5 (prompt v5, book compiler, nightly study); live scenario changed only after Francesco sees the new text"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "18:06",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-191",
+      "name": "IRIDE_PROACTIVE_DUTIES_AND_OUTBOUND_RULE",
+      "sourceQuoteFragments": [
+        "non puo lasciare esposte iride calendario da confermare ora sa i riferimenri e deve chiedere si avere le infornazini oper completare",
+        "non puo non avere i referti consegnarti , fine partita li deve chiedere",
+        "non puo anon comunicare le presenze o i pagnaenti e le quote",
+        "non puo non sapere a che punto sono i kit consegfnatoi perche deve recuperare i soldi",
+        "non puo non sapere se adempinenti sono apposto e se no va fatta richiesta di farli e comnicare",
+        "non puo dopo la partita non chierdere di inviare risultati e altre e foto",
+        "non puo non chiedere 20 minuti prima della oartita la foto delle distinte a chi è dirifente per inserire live",
+        "non puo non sapere le mail arrivatee non averle smictate",
+        "non puo non sapere e aver letto comunicato e comunicare cose importati a chi di dovere o soiogolo atleta",
+        "mente e braccio di una segreteria organizzata e di livello internazionale",
+        "Staff da sola, famiglie con ok"
+      ],
+      "normalizedCommand": {
+        "rule": "Iride's standing duties: (1) calendar items 'da confermare': ask the referents for the missing data until complete; (2) match day: 20 minutes before kick-off ask the team's dirigente for the photo of the distinta (for the live), at the final whistle ask for result, referto and photos; (3) adempimenti (certificates, tesseramenti, documents): know the state of each, ask for what is missing, inform and follow up to closure; (4) quote, payments and kits delivered: know who paid and what was delivered, so the money is recovered; (5) presenze: collect and communicate them to who must know; (6) mail: every incoming mail read and sorted; (7) FIGC/LND/SGS comunicati: read, and important items passed to the right people or the single athlete; (8) times and moves: always known, cascade notices when they change. Outbound rule (17/10 18:08): Iride writes FIRST to club staff (dirigenti, mister, responsabili, segreteria) by herself; reminders to families about quote, payments and kits are prepared by her and sent after one daily batch ok of the DG or the Tesoreria. WhatsApp business-initiated messages use Meta-approved templates; staff numbers only from the staff directory with consent (r141).",
+        "scope": "Iride engine (Make scenario 7979437 + scheduled tasks), staff directory r141, calendar 'da confermare' rows, team match area (r117), quote/kit sources, mail intake, comunicati reader",
+        "supersedes": "UD-155 limit 'replies only to who wrote first' for messages to club staff",
+        "engine": "TEMPO",
+        "measure": "distinte received before kick-off; referti and results received within 1 hour of the final whistle; 'da confermare' items older than 48 hours; open adempimenti; euros recovered on kits and quote",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "branch feat/iride-v5; needs Meta templates approved and «applica r141»"
+      }
     }
   ],
   "completionGate": {

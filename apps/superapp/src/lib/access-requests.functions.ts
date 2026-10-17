@@ -164,3 +164,81 @@ export const rejectAccessRequest = createServerFn({ method: "POST" })
     if (error) return { ok: false, message: "Operazione non riuscita, riprova." };
     return { ok: true, message: "Richiesta rifiutata." };
   });
+
+/* ------------------------------------------------------------- one person, many hats (UD-189, r121) */
+
+const MultiInput = z.object({
+  id: z.string().uuid(),
+  personId: z.string().uuid().nullable(),
+  mergeIds: z.array(z.string().uuid()).max(4),
+  role: z.enum(["FAMILY", "ATHLETE", "MISTER", "MANAGER", "STAFF"]),
+  positions: z
+    .array(z.object({ code: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).max(80), teamCode: z.string().trim().max(40).nullable() }))
+    .max(12),
+  childIds: z.array(z.string().uuid()).max(8),
+  note: z.string().max(300),
+});
+export type ApproveMultiInput = z.input<typeof MultiInput>;
+
+/** A request the r64 approval alone can record: no merge, at most one child, no organigram position. */
+export function simpleRequest(d: { mergeIds: readonly string[]; childIds: readonly string[]; positions: readonly unknown[] }): boolean {
+  return d.mergeIds.length === 0 && d.childIds.length <= 1 && d.positions.length === 0;
+}
+
+/** Plain-words outcome of scd_approve_access_request_multi. */
+export function multiOutcome(error: { code?: string | null; message?: string | null } | null): { ok: boolean; message: string } {
+  if (!error) return { ok: true, message: "Accesso attivato con tutti i ruoli: la persona entra da \"Accedi\" con la sua e-mail." };
+  const m = error.message ?? "";
+  if (error.code === "PGRST202" || error.code === "42883") return { ok: false, message: "Più ruoli e unione schede non ancora attivi: serve «applica r121»." };
+  if (/only Presidente or Direttore Generale/.test(m)) return { ok: false, message: "Le schede o i ruoli di Presidente e Direttore generale li gestiscono solo loro due." };
+  if (error.code === "42501") return { ok: false, message: "Solo Direzione e Segreteria possono autorizzare." };
+  if (/already reviewed/.test(m)) return { ok: false, message: "Richiesta già gestita." };
+  if (/different birth dates/.test(m)) return { ok: false, message: "Le schede da unire hanno date di nascita diverse: non sono la stessa persona, controlla." };
+  if (/both cards are athletes/.test(m)) return { ok: false, message: "Tutte e due le schede sono atleti: unirle va fatto dalla Segreteria con i tesseramenti davanti." };
+  if (/same section|same active consent|same tesseramento|same transport/.test(m)) return { ok: false, message: "Le due schede hanno dati doppi (permessi, consensi, tesseramenti o pulmini): unione fermata, nulla è cambiato." };
+  if (/minor holds no organigram position/.test(m)) return { ok: false, message: "Un minorenne non ha cariche nell'organigramma." };
+  if (/unknown position/.test(m)) return { ok: false, message: "Un ruolo scelto non è attivo nel catalogo: toglilo o fallo approvare." };
+  if (/team not found/.test(m)) return { ok: false, message: "Squadra non trovata: scegli di nuovo." };
+  if (/child not found|card not found|person not found/.test(m)) return { ok: false, message: "Una scheda scelta non esiste più: ricarica la pagina." };
+  return { ok: false, message: "Autorizzazione non riuscita, riprova." };
+}
+
+export const approveAccessRequestMulti = createServerFn({ method: "POST" })
+  .inputValidator((d: ApproveMultiInput) => MultiInput.parse(d))
+  .handler(async ({ data }): Promise<{ ok: boolean; message: string }> => {
+    const c = await office();
+    if (!c) return { ok: false, message: "Accesso non valido." };
+    if (data.role === "FAMILY" && data.childIds.length === 0) return { ok: false, message: "Per un genitore scegli almeno un figlio da collegare." };
+    if (data.mergeIds.length && !data.personId) return { ok: false, message: "Scegli la scheda che resta." };
+    // Team codes -> ids of this club (unknown code = refused, never guessed).
+    const codes = [...new Set(data.positions.map((p) => p.teamCode).filter((x): x is string => !!x))];
+    const teamId = new Map<string, string>();
+    if (codes.length) {
+      const { data: teams, error } = await c.sb.from("scd_teams").select("id,code").eq("organization_id", c.org.organizationId).in("code", codes);
+      if (error) return { ok: false, message: "Squadre non lette, riprova." };
+      for (const t of (teams ?? []) as Array<{ id: string; code: string }>) teamId.set(t.code, t.id);
+      if (codes.some((x) => !teamId.has(x))) return { ok: false, message: "Squadra non trovata: scegli di nuovo." };
+    }
+    const { error } = await c.sb.rpc("scd_approve_access_request_multi", {
+      p_request_id: data.id,
+      p_person_id: data.personId,
+      p_merge_ids: data.mergeIds,
+      p_role: data.role,
+      p_positions: data.positions.map((p) => (p.teamCode ? { code: p.code, teamId: teamId.get(p.teamCode) } : { code: p.code })),
+      p_child_ids: data.childIds,
+      p_note: data.note.trim() || null,
+    });
+    // Before "applica r121": a request with one card, at most one child and no organigram role still goes through
+    // the r64 approval, so the office is never blocked; anything more waits for r121 and says so.
+    if (error && (error.code === "PGRST202" || error.code === "42883") && simpleRequest(data)) {
+      const v1 = await c.sb.rpc("scd_approve_access_request", {
+        p_request_id: data.id,
+        p_person_id: data.personId,
+        p_role: data.role,
+        p_child_person_id: data.childIds[0] ?? null,
+        p_note: data.note.trim() || null,
+      });
+      return multiOutcome(v1.error);
+    }
+    return multiOutcome(error);
+  });

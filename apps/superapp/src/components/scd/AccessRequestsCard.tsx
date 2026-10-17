@@ -4,13 +4,33 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Card, Chip } from "@/components/scd/interior-ui";
 import { EmptyState } from "@/components/scd/work-area-ui";
-import { GRANTABLE_ROLES, MATCH_LABEL, ageOn, type GrantableRole } from "@/lib/access-requests";
-import { approveAccessRequest, getAccessCandidates, getAccessRequests, rejectAccessRequest, type AccessCandidate, type AccessRequestRow } from "@/lib/access-requests.functions";
+import {
+  CREATOR_POSITIONS,
+  GRANTABLE_ROLES,
+  MATCH_LABEL,
+  ageOn,
+  baseRoleFor,
+  cardToKeep,
+  isSeatPosition,
+  type GrantableRole,
+} from "@/lib/access-requests";
+import {
+  approveAccessRequestMulti,
+  getAccessCandidates,
+  getAccessRequests,
+  rejectAccessRequest,
+  type AccessCandidate,
+  type AccessRequestRow,
+} from "@/lib/access-requests.functions";
 import { itDate, type PersonRow } from "@/lib/people";
+import { POSITION_GROUP_LABEL, type CatalogPosition } from "@/lib/position-catalog";
+import { getPositionCatalog } from "@/lib/position-catalog.functions";
 
 /**
- * Office queue of self-registrations (r64). Direzione / Segreteria verify who the person is,
- * link the request to an existing person (or create one), pick the role and, for a parent, the child.
+ * Office queue of self-registrations (r64). Direzione / Segreteria verify who the person is and record EVERYTHING the
+ * person is in the club (UD-189, r121): the cards of the same human are merged into one, then parent of one or more
+ * children, athlete, and any organigram positions from the FIGC/LND/SGS/RASD catalogue. The app account gets the
+ * highest base level; sections stay closed until the Direzione opens them (r100).
  */
 export function AccessRequestsCard({ people, today, canWrite, onChanged }: { people: PersonRow[]; today: string; canWrite: boolean; onChanged: () => Promise<void> }) {
   const load = useServerFn(getAccessRequests);
@@ -91,45 +111,109 @@ export function AccessRequestsCard({ people, today, canWrite, onChanged }: { peo
   );
 }
 
+const BASE_LABEL: Readonly<Record<GrantableRole, string>> = {
+  FAMILY: "Famiglia",
+  ATHLETE: "Atleta",
+  MISTER: "Mister",
+  MANAGER: "Dirigente",
+  STAFF: "Staff",
+};
+
+interface PickedPosition {
+  code: string;
+  label: string;
+  roleKind: string;
+  teamCode: string | null;
+}
+
+const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const sectionTitle = "mb-2 text-[15px] font-semibold";
+const box = "rounded-xl border border-[var(--in-line)] px-3 py-2";
+
 function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { request: AccessRequestRow; people: PersonRow[]; today: string; canWrite: boolean; onClose: () => void; onDone: () => Promise<void> }) {
   const candidatesFn = useServerFn(getAccessCandidates);
-  const approve = useServerFn(approveAccessRequest);
+  const catalogFn = useServerFn(getPositionCatalog);
+  const approve = useServerFn(approveAccessRequestMulti);
   const reject = useServerFn(rejectAccessRequest);
   const [candidates, setCandidates] = useState<AccessCandidate[] | null>(null);
-  const [personId, setPersonId] = useState<string | null>(null);
-  const [role, setRole] = useState<GrantableRole>(request.minor ? "ATHLETE" : "FAMILY");
-  const [childId, setChildId] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<CatalogPosition[] | null>(null);
+  const [same, setSame] = useState<string[]>([]);
+  const [keepId, setKeepId] = useState<string | null>(null);
+  const [parent, setParent] = useState(false);
+  const [athlete, setAthlete] = useState(request.minor);
+  const [children, setChildren] = useState<string[]>([]);
   const [childQuery, setChildQuery] = useState("");
+  const [positions, setPositions] = useState<PickedPosition[]>([]);
+  const [posQuery, setPosQuery] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const age = ageOn(request.birthDate, today);
+  const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
 
   useEffect(() => {
-    void candidatesFn({ data: { id: request.id } }).then((c) => {
-      setCandidates(c);
-      const best = c.find((x) => x.match !== "NAME");
-      if (best) {
-        setPersonId(best.personId);
-        if (best.kind === "atleta") setRole("ATHLETE");
-        if (best.kind === "staff") setRole("MANAGER");
-      }
-    });
-  }, [request.id, candidatesFn]);
+    void candidatesFn({ data: { id: request.id } })
+      .then((c) => {
+        setCandidates(c);
+        // Strong matches (same e-mail, same name + birth date) are proposed as the same person; a name alone is not.
+        const strong = c.filter((x) => x.match !== "NAME").map((x) => x.personId);
+        setSame(strong);
+        if (c.some((x) => x.match !== "NAME" && x.kind === "atleta")) setAthlete(true);
+      })
+      .catch(() => setCandidates([]));
+    void catalogFn()
+      .then((v) => setCatalog(v.positions.filter((p) => p.status === "ACTIVE" && isSeatPosition(p.code))))
+      .catch(() => setCatalog([]));
+  }, [request.id, candidatesFn, catalogFn]);
 
-  const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const ticked = useMemo(
+    () => (candidates ?? []).filter((c) => same.includes(c.personId)).map((c) => ({ ...c, roleCount: byId.get(c.personId)?.roles.length ?? 0 })),
+    [candidates, same, byId],
+  );
+  const keep = ticked.find((c) => c.personId === keepId) ?? cardToKeep(ticked);
+  const mergeIds = ticked.filter((c) => c.personId !== keep?.personId).map((c) => c.personId);
+  // Roles the human already holds on any of the ticked cards (shown, never duplicated).
+  const held = ticked.flatMap((c) => byId.get(c.personId)?.roles ?? []);
+  const heldKinds = held.map((r) => r.kind as string);
+
+  const base = baseRoleFor({ parent, athlete, positionKinds: [...heldKinds, ...positions.map((p) => p.roleKind)] });
+  const teams = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const p of people) for (const t of p.teams) m.set(t.code, t.name);
+    for (const p of people) for (const r of p.roles) if (r.teamCode && r.teamName) m.set(r.teamCode, r.teamName);
+    return [...m.entries()].sort((a, b) => a[1].localeCompare(b[1], "it"));
+  }, [people]);
+
   const childResults = useMemo(() => {
     const q = fold(childQuery.trim());
     if (q.length < 2) return [];
-    return people.filter((p) => p.kind === "atleta" && p.status !== "LEFT" && fold(p.displayName).includes(q)).slice(0, 8);
-  }, [childQuery, people]);
-  const child = people.find((p) => p.id === childId) ?? null;
+    return people.filter((p) => p.kind === "atleta" && p.status !== "LEFT" && !children.includes(p.id) && fold(p.displayName).includes(q)).slice(0, 8);
+  }, [childQuery, people, children]);
+  const posResults = useMemo(() => {
+    const q = fold(posQuery.trim());
+    if (!catalog || q.length < 2) return [];
+    return catalog.filter((p) => !positions.some((x) => x.code === p.code) && (fold(p.label).includes(q) || p.code.includes(q))).slice(0, 10);
+  }, [posQuery, catalog, positions]);
+
+  const missingChild = parent && children.length === 0;
+  const canApprove = canWrite && !busy && base !== null && !missingChild;
 
   async function doApprove() {
+    if (!base) return;
     setBusy(true);
     setMessage(null);
     try {
-      const res = await approve({ data: { id: request.id, personId, role, childPersonId: role === "FAMILY" ? childId : null, note } });
+      const res = await approve({
+        data: {
+          id: request.id,
+          personId: keep?.personId ?? null,
+          mergeIds,
+          role: base,
+          positions: positions.map((p) => ({ code: p.code, teamCode: p.teamCode })),
+          childIds: parent ? children : [],
+          note,
+        },
+      });
       setMessage(res.message);
       if (res.ok) await onDone();
     } catch {
@@ -144,6 +228,8 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
       const res = await reject({ data: { id: request.id, note } });
       setMessage(res.message);
       if (res.ok) await onDone();
+    } catch {
+      setMessage("Operazione non riuscita, riprova.");
     } finally {
       setBusy(false);
     }
@@ -153,73 +239,150 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
     <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#021433]/50 sm:items-center" role="dialog" aria-modal="true" aria-label={`Verifica ${request.firstName} ${request.lastName}`}>
       <div className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-4 shadow-xl sm:rounded-2xl sm:p-5">
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             <h3 className="m-0 text-[19px] font-bold">{request.firstName} {request.lastName}</h3>
             <p className="m-0 mt-1 text-[14px] text-[var(--in-sub)]">Nato/a il {itDate(request.birthDate)}{age !== null ? ` (${age} anni)` : ""}</p>
-            <p className="m-0 text-[14px] text-[var(--in-sub)]">{request.email} · {request.phone}</p>
+            <p className="m-0 break-all text-[14px] text-[var(--in-sub)]">{request.email} · {request.phone}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Chiudi" className="scd-focus flex size-11 items-center justify-center rounded-lg"><X className="size-5" aria-hidden="true" /></button>
+          <button type="button" onClick={onClose} aria-label="Chiudi" className="scd-focus flex size-11 shrink-0 items-center justify-center rounded-lg"><X className="size-5" aria-hidden="true" /></button>
         </div>
 
         {request.minor && (
-          <p className="mt-3 rounded-xl bg-[#fff3c4] px-3 py-2 text-[14px] leading-snug text-[#7a5200]">Ha tra 14 e 17 anni: prima di attivare verifica il consenso di un genitore.</p>
+          <p className="mt-3 rounded-xl bg-[#fff3c4] px-3 py-2 text-[14px] leading-snug text-[#7a5200]">Ha tra 14 e 17 anni: prima di attivare verifica il consenso di un genitore. Un minorenne non ha cariche nell'organigramma.</p>
         )}
 
+        {/* 1. Chi è */}
         <fieldset className="mt-4 min-w-0 border-0 p-0">
-          <legend className="mb-2 text-[15px] font-semibold">Chi è nel database</legend>
+          <legend className={sectionTitle}>1 · Chi è nel database</legend>
           {candidates === null ? (
             <p className="text-[14px] text-[var(--in-sub)]">Cerco corrispondenze…</p>
+          ) : candidates.length === 0 ? (
+            <p className="m-0 text-[14px] text-[var(--in-sub)]">Nessuna scheda simile: ne creo una nuova.</p>
           ) : (
             <div className="grid gap-1.5">
-              {candidates.map((c) => (
-                <label key={c.personId} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-[var(--in-line)] px-3 py-2 text-[14.5px]">
-                  <input type="radio" name="person" checked={personId === c.personId} onChange={() => setPersonId(c.personId)} className="size-5 accent-[var(--scd-blue)]" />
-                  <span className="min-w-0 flex-1">
-                    <b className="block truncate">{c.displayName}{c.birthYear ? ` · ${c.birthYear}` : ""}</b>
-                    <small className="text-[13px] text-[var(--in-sub)]">{c.kind}{c.teamCodes.length ? ` · ${c.teamCodes.join(", ")}` : ""} · {MATCH_LABEL[c.match] ?? c.match}</small>
-                  </span>
+              <p className="m-0 text-[13.5px] text-[var(--in-sub)]">Spunta tutte le schede che sono questa stessa persona: diventano una sola, con tutti i suoi ruoli.</p>
+              {candidates.map((c) => {
+                const on = same.includes(c.personId);
+                const roles = byId.get(c.personId)?.roles ?? [];
+                return (
+                  <label key={c.personId} className={`flex min-h-11 cursor-pointer items-center gap-3 ${box} text-[14.5px] ${on ? "border-[var(--scd-blue)] bg-[#f3f8ff]" : ""}`}>
+                    <input type="checkbox" checked={on} onChange={() => setSame((s) => (on ? s.filter((x) => x !== c.personId) : [...s, c.personId]))} className="size-5 accent-[var(--scd-blue)]" />
+                    <span className="min-w-0 flex-1">
+                      <b className="block truncate">{c.displayName}{c.birthYear ? ` · ${c.birthYear}` : ""}</b>
+                      <small className="block text-[13px] text-[var(--in-sub)]">{c.kind}{c.teamCodes.length ? ` · ${c.teamCodes.join(", ")}` : ""} · {MATCH_LABEL[c.match] ?? c.match}</small>
+                      {roles.length > 0 && <small className="block text-[13px] text-[#0b2a5b]">Ha già: {roles.map((r) => r.label + (r.teamName ? ` (${r.teamName})` : "")).join(", ")}</small>}
+                    </span>
+                  </label>
+                );
+              })}
+              {ticked.length > 1 && keep && (
+                <label className="mt-1 flex flex-col gap-1 text-[14px] font-semibold">
+                  Scheda che resta (le altre si uniscono qui)
+                  <select value={keep.personId} onChange={(e) => setKeepId(e.target.value)} className="h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-2 text-[15px] font-normal">
+                    {ticked.map((c) => <option key={c.personId} value={c.personId}>{c.displayName}{c.birthYear ? ` · ${c.birthYear}` : ""} · {c.kind}</option>)}
+                  </select>
                 </label>
-              ))}
-              <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-dashed border-[var(--in-line)] px-3 py-2 text-[14.5px]">
-                <input type="radio" name="person" checked={personId === null} onChange={() => setPersonId(null)} className="size-5 accent-[var(--scd-blue)]" />
-                <span>Nessuna di queste: crea una nuova scheda</span>
-              </label>
+              )}
+              {ticked.length === 0 && <p className="m-0 text-[13.5px] text-[var(--in-sub)]">Nessuna spuntata: creo una scheda nuova (solo se è davvero un'altra persona, per esempio un omonimo).</p>}
             </div>
           )}
         </fieldset>
 
-        <label className="mt-4 flex flex-col gap-1 text-[15px] font-semibold">
-          Ruolo nell'app
-          <select value={role} onChange={(e) => setRole(e.target.value as GrantableRole)} className="h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-2 text-[15px] font-normal">
-            {GRANTABLE_ROLES.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
-          </select>
-          <small className="font-normal text-[var(--in-sub)]">Mister e dirigenti vedono la squadra del loro ruolo nell'organigramma. I ruoli di Direzione e Segreteria non si danno da qui.</small>
-        </label>
+        {/* 2. Cosa fa nel club */}
+        <fieldset className="mt-5 min-w-0 border-0 p-0">
+          <legend className={sectionTitle}>2 · Cosa fa nel club (anche più cose)</legend>
+          <div className="grid gap-1.5">
+            <label className={`flex min-h-11 cursor-pointer items-center gap-3 ${box} text-[14.5px]`}>
+              <input type="checkbox" checked={parent} onChange={() => setParent((v) => !v)} className="size-5 accent-[var(--scd-blue)]" />
+              Genitore / tutore
+            </label>
+            {parent && (
+              <div className="ml-2 border-l-2 border-[var(--in-line)] pl-3">
+                {children.map((id) => {
+                  const ch = byId.get(id);
+                  return (
+                    <p key={id} className="m-0 flex min-h-9 items-center justify-between gap-2 text-[14.5px]">
+                      <span className="flex items-center gap-2"><Check className="size-4 text-[#15803d]" aria-hidden="true" />{ch?.displayName ?? "Figlio"}{ch?.birthYear ? ` · ${ch.birthYear}` : ""}</span>
+                      <button type="button" onClick={() => setChildren((c) => c.filter((x) => x !== id))} aria-label={`Togli ${ch?.displayName ?? "figlio"}`} className="scd-focus flex size-9 items-center justify-center rounded-lg"><X className="size-4" aria-hidden="true" /></button>
+                    </p>
+                  );
+                })}
+                <span className="mt-1 flex items-center gap-2 rounded-[10px] border border-[var(--in-line)] px-3">
+                  <Search className="size-4 text-[var(--in-sub)]" aria-hidden="true" />
+                  <input type="search" aria-label="Cerca il figlio per nome" value={childQuery} onChange={(e) => setChildQuery(e.target.value)} placeholder={children.length ? "Aggiungi un altro figlio" : "Cerca il figlio per nome"} className="h-11 w-full bg-transparent text-[15px] outline-none" />
+                </span>
+                {childResults.length > 0 && (
+                  <ul className="m-0 mt-1 list-none overflow-hidden rounded-xl border border-[var(--in-line)] p-0">
+                    {childResults.map((p) => (
+                      <li key={p.id}>
+                        <button type="button" onClick={() => { setChildren((c) => [...c, p.id]); setChildQuery(""); }} className="scd-focus flex min-h-11 w-full items-center justify-between gap-2 border-t border-[var(--in-line)] px-3 text-left text-[14.5px] first:border-t-0 hover:bg-[#f7fbff]">
+                          <span className="truncate">{p.displayName}</span>
+                          <span className="text-[13px] text-[var(--in-sub)]">{p.birthYear ?? ""}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {missingChild && <p className="m-0 mt-1 text-[13.5px] text-[#9a1d14]">Scegli almeno un figlio.</p>}
+              </div>
+            )}
+            <label className={`flex min-h-11 cursor-pointer items-center gap-3 ${box} text-[14.5px]`}>
+              <input type="checkbox" checked={athlete} onChange={() => setAthlete((v) => !v)} className="size-5 accent-[var(--scd-blue)]" />
+              Atleta
+            </label>
+          </div>
 
-        {role === "FAMILY" && (
-          <div className="mt-4">
-            <label className="flex flex-col gap-1 text-[15px] font-semibold">
-              Figlio da collegare
+          {!request.minor && (
+            <div className="mt-3">
+              <p className="m-0 mb-1 text-[14.5px] font-semibold">Ruoli nell'organigramma</p>
+              {held.length > 0 && (
+                <p className="m-0 mb-1 flex flex-wrap gap-1">
+                  {held.map((r) => <Chip key={r.id} tone="ok">{r.label}{r.teamName ? ` · ${r.teamName}` : ""} · già</Chip>)}
+                </p>
+              )}
+              {positions.map((p) => (
+                <div key={p.code} className={`mb-1.5 flex flex-wrap items-center gap-2 ${box} text-[14.5px]`}>
+                  <span className="min-w-0 flex-1 font-semibold">{p.label}</span>
+                  {(p.roleKind === "MISTER" || p.roleKind === "DIRIGENTE") && (
+                    <select aria-label={`Squadra per ${p.label}`} value={p.teamCode ?? ""} onChange={(e) => setPositions((all) => all.map((x) => (x.code === p.code ? { ...x, teamCode: e.target.value || null } : x)))} className="h-10 max-w-[12rem] rounded-[10px] border border-[var(--in-line)] bg-white px-2 text-[14px]">
+                      <option value="">Tutto il club</option>
+                      {teams.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+                    </select>
+                  )}
+                  <button type="button" onClick={() => setPositions((all) => all.filter((x) => x.code !== p.code))} aria-label={`Togli ${p.label}`} className="scd-focus flex size-10 items-center justify-center rounded-lg"><X className="size-4" aria-hidden="true" /></button>
+                  {CREATOR_POSITIONS.includes(p.code) && <small className="basis-full text-[12.5px] text-[var(--in-sub)]">Lo assegnano solo il Presidente o il Direttore generale.</small>}
+                </div>
+              ))}
               <span className="flex items-center gap-2 rounded-[10px] border border-[var(--in-line)] px-3">
                 <Search className="size-4 text-[var(--in-sub)]" aria-hidden="true" />
-                <input type="search" value={childQuery} onChange={(e) => setChildQuery(e.target.value)} placeholder="Cerca per nome" className="h-11 w-full bg-transparent text-[15px] font-normal outline-none" />
+                <input type="search" aria-label="Cerca un ruolo" value={posQuery} onChange={(e) => setPosQuery(e.target.value)} placeholder={catalog === null ? "Carico il catalogo dei ruoli…" : "Cerca un ruolo: presidente, consigliere, dirigente…"} disabled={catalog === null} className="h-11 w-full bg-transparent text-[15px] outline-none" />
               </span>
-            </label>
-            {child && <p className="mt-2 flex items-center gap-2 text-[14.5px]"><Check className="size-4 text-[#15803d]" aria-hidden="true" />{child.displayName}{child.birthYear ? ` · ${child.birthYear}` : ""}</p>}
-            {childResults.length > 0 && (
-              <ul className="m-0 mt-2 list-none overflow-hidden rounded-xl border border-[var(--in-line)] p-0">
-                {childResults.map((p) => (
-                  <li key={p.id}>
-                    <button type="button" onClick={() => { setChildId(p.id); setChildQuery(""); }} className="scd-focus flex min-h-11 w-full items-center justify-between gap-2 border-t border-[var(--in-line)] px-3 text-left text-[14.5px] first:border-t-0 hover:bg-[#f7fbff]">
-                      <span className="truncate">{p.displayName}</span>
-                      <span className="text-[13px] text-[var(--in-sub)]">{p.birthYear ?? ""}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
+              {posResults.length > 0 && (
+                <ul className="m-0 mt-1 list-none overflow-hidden rounded-xl border border-[var(--in-line)] p-0">
+                  {posResults.map((p) => (
+                    <li key={p.code}>
+                      <button type="button" onClick={() => { setPositions((all) => [...all, { code: p.code, label: p.label, roleKind: p.roleKind, teamCode: null }]); setPosQuery(""); }} className="scd-focus flex min-h-11 w-full items-center justify-between gap-2 border-t border-[var(--in-line)] px-3 text-left text-[14.5px] first:border-t-0 hover:bg-[#f7fbff]">
+                        <span className="min-w-0 truncate">{p.label}</span>
+                        <span className="shrink-0 text-[12.5px] text-[var(--in-sub)]">{POSITION_GROUP_LABEL[p.group]}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {catalog !== null && catalog.length === 0 && <p className="m-0 mt-1 text-[13.5px] text-[var(--in-sub)]">Catalogo dei ruoli non leggibile ora: puoi aggiungere i ruoli dopo, dall'organigramma.</p>}
+            </div>
+          )}
+        </fieldset>
+
+        {/* 3. Accesso */}
+        <div className="mt-5 rounded-xl bg-[#f3f8ff] px-3 py-2.5 text-[14px] leading-snug">
+          <b className="block text-[15px]">3 · Accesso all'app</b>
+          {base ? (
+            <span>Entra come <b>{BASE_LABEL[base]}</b>: è il livello più alto tra i suoi ruoli. Le altre sezioni le apri tu da Direzione → Accessi, una per una.</span>
+          ) : (
+            <span>Spunta almeno una cosa che fa nel club.</span>
+          )}
+        </div>
 
         <label className="mt-4 flex flex-col gap-1 text-[15px] font-semibold">
           Nota della verifica
@@ -231,8 +394,8 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
           <button type="button" disabled={busy || !canWrite} onClick={() => void doReject()} className="scd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-[#b42318] bg-white text-[15.5px] font-semibold text-[#9a1d14] disabled:opacity-50">
             <X className="size-[18px]" aria-hidden="true" />Rifiuta
           </button>
-          <button type="button" disabled={busy || !canWrite || (role === "FAMILY" && !childId)} onClick={() => void doApprove()} className="scd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[10px] bg-[var(--scd-blue)] text-[15.5px] font-semibold text-white disabled:opacity-50">
-            <UserCheck className="size-[18px]" aria-hidden="true" />Autorizza
+          <button type="button" disabled={!canApprove} onClick={() => void doApprove()} className="scd-focus inline-flex h-12 items-center justify-center gap-2 rounded-[10px] bg-[var(--scd-blue)] text-[15.5px] font-semibold text-white disabled:opacity-50">
+            <UserCheck className="size-[18px]" aria-hidden="true" />{mergeIds.length ? "Unisci e autorizza" : "Autorizza"}
           </button>
         </div>
         <p role="status" aria-live="polite" className="m-0 mt-2 min-h-[1.2em] text-[14px] text-[var(--in-sub)]">{message}</p>
