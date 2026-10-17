@@ -4191,6 +4191,61 @@
         "implementationStatus": "IN_PROGRESS",
         "implementation": "scd-figc-lnd, scd-tesserati reconciliation; Vetta Legnone counts"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "11:57",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-178",
+      "name": "IRIDE_CENTRALINO_ROUTES_AND_REPORTS_BACK_WITH_PROOF",
+      "sourceQuoteFragments": [
+        "Iride è la parte esterna che recepisce da tutti e poi smista come centralino; poi quando viene eseguita loro avvisano e lei avvisa, e se c'è bisogno fa vedere cosa è stato fatto e come, poi la persona continua"
+      ],
+      "normalizedCommand": {
+        "rule": "Iride is the external front desk: she receives requests from everyone, logs them with a code and routes them to the owner role of docs/organizzazione/MANSIONARIO.md. When the owner has executed or prepared the work, the outcome is written back with proof and status (ESEGUITA, IN_ATTESA + role, SERVE_OK_DIREZIONE, NON_ESEGUIBILE, ERRORE_CORRETTO) and Iride tells the requester what was done, how (with a link the requester may open when useful) and the next step for them, so the person can continue. Outcome texts are fixed texts built by Make, never invented by the AI; minors are answered through a parent; no health data, phone numbers or minors' names in the log. Any change to the live Make scenario follows UD-155 (diff shown, Francesco's OK). Until Iride v4.4 is approved, every outcome goes out only after a human ok (SKILL.md §4 Human-ok gate).",
+        "scope": "Iride (WhatsApp, later mail and app), SCD_INTAKE_LOG, app work queue, ciclo Ufficio",
+        "supersedes": "none; extends UD-155 and the Iride v4.4 design",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": ".claude/skills/scd-ufficio/SKILL.md §4 (UFFICIO_ESITO / IRIDE_AVVISO contract); Make change is PROPOSED to the PC chat (I-261017-40)"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "11:57",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-179",
+      "name": "ROLE_AGENTS_WORK_AS_EMPLOYEES_PER_MANSIONARIO",
+      "sourceQuoteFragments": [
+        "ragiona e sviluppa tutte le cose che un dipendente fa quando gli assegni un ruolo, non sta lì solo a chiacchierare",
+        "l'agente che doveva interagire e rendere dinamica la super app sembra scomparso; qui c'è bisogno di un agente pensante che si migliora e sviluppa ogni volta"
+      ],
+      "normalizedCommand": {
+        "rule": "Every SCD role agent works like an employee with a job description in docs/organizzazione/MANSIONARIO.md: recurring duties (daily, weekly, seasonal), requests it handles, what it executes alone (reversible and authorised), who approves the rest (fields, calendars and trainings: any one of Responsabile attività di base, Coordinatore attività sportive, Direttore Generale; money, contracts, sensitive data, minors: Direzione), inputs, outputs, proof of done and SLA. scd-regista runs the «Ufficio» work loop three times a day (skill scd-ufficio): read open items, classify, assign, execute or prepare, write outcome with proof, learn. Errors (Francesco 11:58): tell the affected person plainly and apologise once, fix or propose the simplest correct path, finish the work, record the lesson and propose a rule. Hard limits of AGENTS.md never widen.",
+        "scope": "all .claude/agents role agents, scd-regista, scheduled task «SCD Ufficio»",
+        "supersedes": "none",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "docs/organizzazione/MANSIONARIO.md; .claude/agents/scd-regista.md section Ufficio; .claude/skills/scd-ufficio/SKILL.md; scheduled task PROPOSED (I-261017-41)"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "11:57",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-180",
+      "name": "CLUB_MEMORY_PER_SEASON",
+      "sourceQuoteFragments": [
+        "anche una memoria per ricordare tutto e tutti ogni anno"
+      ],
+      "normalizedCommand": {
+        "rule": "The club keeps a «Memoria del club» per season in docs/memoria/<AAAA-AA>/: people and roles, teams and age groups, Direzione decisions with date, suppliers/partners/bodies, lessons learnt, yearly recurrences; every line with source and VERIFIED / INFERRED / PROPOSED or «da confermare». Solo ruoli; i nomi degli adulti stanno nella Rubrica staff (SCD PULSE). It never holds phone numbers, e-mails, codici fiscali, IBAN, birth dates, health data or minors' names, and it is not a second register: live data stay in the masters (LND portal, SCD PULSE, Drive, SCD_INTAKE_LOG). The Ufficio loop appends lessons every evening. On 1 July the season folder is archived and people and roles are carried forward as «da confermare» until the Direzione confirms.",
+        "scope": "docs/memoria, all agents, Iride knowledge candidates",
+        "supersedes": "none",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "docs/memoria/README.md (structure and 1 July rollover); docs/memoria/2026-27/*.md seeded 17/10/2026"
+      }
     }
   ],
   "completionGate": {

@@ -61,6 +61,10 @@ Cinquantasei agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. C
 | scd-commerciale | SCD GROW: listino diritti, proposte, metodo di vendita, rinnovi, ritorno per gli sponsor |
 | scd-negoziazione | Comuni, federazione, scuole, partner: mappa dei rapporti, schede incontro, trattative |
 
+## Mansionario e ciclo Ufficio
+
+Ogni agente di ruolo lavora come un dipendente (Francesco 17/10/2026 11:57, UD-179): compiti quotidiani, settimanali e stagionali, cosa fa da solo, chi approva, la prova di fine lavoro e i tempi stanno in `docs/organizzazione/MANSIONARIO.md`. Tre volte al giorno `scd-regista` fa girare il ciclo «Ufficio» (skill `scd-ufficio`): legge le richieste aperte, le passa al ruolo giusto, scrive esito, prova e stato, e Iride avvisa chi ha chiesto (UD-178). Quello che si impara va nella memoria del club per stagione, `docs/memoria/` (UD-180).
+
 ## Percorso e squadre
 
 Sequenza dall'idea al sito vero, passi obbligatori, squadre in parallelo e catene per ogni piattaforma del gestionale: vedi `PIPELINE.md`. Registro dei miglioramenti di skill, agenti e plugin: `MIGLIORAMENTI.md`.
