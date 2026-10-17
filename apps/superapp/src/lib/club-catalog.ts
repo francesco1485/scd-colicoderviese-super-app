@@ -262,7 +262,7 @@ export function validateCatalogDraft(
   if (howTo.length > 300) return fail("how_to");
   if (days.length > 60) return fail("days");
   const text = [title, body, howTo, days].join(" ");
-  if (MAIL.test(text) || PHONE.test(text)) return fail("contact");
+  if (MAIL.test(text) || PHONE.test(text.replace(/\d{4}-\d{2}-\d{2}/g, " "))) return fail("contact");
   if (link && (link.length > 300 || !/^https:\/\/\S+$/.test(link))) return fail("link");
   const price = parseEuroInput(d.price);
   if (price === "invalid") return fail("price");

@@ -209,7 +209,9 @@ begin
   if v_body is not null and char_length(v_body) > 600 then return jsonb_build_object('code', 'body'); end if;
   if v_how is not null and char_length(v_how) > 300 then return jsonb_build_object('code', 'how_to'); end if;
   if v_days is not null and char_length(v_days) > 60 then return jsonb_build_object('code', 'days'); end if;
-  if concat_ws(' ', v_title, v_body, v_how, v_days) ~ c_mail or concat_ws(' ', v_title, v_body, v_how, v_days) ~ c_phone then
+  -- dates (YYYY-MM-DD) are not phone numbers: drop them before the phone check
+  if concat_ws(' ', v_title, v_body, v_how, v_days) ~ c_mail
+     or regexp_replace(concat_ws(' ', v_title, v_body, v_how, v_days), '[0-9]{4}-[0-9]{2}-[0-9]{2}', ' ', 'g') ~ c_phone then
     return jsonb_build_object('code', 'contact');
   end if;
   if v_site is not null and v_site not in ('COLICO','DERVIO') then return jsonb_build_object('code', 'site'); end if;
