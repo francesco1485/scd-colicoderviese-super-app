@@ -1033,3 +1033,7 @@ Backlog cloud B11. Motore: PERSONE (una famiglia che apre /impianti legge «in a
 - «Segnala un risultato»: fixed reply, no model, no score written; the Segreteria checks it against the official LND source (UD-182).
 - Assets: Crovi v3 cut-outs and avatar approved with Francesco's quote (`config/scd-assets.v1.json`); PersonaAvatar shows `crovi-avatar-256.webp` instead of the 'C'.
 - UD-134 superseded only for "Crovi on public pages"; still no second greeting bubble beside the launcher.
+
+## 17/10/2026 15:06 · Conservazione documenti squadra (UD-185, r119 APPLICATA)
+
+Decisione di Francesco (DG): «Tenere fino al 30 giugno 2027». Referti e distinte rimossi restano illeggibili per tutti e il file resta conservato fino al 30 giugno della stagione in cui è stato rimosso (2026/27: 30/06/2027); solo dopo diventa candidato alla pulizia. Nessuna cancellazione automatica: la pulizia resta da approvare. Migrazione `r119_team_docs_retention_season.sql` applicata il 17/10/2026 dopo «Applica r119» (verificato: fine stagione 30/06/2027, funzione solo per il sistema).
