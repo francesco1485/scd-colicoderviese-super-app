@@ -36,7 +36,7 @@ interface FaqEntry {
   status: "verificato" | "da-confermare";
 }
 ```
-Tests must check: every `action.to` exists in the route tree; every FIGC/LND/SGS entry has `source` or `status: "da-confermare"`; no entry contains phone numbers, emails of people, IBAN or CF; lengths respected.
+Tests must check: every `action.to` exists in the route tree; every FIGC/LND/SGS entry has `source` or `status: "da-confermare"`; no entry contains phone numbers, emails of people, IBAN, CF or a minor's surname; lengths respected.
 
 ## 3. Behaviour
 - First access: tour opens once per device and role (localStorage flag in try/catch; works without it), «Salta» always visible, dots for progress, «Avanti / Indietro», last card «Fatto · Rivedi quando vuoi da Guida».
