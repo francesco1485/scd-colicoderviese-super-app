@@ -4347,6 +4347,28 @@
         "implementationStatus": "IMPLEMENTED",
         "implementation": "Phases R1+R2: apps/superapp/src/lib/lnd-standings.ts (parser + registry), scripts/ingest-lnd-standings.mjs (not scheduled; plan every 6 h, hourly on match weekends), snapshot src/data/classifiche-lnd-snapshot.json, /classifiche, team pages; r116 APPLIED on SCD PULSE 17/10/2026 ~13:35-13:45 after «applica r115 r116» (verified: RLS on 4 tables, 1 policy each, anon no insert, disciplinary items staff only); ingestion job not scheduled yet"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "14:08",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-184",
+      "name": "CROVI_ON_THE_PUBLIC_HOME_AND_PUBLIC_CHAT",
+      "sourceQuoteFragments": [
+        "Io voglio vedere in prima pagina app super web il crovi cavolo ma perché non si lavora qui",
+        "Crovi è avatar + chatbot in cima alla home; divertente da parlarci; si possono chiedere cose o segnalare risultati velocemente; internamente passa la palla agli altri personaggi come un centralinista (15/10/2026)",
+        "crovi per i più giovani"
+      ],
+      "normalizedCommand": {
+        "rule": "Crovi (approved Crovi v3 realistic character, config/scd-assets.v1.json) is on the first page of the Super App: a compact card at the top of the public home, right after the urgent safety notices and before the club communication (no hero banner, phone first), with the cut-out that breathes and greets (reduced motion respected), a pose by day (weekday wave, Fri-Sun point, Monday thumbs), a short warm line by day and time (Europe/Rome; a match only from the public calendar), an input «Chiedi a Crovi…» and the chips «Quando si gioca?», «Allenamenti di stasera», «Pulmini», «Segnala un risultato» that open the app chat with the text sent. The general chat of public pages is Crovi (persona id 'sky'), a switchboard who passes to Iride (segreteria), Garrison (Club House) and Enea (tornei); area face cards keep Iride; reserved areas keep Iride for staff and adults. «Segnala un risultato» never writes a score: fixed hand-off to the Segreteria, which checks it against the official LND source (UD-182).",
+        "scope": "SUPER_APP public home (components/home/CroviWelcome.tsx, PublicHome.tsx), lib/crovi-welcome.ts, lib/assistant.ts resolveChat + Crovi voice, lib/assistant.server.ts result-report hand-off, lib/assistant-open.ts first message, SkyChat.tsx, SkyJolly.tsx PersonaAvatar, config/scd-assets.v1.json",
+        "supersedes": "UD-134 only for 'Crovi on public pages' (one assistant at a time stays: no second greeting bubble beside the launcher); UD-121 public general chat persona 'vera' -> 'sky' shown as Crovi; UD-122 'image only, no chat' for Crovi",
+        "engine": "PERSONE",
+        "measure": "chat opens from the Crovi home card (input and chips) per home visit; share of public questions answered without hand-off",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "branch feat/crovi-home-2 (PR to staging/superapp); tests lib/crovi-welcome.test.ts, lib/assistant-open.test.ts; assistant, cast-personas, SkyJolly and public-home tests updated"
+      }
     }
   ],
   "completionGate": {

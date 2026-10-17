@@ -1935,7 +1935,7 @@
           "apps/superapp/src/lib/moderation.server.ts"
         ],
         "data_classes_sent": {
-          "public_assistant_vera": "PUBLIC_ONLY (UD-121, formerly public_assistant_crovi): next 7 days of official fixtures (date, time, home/away, team label, opponent, venue, competition), club events, ticket office rules, facility addresses, official contacts, registration paths, sponsor packages and Direzione-confirmed sponsor names, official result links, app guide",
+          "public_assistant_vera": "PUBLIC_ONLY (UD-121, formerly public_assistant_crovi; since UD-184 the public general voice is Crovi, id sky, on the same public-only context): next 7 days of official fixtures (date, time, home/away, team label, opponent, venue, competition), club events, ticket office rules, facility addresses, official contacts, registration paths, sponsor packages and Direzione-confirmed sponsor names, official result links, app guide",
           "staff_assistant_era": "INTERNO or RISERVATO as returned by scd_kb_search for the caller's own session (title, summary, status, due date, season, link); amounts, sources, entities and tags excluded",
           "moderator": "post text already filtered by database rules (no minors' names)",
           "never": [
@@ -2734,7 +2734,7 @@
       "personas": {
         "directive": "UD-121",
         "rule": "ONE_CHAT_PERSONA_IRIDE_EVERYWHERE (persona id vera, UD-139); CROVI_FOR_YOUNGER_MEMBERS_AND_RESERVED_PAGES_BEFORE_SESSION (persona id sky); SKY_NEVER_IN_THE_APP",
-        "legacy_aliases": {"genny": "vera", "crovi": "vera"},
+        "legacy_aliases": {"genny": "vera", "crovi": "sky"},
         "vera": {
           "role": "IRIDE_AI_SECRETARY_OF_THE_CLUB (visible name Iride since UD-139, 15/10/2026; formerly Vera/Genny; same persona as the WhatsApp AI secretary of the PC chat; absorbs the ticket office)",
           "surface_public": "askAssistant, PUBLIC_PROJECTION_ONLY, context_cap_tokens 3000",
@@ -2761,7 +2761,7 @@
         },
         "tip_only_no_chat": ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"]
       },
-      "persona_rule": "UD-121 + UD-139: public pages Iride (id vera); inside: staff positions and families -> Iride, athlete-only or unknown age -> Crovi (id sky; age not in session); a chat area answers only inside Vera's chat when a face card asks for it and assistant.ts resolveChat allows it",
+      "persona_rule": "UD-121 + UD-139 + UD-184 (17/10/2026): public pages general chat Crovi (id sky), Iride (id vera) only when a public face card asks for its area; inside: staff positions and families -> Iride, athlete-only or unknown age -> Crovi (id sky; age not in session); a chat area answers only inside Vera's chat when a face card asks for it and assistant.ts resolveChat allows it",
       "pre_router": [
         "DISTRESS_TO_FIXED_REFERRAL_UD111",
         "SAFEGUARDING_TO_RESERVED_CHANNEL_RULES",
@@ -2793,7 +2793,7 @@
         "faces": ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "sky"],
         "faces_registry": "apps/superapp/src/lib/cast-personas.ts CAST_FACES (2-3 actions on registered routes, 'Chiedi a Iride')",
         "tip_only": ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"],
-        "absorbed_by_vera": ["biglietteria", "crovi (v3 files VERIFIED, never APPROVED: chat and cameo removed, files kept)"]
+        "absorbed_by_vera": ["biglietteria", "crovi: no longer absorbed since UD-184 (v3 APPROVED 17/10/2026, public general chat and home welcome card)"]
       },
       "named": {
         "era": "NUTRIZIONISTA_TIP_OF_THE_DAY_ONLY",
@@ -2810,7 +2810,7 @@
         "volto-sponsor"
       ],
       "new_roles_presence": "UD118_FACE_OR_TIP_ONLY_OR_ABSORBED_NO_PORTRAIT_NO_VOICE_NAMES_TBD_AS_ROLE_LABELS",
-      "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era ON_HOLD until a new Direzione-approved image; vera = Iride APPROVED 15/10/2026 (cast/iride; legacy cast/genny stays ON_HOLD, not shown); Crovi in the chat shows a neutral C initial",
+      "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era ON_HOLD until a new Direzione-approved image; vera = Iride APPROVED 15/10/2026 (cast/iride; legacy cast/genny stays ON_HOLD, not shown); Crovi v3 APPROVED 17/10/2026 (UD-184): chat avatar crovi-avatar-256.webp and home welcome card",
       "voices": "NONE_UNTIL_DIREZIONE_APPROVES_ORIGINAL_SYNTHETIC_VOICE_NOT_TIED_TO_A_REAL_PERSON",
       "safety_rule": "DISTRESS_FIXED_REFERRAL_NO_THERAPY (cast-safety.ts; rules engine and AI pre-router)",
       "area_personas": {

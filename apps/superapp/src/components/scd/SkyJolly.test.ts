@@ -20,17 +20,20 @@ import {
 } from "./SkyJolly";
 
 describe("helper persona (UD-121: one chat, Iride; Sky only for the younger members)", () => {
-  it("puts Iride in the chat on every public page", () => {
-    expect(personaFor("/")).toBe("vera");
-    for (const p of PUBLIC_PREFIXES) expect(personaFor(p)).toBe("vera");
-    expect(personaFor("/eventi/christmas-lario-cup")).toBe("vera");
-    expect(personaFor("/calendario/rotazione-campi")).toBe("vera");
-    // /sostieni is open to everyone (out of PUBLIC_PREFIXES only for caching): Vera, never Sky (cleanup 15/10/2026).
+  it("UD-184: puts Crovi (persona 'sky') in the general chat of every public page; Iride only with a public area", () => {
+    expect(personaFor("/")).toBe("sky");
+    expect(PERSONA_COPY.sky.name).toBe("Crovi");
+    for (const p of PUBLIC_PREFIXES) expect(personaFor(p)).toBe("sky");
+    expect(personaFor("/eventi/christmas-lario-cup")).toBe("sky");
+    expect(personaFor("/calendario/rotazione-campi")).toBe("sky");
     for (const p of ["/sostieni", "/sostieni/dona-materiale", "/sostieni/proponi", "/sostieni/fondo-solidale"]) {
       expect(isReservedPath(p)).toBe(false);
-      expect(personaFor(p)).toBe("vera");
-      expect(launcherFaceFor(p)).toBe("vera");
+      expect(personaFor(p)).toBe("sky");
+      expect(launcherFaceFor(p)).toBe("sky");
     }
+    // A face card with a public area keeps Iride (Club House, sponsor, tornei, biglietteria).
+    expect(personaFor("/", null, "biglietteria")).toBe("vera");
+    expect(personaFor("/tornei", null, "mentore-tornei")).toBe("vera");
     expect(personaFor("/sostienix")).toBe("sky");
   });
 
@@ -47,11 +50,12 @@ describe("helper persona (UD-121: one chat, Iride; Sky only for the younger memb
     expect(personaFor("/partners")).toBe("sky");
   });
 
-  it("never fronts the public pages with Sky (Direzione 13/10/2026): Iride everywhere outside", () => {
+  it("UD-184: Crovi fronts the public pages (launcher face and chat), Iride stays inside for staff and adults", () => {
     for (const p of ["/", "/fantacalcio", "/top11", "/top11/settimana", "/calendario", "/contatti", "/partner", "/sponsor", "/societa", "/eventi", "/comunicazioni", "/rassegna-stampa", "/tornei", "/kit", "/impianti", "/privacy"]) {
-      expect(launcherFaceFor(p)).toBe("vera");
-      expect(personaFor(p)).toBe("vera");
+      expect(launcherFaceFor(p)).toBe("sky");
+      expect(personaFor(p)).toBe("sky");
     }
+    expect(personaFor("/direzione", { roles: ["segreteria"] })).toBe("vera");
   });
 
   it("marks only the under-14 team pages as Sky's place", () => {
@@ -171,5 +175,18 @@ describe("Iride in the reserved areas (Direzione 'Vai A B C' 13/10/2026, UD-121)
   it("never opens a tip-only character's chat: asking for Era gives Iride's general chat", () => {
     expect(personaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBe("vera");
     expect(chatAreaFor("/famiglia", { roles: ["famiglia"] }, "era")).toBeNull();
+  });
+});
+
+describe("Crovi avatar (UD-184: Crovi v3 approved as official asset)", () => {
+  it("shows the approved Crovi v3 avatar for persona 'sky', never the old 'C' initial", async () => {
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const { createElement } = await import("react");
+    const { PersonaAvatar, CROVI_AVATAR_SRC } = await import("./SkyJolly");
+    expect(CROVI_AVATAR_SRC).toBe("/media/crovi/v3/crovi-avatar-256.webp");
+    const html = renderToStaticMarkup(createElement(PersonaAvatar, { persona: "sky", size: 32 }));
+    expect(html).toContain('src="/media/crovi/v3/crovi-avatar-256.webp"');
+    expect(html).toContain('data-persona-avatar="crovi"');
+    expect(html).not.toMatch(/data-persona-initial/);
   });
 });

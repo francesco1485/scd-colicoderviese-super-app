@@ -1025,3 +1025,11 @@ Backlog cloud B11. Motore: PERSONE (una famiglia che apre /impianti legge «in a
 - Sweep di tutte le pagine pubbliche (29 indirizzi, build locale, testo visibile): nessun altro codice interno, tranne /vetta-legnone (fonti «Cervellone cartella 04», «Master Tornei e Iniziative») lasciato com'è perché la pagina è stata approvata da Francesco (#183): decide lui.
 - Test: `components/scd/FacilityMap.public-copy.test.tsx` (jsdom, apre ogni spazio dei due siti, controlla anche la modalità staff e «posizione indicativa»).
 - Revisione round 1: scd-sicurezza PASS; scd-revisore BLOCK («posizione indicativo», concordanza) → corretto, con nit (commento in testa, JSDoc, doppia dicitura posizione).
+## 2026-10-17 — chat cloud — Crovi in prima pagina: avatar + chat in cima alla home (UD-184; Francesco DG 14:08 «Io voglio vedere in prima pagina app super web il crovi cavolo ma perché non si lavora qui»)
+
+- Engine: PERSONE. Measure: chat opens from the Crovi home card (input and chips) per home visit.
+- `components/home/CroviWelcome.tsx`: compact navy/blue card right after the urgent notices, before the club communication (no hero banner); approved Crovi v3 cut-out with entrance + breathing (`.crovi-enter`, `.crovi-actor`, reduced motion still), pose by day and a line by day/time (`lib/crovi-welcome.ts`, Europe/Rome; a match only from the public calendar: next home game with a confirmed time), input «Chiedi a Crovi…» and chips «Quando si gioca?», «Allenamenti di stasera», «Pulmini», «Segnala un risultato».
+- Chat: public general chat persona is "sky" shown as Crovi (`resolveChat`), switchboard voice (Iride segreteria, Garrison Club House, Enea tornei); face cards with an area keep Iride; inside unchanged. `assistant:open` carries an optional first message (`openAssistant(area, text)`, `openedText`), SkyChat sends it on open.
+- «Segnala un risultato»: fixed reply, no model, no score written; the Segreteria checks it against the official LND source (UD-182).
+- Assets: Crovi v3 cut-outs and avatar approved with Francesco's quote (`config/scd-assets.v1.json`); PersonaAvatar shows `crovi-avatar-256.webp` instead of the 'C'.
+- UD-134 superseded only for "Crovi on public pages"; still no second greeting bubble beside the launcher.

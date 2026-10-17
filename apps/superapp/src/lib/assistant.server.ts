@@ -18,6 +18,7 @@
  * projection plus the area notes, with the area's extra rules in the system prompt and her strict output guard.
  * Logs carry only outcome, persona, area, latency and token counts: never the question, the context or the answer.
  */
+import { isResultReport, RESULT_REPORT_REPLY } from "./crovi-welcome";
 import { createHash } from "node:crypto";
 
 import { anthropicApiKey, callClaude, type FetchLike } from "./anthropic.server";
@@ -179,7 +180,11 @@ export async function answerPublic(input: PublicAnswerInput, deps: PublicDeps): 
   const persona = input.persona;
   const area = persona === "vera" && isChatArea(input.area) ? input.area : null;
   const safety = async () => asReply(await deps.rules({ message: input.message, persona, area }), persona, area);
-  if (bypassesModel(input.message, area)) return safety();
+  const bypass = bypassesModel(input.message, area);
+  if (bypass === "distress" || bypass === "safeguarding") return safety();
+  // UD-184 + UD-182: «Segnala un risultato» never becomes a score written by the chat: fixed hand-off to the Segreteria.
+  if (isResultReport(input.message)) return asReply(RESULT_REPORT_REPLY, persona, area);
+  if (bypass) return safety();
   if (isExplicitAppQuestion(input.message)) return asReply(appHelpReply(), persona, area);
   const rules = async () => (isLegacyAppHelp(input.message) ? asReply(appHelpReply(), persona, area) : safety());
   if (!cfg.enabled) return rules();
@@ -232,6 +237,7 @@ export async function answerStaff(message: string, deps: StaffDeps, requested?: 
   const safety = async () => asReply(await deps.rules({ message, persona, area }), persona, area);
   const bypass = bypassesModel(message, area);
   if (bypass === "distress" || bypass === "safeguarding") return safety();
+  if (persona === "sky" && isResultReport(message)) return asReply(RESULT_REPORT_REPLY, persona, area);
   // UD-167: who does what / a staff number. Deterministic, from the caller's own directory: the model never writes a
   // number, and a number not shared becomes a hand-off to the Segreteria. The directory RPC (scd_staff_directory) runs
   // only for a contact question or, below, when the model is about to be called with the names-and-roles context.

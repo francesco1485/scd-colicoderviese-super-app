@@ -17,7 +17,7 @@ import {
 } from "@/components/scd/SkyJolly";
 import { AI_NOTICE, type ChatAreaId } from "@/lib/assistant";
 import { askAssistant, askStaffAssistant } from "@/lib/assistant.functions";
-import { ASSISTANT_OPEN_EVENT, VERA_OPEN_EVENTS, openedArea } from "@/lib/assistant-open";
+import { ASSISTANT_OPEN_EVENT, VERA_OPEN_EVENTS, openedArea, openedText } from "@/lib/assistant-open";
 import { type SkyReply } from "@/lib/sky.functions";
 import { useSession } from "@/lib/use-session";
 
@@ -123,13 +123,15 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
   const [mood, setMood] = useState<Mood>("info");
   const [notify, setNotify] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>(() => greeting(persona, area));
+  // First message asked by the page (Crovi's home card: input or chip, UD-184), sent once the chat is open.
+  const [pending, setPending] = useState<string | null>(null);
   const askPublic = useServerFn(askAssistant);
   const askInside = useServerFn(askStaffAssistant);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  // One assistant only (UD-134, Francesco 15/10/2026 09:18: "ci sono due chatbot e non si capisce nulla"): the Crovi
-  // greeting bubble is gone; Vera is the only chat on public pages.
+  // One assistant at a time (UD-134): no greeting bubble beside the launcher. Since UD-184 the public chat is Crovi,
+  // who greets from his card at the top of the home (components/home/CroviWelcome.tsx) and opens this same chat.
 
   // A new persona (public <-> reserved) or a new area starts a fresh conversation with its own greeting.
   const chatKey = `${persona}|${area ?? ""}`;
@@ -151,6 +153,7 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
     };
     const onAssistant = (e: Event) => {
       setRequested(openedArea(e));
+      setPending(openedText(e));
       setOpen(true);
       setNotify(false);
     };
@@ -223,6 +226,15 @@ export function SkyChat({ interior = false }: { interior?: boolean } = {}) {
       setBusy(false);
     }
   }
+
+  // Sends the page's first message once the chat is open and the persona of the page is settled (same render pass).
+  useEffect(() => {
+    if (!open || !pending || busy) return;
+    const text = pending;
+    setPending(null);
+    void send(text);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, pending, busy]);
 
   if (hidden || (interior && !open)) return null;
 

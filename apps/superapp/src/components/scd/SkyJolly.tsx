@@ -1,9 +1,10 @@
 /**
  * The floating helper of the Super App (one chat since UD-121, Direzione 14/10/2026: "una sola assistente chat in
  * tutta l'app, di nome VERA"):
- * - public pages: the chat and the launcher face are Vera, the club reception ("Chiedi a Vera");
- * - Sky stays away from the general app (Direzione 13/10/2026): never on public pages; inside only for young members
- *   (lib/assistant.ts rule) and on the under-14 team pages (KIDS_TEAM_IDS);
+ * - public pages: the general chat and the launcher face are Crovi (persona id "sky", UD-184, Francesco DG 17/10/2026
+ *   14:08 «Io voglio vedere in prima pagina app super web il crovi»), the switchboard who passes the ball to Iride
+ *   (segreteria), Garrison (Club House) and Enea (tornei); a face card with an area opens Iride with that area;
+ * - Sky the mascot stays away from the app (UD-151); persona id "sky" is shown as Crovi;
  * - reserved areas: the helper goes by the signed-in viewer (r99, UD-104): Vera for staff and adult members (15+),
  *   Sky for younger members and when nothing tells us the viewer is 15+. The rule lives in one place, lib/assistant.ts
  *   veraEligible / resolveChat, shared by the chat persona, the launcher face and the server voice.
@@ -12,9 +13,8 @@
  * The chat logic lives in SkyChat.tsx; answers come from the AI assistants (lib/assistant.functions.ts) with the
  * rules engine as fallback.
  *
- * Official assets only (config/scd-assets.v1.json): Sky head /media/brand/sky-atv-head.webp, Sky head + ball
- * /media/brand/sky-scd.png (Sky stays out of the app since UD-151). Iride (persona id "vera") shows her approved image;
- * Crovi (persona id "sky") a neutral 'C' initial until the Direzione approves one.
+ * Official assets only (config/scd-assets.v1.json): Iride (persona id "vera") shows her approved image; Crovi
+ * (persona id "sky") his approved v3 avatar /media/crovi/v3/crovi-avatar-256.webp (UD-184).
  */
 import { resolveChat, type AssistantPersona, type ChatAreaId, type HelperViewer } from "@/lib/assistant";
 import { CAST_IDS, castAvatarSrc, castReady, type CastId } from "@/lib/assistant-cast";
@@ -70,7 +70,7 @@ export function isHelperHiddenPath(pathname: string): boolean {
   return startsWithPrefix(pathname, HIDDEN_PREFIXES);
 }
 
-/** Who answers in the chat: Vera everywhere, Sky inside for younger members (lib/assistant.ts resolveChat, UD-121). */
+/** Who answers in the chat: Crovi on public pages, Iride with an area and inside for adults (lib/assistant.ts resolveChat). */
 export function personaFor(pathname: string, viewer?: HelperViewer | null, requested?: string | null): Persona {
   return resolveChat(isReservedPath(pathname) ? "inside" : "public", viewer, requested).persona;
 }
@@ -80,7 +80,7 @@ export function chatAreaFor(pathname: string, viewer?: HelperViewer | null, requ
   return resolveChat(isReservedPath(pathname) ? "inside" : "public", viewer, requested).area;
 }
 
-/** Face shown on the floating launcher: always the figure that answers (Vera outside, Direzione 13/10 + UD-121). */
+/** Face shown on the floating launcher: always the figure that answers (Crovi outside since UD-184). */
 export function launcherFaceFor(pathname: string, viewer?: HelperViewer | null): Persona {
   return personaFor(pathname, viewer);
 }
@@ -103,18 +103,18 @@ export const PERSONA_COPY: Readonly<Record<Persona, PersonaCopy>> = {
   sky: {
     name: "Crovi",
     title: "Chiedi a Crovi",
-    subtitle: "l'aiuto per bambini e famiglie",
+    subtitle: "il centralinista del club: ti passo la persona giusta",
     greeting:
-      "Ciao, sono Crovi della ColicoDerviese. Dimmi cosa cerchi: prossima partita, calendario, come arrivare al campo, iscrizioni, contatti o come funziona l'app.",
+      "Ciao, sono Crovi della ColicoDerviese! Chiedimi partite, allenamenti, pulmini o come arrivare al campo. Se serve, ti passo la persona giusta: Iride per la segreteria, Garrison per la Club House, Enea per i tornei.",
     placeholder: "Scrivi a Crovi…",
     thinking: "Crovi sta cercando…",
     quick: [
-      "Prossima partita",
-      "Calendario",
+      "Quando si gioca?",
+      "Allenamenti di stasera",
+      "Pulmini",
+      "Segnala un risultato",
       "Come arrivare",
-      "Iscriviti",
       "Contatti",
-      "Come funziona l'app",
     ],
   },
   vera: {
@@ -164,12 +164,12 @@ export function greetingFor(persona: Persona, area: ChatAreaId | null = null): {
   };
 }
 
-/** Initial shown for the younger members' helper (Crovi) until the Direzione approves his image. */
-export const CROVI_INITIAL = "C";
+/** Approved Crovi v3 avatar (config/scd-assets.v1.json, UD-184, Francesco DG 17/10/2026 14:08). */
+export const CROVI_AVATAR_SRC = "/media/crovi/v3/crovi-avatar-256.webp";
 
 /**
- * Round avatar of the active persona: Vera and Crovi use their picture once an image is approved; until then a
- * neutral initial in the club colours (Crovi 'C'; Iride has her approved image). Sky never appears in the app (UD-151).
+ * Round avatar of the active persona: Iride her approved image, Crovi (persona "sky") his approved v3 avatar
+ * (UD-184). Sky never appears in the app (UD-151).
  */
 export function PersonaAvatar({
   persona = "sky",
@@ -182,14 +182,15 @@ export function PersonaAvatar({
 }) {
   if (persona === "vera") return <CastBadge id="vera" size={size} className={className} />;
   return (
-    <span
-      aria-hidden="true"
-      data-persona-initial="crovi"
-      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-[#0b2a5b] font-bold text-[#ffd600] ring-2 ring-[#ffd600] ${className}`}
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }}
-    >
-      {CROVI_INITIAL}
-    </span>
+    <img
+      src={CROVI_AVATAR_SRC}
+      alt=""
+      width={size}
+      height={size}
+      data-persona-avatar="crovi"
+      className={`shrink-0 rounded-full bg-white object-cover ring-2 ring-[#ffd600] ${className}`}
+      style={{ width: size, height: size }}
+    />
   );
 }
 
