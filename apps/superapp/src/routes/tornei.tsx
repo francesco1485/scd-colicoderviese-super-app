@@ -135,7 +135,7 @@ function RegisterLink({ t, className = GOLD_CTA }: { t: TournamentEdition; class
 }
 
 /** Link to the club's public registration form for one tournament (null when the form or the id is not known). */
-function IntakeFormLink({ t, light = false }: { t: TournamentEdition; light?: boolean }) {
+function IntakeFormLink({ t, light = false, place = "card" }: { t: TournamentEdition; light?: boolean; place?: "hero" | "card" | "coming" }) {
   if (!(INTAKE_TOURNAMENT_IDS as readonly string[]).includes(t.id)) return null;
   const link = intakeLink("ISCRIZIONE_TORNEO", { torneo: t.id });
   if (!link.href) return null;
@@ -147,7 +147,7 @@ function IntakeFormLink({ t, light = false }: { t: TournamentEdition; light?: bo
       className={`scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-[12px] px-4 font-display text-[15px] font-semibold ${
         light ? "text-[#0457af] shadow-[inset_0_0_0_2px_#0457af]" : "text-white shadow-[inset_0_0_0_2px_rgb(255_255_255/0.6)]"
       }`}
-      data-testid={`tornei-modulo-${t.id}`}
+      data-testid={`tornei-modulo-${place}-${t.id}`}
     >
       <ClipboardList className="size-4" aria-hidden="true" />
       Modulo d'iscrizione SCD
@@ -239,11 +239,17 @@ function Hero({ hero, editions, serverNow }: { hero: TournamentEdition | null; e
         </div>
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
           {hero && <RegisterLink t={hero} />}
-          {hero && <IntakeFormLink t={hero} />}
+          {hero && <IntakeFormLink t={hero} place="hero" />}
           {/* The hub is shared from the hero; each card shares its own tournament page. */}
           <ShareButton page={SHARE_PAGES.tornei} />
         </div>
       </div>
+      {hero && intakeLink("ISCRIZIONE_TORNEO").available && (
+        <p className="m-0 mt-3 max-w-[60ch] text-[13.5px] leading-snug text-[#dbe5f7]" data-testid="tornei-modulo-nota">
+          Il «Modulo d'iscrizione SCD» è la richiesta alla nostra società (iscrizione, ospitalità, informazioni): ti ricontattiamo noi.
+          Dove c'è un organizzatore esterno, l'iscrizione è confermata quando lui la registra.
+        </p>
+      )}
     </header>
   );
 }
@@ -362,7 +368,7 @@ function ComingList({ list }: { list: TournamentEdition[] }) {
             <span className="rounded-full bg-[#eef2f8] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#13254d]">
               {TOURNAMENT_STATUS_LABEL[t.status]}
             </span>
-            <IntakeFormLink t={t} light />
+            <IntakeFormLink t={t} light place="coming" />
           </li>
         ))}
       </ul>

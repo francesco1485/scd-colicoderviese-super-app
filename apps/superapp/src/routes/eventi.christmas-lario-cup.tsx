@@ -269,9 +269,11 @@ function ChristmasLarioCup() {
               {signForm.href && (
                 <a href={signForm.href} target="_blank" rel="noopener noreferrer" className={ghost} data-testid="clc-modulo-iscrizione">
                   {T.signForm}
+                  <span className="sr-only"> ({T.newTab})</span>
                 </a>
               )}
             </div>
+            {signForm.href && <small className="text-[13.5px] text-[#d5e2ff]" data-testid="clc-modulo-nota">{T.signFormNote}</small>}
           </div>
         </Sec>
 

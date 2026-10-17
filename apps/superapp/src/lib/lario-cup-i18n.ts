@@ -48,6 +48,9 @@ export type LarioText = {
   writeOrg: string;
   /** The club's own registration form (Tally, UD-163). */
   signForm: string;
+  /** What the club form is for, under the registration buttons. */
+  signFormNote: string;
+  newTab: string;
   liveKicker: string;
   liveTitle: string;
   liveHead: { pre: string; live: string; post: string };
@@ -121,6 +124,8 @@ const IT: LarioText = {
     `${n} squadre confermate pubblicamente dalle locandine ufficiali. Il contatore si aggiornerà con il registro iscrizioni dell'organizzazione.`,
   writeOrg: "Scrivi all'organizzazione",
   signForm: "Modulo d'iscrizione SCD",
+  signFormNote: "Il modulo SCD è la richiesta alla nostra società (iscrizione, ospitalità, informazioni): ti ricontattiamo noi. L'iscrizione è confermata quando l'organizzazione la registra.",
+  newTab: "si apre in una nuova scheda",
   liveKicker: "Ogni gol, in tempo reale",
   liveTitle: "Il torneo live",
   liveHead: { pre: "Si accende l'8 dicembre", live: "In campo ora", post: "Risultati finali" },
@@ -196,7 +201,9 @@ const DE: LarioText = {
   confirmedNote: (n) =>
     `${n} Mannschaften laut den offiziellen Plakaten öffentlich bestätigt. Der Zähler wird mit dem Anmeldeverzeichnis der Organisation aktualisiert.`,
   writeOrg: "Organisation kontaktieren",
-  signForm: "Anmeldeformular des Vereins",
+  signForm: "Anmeldeformular des Vereins (auf Italienisch)",
+  signFormNote: "Das SCD-Formular ist eine Anfrage an unseren Verein (Anmeldung, Unterkunft, Informationen): wir melden uns. Die Anmeldung gilt, sobald die Organisation sie registriert.",
+  newTab: "öffnet in neuem Tab",
   liveKicker: "Jedes Tor in Echtzeit",
   liveTitle: "Das Turnier live",
   liveHead: { pre: "Start am 8. Dezember", live: "Jetzt auf dem Platz", post: "Endergebnisse" },
@@ -283,7 +290,9 @@ const EN: LarioText = {
   confirmedNote: (n) =>
     `${n} teams publicly confirmed on the official posters. The counter will follow the organisers' registration list.`,
   writeOrg: "Write to the organisers",
-  signForm: "Club registration form",
+  signForm: "Club registration form (in Italian)",
+  signFormNote: "The SCD form is a request to our club (registration, hospitality, information): we will get back to you. Registration is confirmed once the organisers record it.",
+  newTab: "opens in a new tab",
   liveKicker: "Every goal, in real time",
   liveTitle: "The tournament live",
   liveHead: { pre: "Kick-off on 8 December", live: "On the pitch now", post: "Final results" },
