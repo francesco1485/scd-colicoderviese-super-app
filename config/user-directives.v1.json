@@ -4099,6 +4099,79 @@
         ]
       },
       "status": "RECORDED"
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "08:09",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-172",
+      "name": "ROLE_GUIDES_FIRST_ACCESS_AND_ALWAYS_AVAILABLE",
+      "sourceQuoteFragments": [
+        "Inserire un agente e una skill che faccia delle schede interattive che spiegano il funzionamento della struttura ai responsabili, ai dirigenti, ai mister, alle famiglie, ai calciatori",
+        "Una guida che uno può leggere o no, una guida che compare al primo accesso e che resta nel portale di ognuno a disposizione, vedi come fa il mondo web"
+      ],
+      "normalizedCommand": {
+        "rule": "Every portal has interactive guide cards per role (responsabili, dirigenti, mister, famiglie, calciatori, tifosi): a skippable 3-6 card tour opens at first access (once per device and role, never blocking), and the same cards stay always available in the existing /guida route and from «Guida» in each portal menu, with search and contextual «?» tips on complex controls. One typed content module feeds tour, /guida, tips and the assistants. Owner agent scd-guide, skill scd-guida-interattiva.",
+        "scope": "SUPER_APP all portals",
+        "supersedes": "none",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": ".claude/agents/scd-guide.md; .claude/skills/scd-guida-interattiva/SKILL.md"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "08:09",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-173",
+      "name": "FAQ_GENERAL_AND_FIGC_LND_SGS_WITH_SOURCES",
+      "sourceQuoteFragments": [
+        "Una cosa delle FAQ studiata per tutto e una cosa FAQ FIGC"
+      ],
+      "normalizedCommand": {
+        "rule": "One FAQ for the whole app, grouped by role and topic and searchable, plus a FIGC/LND/SGS FAQ (tesseramento, vincolo e svincolo, certificato, assicurazione, Tutela Minori, categorie, liste, giustizia sportiva, trasferimenti). Every federal answer carries source document, date and «Verificato il»; unverified answers say «chiedi alla Segreteria» and are marked da confermare. Never legal advice. The same FAQ is the knowledge of Iride and the cast (no duplicate texts).",
+        "scope": "SUPER_APP /guida, Iride, cast",
+        "supersedes": "none",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "scd-guide; scd-segreteria and scd-figc-lnd verify federal answers"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "08:09",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-174",
+      "name": "SPORTING_DIRECTOR_EXPERT_CHARACTER",
+      "sourceQuoteFragments": [
+        "Serve Crovi e altri avatar stile direttore sportivo, stile Moggi, Marotta, tanti altri bravi, che deve sapere tutto della FIGC, dello sport e di ogni cosa FIGC LND"
+      ],
+      "normalizedCommand": {
+        "rule": "Add to the cast, beside Crovi, an original sporting-director character (the club's «Direttore sportivo») expert in FIGC, LND, SGS, regulations, tesseramento, mercato dilettanti and team management, answering internal staff in the reserved areas. Inspired by the role and the style of great Italian sporting directors, never resembling, named after or quoting a real person (no Moggi, Marotta or other real likeness, voice or catchphrase). Name and artwork to be approved by Francesco; until then initials only. Federal answers only from UD-173 sources; uncertain = da confermare.",
+        "scope": "SUPER_APP cast, reserved areas",
+        "supersedes": "none",
+        "implementationStatus": "PROPOSED_AWAITING_NAME",
+        "implementation": "scd-avatar (character sheet), scd-guide (knowledge), scd-sviluppo"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "08:09",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-175",
+      "name": "CAST_HANDOFF_EXPERT_JOINS_CHAT",
+      "sourceQuoteFragments": [
+        "Se a Iride viene chiesto l'infermiere o Enea per parlare di tornei lei deve passarglielo e entra in chat lui che è esperto di quello, o se lei vede che non è capace in automatico indirizza su qualcun esperto"
+      ],
+      "normalizedCommand": {
+        "rule": "The cast works as one team. When the user asks Iride (or any character) for a topic owned by another expert (Infermeria, Enea for tornei, sponsor, Club House, Direttore sportivo for FIGC/LND, Pulmini), she says who she is passing to and that expert joins the same chat and answers with his own knowledge and rules; the user can go back to Iride. When the current character cannot answer (low confidence, no knowledge entry), it routes automatically to the right expert, or to a real person of the Segreteria when no expert fits. Health and private topics only inside reserved areas; no 1:1 adult-minor chat. WhatsApp Iride follows the same map only after Francesco approves the Make change.",
+        "scope": "SUPER_APP chat (SkyChat, assistant, cast-personas); Iride WhatsApp later with approval",
+        "supersedes": "none",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "scd-sviluppo after the Crovi home work; scd-iride for WhatsApp (Serve ok)"
+      }
     }
   ],
   "completionGate": {

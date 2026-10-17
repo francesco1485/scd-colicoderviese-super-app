@@ -40,5 +40,9 @@ Stato: Pronta · Serve ok (migrazione, spesa, servizio nuovo o messaggi a terzi)
 | I-261017-31 | Tutta l'app | Parola chiave → risposta: «scrivi PULMINO / ISCRIZIONE / ORARI a Iride» su post e locandine, Iride risponde col link giusto | Feed 17/10 (post «Commenta EMAIL50 e ti scrivo») | PERSONE | M | 3 | Serve ok (risposte automatiche Instagram via Meta) |
 | I-261017-32 | 26 Idee | Tavola «La squadra degli agenti» per Francesco: un robot colorato per area e sotto i compiti, come mappa di chi fa cosa | Feed 17/10 («Build your Claude Legal Team») | TEMPO | S | 3 | Pronta |
 | I-261017-33 | Strumenti | Scartati: personaggi IA da foto di persone (Sjinn, MakeViral), alternative Adobe in prova, confronto firewall, scorciatoie Excel, corsi Java | Feed 17/10 | — | — | — | Scartata (rischio volti/minori o non utile al club) |
+| I-261017-34 | Tutta l'app | **Comando UD-172**: guida interattiva per ruolo al primo accesso (3-6 schede, «Salta» sempre visibile) che resta in «Guida» di ogni portale, con ricerca e «?» sui comandi difficili | Francesco 17/10 08:09 | PERSONE | M | 4.5 | Pronta (priorità alta) |
+| I-261017-35 | Tutta l'app + Iride | **Comando UD-173**: FAQ unica per ruolo e argomento + FAQ FIGC/LND/SGS con fonte e data; è anche la conoscenza di Iride e del cast | Francesco 17/10 08:09 | TEMPO | M | 4.5 | Pronta |
+| I-261017-36 | Cast | **Comando UD-174**: personaggio originale «Direttore sportivo» esperto FIGC/LND per l'area interna, ispirato al ruolo dei grandi ds e mai somigliante a persone reali | Francesco 17/10 08:09 | TEMPO | M | 3 | Serve ok (nome e disegno da approvare) |
+| I-261017-37 | Cast + chat | **Comando UD-175**: Iride passa all'esperto (Infermeria, Enea, Direttore sportivo…) che entra nella stessa chat; se nessuno sa rispondere, passa a una persona della Segreteria | Francesco 17/10 08:09 | PERSONE | M | 4.5 | Pronta in app · Serve ok su WhatsApp |
 
 Le ricerche complete stanno in `docs/piattaforme/ricerche/`.
