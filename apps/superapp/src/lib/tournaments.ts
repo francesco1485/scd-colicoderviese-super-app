@@ -4,8 +4,13 @@
  *
  * Only facts the club already published or recorded; nothing is invented (UNKNOWN ≠ ZERO):
  * - Christmas Lario Cup 2026: lib/events.ts (official posters R02 maschile / R03 Female Edition, Master Tornei);
- * - Memorial José Nasazzi 2027: dates recorded in the club's Master Tornei & Iniziative (22–23 May 2027), programme,
- *   categories and registrations not published yet → status "date da confermare";
+ * - Memorial José Nasazzi 2027: CONFIRMED by the Direzione (Francesco, DG, 17/10/2026 11:15: «nasazzi già è confermato e
+ *   si lavora») with the two official posters of the 7th edition, approved by the Direzione 17/10/2026 as published
+ *   (11:16 «lascia così le locandine»; the artwork prints «S.D.C.», the club name in all copy stays «S.C.D.
+ *   ColicoDerviese»). Main event at Colico (annate 2016 dilettanti, 2017 professionisti, six confirmed clubs) and the
+ *   Female Edition at Dervio (Pulcini 7v7), same organisation and same registrations (organiser Sport Pro Experience,
+ *   registrations on its site). Only what the posters print: no start time (no countdown), no nations (the flags are
+ *   decoration), no name of the charity (not published), no phone number;
  * - Memorial Sandro Guattini: recurring youth tournament with a 2026 edition in the club archive; 2027 dates not
  *   published → "date in arrivo".
  * Guest teams are names only (crests need a verified source); no results, no minors.
@@ -44,6 +49,16 @@ export interface TournamentEdition {
   text: string;
   /** Existing page and CTA for details or registrations (null: no page yet). */
   link: { to: string; hash?: string; label: string } | null;
+  /**
+   * Registrations handled by the organiser on its own public site (https only, printed on the official poster): the
+   * «Iscrivi la squadra» button opens it in a new tab instead of the internal page.
+   */
+  registerUrl?: string;
+  /**
+   * Edition registered together with another one («stessa organizzazione, stesse iscrizioni»): the intake form uses
+   * that tournament id (lib/intake-kinds.ts INTAKE_TOURNAMENT_IDS mirrors the database list).
+   */
+  registersWith?: string;
   poster: { src: string; alt: string } | null;
   source: string;
   /** Exact start (ISO with offset) when published: drives the live countdown on /tornei. */
@@ -77,6 +92,19 @@ type CupData = {
 };
 const clcMale: CupData = clc.cups[0]!;
 const clcFemale: CupData = clc.cups[1]!;
+
+/** Memorial José Nasazzi 2027: the facts printed on the two official posters (Direzione 17/10/2026). */
+const NASAZZI_SOURCE = "Locandine ufficiali 7ª edizione (Direzione 17/10/2026)";
+/** Public organiser site printed on both posters (same organiser as the Christmas Lario Cup, lib/events.ts). */
+const NASAZZI_ORGANISER_URL = clc.infoUrl;
+const NASAZZI_TEAMS: readonly string[] = [
+  "Sporting Braga",
+  "Spezia",
+  "Renate",
+  "AlbinoLeffe",
+  "Calcio Lecco",
+  "Folgore Caratese",
+];
 
 export const TOURNAMENTS: readonly TournamentEdition[] = [
   {
@@ -140,18 +168,58 @@ export const TOURNAMENTS: readonly TournamentEdition[] = [
   {
     id: "memorial-jose-nasazzi",
     name: "Memorial José Nasazzi 2027",
-    section: "Torneo del club",
+    section: "Internazionale",
     when: "22–23 maggio 2027",
     date: "2027-05-22",
-    place: null,
-    categories: [],
+    place: "Colico (Lago di Como) · Centro Sportivo Comunale – Campo sportivo TGM Montecchi",
+    categories: ["Annata 2016 · dilettanti", "Annata 2017 · professionisti"],
+    confirmedTeams: NASAZZI_TEAMS,
+    status: "ISCRIZIONI_APERTE",
+    text: "7ª edizione del Memorial Internazionale José Nasazzi – El Gran Mariscal: due giorni di calcio internazionale giovanile a Colico, con calcio, musica, spettacolo, animazione e ristorazione. Nessuna quota di iscrizione; parte dell'incasso è devoluta a un'associazione benefica.",
+    link: { to: "/tornei", hash: "memorial-jose-nasazzi", label: "Programma e iscrizioni" },
+    registerUrl: NASAZZI_ORGANISER_URL,
+    poster: {
+      src: "/media/eventi/memorial-jose-nasazzi-2027.webp",
+      alt: "Locandina ufficiale della 7ª edizione del Memorial Internazionale José Nasazzi – El Gran Mariscal, S.C.D. ColicoDerviese con Sport Pro Experience: 22–23 maggio 2027 a Colico, annate 2016 dilettanti e 2017 professionisti, squadre confermate",
+    },
+    source: NASAZZI_SOURCE,
+    annate: [
+      { big: "2016", note: "Dilettanti" },
+      { big: "2017", note: "Professionisti" },
+    ],
+    services: {
+      ristorazione: "Ristorazione; info e pranzo su richiesta",
+      organizzazione: "S.C.D. ColicoDerviese con Sport Pro Experience (co-organizzatore); nessuna quota di iscrizione",
+      ospitalita: "Possibilità di pernottamento su richiesta",
+    },
+  },
+  {
+    id: "memorial-jose-nasazzi-female",
+    name: "Memorial José Nasazzi Female Edition",
+    section: "Femminile",
+    when: "22–23 maggio 2027",
+    date: "2027-05-22",
+    place: "Dervio (LC) · Centro Sportivo Comunale",
+    categories: ["Pulcini 7v7 · nate 2016–2017", "Ammesse 2018 con 8 anni compiuti"],
     confirmedTeams: [],
-    status: "DATE_DA_CONFERMARE",
-    text: "Lo storico torneo della società torna a maggio 2027. Categorie, campi e iscrizioni saranno pubblicati qui.",
-    link: null,
-    poster: null,
-    source:
-      "Master Tornei & Iniziative della società (date in programma, da confermare)",
+    status: "ISCRIZIONI_APERTE",
+    text: "Torneo di calcio giovanile femminile a Dervio, in contemporanea all'evento principale di Colico: stessa organizzazione, stesse iscrizioni.",
+    link: { to: "/tornei", hash: "memorial-jose-nasazzi-female", label: "Programma e iscrizioni" },
+    registerUrl: NASAZZI_ORGANISER_URL,
+    registersWith: "memorial-jose-nasazzi",
+    poster: {
+      src: "/media/eventi/memorial-jose-nasazzi-2027-female.webp",
+      alt: "Locandina ufficiale del Memorial José Nasazzi Female Edition, S.C.D. ColicoDerviese con Sport Pro Experience: torneo di calcio giovanile femminile il 22–23 maggio 2027 a Dervio, Pulcini 7v7, iscrizioni aperte",
+    },
+    source: NASAZZI_SOURCE,
+    annate: [
+      { big: "2016", note: "Pulcini 7v7" },
+      { big: "2017", note: "Pulcini 7v7" },
+      { big: "2018", note: "Ammesse con 8 anni compiuti" },
+    ],
+    services: {
+      organizzazione: "S.C.D. ColicoDerviese con Sport Pro Experience; stessa organizzazione e stesse iscrizioni dell'evento principale",
+    },
   },
   {
     id: "memorial-sandro-guattini",

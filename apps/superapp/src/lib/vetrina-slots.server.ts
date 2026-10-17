@@ -138,7 +138,7 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
     theme: "eventi",
     kicker: "Tornei del club",
     title: "Tutti i nostri tornei",
-    text: "Christmas Lario Cup maschile e femminile, Memorial José Nasazzi 2027, Memorial Sandro Guattini.",
+    text: "Christmas Lario Cup maschile e femminile, Memorial José Nasazzi 2027 con la Female Edition, Memorial Sandro Guattini.",
     href: "/tornei",
     cta: "Vai ai tornei",
     visual: { kind: "type", big: "CUP", small: "Tornei SCD" },
@@ -151,16 +151,16 @@ export const VETRINA_SLOTS: readonly VetrinaSlot[] = [
   ...(nasazzi?.date
     ? [
         {
-          // lib/tournaments.ts (Master Tornei: 22–23 May 2027, to be confirmed). Peak: the 7 weeks before the event.
+          // lib/tournaments.ts (confirmed by the Direzione 17/10/2026, official posters: 22–23 May 2027). Peak: the 7 weeks before.
           id: "nasazzi",
           kind: "tournament",
           theme: "eventi",
           kicker: `Torneo · ${nasazzi.when ?? "date in arrivo"}`,
           title: "Memorial José Nasazzi",
-          text: "Lo storico torneo della società torna a maggio 2027 (date da confermare).",
+          text: "7ª edizione del torneo internazionale giovanile: annate 2016 e 2017 a Colico, Female Edition a Dervio. Iscrizioni aperte.",
           href: "/tornei",
           hash: nasazzi.id,
-          cta: "Dettagli in arrivo",
+          cta: "Scopri il torneo",
           visual: {
             kind: "type",
             big: nasazzi.date.slice(0, 4),
