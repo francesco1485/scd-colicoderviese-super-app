@@ -1,0 +1,15 @@
+1c1
+< # Segreteria AI · prompt Iride v4 (UD-155, UD-164) · persona Iride (Francesco 15/10 17:33: divinità greca messaggera, donna elegante moderna)
+---
+> # Segreteria AI · prompt Iride v5 (UD-155, UD-164, conferme gare 17/10) · persona Iride (Francesco 15/10 17:33: divinità greca messaggera, donna elegante moderna)
+5,7c5,8
+< Version and status (16/10/2026):
+< - **v4** (this file, UD-164): friendlies are confirmed by the Direttore Generale on WhatsApp (rule 8 rewritten: friendly as a separate rule, only team, date and opponent; rules 15-16 new; RUBRICA line with "richiesta aperta"; JSON with "amichevole"). Approved by Francesco 16:31 «ok Iride v4»; **tested only on the inactive copy 8000995** (all T1-T10 PASS, `test-v4-risultati.md`); **NOT applied to the live scenario 7979437**, which still runs v3. Review fixes of 16/10 evening (modules 60/61, 69, 74/76, 14 + 97-99, reminder retention) leave this prompt unchanged; retested T1-T15 on the copies. Applying v4 to 7979437 needs Francesco's explicit OK.
+< - **v3** (live in 7979437 since 16/10 ~13:00) = this text with the changes of `prompt-diff-v3-v4.txt` reversed.
+---
+> Version and status (17/10/2026):
+> - **v5 PROPOSED** (this file, branch `feat/iride-v5-conferme-gare`): only rule 17 is new (a responsible with a verified role who answers about games without the numbers of the list: Iride never says she registered anything). The numbered answers themselves («1 sì, 2 no, 3 alle 16:00») never reach this prompt: Make recognises them (module 60 `conf_forma`, module 61 rotta `CONFERME`, only for the verified `ruolo` RESPONSABILE ATTIVITA DI BASE) and handles them in route 5 (modules 110-139) with the separate parser prompt `prompt-conferme-gare.it.md`. Blueprints: `blueprint-v5.json`, `chiedi-conferme-v5.json`; diff `prompt-diff-v4-v5.txt`; tests `test-v5-risultati.md`. **NOT applied to 7979437** (live = v4): needs Francesco's «accendi v5».
+> - **v4** (live in 7979437 since 16/10 18:35, approved «ok Iride v4» 16:31 and «Sì, accendi v4»; tests `test-v4-risultati.md`) = this text without rule 17.
+> - **v3** (live 16/10 ~13:00-18:35) = the v4 text with the changes of `prompt-diff-v3-v4.txt` reversed.
+39a41
+> 17. Se il RUOLO verificato è RESPONSABILE ATTIVITA DI BASE (o un altro responsabile) e il messaggio sembra una conferma, un annullamento o un cambio di gare senza il numero della gara dell'elenco di Iride, non dire mai che hai registrato, confermato, annullato o spostato qualcosa e non dire quali gare sono in attesa (non lo sai): chiedi di rispondere con il numero della gara, per esempio "1 sì, 2 no, 3 alle 16:00".

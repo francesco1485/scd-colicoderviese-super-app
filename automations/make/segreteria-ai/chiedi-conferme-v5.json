@@ -1,0 +1,368 @@
+{
+ "name": "SCD · Iride · Chiedi conferme gare",
+ "flow": [
+  {
+   "id": 1,
+   "module": "datastore:SearchRecord",
+   "version": 1,
+   "parameters": {
+    "datastore": 220276,
+    "limit": 1,
+    "continueWhenNoRes": false
+   },
+   "mapper": {
+    "filter": [
+     [
+      {
+       "a": "ruolo",
+       "b": "RESPONSABILE ATTIVITA DI BASE",
+       "o": "text:equal"
+      }
+     ]
+    ]
+   },
+   "metadata": {}
+  },
+  {
+   "id": 2,
+   "module": "google-drive:getAFile",
+   "version": 4,
+   "parameters": {
+    "__IMTCONN__": 11936506
+   },
+   "mapper": {
+    "file": "1xSQ2MClw7LlIeWhJCSXllmCMQMrXYPn5",
+    "select": "map",
+    "formatDrawings": "application/pdf",
+    "formatDocuments": "text/plain",
+    "formatSpreadsheets": "text/csv",
+    "formatPresentations": "application/pdf"
+   },
+   "metadata": {}
+  },
+  {
+   "id": 3,
+   "module": "json:ParseJSON",
+   "version": 1,
+   "parameters": {
+    "type": ""
+   },
+   "mapper": {
+    "json": "{{toString(2.data)}}"
+   },
+   "metadata": {}
+  },
+  {
+   "id": 4,
+   "module": "builtin:BasicFeeder",
+   "version": 1,
+   "parameters": {},
+   "mapper": {
+    "array": "{{3.events}}"
+   },
+   "metadata": {}
+  },
+  {
+   "id": 5,
+   "module": "builtin:BasicAggregator",
+   "version": 1,
+   "parameters": {
+    "feeder": 4
+   },
+   "mapper": {
+    "id": "{{4.id}}",
+    "date": "{{4.date}}",
+    "time": "{{4.time}}",
+    "category": "{{4.category}}",
+    "home_away": "{{4.home_away}}",
+    "venue": "{{4.venue}}",
+    "opponent": "{{4.opponent}}",
+    "conflict": "{{4.verification.facility_review_required}}"
+   },
+   "metadata": {},
+   "filter": {
+    "name": "Solo gare dell'attività di base nei prossimi 8 giorni, orario o campo da confermare",
+    "conditions": [
+     [
+      {
+       "a": "{{if(replace(4.date; \"-\"; \"\") >= formatDate(now; \"YYYYMMDD\"; \"Europe/Rome\") & replace(4.date; \"-\"; \"\") <= formatDate(addDays(now; 8); \"YYYYMMDD\"; \"Europe/Rome\") & (4.group = \"primicalci\" | 4.group = \"piccoli\" | 4.group = \"pulcini\" | 4.group = \"2014\" | 4.group = \"2015\" | 4.group = \"esordienti\") & (4.verification.time_confirmed != true | 4.verification.venue_confirmed != true | 4.match_status = \"CLUB_EVENT\"); true; false)}}",
+       "b": "true",
+       "o": "boolean:equal"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "id": 6,
+   "module": "util:SetVariables",
+   "version": 1,
+   "parameters": {},
+   "mapper": {
+    "variables": [
+     {
+      "name": "richiesta_id",
+      "value": "{{\"CG-\" + formatDate(now; \"YYYYMMDD-HHmm\"; \"Europe/Rome\")}}"
+     },
+     {
+      "name": "quante",
+      "value": "{{length(5.array)}}"
+     }
+    ]
+   },
+   "metadata": {}
+  },
+  {
+   "id": 7,
+   "module": "builtin:BasicRouter",
+   "version": 1,
+   "parameters": {},
+   "mapper": {},
+   "metadata": {},
+   "routes": [
+    {
+     "flow": [
+      {
+       "id": 8,
+       "module": "datastore:SearchRecord",
+       "version": 1,
+       "parameters": {
+        "datastore": 900001,
+        "limit": 50,
+        "continueWhenNoRes": false
+       },
+       "mapper": {
+        "filter": [
+         [
+          {
+           "a": "responsabile_key",
+           "b": "{{1.key}}",
+           "o": "text:equal"
+          },
+          {
+           "a": "stato",
+           "b": "IN_ATTESA",
+           "o": "text:equal"
+          }
+         ]
+        ]
+       },
+       "metadata": {},
+       "filter": {
+        "name": "Prima chiudi la lista precedente",
+        "conditions": [
+         [
+          {
+           "a": "{{6.quante}}",
+           "b": "0",
+           "o": "number:greater"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "id": 9,
+       "module": "datastore:UpdateRecord",
+       "version": 1,
+       "parameters": {
+        "datastore": 900001
+       },
+       "mapper": {
+        "key": "{{8.key}}",
+        "data": {
+         "stato": "SOSTITUITA",
+         "deciso_il": "{{now}}"
+        },
+        "upsert": false,
+        "overwriteArrays": false
+       },
+       "metadata": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 10,
+       "module": "builtin:BasicFeeder",
+       "version": 1,
+       "parameters": {
+        "name": "Poi salva e manda la nuova lista",
+        "conditions": [
+         [
+          {
+           "a": "{{6.quante}}",
+           "b": "0",
+           "o": "number:greater"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "array": "{{5.array}}"
+       },
+       "metadata": {}
+      },
+      {
+       "id": 11,
+       "module": "datastore:UpdateRecord",
+       "version": 1,
+       "parameters": {
+        "datastore": 900001
+       },
+       "mapper": {
+        "key": "{{1.key + \"-\" + toString(10.__IMTINDEX__)}}",
+        "upsert": true,
+        "overwriteArrays": false,
+        "data": {
+         "responsabile_key": "{{1.key}}",
+         "n": "{{10.__IMTINDEX__}}",
+         "event_id": "{{10.id}}",
+         "giorno": "{{get(split(\"dom,lun,mar,mer,gio,ven,sab\"; \",\"); parseNumber(formatDate(parseDate(10.date; \"YYYY-MM-DD\"; \"Europe/Rome\"); \"d\"; \"Europe/Rome\"); \".\") + 1)}}",
+         "data_gara": "{{formatDate(parseDate(10.date; \"YYYY-MM-DD\"; \"Europe/Rome\"); \"DD/MM\"; \"Europe/Rome\")}}",
+         "ora": "{{10.time}}",
+         "categoria": "{{10.category}}",
+         "casa_fuori": "{{10.home_away}}",
+         "sede": "{{10.venue}}",
+         "avversario": "{{10.opponent}}",
+         "conflitto": "{{10.conflict}}",
+         "stato": "IN_ATTESA",
+         "inviata_il": "{{now}}",
+         "richiesta_id": "{{6.richiesta_id}}",
+         "deciso_il": "",
+         "deciso_msg": "",
+         "ora_nuova": "",
+         "sede_nuova": ""
+        }
+       },
+       "metadata": {}
+      },
+      {
+       "id": 12,
+       "module": "util:TextAggregator",
+       "version": 1,
+       "parameters": {
+        "feeder": 10,
+        "rowSeparator": "\n"
+       },
+       "mapper": {
+        "value": "{{toString(10.__IMTINDEX__) + \". \" + get(split(\"dom,lun,mar,mer,gio,ven,sab\"; \",\"); parseNumber(formatDate(parseDate(10.date; \"YYYY-MM-DD\"; \"Europe/Rome\"); \"d\"; \"Europe/Rome\"); \".\") + 1) + \" \" + formatDate(parseDate(10.date; \"YYYY-MM-DD\"; \"Europe/Rome\"); \"DD/MM\"; \"Europe/Rome\") + \" ore \" + ifempty(10.time; \"da definire\") + \" · \" + 10.category + \" · \" + if(10.home_away = \"CASA\"; \"in casa \" + ifempty(10.venue; \"\"); \"@\" + ifempty(10.venue; \"\")) + \" · contro \" + ifempty(10.opponent; \"-\") + if(10.conflict = true; \" (conflitto campo aperto)\"; \"\")}}"
+       },
+       "metadata": {}
+      },
+      {
+       "id": 13,
+       "module": "util:SetVariables",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "variables": [
+         {
+          "name": "canale",
+          "value": "{{if(parseNumber(formatDate(ifempty(1.data.ultimo_contatto; \"2000-01-01T00:00:00.000Z\"); \"X\")) >= parseNumber(formatDate(addHours(now; -23); \"X\")); \"SESSIONE\"; \"MAIL\")}}"
+         },
+         {
+          "name": "testo",
+          "value": "{{substring(\"Ciao \" + ifempty(first(split(trim(ifempty(1.data.nome; \"\")); \" \")); \"\") + \", sono Iride (assistente AI) ⚽ Queste gare dell'attività di base sono ancora da confermare:\" + newline + 12.text + newline + newline + \"Mi rispondi con il numero e sì/no? Per esempio: 1 sì, 2 sì, 3 no. Se cambia orario o campo scrivilo: 4 alle 16:00, 5 campo 2. Poi aggiorno io il calendario e lo pubblico.\"; 0; 1500)}}"
+         }
+        ]
+       },
+       "metadata": {}
+      },
+      {
+       "id": 14,
+       "module": "builtin:BasicRouter",
+       "version": 1,
+       "parameters": {},
+       "mapper": {},
+       "metadata": {},
+       "routes": [
+        {
+         "flow": [
+          {
+           "id": 15,
+           "module": "whatsapp-business-cloud:sendMessage",
+           "version": 1,
+           "parameters": {
+            "__IMTCONN__": 11971947
+           },
+           "mapper": {
+            "to": "+{{1.key}}",
+            "text": {
+             "body": "{{13.testo}}",
+             "preview_url": false
+            },
+            "type": "text",
+            "fromId": "<WHATSAPP_PHONE_NUMBER_ID>"
+           },
+           "metadata": {},
+           "filter": {
+            "name": "Il responsabile ha scritto a Iride nelle ultime 23 ore",
+            "conditions": [
+             [
+              {
+               "a": "{{13.canale}}",
+               "b": "SESSIONE",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           }
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 16,
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "parameters": {
+            "__IMTCONN__": 11936496
+           },
+           "mapper": {
+            "to": [
+             "sportclubcolico@gmail.com"
+            ],
+            "subject": "[Iride] Gare da confermare · attività di base",
+            "content": "<p>Iride non può scrivere al Responsabile attività di base: non le scrive da più di 23 ore e il modello WhatsApp non è ancora approvato da Meta. Inoltragli questo elenco o chiedigli di scrivere «ciao» a Iride.</p><p>{{replace(escapeHTML(12.text); newline; \"<br>\")}}</p><p style=\"color:#666\">Nessun numero di telefono in questa mail.</p>",
+            "bodyType": "rawHtml"
+           },
+           "metadata": {},
+           "filter": {
+            "name": "Fuori finestra 24 ore: mail alla segreteria",
+            "conditions": [
+             [
+              {
+               "a": "{{13.canale}}",
+               "b": "MAIL",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "metadata": {
+  "instant": false,
+  "version": 1,
+  "scenario": {
+   "dlq": false,
+   "dataloss": false,
+   "maxErrors": 3,
+   "autoCommit": true,
+   "roundtrips": 1,
+   "sequential": true,
+   "confidential": true
+  }
+ }
+}
