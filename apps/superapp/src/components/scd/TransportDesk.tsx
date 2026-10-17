@@ -11,6 +11,8 @@ import {
   draftWarnings,
   emptyDraft,
   expiryTone,
+  FLEET_2026_27,
+  TRANSPORT_OFFICE,
   upcomingRuns,
   workQueue,
   type RunDraft,
@@ -80,7 +82,7 @@ function Due({ label, due, today }: { label: string; due: string | null; today: 
 
 export function TransportFleetCard({ board, today, managers }: { board: TransportBoard; today: string; managers?: ReactNode }) {
   return (
-    <Card id="pul-flotta" title="Flotta e autisti" sub="Dal Master Flotta e Trasporti, copia automatica.">
+    <Card id="pul-flotta" title="Flotta e autisti" sub={`Dal Master Flotta e Trasporti, copia automatica. Stagione 2026/27: ${FLEET_2026_27.clubVans} ${FLEET_2026_27.model} del club + ${FLEET_2026_27.partnerVans} dell'${FLEET_2026_27.partnerOwner} usato all'occorrenza.`}>
       {board.vehicles.length === 0 ? (
         <div className="px-4 pb-4 sm:px-[18px]">
           <EmptyState title="Nessun mezzo nella copia">Il Master non ha ancora mezzi attivi nella scheda 04 FLOTTA MEZZI.</EmptyState>
@@ -123,7 +125,6 @@ export function TransportFleetCard({ board, today, managers }: { board: Transpor
                     patente {d.licenceCategory ?? ""} {d.licenceDue ? `scade ${itShort(d.licenceDue)}` : "scadenza da inserire"}
                   </span>
                   {lic === "crit" && <Chip tone="crit">patente scaduta</Chip>}
-                  {d.phone && <span className="ml-auto select-all text-[13.5px] font-semibold tabular-nums">{d.phone}</span>}
                 </li>
               );
             })}
@@ -131,7 +132,7 @@ export function TransportFleetCard({ board, today, managers }: { board: Transpor
         )}
       </div>
       {managers}
-      <SourceLine>Sul pulmino compare il nome dell'autista; i ragazzi sono figure senza nome. I telefoni li vedono solo Direzione, Segreteria e responsabile trasporti.</SourceLine>
+      <SourceLine>Sul pulmino compare il nome dell'autista; i ragazzi sono figure senza nome. Tutti gli autisti sono volontari; i telefoni non compaiono nell'app.</SourceLine>
     </Card>
   );
 }
@@ -163,7 +164,7 @@ export function TransportPlanner({
     <Card
       id="pul-organizza"
       title="Corse organizzate"
-      sub={board.canManage ? "Trasferte, allenamenti ed extra: pulmino, autista e orari. Ogni salvataggio resta nello storico con il tuo nome." : "Le corse dei prossimi due mesi. Le organizzano Direzione, Segreteria e responsabile trasporti."}
+      sub={board.canManage ? "Trasferte, allenamenti ed extra: pulmino, autista e orari. Ogni salvataggio resta nello storico con il tuo nome." : `Le corse dei prossimi due mesi. Le organizza il ${TRANSPORT_OFFICE}.`}
       aside={
         board.canManage && !draft ? (
           <button type="button" onClick={() => setDraft(emptyDraft(today))} className="inline-flex h-11 items-center gap-1.5 rounded-full bg-[var(--in-ink)] px-4 text-[14.5px] font-bold text-white">
