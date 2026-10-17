@@ -4454,7 +4454,7 @@
         "engine": "PERSONE",
         "measure": "switch-offs per week; minutes from switch-off to the story gone from the home",
         "implementationStatus": "IMPLEMENTED",
-        "implementation": "branch feat/front-page-switch (PR to staging/superapp); r120 STAGED until «applica r120»; tests lib/front-page.test.ts, supabase/tests/r120_front_page_switch.pglite.mjs"
+        "implementation": "branch feat/front-page-switch (PR to staging/superapp); r120 APPLIED 17/10/2026 after «applica r120»; tests lib/front-page.test.ts, supabase/tests/r120_front_page_switch.pglite.mjs"
       }
     }
   ],

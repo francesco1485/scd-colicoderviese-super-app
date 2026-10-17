@@ -1048,11 +1048,11 @@ Francesco DG 16:23 «il crovi… lascia solo come chatbot… in alto vedere live
 - Channel (scd-sicurezza review): the agent commits `front-page.json` to the data branch `data/front-page`; no database write, no Supabase connector for the agent. `lib/front-page.functions.ts` reads it (no redirects, 4 s timeout, 32 KB cap, 5 min cache); `lib/front-page.ts` shows it only on its own Rome day, VERIFIED items only, internal links split into path/search/hash for the router, personal-data patterns dropped. Switch-off: `"off": true`.
 - `.claude/agents/scd-super-giornalista.md`: publish step and the single exception to «drafts only»; source `SCD_FRONT_PAGE_DAILY` in the manifest; tests `lib/front-page.test.ts`, public-home tests updated.
 
-## 2026-10-17 — chat cloud — «Spegni notizia»: interruttore della Direzione per la Prima pagina (UD-188, r120 STAGED)
+## 2026-10-17 — chat cloud — «Spegni notizia»: interruttore della Direzione per la Prima pagina (UD-188, r120 APPLICATA)
 
 Francesco DG 17:20 «Spegni notizia» → «Costruisci il pulsante».
 
 - Engine: PERSONE. Measure: switch-offs per week; minutes until the story is gone from the home.
 - `components/scd/FrontPageDesk.tsx` in Direzione → Contenuti (role direzione): today's items with «Spegni / Riaccendi» and «Spegni tutto».
-- r120 (STAGED, «applica r120»): `scd_front_page_switch` (RLS, no direct access), `scd_front_page_set_hidden` (DIRECTION only, audit with item id and day), `scd_public_front_page_hidden` (anon, ids only). PGlite test.
+- r120 (APPLICATA 17/10 dopo «applica r120»): `scd_front_page_switch` (RLS, no direct access), `scd_front_page_set_hidden` (DIRECTION only, audit with item id and day), `scd_public_front_page_hidden` (anon, ids only). PGlite test.
 - Server: the public home applies the switch on every request (30 s cache); unreadable switch → the whole front page is hidden; before r120 nothing is switched off. The agent never writes the switch.

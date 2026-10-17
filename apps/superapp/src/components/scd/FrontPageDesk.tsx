@@ -26,14 +26,20 @@ export function FrontPageDesk({ desk }: { desk: Desk }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(desk.hidden === null ? "Non riesco a leggere l'interruttore: la prima pagina è nascosta per sicurezza finché non torna." : null);
   const toggle = useServerFn(setFrontPageHidden);
-  const pageOff = hidden.includes("*");
+  // An unreadable switch hides the whole page on the home (fail closed): show it as off here too.
+  const pageOff = hidden.includes("*") || desk.hidden === null;
 
   async function flip(itemId: string, next: boolean) {
     setBusy(itemId);
-    const r = await toggle({ data: { day: desk.day, itemId, hidden: next } });
-    setBusy(null);
-    setMsg(r.message);
-    if (r.ok) setHidden((h) => (next ? [...new Set([...h, itemId])] : h.filter((x) => x !== itemId)));
+    try {
+      const r = await toggle({ data: { day: desk.day, itemId, hidden: next } });
+      setMsg(r.message);
+      if (r.ok) setHidden((h) => (next ? [...new Set([...h, itemId])] : h.filter((x) => x !== itemId)));
+    } catch {
+      setMsg("Non riuscito, riprova.");
+    } finally {
+      setBusy(null);
+    }
   }
 
   const btn =

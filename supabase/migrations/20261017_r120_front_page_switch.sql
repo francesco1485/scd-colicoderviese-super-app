@@ -1,6 +1,6 @@
 -- r120: «Spegni notizia» — the Direzione's switch for the daily Prima pagina of the public home (UD-188), 2026-10-17,
 -- chat CLOUD (range r110-r129; r116-r119 used).
--- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r120". Never apply from an agent.
+-- APPLIED on SCD PULSE 17/10/2026 ~17:30 after Francesco wrote «applica r120» (both reviews PASS). Never apply from an agent.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires (r33, r51): scd_organizations, scd_has_org_role, scd_audit_events. A guard below stops the migration when
 -- one of them is missing.

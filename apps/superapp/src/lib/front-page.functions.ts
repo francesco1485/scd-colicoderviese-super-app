@@ -123,7 +123,10 @@ export interface FrontPageDesk {
 }
 
 /** For the Direzione desk: today's items and the switch state, read fresh (no cache). */
-export const getFrontPageDesk = createServerFn({ method: "GET" }).handler(async (): Promise<FrontPageDesk> => {
+export const getFrontPageDesk = createServerFn({ method: "GET" }).handler(async (): Promise<FrontPageDesk | null> => {
+  const { sessionView } = await import("./auth.functions");
+  const s = await sessionView();
+  if (!s.user || !s.roles.includes("direzione")) return null;
   const now = Date.now();
   const day = serverRomeDay(process.env, now);
   const page = await readFrontPage(day);
