@@ -67,7 +67,7 @@ describe("access screen content from the registry", () => {
   it("pulmini: board copy, registry roles and sources, Entra to the role landing", () => {
     const s = accessScreen("pulmini");
     expect(s).toMatchObject({ label: "Pulmini", path: "/pulmini", icon: "bus", blurb: "Mezzi, autisti, corse", parent: null });
-    expect(whoEnters(s)).toBe("responsabile trasporti, autisti, Direzione");
+    expect(whoEnters(s)).toBe("Responsabile servizio pulmini, autisti, Direzione");
     expect(s.sources).toEqual(["Master Flotta"]);
     expect(s.enter).toEqual({ href: "/aree/pulmini", via: "landing" });
     expect(s.insideFrom).toBe("landing");
@@ -140,7 +140,7 @@ describe("work areas: real read-only pages behind the same access gate", () => {
       expect(findArea(id), id).toBeDefined();
       expect(ACCESS_SCREEN_IDS, id).not.toContain(id);
     }
-    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "gestionale", "infermeria", "intake", "lotteria", "magazzino", "magazzino-cassa", "mister", "movimenti", "nutrizionista", "organigramma", "persone", "planning", "posta", "posta-collega", "pulmini", "quadro", "quote", "richieste", "scadenzario", "segreteria", "struttura", "tesoreria"]);
+    expect([...WORK_AREA_IDS].sort()).toEqual(["accessi", "biglietteria", "certificati", "cervellone", "club-house", "coda", "compensi", "crm", "gestionale", "infermeria", "intake", "lotteria", "magazzino", "magazzino-cassa", "mister", "movimenti", "nutrizionista", "organigramma", "persone", "planning", "posta", "posta-collega", "pulmini", "quadro", "quote", "richieste", "rubrica", "scadenzario", "segreteria", "struttura", "tesoreria"]);
   });
 
   it("each has a real route at its canonical path and is marked 'page', not 'access screen'", () => {

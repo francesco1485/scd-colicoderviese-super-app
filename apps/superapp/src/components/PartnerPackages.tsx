@@ -1,56 +1,69 @@
-import { Link } from "@tanstack/react-router";
-import { Armchair, Check, MonitorPlay, Shirt, Smartphone, Trophy, type LucideIcon } from "lucide-react";
+import { Check, MapPin } from "lucide-react";
 
+import { IdeaScene } from "@/components/IdeaScene";
 import {
   PACKAGE_STEPS,
   PARTNER_PACKAGES,
+  PROPOSAL_ON_MEASURE,
   formatAudienceNumbers,
-  formatPackagePrice,
   type PackageIcon,
   type PartnerPackage,
 } from "@/lib/sponsor-packages";
+import type { IdeaScene as Scene } from "@/lib/sponsor-ideas";
 
 /**
- * Listino partner on /sponsor (item C1). Every package is the same plain card, in listino order (no "pacchetto
- * principale" promo card: no vetrine, Francesco 15/10/2026); packages with a link (none while the tribune seat is
- * internal, UD-132) render as slim lines. Every price is "in approvazione" until the Direzione approves it (sponsor-packages.ts).
- * "Chiedi questo pacchetto" calls `onChoose(id)`: the page preselects it in the #proposta form and scrolls there.
+ * The four packages on /sponsor as «idee di sponsorizzazione» (Francesco 17/10/2026 09:42: «vanno creati pacchetti ma
+ * prezzi non esposti perché li fa al momento il Presidente»). Each card: the picture of where the brand goes, the
+ * places as chips, one story line, what the partner gets, who sees it, «Proposta su misura» instead of any price, and
+ * one action «Parliamone» → `onChoose(id)`: the page preselects it in the #proposta form (?pacchetto=) and scrolls there.
+ * No price, amount or discount is ever rendered (tested in sponsor-public-no-price.test.tsx). No router Link inside:
+ * the component renders in SSR tests as is.
  */
 
-const ICONS: Record<PackageIcon, LucideIcon> = {
-  ledwall: MonitorPlay,
-  maglia: Shirt,
-  tornei: Trophy,
-  digitale: Smartphone,
-  seggiolino: Armchair,
+const SCENE: Readonly<Record<PackageIcon, Scene>> = {
+  ledwall: "led",
+  maglia: "maglia",
+  tornei: "torneo",
+  digitale: "digitale",
+  seggiolino: "palestra",
 };
 
-const CTA_CLS =
-  "surface-sun scd-focus inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-2 text-center text-sm font-bold uppercase";
+export const CTA_CLS =
+  "scd-gold scd-focus inline-flex min-h-11 w-full items-center justify-center rounded-[10px] px-4 py-2 text-center font-display text-[16px] font-bold";
 
-function ChooseButton({ p, onChoose }: { p: PartnerPackage; onChoose: (id: string) => void }) {
+/** «Parliamone»: an anchor that still works without JavaScript (?pacchetto=id#proposta). */
+export function TalkButton({ id, title, onChoose, testId }: { id: string; title: string; onChoose: (id: string) => void; testId: string }) {
   return (
     <a
-      href={`?pacchetto=${p.id}#proposta`}
+      href={`?pacchetto=${id}#proposta`}
       onClick={(e) => {
         e.preventDefault();
-        onChoose(p.id);
+        onChoose(id);
       }}
       className={CTA_CLS}
-      aria-label={`Chiedi questo pacchetto: ${p.title}`}
-      data-testid={`package-cta-${p.id}`}
+      aria-label={`Parliamone: ${title}`}
+      data-testid={testId}
     >
-      Chiedi questo pacchetto
+      Parliamone
     </a>
+  );
+}
+
+/** The line that stands where a price would be. */
+export function OnMeasure({ testId }: { testId?: string }) {
+  return (
+    <p className="m-0 rounded-[10px] bg-[#fff6d6] px-3 py-2 text-[13.5px] font-semibold leading-snug text-[#13254d]" data-testid={testId}>
+      {PROPOSAL_ON_MEASURE}
+    </p>
   );
 }
 
 function Benefits({ items }: { items: readonly string[] }) {
   return (
-    <ul className="m-0 list-none space-y-2 p-0 text-sm">
+    <ul className="m-0 list-none space-y-1.5 p-0 text-[14px] leading-snug text-[#24385a]">
       {items.map((b) => (
         <li key={b} className="flex gap-2">
-          <Check className="mt-0.5 size-4 flex-none text-primary" aria-hidden="true" />
+          <Check className="mt-0.5 size-4 flex-none text-[#0457af]" strokeWidth={2.4} aria-hidden="true" />
           <span>{b}</span>
         </li>
       ))}
@@ -58,101 +71,74 @@ function Benefits({ items }: { items: readonly string[] }) {
   );
 }
 
-function Meta({ p }: { p: PartnerPackage }) {
-  return (
-    <dl className="m-0 grid gap-2 text-sm">
-      <div>
-        <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Chi lo vede</dt>
-        <dd className="m-0">
-          {p.audience} <span className="text-muted-foreground">{formatAudienceNumbers(p)}.</span>
-        </dd>
-      </div>
-      <div>
-        <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Prezzo</dt>
-        <dd className="m-0 font-semibold" data-testid={`package-price-${p.id}`}>{formatPackagePrice(p.price)}</dd>
-      </div>
-    </dl>
-  );
-}
+const LABEL = "m-0 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-[#52627f]";
 
 function PackageCard({ p, onChoose }: { p: PartnerPackage; onChoose: (id: string) => void }) {
-  const Icon = ICONS[p.icon];
   return (
-    <article aria-labelledby={`pkg-${p.id}`} className="card-premium flex min-w-0 flex-col p-5" data-testid={`package-${p.id}`}>
-      <span className="inline-flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
-        <Icon className="size-5" />
-      </span>
-      <h3 id={`pkg-${p.id}`} className="mt-3 text-xl font-bold">{p.title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">{p.summary}</p>
-      <div className="mt-4 flex-1">
-        <Benefits items={p.benefits} />
+    <article aria-labelledby={`pkg-${p.id}`} className="flex min-w-0 flex-col overflow-hidden rounded-[14px] border border-[#d6deeb] bg-white shadow-[0_10px_24px_-18px_rgb(20_38_77/0.7)]" data-testid={`package-${p.id}`}>
+      <IdeaScene scene={SCENE[p.icon]} label={`Dove compare il tuo marchio: ${p.placements.join(", ")}`} />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div>
+          <p className="m-0 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-[#0457af]">Idea di sponsorizzazione</p>
+          <h3 id={`pkg-${p.id}`} className="m-0 mt-0.5 font-display text-[22px] font-bold uppercase leading-none text-[#14264d]">{p.title}</h3>
+        </div>
+        <p className="m-0 text-[14.5px] leading-snug text-[#14264d]">{p.story}</p>
+        <div>
+          <p className={LABEL}>Dove compare il tuo marchio</p>
+          <ul className="m-0 mt-1.5 flex list-none flex-wrap gap-1.5 p-0">
+            {p.placements.map((x) => (
+              <li key={x} className="inline-flex items-center gap-1 rounded-full bg-[#eaf3fd] px-2.5 py-1 text-[12.5px] font-semibold text-[#0457af]">
+                <MapPin className="size-3.5" aria-hidden="true" />
+                {x}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex-1">
+          <p className={`${LABEL} mb-1.5`}>Cosa ottieni</p>
+          <Benefits items={p.benefits} />
+        </div>
+        <div>
+          <p className={LABEL}>Chi lo vede</p>
+          <p className="m-0 text-[13.5px] leading-snug text-[#24385a]">
+            {p.audience} <span className="text-[#52627f]">{formatAudienceNumbers(p)}.</span>
+          </p>
+        </div>
+        <OnMeasure testId={`package-measure-${p.id}`} />
+        <TalkButton id={p.id} title={p.title} onChoose={onChoose} testId={`package-cta-${p.id}`} />
       </div>
-      <div className="mt-5 border-t border-border pt-4">
-        <Meta p={p} />
-      </div>
-      <div className="mt-4">
-        <ChooseButton p={p} onChoose={onChoose} />
-      </div>
-    </article>
-  );
-}
-
-function LinkRow({ p }: { p: PartnerPackage }) {
-  const Icon = ICONS[p.icon];
-  return (
-    <article
-      aria-labelledby={`pkg-${p.id}`}
-      className="flex flex-col gap-4 rounded-2xl border border-dashed border-border bg-card p-5 sm:flex-row sm:items-center"
-      data-testid={`package-${p.id}`}
-    >
-      <Icon className="size-7 flex-none text-primary" aria-hidden="true" />
-      <div className="min-w-0 flex-1">
-        <h3 id={`pkg-${p.id}`} className="text-lg font-bold">{p.title}</h3>
-        <p className="m-0 mt-1 text-sm text-muted-foreground">
-          {p.summary} {p.benefits.slice(1).join(". ")}. <span className="font-semibold text-foreground">{formatPackagePrice(p.price)}</span>
-        </p>
-      </div>
-      {p.link && (
-        <Link to={p.link.to} className="scd-focus inline-flex min-h-11 items-center justify-center rounded-lg border border-primary px-4 py-2 text-sm font-bold uppercase text-primary">
-          {p.link.label}
-        </Link>
-      )}
     </article>
   );
 }
 
 export function PartnerPackages({ onChoose }: { onChoose: (id: string) => void }) {
   const cards = PARTNER_PACKAGES.filter((p) => !p.link);
-  const linked = PARTNER_PACKAGES.filter((p) => p.link);
   return (
-    <section id="listino" aria-labelledby="listino-title" className="mx-auto mt-14 max-w-6xl scroll-mt-20 px-4" data-testid="partner-packages">
-      <p className="eyebrow">Listino partner · stagione 2026/27</p>
-      <h2 id="listino-title" className="mt-1 text-3xl font-bold">Cosa puoi avere come partner</h2>
-      <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-        Quattro pacchetti, da soli o insieme. I prezzi sono in approvazione dalla Direzione: chiedi il pacchetto e ti facciamo una proposta.
+    <section id="listino" aria-labelledby="listino-title" className="scroll-mt-20" data-testid="partner-packages">
+      <p className="m-0 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-[#0457af] lg:text-[12px]">Come esserci · stagione 2026/27</p>
+      <h2 id="listino-title" className="m-0 mt-0.5 font-display text-[24px] font-bold leading-tight text-[#14264d] lg:text-[30px]">Quattro modi per esserci</h2>
+      <p className="m-0 mt-1 max-w-3xl text-[14px] leading-snug text-[#52627f]">
+        Da soli o insieme. Non c'è un listino: ogni proposta la definisce il Presidente con te, su misura per la tua azienda.
       </p>
 
-      <div className="mt-6 grid gap-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {cards.map((p) => <PackageCard key={p.id} p={p} onChoose={onChoose} />)}
-        </div>
-        {linked.map((p) => <LinkRow key={p.id} p={p} />)}
+      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {cards.map((p) => <PackageCard key={p.id} p={p} onChoose={onChoose} />)}
       </div>
 
-      <div className="mt-10" data-testid="package-steps">
-        <h3 className="text-xl font-bold">Come funziona</h3>
-        <ol className="m-0 mt-4 grid list-none gap-3 p-0 md:grid-cols-3">
+      <div className="mt-8" data-testid="package-steps">
+        <h3 className="m-0 font-display text-[20px] font-bold text-[#14264d]">Come funziona, in tre passi</h3>
+        <ol className="m-0 mt-3 grid list-none gap-3 p-0 md:grid-cols-3">
           {PACKAGE_STEPS.map((s, i) => (
-            <li key={s.title} className="flex gap-3 rounded-xl border border-border bg-card p-4">
-              <span className="surface-sun inline-flex size-9 flex-none items-center justify-center rounded-full font-display text-base font-bold" aria-hidden="true">
+            <li key={s.title} className="flex gap-3 rounded-[12px] border border-[#d6deeb] bg-white p-4">
+              <span className="scd-gold inline-flex size-10 flex-none items-center justify-center rounded-full font-display text-[18px] font-bold" aria-hidden="true">
                 {i + 1}
               </span>
               <div className="min-w-0">
-                <p className="m-0 font-bold">
+                <p className="m-0 font-bold text-[#14264d]">
                   <span className="sr-only">Passo {i + 1}: </span>
                   {s.title}
                 </p>
-                <p className="m-0 mt-1 text-sm text-muted-foreground">{s.text}</p>
+                <p className="m-0 mt-1 text-[14px] leading-snug text-[#52627f]">{s.text}</p>
               </div>
             </li>
           ))}

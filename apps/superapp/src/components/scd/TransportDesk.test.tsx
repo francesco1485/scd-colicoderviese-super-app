@@ -40,10 +40,11 @@ describe("TransportDesk", () => {
     expect(queue).toContain("Master, scheda 04 FLOTTA MEZZI");
   });
 
-  it("shows deadlines, unconfirmed seats and phones only when the database sent them", () => {
+  it("shows deadlines and unconfirmed seats, never a phone even if one reaches the component", () => {
     expect(fleet).toContain("scaduta");
     expect(fleet).toContain("posti da confermare");
-    expect(fleet).toContain("000 0000000");
+    expect(fleet).not.toContain("000 0000000");
+    expect(fleet).toContain("ASD Volley Colico");
     expect(fleet).toContain("scadenza da inserire");
   });
 

@@ -97,8 +97,9 @@ describe("rules follow chi-fa-cosa (G14) and never route families, athletes, par
     expect(kindPositions("SPONSOR", null, "viewers")).not.toContain("segreteria");
   });
 
-  it("knows only the tournaments of lib/tournaments.ts", () => {
-    expect([...INTAKE_TOURNAMENT_IDS].sort()).toEqual(TOURNAMENTS.map((t) => t.id).sort());
+  it("knows only the tournaments of lib/tournaments.ts (editions with shared registrations use their main id)", () => {
+    expect([...INTAKE_TOURNAMENT_IDS].sort()).toEqual([...new Set(TOURNAMENTS.map((t) => t.registersWith ?? t.id))].sort());
+    for (const t of TOURNAMENTS) if (t.registersWith) expect(INTAKE_TOURNAMENT_IDS as readonly string[], t.id).toContain(t.registersWith);
   });
 
   it("sponsors and convenzioni are invoiced, never paid by link", () => {

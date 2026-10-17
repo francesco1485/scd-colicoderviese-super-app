@@ -31,6 +31,7 @@ export const MENU_GROUPS: readonly MenuGroup[] = [
       { to: "/", label: "Home" },
       { to: "/societa", label: "Chi siamo" },
       { to: "/calendario", label: "Calendario gare" },
+      { to: "/classifiche", label: "Classifiche" },
       { to: "/impianti", label: "Mappa campi" },
       { to: "/comunicazioni", label: "Comunicazioni" },
       { to: "/eventi", label: "Eventi" },

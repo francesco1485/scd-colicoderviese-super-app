@@ -137,7 +137,10 @@ describe("sources to rows", () => {
     // Maschile and Female Edition are two tournaments on the same day; the club event duplicates them.
     expect(dec8.map((d) => d.title)).toEqual(["Christmas Lario Cup", "Christmas Lario Cup Female"]);
     expect(dated.some((d) => d.id === "evento:christmas-lario-cup-2026")).toBe(false);
-    expect(dated.find((d) => d.id === "torneo:memorial-jose-nasazzi")?.detail).toContain("date da confermare");
+    const nasazzi = dated.find((d) => d.id === "torneo:memorial-jose-nasazzi");
+    expect(nasazzi?.detail).toBe("Internazionale · 22–23 maggio 2027");
+    expect(nasazzi?.detail).not.toContain("da confermare");
+    expect(dated.find((d) => d.id === "torneo:memorial-jose-nasazzi-female")?.detail).toBe("Femminile · 22–23 maggio 2027");
     expect(undated.map((t) => t.id)).toContain("memorial-sandro-guattini");
   });
 
@@ -222,7 +225,8 @@ describe("aggregation", () => {
   it("KPIs: matches unknown without calendar, partial due count without Cervellone", () => {
     const full = buildSeasonPlan(baseInput());
     expect(full.kpis.matches).toBe(1);
-    expect(full.kpis.events).toBe(3);
+    // Christmas Lario Cup maschile + Female, Memorial Nasazzi + Female Edition (Guattini has no date).
+    expect(full.kpis.events).toBe(4);
     // LND/CRL deadlines are not connected yet, so the due count stays partial even with every other source.
     expect(full.kpis.duePartial).toBe(true);
     // 31/10 fees + SGS level-3 deadlines on 31/10 + Cervellone 05/11 + fee 30/11? (outside 30 days) — computed, not hard-coded.

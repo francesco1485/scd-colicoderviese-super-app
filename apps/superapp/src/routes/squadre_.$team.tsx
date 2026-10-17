@@ -3,7 +3,6 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Bell,
   ChevronLeft,
-  ExternalLink,
   Share2,
   ShieldCheck,
   Users,
@@ -35,8 +34,31 @@ import {
   type RosterPlayer,
 } from "@/lib/public-roster";
 import { getPublicRoster } from "@/lib/public-roster.functions";
+import {
+  isShowcaseTeam,
+  SHOWCASE_NOINDEX,
+  SHOWCASE_SHARE,
+  viewerNeutralPosts,
+  viewerNeutralSocial,
+} from "@/lib/team-showcase";
+import { pageHead } from "@/lib/share";
+import { getTeamShowcase } from "@/lib/team-showcase.functions";
+import { TeamShowcaseSection } from "@/components/scd/TeamShowcase";
 import { publicTeamCrest } from "@/lib/team-crest";
-import { resultLinkFor, VERIFIED_CHAMPIONSHIPS } from "@/lib/official-links";
+import { VERIFIED_CHAMPIONSHIPS } from "@/lib/official-links";
+import {
+  OfficialBadge,
+  ResultsList,
+  SourceLine,
+  StandingsTable,
+  standingSummary,
+} from "@/components/scd/LndStandings";
+import { LND_SNAPSHOT } from "@/lib/lnd-snapshot";
+import {
+  competitionsOfTeam,
+  latestResults,
+  ourStanding,
+} from "@/lib/lnd-standings";
 import {
   channelsFrom,
   isBaseActivityChannel,
@@ -51,6 +73,16 @@ import {
 } from "@/lib/social.functions";
 import { itemState, orderTeams } from "@/lib/universe";
 
+/** Public head of a showcase team (UD-168): link preview without player names. */
+function showcaseHead(id: string) {
+  if (!isShowcaseTeam(id)) return membersOnlyHead("Squadra");
+  const head = pageHead(SHOWCASE_SHARE[id]);
+  // Allievi U16 Élite: public but not indexed (all minors), also left out of robots.txt and the sitemap.
+  return SHOWCASE_NOINDEX.has(id)
+    ? { ...head, meta: [...head.meta, { name: "robots", content: "noindex" }] }
+    : head;
+}
+
 /**
  * Pagina squadra (UD-089, foglio 3): testata con il colore ufficiale dell'annata, "Segui", prossima gara, le gare
  * che vengono, la rosa (r94: nomi per le squadre agonistiche con la regola dell'età, solo il numero per l'attività
@@ -60,14 +92,20 @@ import { itemState, orderTeams } from "@/lib/universe";
 async function loadTeam(team: string) {
   const id = team.toLowerCase();
   if (!/^[a-z0-9_-]{1,40}$/.test(id)) throw notFound();
-  // Teams are inside (UD-100): no team data for anonymous visitors, only the members-only screen.
+  // Teams are inside (UD-100), except the three showcase teams (UD-168, DG 17/10/2026): Prima Squadra, Juniores U19
+  // Élite and Allievi U16 Élite are open to everyone. Their roster comes from the public showcase (r142) for every
+  // visitor, signed in or not, so the page is the same for all and never carries a member-only roster.
+  const showcase = isShowcaseTeam(id);
   const session = await getSession();
-  if (!session.user) return { signedIn: false as const, id };
-  const [calendar, social, posts, roster] = await Promise.all([
+  if (!session.user && !showcase) return { signedIn: false as const, id };
+  const [calendar, social, posts, roster, vetrina] = await Promise.all([
     getPublicCalendarSnapshot(),
     getPublicSocial(),
     getChannelFeed({ data: { channel: teamChannel(id) } }),
-    getPublicRoster({ data: { team: id } }),
+    showcase
+      ? Promise.resolve(null)
+      : getPublicRoster({ data: { team: id } }),
+    showcase ? getTeamShowcase({ data: { team: id } }) : Promise.resolve(null),
   ]);
   const group = calendar.groups.find((g) => g.id === id);
   if (!group) throw notFound();
@@ -77,13 +115,16 @@ async function loadTeam(team: string) {
     new Date(serverNow).toISOString().slice(0, 10);
   return {
     signedIn: true as const,
+    // Showcase pages: the same loader data for every visitor (no viewer state); the client reads it after load.
+    member: showcase ? false : !!session.user,
     id,
     group,
     groups: calendar.groups,
     events: calendar.events.filter((e) => e.group === id),
-    social,
-    posts,
+    social: showcase ? viewerNeutralSocial(social) : social,
+    posts: showcase ? viewerNeutralPosts(posts) : posts,
     roster,
+    vetrina,
     serverNow,
     today,
   };
@@ -93,18 +134,20 @@ export const Route = createFileRoute("/squadre_/$team")({
   loader: ({ params }) => loadTeam(params.team),
   head: ({ loaderData }) =>
     loaderData?.signedIn
-      ? {
-          meta: [
-            {
-              title: `${loaderData.group.label} — S.C.D. ColicoDerviese`,
-            },
-            {
-              name: "description",
-              content: `Gare, notizie e dirette della squadra ${loaderData.group.label} della S.C.D. ColicoDerviese. Segui la squadra nell'app.`,
-            },
-            { name: "robots", content: "noindex" },
-          ],
-        }
+      ? loaderData.vetrina
+        ? showcaseHead(loaderData.id)
+        : {
+            meta: [
+              {
+                title: `${loaderData.group.label} — S.C.D. ColicoDerviese`,
+              },
+              {
+                name: "description",
+                content: `Gare, notizie e dirette della squadra ${loaderData.group.label} della S.C.D. ColicoDerviese. Segui la squadra nell'app.`,
+              },
+              { name: "robots", content: "noindex" },
+            ],
+          }
       : membersOnlyHead("Squadra"),
   notFoundComponent: () => (
     <main className="min-h-dvh bg-[#f2f6fb] px-4 pt-8 text-center text-[#0b1e3a]">
@@ -140,12 +183,36 @@ function TeamPage({ data }: { data: TeamData }) {
     social,
     posts: initialPosts,
     roster,
+    vetrina,
+    member,
     serverNow,
     today,
   } = data;
   const [nowMs, setNowMs] = useState(serverNow);
   const [follows, setFollows] = useState(social.follows);
   const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [viewer, setViewer] = useState({ signedIn: social.signedIn, member });
+  const readSocial = useServerFn(getPublicSocial);
+  const readFeed = useServerFn(getChannelFeed);
+  // Showcase pages ship no viewer state: follows, «Forza» and sign-in are read here, after load.
+  useEffect(() => {
+    if (!vetrina) return;
+    let live = true;
+    void Promise.all([
+      readSocial(),
+      readFeed({ data: { channel: teamChannel(id) } }),
+    ])
+      .then(([s, p]) => {
+        if (!live) return;
+        setFollows(s.follows);
+        setViewer({ signedIn: s.signedIn, member: s.signedIn });
+        setPosts(p);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [vetrina, id, readSocial, readFeed]);
   const [sky, setSky] = useState<{ title: string; text: string } | null>(null);
   const doFollow = useServerFn(setFollow);
   const doForza = useServerFn(toggleForza);
@@ -185,10 +252,21 @@ function TeamPage({ data }: { data: TeamData }) {
   const followed = follows.includes(channel.key);
   const c = VERIFIED_CHAMPIONSHIPS[id];
   const champ = c ? `${c.name} ${c.group}`.trim() : null;
-  const results = resultLinkFor(id);
+  // Official LND data only (UD-182): standings and last results with source and fetch date. None for base activity.
+  const league = base
+    ? null
+    : (competitionsOfTeam(LND_SNAPSHOT, id).find(
+        (x) => x.kind === "CAMPIONATO",
+      ) ?? null);
+  const lastResults = base ? [] : latestResults(LND_SNAPSHOT, id, 5);
+  const resultSources = [
+    ...new Map(lastResults.map((r) => [r.competition.id, r.competition])).values(),
+  ];
+  const hasLndCompetitions = competitionsOfTeam(LND_SNAPSHOT, id).length > 0;
+  const us = ourStanding(league?.standings ?? null);
 
   const toggle = async () => {
-    if (!social.signedIn) {
+    if (!viewer.signedIn) {
       setSky({
         title: "Iscriviti",
         text: 'Con un account segui la squadra e la trovi in "Per te".',
@@ -208,7 +286,7 @@ function TeamPage({ data }: { data: TeamData }) {
     }
   };
   const forza = async (post: Post) => {
-    if (!social.signedIn) {
+    if (!viewer.signedIn) {
       setSky({ title: "Forza SCD!", text: "Iscriviti per fare il tifo." });
       return;
     }
@@ -253,8 +331,8 @@ function TeamPage({ data }: { data: TeamData }) {
           className="absolute inset-0 bg-[linear-gradient(180deg,rgb(7_29_66/0.25),rgb(11_42_91/0.95))]"
         />
         <Link
-          to="/squadre"
-          aria-label="Tutte le squadre"
+          to={viewer.member ? "/squadre" : "/"}
+          aria-label={viewer.member ? "Tutte le squadre" : "Torna alla home"}
           className="scd-focus absolute left-3 top-3.5 grid size-11 place-items-center rounded-[12px] bg-white/14 text-white"
         >
           <ChevronLeft className="size-6" aria-hidden="true" />
@@ -316,14 +394,18 @@ function TeamPage({ data }: { data: TeamData }) {
       </div>
 
       <div className="mx-auto grid max-w-[720px] grid-cols-1 gap-3.5 px-3 pt-3.5">
-        <RosterSection
-          teamId={id}
-          color={team.color}
-          base={base}
-          count={roster.count}
-          players={roster.players}
-          signedIn={social.signedIn}
-        />
+        {vetrina ? (
+          <TeamShowcaseSection showcase={vetrina} color={team.color} />
+        ) : roster ? (
+          <RosterSection
+            teamId={id}
+            color={team.color}
+            base={base}
+            count={roster.count}
+            players={roster.players}
+            signedIn={viewer.signedIn}
+          />
+        ) : null}
         <section className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
           <h2 className="mb-2.5 mt-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]">
             PROSSIMA GARA
@@ -351,6 +433,84 @@ function TeamPage({ data }: { data: TeamData }) {
           )}
         </section>
 
+        {league && (
+          <section
+            className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+            aria-labelledby="classifica-title"
+            data-testid="team-standings"
+          >
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <h2
+                id="classifica-title"
+                className="m-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]"
+              >
+                CLASSIFICA
+              </h2>
+              <OfficialBadge />
+            </div>
+            <p className="m-0 text-[14px] text-[#3e5272]">
+              {league.label} · {league.group_label}
+            </p>
+            {us && league.standings ? (
+              <p className="m-0 mt-1 font-uv text-[24px] leading-none text-[#0b2a5b]">
+                {standingSummary(us, league.standings.length)}
+              </p>
+            ) : (
+              <p className="m-0 mt-1 text-[14px] text-[#3e5272]">
+                {league.standings_note ?? "Classifica non disponibile: vedi la fonte."}
+              </p>
+            )}
+            {league.standings && (
+              <details className="mt-2.5">
+                <summary className="scd-focus inline-flex min-h-11 cursor-pointer items-center text-[14px] font-bold text-[#0457af]">
+                  Vedi tutta la classifica
+                </summary>
+                <div className="mt-1.5">
+                  <StandingsTable
+                    rows={league.standings}
+                    caption={`Classifica ${league.label} ${league.group_label}`}
+                  />
+                </div>
+              </details>
+            )}
+            <SourceLine
+              url={league.source_url}
+              fetchedAt={league.fetched_at}
+              className="mt-2"
+            />
+          </section>
+        )}
+
+        {!base && lastResults.length > 0 && (
+          <section
+            className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+            aria-labelledby="risultati-title"
+            data-testid="team-results"
+          >
+            <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
+              <h2
+                id="risultati-title"
+                className="m-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]"
+              >
+                ULTIMI RISULTATI
+              </h2>
+              <OfficialBadge />
+            </div>
+            <ResultsList results={lastResults} showCompetition />
+            {/* One source line per competition in the list: league and cups have different LND pages. */}
+            <div className="mt-2.5 grid gap-1" data-testid="team-results-sources">
+              {resultSources.map((c) => (
+                <SourceLine
+                  key={c.id}
+                  url={c.source_url}
+                  fetchedAt={c.fetched_at}
+                  label={`fonte ${c.label}`}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="grid grid-cols-2 gap-2.5">
           <Link
             to="/allenamenti"
@@ -364,21 +524,19 @@ function TeamPage({ data }: { data: TeamData }) {
               Giorni, orari e campo
             </span>
           </Link>
-          {results ? (
-            <a
-              href={results.url}
-              target="_blank"
-              rel="noopener noreferrer"
+          {hasLndCompetitions ? (
+            <Link
+              to="/classifiche"
               className="scd-focus grid gap-2 rounded-[18px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
             >
               <span className="grid size-10 place-items-center rounded-[12px] bg-[var(--uv-gold)] text-[#0b1e3a]">
-                <ExternalLink className="size-5" aria-hidden="true" />
+                <ShieldCheck className="size-5" aria-hidden="true" />
               </span>
-              <b className="text-[15px]">Classifica</b>
+              <b className="text-[15px]">Classifiche</b>
               <span className="text-[13px] text-[#5a6b85]">
-                Fonte ufficiale LND
+                Campionati e coppe · ufficiali LND
               </span>
-            </a>
+            </Link>
           ) : (
             <div className="grid gap-2 rounded-[18px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
               <span className="grid size-10 place-items-center rounded-[12px] bg-[#e3eefb] text-[#0b2a5b]">
@@ -408,7 +566,7 @@ function TeamPage({ data }: { data: TeamData }) {
             />
           ))
         ) : (
-          <EmptyFeed mode="tutti" signedIn={social.signedIn} />
+          <EmptyFeed mode="tutti" signedIn={viewer.signedIn} />
         )}
 
         <p className="m-0 flex items-start gap-2 rounded-[14px] bg-[#eef5ff] px-3 py-3 text-[13px] leading-[1.4] text-[#22385c]">
@@ -418,7 +576,9 @@ function TeamPage({ data }: { data: TeamData }) {
           />
           {base
             ? "Attività di base: i nomi e le foto dei bambini restano nell'area riservata a staff e famiglie."
-            : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
+            : vetrina
+              ? "Rosa aperta a tutti per decisione della Direzione. Dei minorenni compare sempre e solo il nome con l'iniziale del cognome. Niente foto dei ragazzi, niente date di nascita né contatti."
+              : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
         </p>
       </div>
       <SkyCameo message={sky} onClose={() => setSky(null)} persona={isKidsPath(`/squadre/${id}`) ? "sky" : "vera"} />

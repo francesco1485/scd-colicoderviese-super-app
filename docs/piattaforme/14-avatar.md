@@ -1,6 +1,6 @@
 # 14 · Avatar
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-avatar · Stato: Attiva · Pagina: `/la-mia-scd/campione` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

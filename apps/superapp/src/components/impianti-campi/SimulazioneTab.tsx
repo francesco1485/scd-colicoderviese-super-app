@@ -6,17 +6,21 @@
 import { useEffect, useMemo, useState } from "react";
 
 import {
+  GROUP_LABEL,
   MODE_LABEL,
   MOVABLE,
   PRESETS,
   RAIN_MOVE_NOTICE_TO,
+  SEASON_TEAMS_2026_27,
   TEAM_NOTICE_DAYS,
+  conflictSuggestions,
   ddmm,
   hhmm,
   longDay,
   type DayReport,
   type MovableGroup,
   type PitchId,
+  type ScenarioOptions,
   type TeamMode,
 } from "@/lib/rotation";
 import { Link } from "@tanstack/react-router";
@@ -24,9 +28,9 @@ import { teamColor, type ImpiantiModel } from "./model";
 import { Chip, SimulationNote, btnPrimary, inputCls, labelCls } from "./ui";
 
 const TEAM_NAME: Record<MovableGroup, string> = {
-  u15: "U15",
-  u16: "U16 Élite",
-  u19: "Juniores U19",
+  u15: GROUP_LABEL["u15"] ?? "U15",
+  u16: GROUP_LABEL["u16"] ?? "U16",
+  u19: GROUP_LABEL["u19"] ?? "U19",
 };
 const LANES: { id: PitchId; site: string; name: string }[] = [
   { id: "C1", site: "Colico", name: "campo 1 · 100×60" },
@@ -69,14 +73,62 @@ function Kpi({
   );
 }
 
+const PITCH_NAME: Record<PitchId, string> = {
+  C1: "Colico campo 1",
+  C2: "Colico campo 2",
+  DV: "Dervio",
+};
+
+/** Proposed ways out of a campo 1 conflict: free slots on the other pitches or times (nothing is moved). */
+function Suggestions({
+  report,
+  options,
+}: {
+  report: DayReport;
+  options: ScenarioOptions;
+}) {
+  if (!report.over.C1.size) return null;
+  const list = conflictSuggestions(report, options);
+  return (
+    <div className="rounded-xl border border-[var(--in-line)] bg-[var(--in-info-bg)] px-3.5 py-2.5 text-[14px]">
+      <b className="block">Soluzioni proposte per il campo 1</b>
+      {list.length === 0 ? (
+        <p className="m-0 mt-1 text-[var(--in-sub)]">
+          Nessuno spazio libero adatto sugli altri campi o in altri orari del
+          giorno: serve una decisione su data o orario con la squadra
+          avversaria.
+        </p>
+      ) : (
+        <ul className="m-0 mt-1 grid gap-0.5 pl-5">
+          {list.map((x) => (
+            <li key={`${x.matchId}-${x.pitch}-${x.start}`}>
+              {x.label}: {PITCH_NAME[x.pitch]} {hhmm(x.start)}–{hhmm(x.end)}
+              {x.kind === "same-time"
+                ? " (stesso orario)"
+                : " (altro orario, da concordare)"}
+              {x.pitch === "DV" ? ", avviso alla squadra 14 giorni prima" : ""}
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="m-0 mt-1 text-[12.5px] text-[var(--in-sub)]">
+        Proposta calcolata: lo spostamento lo decide chi è autorizzato e va
+        comunicato a FIGC (LND/SGS) quando cambia campo o orario di una gara.
+      </p>
+    </div>
+  );
+}
+
 function DayCard({
   report,
   buffer,
   highlight,
+  options,
 }: {
   report: DayReport;
   buffer: number;
   highlight: boolean;
+  options: ScenarioOptions;
 }) {
   const crit = report.issues.some((i) => i.severity === "crit");
   const warn = !crit && report.issues.length > 0;
@@ -194,6 +246,7 @@ function DayCard({
           })}
         </div>
       </div>
+      <Suggestions report={report} options={options} />
       <details>
         <summary className="scd-focus cursor-pointer text-[13px] font-semibold text-[var(--in-sub)]">
           Uso dei campi del giorno ({report.matches.length})
@@ -487,35 +540,13 @@ export function SimulazioneTab({
           className="flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] text-[var(--in-sub)]"
           aria-label="Legenda"
         >
-          {[
-            "prima",
-            "u19",
-            "u16",
-            "u15",
-            "2014",
-            "2015",
-            "pulcini",
-            "primicalci",
-          ].map((g) => (
-            <span key={g} className="inline-flex items-center gap-1.5">
+          {SEASON_TEAMS_2026_27.map((t) => (
+            <span key={t.id} className="inline-flex items-center gap-1.5">
               <i
                 className="inline-block size-3 rounded-sm"
-                style={{ background: teamColor(g) }}
+                style={{ background: teamColor(t.id) }}
               />
-              {
-                (
-                  {
-                    prima: "Prima Squadra",
-                    u19: "Juniores U19",
-                    u16: "U16 Élite",
-                    u15: "U15",
-                    "2014": "Esordienti 2014",
-                    "2015": "Esordienti 2015",
-                    pulcini: "Pulcini",
-                    primicalci: "Primi Calci",
-                  } as Record<string, string>
-                )[g]
-              }
+              {t.label}
             </span>
           ))}
           <span className="inline-flex items-center gap-1.5">
@@ -534,6 +565,7 @@ export function SimulazioneTab({
               report={d}
               buffer={options.buffer}
               highlight={d.date === focusDate}
+              options={options}
             />
           ))}
           {!shown.length && (
@@ -562,8 +594,9 @@ export function SimulazioneTab({
             gara a 11 (misure da verificare) o a 9, oppure 2 a 7, 3 a 5.
           </li>
           <li>
-            Dervio campo 1, erba 97,80 × 50 (verbale di omologazione LND; il master
-            riporta ancora 96 × 48): 1 gara a 11, oppure 1 a 9, 2 a 7, 3 a 5.
+            Dervio campo 1, erba 97,80 × 50 (verbale di omologazione LND; il
+            master riporta ancora 96 × 48): 1 gara a 11, oppure 1 a 9, 2 a 7, 3
+            a 5.
           </li>
           <li>
             Durata quando il calendario non dà l'orario di fine: 11 contro 11

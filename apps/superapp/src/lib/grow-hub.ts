@@ -82,7 +82,7 @@ export const GROW_TOOLS: readonly GrowTool[] = [
   {
     id: "listino",
     title: "Pacchetti",
-    text: "I livelli di partnership con «Chiedi questo pacchetto». Nessun prezzo pubblicato: valore su proposta.",
+    text: "I livelli di partnership con «Parliamone» e le idee da sponsorizzare. Nessun prezzo pubblicato: proposta su misura del Presidente.",
     status: "attivo",
     audience: "pubblica",
     to: "/sponsor",

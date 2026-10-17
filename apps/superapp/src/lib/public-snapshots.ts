@@ -116,10 +116,31 @@ export function fieldMatches(fieldText: string, query: string): boolean {
 
 export type TrainingSession = { day: string; timeLabel: string; start: number; field: "C1" | "C2"; text: string };
 
+/**
+ * Annata -> categoria della stagione 2026/27 (VERIFIED, Direzione 17/10/2026): il quadro scrive a volte solo
+ * la categoria ("U13"), così chi cerca l'anno di nascita trova la sua squadra. Solo queste coppie, nient'altro
+ * dedotto: 2011 U16 Élite; 2012-2013 U15 insieme (nessuna U14); 2014 U13; 2015 U12; 2016-2017 U11 (Pulcini);
+ * 2018-2019 Primi Calci; 2020-2021 Piccoli Amici. Alcuni 2016 giocano con gli Esordienti 2015: restano U11 qui.
+ */
+export const ANNATA_CATEGORY_2026_27: Readonly<Record<string, string>> = {
+  "2011": "U16",
+  "2012": "U15",
+  "2013": "U15",
+  "2014": "U13",
+  "2015": "U12",
+  "2016": "U11",
+  "2017": "U11",
+  "2018": "Primi Calci",
+  "2019": "Primi Calci",
+  "2020": "Piccoli Amici",
+  "2021": "Piccoli Amici",
+};
+
 /** Sessioni di una annata: fonte SOLO i campi C1/C2 del quadro, mai spogliatoi o rotazioni. */
 export function findSessions(slots: TrainingSlot[], query: string): TrainingSession[] {
+  const alias = ANNATA_CATEGORY_2026_27[query.trim()];
   return slots.flatMap((s) => (["C1", "C2"] as const)
-    .filter((f) => fieldMatches(s.fields[f], query))
+    .filter((f) => fieldMatches(s.fields[f], query) || (alias !== undefined && fieldMatches(s.fields[f], alias)))
     .map((f) => ({ day: s.day, timeLabel: s.timeLabel, start: s.start, field: f, text: s.fields[f] })));
 }
 

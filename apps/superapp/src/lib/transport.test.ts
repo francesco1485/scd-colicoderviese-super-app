@@ -120,7 +120,7 @@ describe("runsForEvent and messages", () => {
   });
   it("speaks Italian for every refusal", () => {
     expect(planErrorMessage("vehicle_busy")).toContain("già su un'altra corsa");
-    expect(planErrorMessage("forbidden")).toContain("responsabile trasporti");
+    expect(planErrorMessage("forbidden")).toContain("Responsabile servizio pulmini");
     expect(planErrorMessage(undefined)).toContain("Riprova");
   });
 });

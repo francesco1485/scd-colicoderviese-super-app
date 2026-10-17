@@ -1,6 +1,6 @@
 # 19 · Convenzioni
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-convenzioni · Stato: In costruzione · Pagina: `/gestionale/piattaforme/convenzioni` (pagina di partenza) · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
