@@ -11,12 +11,15 @@ import {
   VETTA_HERO,
   VETTA_RULES,
   VETTA_EPOCHS,
+  VETTA_HISTORY_NOTE,
   VETTA_LEVELS,
+  VETTA_MILESTONES,
   VETTA_NEEDS,
   VETTA_PATH,
   VETTA_SHARE,
   vettaAllText,
   vettaAudiences,
+  vettaHistoryCta,
   vettaRoutes,
 } from "./vetta-legnone";
 
@@ -37,6 +40,7 @@ const ALLOWED_PROPER_WORDS = new Set([
   "Colico", "Lido", "Meda", "Atalanta", "Football", "Camp", "Sampdoria", "FIGC", "Covid", "AC", "Monza", "Prima", "Squadra",
   "Christmas", "Lario", "Juniores", "Under", "DS", "Riva", "Molo", "Largo", "Rifugio", "NOIF", "GDPR", "Segreteria",
   "Ottavio", "Cervellone", "Super", "App", "V", "I", "B", "Direzione", "Leggende", "Leggenda", "SELECT",
+  "Tornei", "Iniziative",
 ]);
 
 /** Capitalised words that do not open a sentence (after «.», «:», «;», «·», «—», ««», «(» or a line start). */
@@ -97,17 +101,62 @@ describe("Vetta Legnone content", () => {
     expect(parent?.gets).toMatch(/privata/);
   });
 
-  it("tells the 6 epochs, each with a source, and keeps unverified outcomes open", () => {
+  it("tells the 6 epochs: strong title, 1-2 lines of story and 1-3 highlights, each with its own source", () => {
     expect(VETTA_EPOCHS).toHaveLength(6);
     for (const e of VETTA_EPOCHS) {
-      expect(e.source.length, e.id).toBeGreaterThan(10);
-      expect(e.facts.length, e.id).toBeGreaterThan(0);
+      expect(e.title.length, e.id).toBeGreaterThan(5);
+      const sentences = e.story.split(/[.!?](?:\s|$)/).filter((x) => x.trim()).length;
+      expect(sentences, e.id).toBeGreaterThanOrEqual(1);
+      expect(sentences, e.id).toBeLessThanOrEqual(2);
+      expect(e.story.length, e.id).toBeLessThanOrEqual(170);
+      expect(e.highlights.length, e.id).toBeGreaterThanOrEqual(1);
+      expect(e.highlights.length, e.id).toBeLessThanOrEqual(3);
+      for (const h of e.highlights) {
+        expect(h.source, `${e.id}: ${h.result}`).toMatch(/Cervellone cartella 04|Calendario eventi del club/);
+        expect(h.tag, h.result).toBe("VERIFIED");
+        expect(h.when.trim().length && h.category.trim().length && h.result.trim().length, h.result).toBeTruthy();
+      }
     }
-    expect(joined).toMatch(/Coppa Italia di Promozione, 14\/05\/2022 a Meda \(esito da verificare\)/);
-    expect(joined).toMatch(/play-off di Promozione/);
-    expect(joined).toMatch(/Memorial José Nasazzi/);
-    expect(joined).toMatch(/Memorial Sandro Guattini/);
-    expect(joined).not.toMatch(/vinto|vittoria della finale|campioni/i);
+    expect(joined).toMatch(/Finale di Coppa Italia di Promozione a Meda \(esito da verificare\)/);
+    expect(joined).not.toMatch(/vinto|vittoria della finale|campioni|trionf|conquist/i);
+  });
+
+  it("«Le nostre tappe» carries the verified milestones, each with a source", () => {
+    expect(VETTA_MILESTONES.map((m) => m.id)).toEqual(["coppa-2022", "nasazzi", "playoff-2526", "guattini"]);
+    for (const m of VETTA_MILESTONES) {
+      expect(m.source, m.id).toMatch(/Cervellone cartella 04|Calendario eventi del club/);
+      expect(m.tag).toBe("VERIFIED");
+    }
+    const text = VETTA_MILESTONES.map((m) => `${m.title} ${m.detail}`).join(" ");
+    expect(text).toMatch(/Finale di Coppa Italia di Promozione/);
+    expect(text).toMatch(/esito da verificare/);
+    expect(text).toMatch(/Play-off di Promozione/);
+    expect(text).toMatch(/Memorial José Nasazzi/);
+    expect(text).toMatch(/Memorial Sandro Guattini/);
+  });
+
+  it("2011/12 is the first documented season, never the founding year", () => {
+    expect(VETTA_HISTORY_NOTE).toMatch(/la prima è il 2011\/12/);
+    expect(VETTA_EPOCHS[0]?.story).toMatch(/prima stagione documentata è il 2011\/12/i);
+    expect(joined).not.toMatch(/\b(1902|1913|1921|1928|2012\/13)\b/);
+    expect(joined).not.toMatch(/anno di fondazione|fondat[aoi] (?!.*da ricostruire)/i);
+    expect(joined).not.toMatch(/\bdal\s+(19|20)\d\d\b[^.]{0,30}(club|società|ColicoDerviese) (esiste|gioca)/i);
+  });
+
+  it("names no minors and no individual players: highlights speak of teams, categories and seasons", () => {
+    const history = [...VETTA_EPOCHS.flatMap((e) => [e.title, e.story, ...e.highlights.flatMap((h) => [h.category, h.result])]), ...VETTA_MILESTONES.flatMap((m) => [m.title, m.detail])];
+    const unknown = new Set<string>();
+    for (const s of history) for (const w of innerCapitalisedWords(s)) if (!ALLOWED_PROPER_WORDS.has(w)) unknown.add(w);
+    expect([...unknown]).toEqual([]);
+    // «Nome C.» is how the app writes a minor: never in the public history.
+    expect(history.join(" ")).not.toMatch(/\b[A-Z][a-zà-ù]+ [A-Z]\.(?!\w)/);
+    expect(history.join(" ")).not.toMatch(/\b(capitano|bomber|portiere|attaccante|difensore|centrocampista|mister)\s+[A-Z]/);
+  });
+
+  it("the history closes on the visitor's next step, bound to PUBLIC_FORMS_LIVE", () => {
+    expect(vettaHistoryCta(false)).toMatchObject({ line: "La prossima tappa la scrivi tu.", to: "/contatti" });
+    expect(vettaHistoryCta(true)).toMatchObject({ line: "La prossima tappa la scrivi tu.", to: "/entra" });
+    expect(vettaHistoryCta(false).hint).toMatch(/genitore/);
   });
 
   it("states needs honestly: roles by the mister, annata 2010 to be confirmed by the DS", () => {
@@ -155,8 +204,9 @@ describe("Vetta Legnone content", () => {
     for (const c of VETTA_COUNTERS) expect(c.source).toMatch(/^Fonte: .+ al 17\/10\/2026$/);
   });
 
-  it("history is labelled as being rebuilt, the federal rule has no unsourced article and minors follow /top11", () => {
-    expect(VETTA_HISTORY_STATUS).toBe("Storia in ricostruzione · da confermare dalla Direzione");
+  it("history carries the Direzione approval (17/10/2026), the federal rule has no unsourced article and minors follow /top11", () => {
+    expect(VETTA_HISTORY_STATUS).toBe("Storia approvata dalla Direzione · 17/10/2026");
+    expect(joined).not.toMatch(/Storia in ricostruzione/);
     expect(joined).not.toMatch(/95\s*bis/i);
     expect(VETTA_RULES.map((r) => r.text).join(" ")).toMatch(/Nome e iniziale solo con il consenso della famiglia, mai volti/);
   });

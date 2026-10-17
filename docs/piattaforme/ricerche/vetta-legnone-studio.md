@@ -55,7 +55,7 @@ Personaggi: **Lario** (DS, UD-174) studia e propone; **Ottavio** (osservatore) i
 ## 2. I nostri calciatori (solo dati aggregati)
 ### 2.1 Storia (fonti: album «STORIA SCD» v1 e integrazioni 2025/26 nel Cervellone, cartella 04)
 - VERIFIED: l'archivio digitale (casella del club) parte il 13/07/2011: sono **16 stagioni sportive documentate** (2011/12-2026/27). NON è l'anno di fondazione, che resta incerto.
-- Epoche (VERIFIED dall'album, da confermare prima di usarle all'esterno):
+- Epoche (VERIFIED dall'album; **approvate dalla Direzione il 17/10/2026**, Francesco 09:42 «la approvo ma voglio che si migliora»; sulla pagina con titoli nuovi, racconto e tappe con fonte, vedi scheda 17):
   - 2011-2015 «Gli anni della scuola calcio»: liste SGS, Fair Play 2014, Piccoli Amici 2015.
   - 2015-2019 «I tornei»: Olginatese Cup, Vis Nova Cup, tornei per annata, Torneo di Primavera ColicoDerviese.
   - 2019-2022 «Elite e ripartenza»: richieste Scuola Calcio Elite, Covid, Promozione con protocolli; **finale di Coppa Italia di Promozione il 14/05/2022 a Meda** (esito da verificare); 1° Memorial José Nasazzi 2022; amichevole con la Sampdoria approvata dalla FIGC (31/05/2022).
