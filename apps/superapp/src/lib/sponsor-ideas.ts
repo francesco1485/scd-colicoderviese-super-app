@@ -6,7 +6,7 @@
  * submitPartnerLead register, or the subject of the official e-mail while public forms are paused).
  *
  * Every idea is one real asset of the club, built only from the repo's data (UNKNOWN ≠ ZERO, no reach numbers):
- * - tournaments: lib/tournaments.ts (Christmas Lario Cup Female, Memorial José Nasazzi 2027, Memorial Sandro Guattini);
+ * - tournaments: lib/tournaments.ts (Christmas Lario Cup Female, Memorial José Nasazzi 2027 confirmed, Memorial Sandro Guattini);
  * - pulmini: lib/pulmini-vans.ts VAN_UNITS (number of vans and line names only, never a child's name or a stop);
  * - palestra and infermeria: lib/giving.ts CAMPAIGN_COPY and VISIBILITY_COPY (UD-113);
  * - Fondo Solidale: UD-113 (entrate del Fondo: donazioni, eventi, sponsor dedicati; families stay reserved);
@@ -79,14 +79,14 @@ function nasazziIdea(): SponsorIdea | null {
     title: t.name,
     scene: "torneo",
     where: "Al torneo storico della società",
-    community: "Lo storico torneo della società torna a maggio 2027: categorie, campi e iscrizioni in arrivo.",
+    community: "La 7ª edizione del torneo internazionale giovanile della società, a Colico con la Female Edition a Dervio: vivai professionistici e club del territorio.",
     gets: [
       "Il tuo nome legato all'edizione 2027 del torneo",
       "Premi e materiali del torneo con il tuo marchio, da definire insieme",
       "Presenza nella pagina del torneo nell'app",
     ],
     audience: null,
-    facts: [t.when ? `${t.when} · date da confermare` : "Date da confermare"],
+    facts: [t.when && t.place ? `${t.when} · ${t.place.split(" · ")[0]}` : (t.when ?? "Date da confermare")],
     source: t.source,
   };
 }
