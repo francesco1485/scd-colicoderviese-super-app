@@ -316,6 +316,15 @@ export const PUBLIC_PAGES = {
     ogDescription: "Prima Squadra, Juniores, U16 e U15: la Top 11 votata da chi ha un account del club.",
     image: CREST_SHARE_IMAGE,
   },
+  classifiche: {
+    path: "/classifiche",
+    title: "Classifiche e risultati ufficiali LND — S.C.D. ColicoDerviese",
+    description:
+      "Classifiche e ultimi risultati delle squadre S.C.D. ColicoDerviese: Prima Squadra, Juniores, U16 e U15. Solo dati ufficiali LND, con fonte e link.",
+    ogTitle: "Classifiche ufficiali LND — S.C.D. ColicoDerviese",
+    ogDescription: "Campionati e coppe delle squadre del club: solo dati ufficiali LND, con fonte e link.",
+    image: CREST_SHARE_IMAGE,
+  },
   rassegnaStampa: {
     path: "/rassegna-stampa",
     title: "Rassegna stampa · Dicono di noi — S.C.D. ColicoDerviese",
