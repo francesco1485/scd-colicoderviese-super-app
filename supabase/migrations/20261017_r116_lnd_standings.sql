@@ -122,7 +122,7 @@ create table if not exists public.scd_official_notices (
   number text not null check (number ~ '^[0-9A-Za-z/._-]{1,20}$'),
   published_on date not null,
   title text check (title is null or length(title) <= 200),
-  url text not null check (url ~ '^https://'),
+  url text not null check (url ~ '^https://([a-z0-9-]+\.)*(lnd\.it|crlombardia\.it|figc\.it)/'),
   fetched_at timestamptz not null default now(),
   created_at timestamptz not null default now(),
   unique (organization_id, issuer, season, number)
@@ -183,7 +183,7 @@ returns jsonb
 language sql
 stable
 security definer
-set search_path to 'public'
+set search_path to 'public', 'pg_temp'
 as $$
   select coalesce(jsonb_agg(x.r order by x.d desc), '[]'::jsonb)
   from (

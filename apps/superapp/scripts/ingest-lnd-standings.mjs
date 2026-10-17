@@ -50,7 +50,9 @@ async function get(url, offlineName) {
   let last;
   for (let i = 0; i < 5; i++) {
     try {
-      const res = await fetch(url, { headers: { "user-agent": "SCD-ColicoDerviese-app/1.0 (classifiche ufficiali LND)", accept: "text/html,application/json" } });
+      const res = await fetch(url, { headers: { "user-agent": "SCD-ColicoDerviese-app/1.0 (classifiche ufficiali LND)", accept: "text/html,application/json" }, redirect: "manual" });
+      if (res.status >= 300 && res.status < 400) throw new Error(`redirect refused (${res.status})`);
+      if (new URL(res.url || url).host !== "gare.lnd.it") throw new Error("host not allowed");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.text();
     } catch (e) {
