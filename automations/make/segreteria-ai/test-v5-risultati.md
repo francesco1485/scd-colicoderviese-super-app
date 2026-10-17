@@ -149,6 +149,13 @@ Le copie sono rigenerate con `make_test_v5.py` dai file del repo 3153638 e sono 
 
 Nota (INFERRED): il campo «AI:» della riga INTAKE_LOG riporta la risposta di Iride («Mi dispiace per il piccolo, spero stia meglio presto…»): nessun sintomo, nessun nome. Nella rubrica di prova restano voci vecchie scritte prima di v5e (v4 e v5d) con testi di salute: sono dati di prova; nel live le voci scritte prima dell'accensione restano come sono.
 
+## v5f (17/10 sera, gate PASS su ec6ed5c: ultimo giro)
+- **Un solo pattern salute** nei moduli 10, 12, 15, 118, 138, 139, allargato con soccors, distors, allerg, asma, gess, nause, raffredd, lesion, contusion, «mal di», «sta male», dentist, «certificato medic» (test locale: 14 frasi di salute riconosciute, 3 frasi normali no).
+- **Modulo 10, parte «AI:» della riga INTAKE_LOG**: se `8.motivo` = SALUTE oppure il pattern trova salute nel riassunto o nella risposta, scrive «risposta di presa in carico» invece del testo della risposta. Stessa condizione nel modulo 15 (mail alla segreteria).
+- **`as_day()`** accetta anche i seriali Excel interi (non i booleani), le date e i datetime; 2 unit test nuovi (29 in tutto).
+- **Limite noto di LAST_VERIFIED**: il controllo è «successivo al giorno dell'esito» (>, non >=). Se la Segreteria lavora la riga **lo stesso giorno** in cui Iride registra l'esito (es. rimette in calendario una gara annullata da Iride poche ore prima), il task orario non se ne accorge e riapplica l'esito: in quel caso va cancellato il record in 222316. Scelta voluta: con >= anche la verifica normale fatta la mattina prima della risposta del Responsabile farebbe scartare il suo esito.
+- Blueprint di prova rigenerati con `make_test_v5.py` (data store di prova 222317/222318). Da ripetere sulle copie: un messaggio normale con «sta male» / «certificato medico» (log, rubrica e mail senza dettagli; «AI:» = presa in carico).
+
 ## «Accendi v5»: cosa cambia sul live 7979437 (v5e)
 Moduli 60 (`conf_forma`), 61 (rotta CONFERME), 62 (5ª rotta), 7 (solo regola 17), 10/83/91/104 (etichetta ROUTING_RULE v5), nuovi 110-142 (140/141 gestione errori, 142 doppioni); data store veri 222315 / 222316 già nel blueprint; il phone_number_id `<WHATSAPP_PHONE_NUMBER_ID>` rimesso dal live. In più: scenario nuovo «Chiedi conferme gare» (`chiedi-conferme-v5.json`, data store 222315) creato **spento**, avvio a mano; prompt del task orario aggiornato con l'id 222316 (testo in `CALENDAR_HOURLY_TASK.md`). Rotte DG / AM- / CANCELLA / normale invariate (T14).
 **Rollback** (il task orario legge 222316 e riapplica gli esiti ogni ora; se il registro non si legge la pubblicazione si blocca e la copia pubblica resta quella di prima, esiti compresi: spegnere v5 da solo **non** toglie gli esiti già registrati):

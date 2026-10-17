@@ -258,6 +258,29 @@ class MasterWins(Base):
                          ("CONFIRMED", "DEFAULT_TO_VERIFY"))
 
 
+class AsDay(unittest.TestCase):
+    def test_serials_text_and_dates(self):
+        d = dt.date(2026, 10, 19)
+        serial = (d - dt.date(1899, 12, 30)).days
+        self.assertEqual(aio.as_day(serial), d)              # int serial
+        self.assertEqual(aio.as_day(float(serial) + 0.5), d)  # float serial with time
+        self.assertEqual(aio.as_day("19/10/2026"), d)
+        self.assertEqual(aio.as_day("2026-10-19 08:00"), d)
+        self.assertEqual(aio.as_day(dt.datetime(2026, 10, 19, 8)), d)
+        self.assertIsNone(aio.as_day(True))
+        self.assertIsNone(aio.as_day(None))
+        self.assertIsNone(aio.as_day("31/02/2026"))
+
+    def test_int_serial_in_plan_skips_later_verification(self):
+        head = {h: h for h in ("EVENT_ID", "DATE", "TIME", "CATEGORY", "MATCH_STATUS", "NOTES", "LAST_VERIFIED", "HOME_AWAY", "VENUE")}
+        rec = {"EVENT_ID": "E1", "DATE": "25/10/2026", "TIME": "15:00", "CATEGORY": "Pulcini", "MATCH_STATUS": "OFFICIAL_CALENDAR",
+               "NOTES": "", "HOME_AWAY": "CASA", "VENUE": "COLICO - CAMPO 1",
+               "LAST_VERIFIED": (dt.date(2026, 10, 19) - dt.date(1899, 12, 30)).days}
+        _, skipped, _ = aio.plan(head, {"E1": {"row": 2, "rec": rec}}, [aio.outcome(FAKE_KEY, "E1", "ANNULLA", "25/10", "15:00")],
+                                 dt.date(2026, 10, 17))
+        self.assertEqual(skipped[0]["motivo"], "riga aggiornata nel master dopo la richiesta")
+
+
 class Cli(Base):
     def cli(self, *args):
         return subprocess.run([sys.executable, "-I", "-B", SCRIPT, *args], capture_output=True, text=True)

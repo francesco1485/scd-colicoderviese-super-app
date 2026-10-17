@@ -235,8 +235,15 @@ def parse_new_date(s: str) -> dt.date | None:
 
 def as_day(v) -> dt.date | None:
     """LAST_VERIFIED of the master: Excel serial, dd/mm/yyyy or yyyy-mm-dd (with or without time)."""
-    if isinstance(v, float):
-        return dt.date(1899, 12, 30) + dt.timedelta(days=int(v))
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        try:
+            return dt.date(1899, 12, 30) + dt.timedelta(days=int(v))
+        except (OverflowError, ValueError):
+            return None
+    if isinstance(v, dt.datetime):
+        return v.date()
+    if isinstance(v, dt.date):
+        return v
     s = str(v or "").strip()
     try:
         m = re.match(r"^(\d{1,2})/(\d{1,2})/(\d{4})", s)
