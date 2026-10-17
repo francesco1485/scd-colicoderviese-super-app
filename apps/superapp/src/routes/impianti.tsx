@@ -52,7 +52,7 @@ function ImpiantiPage() {
             </Link>
             <span className="inline-flex min-h-12 items-center gap-2 rounded-[12px] border border-white/40 px-4 text-[15px] font-semibold">
               <Ticket className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              Biglietteria a Colico · {ticket.hours ? "orari nella mappa" : "orari da inserire"}
+              Biglietteria a Colico · {ticket.hours ? "orari nella mappa" : "orari in aggiornamento"}
             </span>
           </div>
         </div>

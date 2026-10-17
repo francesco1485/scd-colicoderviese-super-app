@@ -23,6 +23,10 @@ import {
   correctionRow,
   correctionTsv,
   hoursLines,
+  hoursPending,
+  PUBLIC_HOURS_PENDING,
+  publicHoursLines,
+  publicStatus,
   isProposed,
   publicSite,
   publicSpace,
@@ -301,7 +305,13 @@ export function FacilityMap({ mode, slots = [], now, initialSiteId = "SED-COL", 
               onFocusSpace={setFocusedId}
             />
           </ScrollRegion>
-          <Legend staff={staff} site={site} layers={layers} hasBoard={spaces.some((s) => s.provenance.source === "board")} />
+          <Legend
+            staff={staff}
+            site={site}
+            layers={layers}
+            hasBoard={spaces.some((s) => s.provenance.source === "board")}
+            pendingHours={hoursPending(spaces)}
+          />
           <p className="m-0 border-t border-[var(--in-line)] px-4 py-3 text-[13px] leading-snug text-[var(--in-sub)]">{site.plan.note}</p>
         </section>
 
@@ -503,7 +513,8 @@ function PlanSvg({
 }
 
 function spaceAria(s: Space, use: UseEntry[], moment: ViewMoment | null, staff: boolean): string {
-  const status = moment ? spaceStatus(s.hours, moment.clock).label : "stato in caricamento";
+  const raw = moment ? spaceStatus(s.hours, moment.clock) : null;
+  const status = !raw ? "stato in caricamento" : staff ? raw.label : (publicStatus(raw)?.label ?? PUBLIC_HOURS_PENDING.toLowerCase());
   const parts = [s.name, TYPE_LABEL[s.type], status];
   if (staff && s.quadro_key) parts.push(use.length ? `in uso: ${use.map((u) => u.group).join(" e ")}` : "libero in questa fascia");
   if (s.provenance.source === "board") parts.push("da board, da verificare");
@@ -691,7 +702,19 @@ function EntranceMarker({ entrance: e, planWidth }: { entrance: Entrance; planWi
 
 /* ───────────────────────── Legend and index ───────────────────────── */
 
-function Legend({ staff, site, layers, hasBoard }: { staff: boolean; site: Site; layers: ReadonlySet<Layer>; hasBoard: boolean }) {
+function Legend({
+  staff,
+  site,
+  layers,
+  hasBoard,
+  pendingHours,
+}: {
+  staff: boolean;
+  site: Site;
+  layers: ReadonlySet<Layer>;
+  hasBoard: boolean;
+  pendingHours: boolean;
+}) {
   const item = (swatch: ReactNode, text: string) => (
     <li className="flex items-center gap-2">
       <svg width="26" height="16" viewBox="0 0 26 16" aria-hidden="true" className="flex-none">
@@ -706,7 +729,8 @@ function Legend({ staff, site, layers, hasBoard }: { staff: boolean; site: Site;
       {item(<rect x="1" y="1" width="24" height="14" rx="3" fill={PLAN.room} stroke={PLAN.roomStroke} strokeWidth="2" />, "Spogliatoio")}
       {item(<rect x="1" y="1" width="24" height="14" rx="3" fill={PLAN.service} stroke={PLAN.serviceStroke} strokeWidth="2" />, "Servizio")}
       {staff && item(<rect x="2" y="2" width="22" height="12" rx="3" fill="#fff" stroke={PLAN.inUse} strokeWidth="3" />, "In uso secondo il quadro")}
-      {item(<circle cx="13" cy="8" r="5" fill="none" stroke={PLAN.sub} strokeWidth="2" strokeDasharray="3 3" />, "Orari da inserire")}
+      {(staff || pendingHours) &&
+        item(<circle cx="13" cy="8" r="5" fill="none" stroke={PLAN.sub} strokeWidth="2" strokeDasharray="3 3" />, staff ? "Orari da inserire" : PUBLIC_HOURS_PENDING)}
       {item(<circle cx="13" cy="8" r="6" fill="#16683f" />, "Aperto")}
       {item(<circle cx="13" cy="8" r="6" fill="#a3241b" />, "Chiuso")}
       {hasBoard && item(<rect x="1" y="1" width="24" height="14" rx="3" fill="#fff" stroke={PLAN.sub} strokeWidth="2" strokeDasharray="5 3" />, "Da board, da verificare")}
@@ -763,7 +787,13 @@ function SpaceIndex({
               <ul className="m-0 list-none p-0">
                 {list.map((s) => {
                   const use = usageOf(s);
-                  const status = moment ? spaceStatus(s.hours, moment.clock) : null;
+                  const raw = moment ? spaceStatus(s.hours, moment.clock) : null;
+                  const status = raw && !staff ? publicStatus(raw) : raw;
+                  const meta = [
+                    moment ? (status?.label ?? null) : "—",
+                    !s.layout ? "posizione da inserire" : null,
+                    s.provenance.source === "board" ? "da verificare" : null,
+                  ].filter((x): x is string => x !== null);
                   return (
                     <li key={s.id}>
                       <button
@@ -778,9 +808,7 @@ function SpaceIndex({
                         <span className="min-w-0 flex-1">
                           <span className="block text-[15px] font-semibold leading-tight">{s.name}</span>
                           <span className="block text-[13px] leading-snug text-[var(--in-sub)]">
-                            {status?.label ?? "—"}
-                            {!s.layout && " · posizione da inserire"}
-                            {s.provenance.source === "board" && " · da verificare"}
+                            {meta.length ? meta.join(" · ") : TYPE_LABEL[s.type]}
                           </span>
                         </span>
                         {staff && use.length > 0 && <Chip tone="info">in uso</Chip>}
@@ -832,8 +860,9 @@ function SpaceDetails({
   use: UseEntry[];
   onPropose?: ((spaceId: string) => void) | undefined;
 }) {
-  const status = moment ? spaceStatus(s.hours, moment.clock) : null;
-  const lines = hoursLines(s.hours);
+  const raw = moment ? spaceStatus(s.hours, moment.clock) : null;
+  const status = raw && !staff ? publicStatus(raw) : raw;
+  const lines = staff ? hoursLines(s.hours) : publicHoursLines(s.hours);
   const who = whoMayEnter(s.access);
   const entrances = s.entrances === null ? null : (site.entrances ?? []).filter((e) => s.entrances!.includes(e.id));
   const fromBoard = s.provenance.source === "board";
@@ -847,7 +876,7 @@ function SpaceDetails({
         <div className="mt-2.5 flex flex-wrap gap-2">
           {status ? (
             <Chip tone={status.state === "open" ? "ok" : status.state === "closed" ? "crit" : "mute"}>{status.label}</Chip>
-          ) : (
+          ) : moment ? null : (
             <Chip>Stato in caricamento</Chip>
           )}
           {fromBoard ? <Chip tone="warn">Da board, da verificare</Chip> : <Chip tone="info">Dal master impianti</Chip>}
@@ -895,7 +924,7 @@ function SpaceDetails({
               ))}
             </ul>
           ) : (
-            <Missing>orari da inserire</Missing>
+            <Missing>{staff ? "orari da inserire" : PUBLIC_HOURS_PENDING.toLowerCase()}</Missing>
           )}
         </Row>
         <Row icon={<DoorOpen className="size-[18px]" strokeWidth={1.8} />} label="Da dove si entra">
