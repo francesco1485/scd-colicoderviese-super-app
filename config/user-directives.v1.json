@@ -4194,6 +4194,27 @@
     },
     {
       "sourceDate": "2026-10-17",
+      "sourceTime": "11:27-11:28",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-168",
+      "name": "PUBLIC_SHOWCASE_ROSTERS_PRIMA_U19_U16",
+      "sourceQuoteFragments": [
+        "prima squadra e juniores e u16 elite li darei pubblici in nomi dei calciatori e ruoli e info e statistiche sempre a tutti senza registrazione",
+        "ok vetrina squadre"
+      ],
+      "normalizedCommand": {
+        "rule": "Rosters of Prima Squadra (Promozione), Juniores U19 Élite and Allievi U16 Élite are public without sign-in. Adults (18+ on the day, from the birth date): first name + surname, role, shirt number if recorded, stats. Minors and unknown ages: first name + surname initial, role, stats (Francesco also allowed the full name and photo with a recorded family consent, plus the player's from 14 years: NOT implemented in r142 after the 17/10/2026 review, consents table empty, to be built as a separate reviewed migration); no photos of minors; never birth dates, ages, towns or contacts. Stats only from official/recorded sources (presenze, gol, ammonizioni, espulsioni); unknown = «da confermare», never 0; unknown role = «ruolo da confermare». Staff of each team (adults) by name and role, never phone numbers. Masking is applied server-side in the database. The mister of each team sets the roles (P/D/C/A) in the mister desk.",
+        "scope": "SUPER_APP /squadre/prima, /squadre/u19, /squadre/u16 (public), /squadre (public category list links them), /gestionale/mister «Ruoli della rosa»; SCD PULSE r142 scd_public_team_showcase, scd_staff_team_roles, scd_staff_set_team_roles",
+        "supersedes": "UD-100 only for the rosters of these three teams (the other teams stay inside)",
+        "implementationStatus": "IMPLEMENTED_PENDING_MIGRATION",
+        "implementation": "apps/superapp/src/lib/team-showcase.ts, team-showcase.functions.ts, team-roles.functions.ts, components/scd/TeamShowcase.tsx, RosterRolesPanel.tsx, routes/squadre_.$team.tsx; supabase/migrations/20261017_r142_public_team_showcase.sql (STAGED, apply only after «applica r142»); test supabase/tests/r142_public_team_showcase.pglite.mjs",
+        "engine": "PERSONE (main), TEMPO",
+        "measure": "visits to the three pages; share of players with a role (today 0 of 315); share of players with recorded stats; ROSTER_ROLES_SET audit rows"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
       "sourceTime": "11:57",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",

@@ -35,7 +35,7 @@ describe("helper persona (UD-121: one chat, Iride; Sky only for the younger memb
   });
 
   it("puts Sky in the reserved areas by page until the session says otherwise (SkyChat upgrades to Iride)", () => {
-    for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u16", "/aree", "/core", "/quadro", "/crm"]) {
+    for (const p of ["/famiglia", "/la-mia-scd", "/direzione", "/segreteria/persone", "/tesoreria", "/gestionale/organigramma", "/squadre", "/squadre/u15", "/aree", "/core", "/quadro", "/crm"]) {
       expect(isReservedPath(p)).toBe(true);
       expect(personaFor(p)).toBe("sky");
       expect(launcherFaceFor(p)).toBe("sky");

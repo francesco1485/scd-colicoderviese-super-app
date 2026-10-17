@@ -15,11 +15,20 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(cacheControlFor("/assets/index-abc.js")).toBeNull();
     expect(isPublicPath("/sponsor")).toBe(true);
     expect(isPublicPath("/sponsorX")).toBe(false);
-    // Teams are inside (UD-100): team pages are private and never stored.
+    // Teams are inside (UD-100): team pages are private and never stored...
     expect(isPublicPath("/squadre")).toBe(false);
     expect(isPublicPath("/squadre/u15")).toBe(false);
+    expect(isPublicPath("/squadre/u18")).toBe(false);
+    expect(isPublicPath("/squadre/2015")).toBe(false);
+    expect(isPublicPath("/squadre/carte")).toBe(false);
+    expect(isPublicPath("/squadre/primavera")).toBe(false);
     expect(cacheControlFor("/squadre")).toContain("no-store");
-    expect(cacheControlFor("/squadre/prima")).toContain("no-store");
+    expect(cacheControlFor("/squadre/u15")).toContain("no-store");
+    // ...except the three showcase teams (UD-168, DG 17/10/2026 «ok vetrina squadre»).
+    for (const p of ["/squadre/prima", "/squadre/u19", "/squadre/u16"]) {
+      expect(isPublicPath(p), p).toBe(true);
+      expect(cacheControlFor(p), p).toBe("public, max-age=0, must-revalidate");
+    }
     // Training schedules are inside too (UD-100): members only, never stored.
     expect(isPublicPath("/allenamenti")).toBe(false);
     expect(isPublicPath("/allenamenti?annata=2014")).toBe(false);
@@ -32,7 +41,7 @@ describe("http policy (launch audit 2026-10-12)", () => {
     const robots = robotsTxt(true, "https://app.example.it");
     const sitemap = sitemapXml("https://app.example.it");
     for (const p of MEMBERS_ONLY_PREFIXES) {
-      expect(robots, p).not.toContain(`Allow: ${p}`);
+      expect(robots.split("\n"), p).not.toContain(`Allow: ${p}`);
       expect(sitemap, p).not.toContain(`https://app.example.it${p}<`);
     }
     expect(sitemap).not.toContain("/allenamenti");
@@ -92,8 +101,11 @@ describe("http policy (launch audit 2026-10-12)", () => {
     expect(prod).toContain("Disallow: /");
     expect(prod).toContain("Sitemap: https://app.example.it/sitemap.xml");
     expect(sitemapXml("https://app.example.it/")).toContain("<loc>https://app.example.it/sponsor</loc>");
-    expect(sitemapXml("https://app.example.it/")).not.toContain("/squadre");
-    expect(prod).not.toContain("Allow: /squadre");
+    expect(sitemapXml("https://app.example.it/")).not.toContain("<loc>https://app.example.it/squadre</loc>");
+    expect(sitemapXml("https://app.example.it/")).not.toContain("/squadre/u15");
+    expect(sitemapXml("https://app.example.it/")).toContain("<loc>https://app.example.it/squadre/prima</loc>");
+    expect(prod.split("\n")).not.toContain("Allow: /squadre");
+    expect(prod.split("\n")).toContain("Allow: /squadre/u19");
   });
 
   it("validates the configured site URL and hides demo screens only in production", () => {
