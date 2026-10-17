@@ -1,6 +1,6 @@
 # Agenti SCD
 
-Quarantotto agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Cinquantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
@@ -38,6 +38,11 @@ Quarantotto agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. Co
 | scd-sociale | Sport inclusivo, disabilità, solidarietà, progetti con servizi sociali |
 | scd-relazioni | Relazioni fra iscritti, famiglie, volontari, ex atleti e partner |
 | scd-impianti | Campi di Colico e Dervio, rotazione, richieste, spogliatoi, luci, manutenzioni |
+| scd-clubhouse | Club House di Colico e Dervio: apertura, listino, card SQUBY, serate, incassi verso Tesoreria |
+| scd-palestra | Palestra SCD: turni per squadra, attrezzi donati, sicurezza, prenotazioni dei tesserati |
+| scd-nutrizione | Piattaforma Nutrizionista: rubrica, richieste riservate, linee guida per età |
+| scd-convenzioni | Convenzioni dei partner per soci e famiglie, con date; fascia promo e post gemelli |
+| scd-analisi | Analisi di app e web (Meta): uso, iscrizioni, funnel, solo dati con consenso e aggregati |
 | scd-pulmini | Pulmini: corse, posti a bordo, linee e fermate, scadenze dei mezzi |
 | scd-squadre | Squadre, allenamenti, calendario, partite, staff per squadra |
 | scd-infermeria | Certificati in scadenza, infortuni (solo numeri), defibrillatori, safeguarding |
