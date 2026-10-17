@@ -12,5 +12,5 @@ Date che tornano ogni anno. Le scadenze federali cambiano ogni stagione: alla co
 | 8 dicembre (2026: martedì 8/12) | Christmas Lario Cup | Tornei | `apps/superapp/src/lib/events.ts` | VERIFIED per il 2026; data da verificare ogni anno |
 | 22–23 maggio 2027 | Memorial José Nasazzi, 7ª edizione, con Female Edition | Tornei | `apps/superapp/src/lib/tournaments.ts`, PR #187 | VERIFIED |
 | Ogni mese | Chiusura della Tesoreria (398/91) | Tesoreria | `.claude/agents/scd-tesoreria.md` | PROPOSED: entro il 10 |
-| Ogni settimana | Quadro allenamenti e campi; rotazione gare Dervio (avviso squadra 14 giorni prima, tutti 3 giorni prima, meteo 3 giorni prima) | Impianti, Squadre | PIPELINE.md §3 | VERIFIED |
+| Ogni settimana | Quadro allenamenti e campi; rotazione gare Dervio (Comune di Dervio già informato con il programma della stagione, nessun avviso per singola gara; squadra che gioca a Dervio avvisata 14 giorni prima, tutti 3 giorni prima, meteo controllato 3 giorni prima; se per pioggia la gara si sposta a Colico si avvisano FIGC e squadra avversaria (non l'arbitro)) | Impianti, Squadre | PIPELINE.md §3 | VERIFIED |
 | Ogni giorno 08:52 · 13:07 · 18:22 | Ciclo «Ufficio» | scd-regista | skill `scd-ufficio` | PROPOSED (attività programmata da creare) |
