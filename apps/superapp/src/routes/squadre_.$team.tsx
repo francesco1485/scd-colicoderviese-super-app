@@ -259,6 +259,10 @@ function TeamPage({ data }: { data: TeamData }) {
         (x) => x.kind === "CAMPIONATO",
       ) ?? null);
   const lastResults = base ? [] : latestResults(LND_SNAPSHOT, id, 5);
+  const resultSources = [
+    ...new Map(lastResults.map((r) => [r.competition.id, r.competition])).values(),
+  ];
+  const hasLndCompetitions = competitionsOfTeam(LND_SNAPSHOT, id).length > 0;
   const us = ourStanding(league?.standings ?? null);
 
   const toggle = async () => {
@@ -493,11 +497,17 @@ function TeamPage({ data }: { data: TeamData }) {
               <OfficialBadge />
             </div>
             <ResultsList results={lastResults} showCompetition />
-            <SourceLine
-              url={lastResults[0]!.competition.source_url}
-              fetchedAt={lastResults[0]!.competition.fetched_at}
-              className="mt-2.5"
-            />
+            {/* One source line per competition in the list: league and cups have different LND pages. */}
+            <div className="mt-2.5 grid gap-1" data-testid="team-results-sources">
+              {resultSources.map((c) => (
+                <SourceLine
+                  key={c.id}
+                  url={c.source_url}
+                  fetchedAt={c.fetched_at}
+                  label={`fonte ${c.label}`}
+                />
+              ))}
+            </div>
           </section>
         )}
 
@@ -514,7 +524,7 @@ function TeamPage({ data }: { data: TeamData }) {
               Giorni, orari e campo
             </span>
           </Link>
-          {!base ? (
+          {hasLndCompetitions ? (
             <Link
               to="/classifiche"
               className="scd-focus grid gap-2 rounded-[18px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"

@@ -1,6 +1,9 @@
 -- r116: Risultati & Classifiche — official LND data only (phase R1, 2026-10-17, chat CLOUD range r110-r129;
 -- number assigned by the coordinator: r111-r114 are taken on the database, r115 by scd_club_catalog (PR #193)).
--- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r116". Never apply from an agent.
+-- APPLIED on SCD PULSE (ndevtxxijbcnskgysdit) 17/10/2026 ~13:35-13:45 Europe/Rome after Francesco wrote «applica r115 r116»:
+-- parts r116_part1_competitions_snapshots and r116_part2_matches_notices via apply_migration; RLS, grants, the 4 policies
+-- and scd_public_lnd_results via execute_sql. Verified after apply: RLS on 4 tables, 1 policy each, anon cannot insert,
+-- disciplinary items not readable by anon, function search_path includes pg_temp. Never re-apply from an agent.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires r33 (scd_organizations, scd_people, scd_events), r35 (scd_has_org_role) and r51 (scd_matches) applied:
 -- a guard below stops the migration when one of them is missing.

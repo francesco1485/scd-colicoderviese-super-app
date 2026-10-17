@@ -392,3 +392,29 @@ export function fetchedLabel(iso: string): string {
   const parts = Object.fromEntries(f.formatToParts(d).map((p) => [p.type, p.value]));
   return `${parts["day"]}/${parts["month"]}/${parts["year"]} alle ${parts["hour"]}:${parts["minute"]}`;
 }
+
+const HOUR_MS = 3_600_000;
+
+/** True inside the match-weekend window Friday 18:00 - Monday 12:00 Europe/Rome (hourly freshness target). */
+export function isLndWeekendWindow(nowMs: number): boolean {
+  const f = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", weekday: "short", hour: "2-digit", hourCycle: "h23" });
+  const parts = Object.fromEntries(f.formatToParts(new Date(nowMs)).map((p) => [p.type, p.value]));
+  const day = parts["weekday"];
+  const hour = Number(parts["hour"]);
+  if (day === "Sat" || day === "Sun") return true;
+  if (day === "Fri") return hour >= 18;
+  if (day === "Mon") return hour < 12;
+  return false;
+}
+
+/** Maximum age of an LND copy before the app says «dato da aggiornare»: 1 hour on match weekends, else 6 hours. */
+export function lndMaxAgeMs(nowMs: number): number {
+  return (isLndWeekendWindow(nowMs) ? 1 : 6) * HOUR_MS;
+}
+
+/** True when the copy is older than the freshness target; an unreadable date is never considered fresh. */
+export function isLndStale(fetchedAt: string, nowMs: number): boolean {
+  const t = new Date(fetchedAt).getTime();
+  if (Number.isNaN(t)) return true;
+  return nowMs - t > lndMaxAgeMs(nowMs);
+}

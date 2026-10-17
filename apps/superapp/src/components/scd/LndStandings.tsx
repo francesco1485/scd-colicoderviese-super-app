@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { BadgeCheck, ExternalLink } from "lucide-react";
 
 import {
   fetchedLabel,
+  isLndStale,
   isOurTeam,
   outcomeForUs,
   pendingNote,
@@ -28,15 +30,43 @@ export function OfficialBadge({ className = "" }: { className?: string }) {
   );
 }
 
-export function SourceLine({ url, fetchedAt, className = "" }: { url: string; fetchedAt: string; className?: string }) {
+/** Current time read only in the browser (null during server render), so the stale note never breaks hydration. */
+function useClientNow(): number | null {
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    setNow(Date.now());
+    const t = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(t);
+  }, []);
+  return now;
+}
+
+export function SourceLine({
+  url,
+  fetchedAt,
+  label = "apri la fonte",
+  className = "",
+}: {
+  url: string;
+  fetchedAt: string;
+  label?: string;
+  className?: string;
+}) {
+  const now = useClientNow();
+  const stale = now !== null && isLndStale(fetchedAt, now);
   return (
     <p className={`m-0 text-[13px] leading-snug text-[#5a6b85] ${className}`}>
-      Aggiornato il {fetchedLabel(fetchedAt)} ·{" "}
+      Letto su gare.lnd.it il {fetchedLabel(fetchedAt)} ·{" "}
       <a href={url} target="_blank" rel="noopener noreferrer" className="scd-focus inline-flex items-center gap-1 font-semibold text-[#0457af] underline">
-        fonte gare.lnd.it
+        {label}
         <ExternalLink className="size-3.5" aria-hidden="true" />
         <span className="sr-only">(si apre in una nuova scheda)</span>
       </a>
+      {stale && (
+        <span className="ml-1.5 inline-block rounded-full bg-[#fff6c7] px-2 py-0.5 text-[12px] font-bold text-[#5a4300]" data-testid="lnd-stale-note">
+          dato da aggiornare
+        </span>
+      )}
     </p>
   );
 }

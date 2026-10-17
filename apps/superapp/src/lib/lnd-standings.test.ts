@@ -13,6 +13,9 @@ import {
   cupRecord,
   fetchedLabel,
   isBaseActivityGroup,
+  isLndStale,
+  isLndWeekendWindow,
+  lndMaxAgeMs,
   latestResults,
   loadLndSnapshot,
   ourPlayedMatches,
@@ -191,5 +194,27 @@ describe("display helpers", () => {
     expect(pendingNote("Da Giudice sportivo")).toBeNull();
     expect(fetchedLabel("2026-10-17T10:50:03.523Z")).toBe("17/10/2026 alle 12:50");
     expect(fetchedLabel("x")).toBe("data non nota");
+  });
+});
+
+describe("LND freshness (6 h, 1 h Friday 18:00 - Monday 12:00 Europe/Rome)", () => {
+  const at = (iso: string) => new Date(iso).getTime();
+  it("knows the weekend window in Rome time", () => {
+    // 17/10/2026 is a Saturday; Rome is UTC+2 in October until the 25th.
+    expect(isLndWeekendWindow(at("2026-10-16T15:59:00Z"))).toBe(false); // Fri 17:59
+    expect(isLndWeekendWindow(at("2026-10-16T16:00:00Z"))).toBe(true); // Fri 18:00
+    expect(isLndWeekendWindow(at("2026-10-17T10:00:00Z"))).toBe(true); // Sat
+    expect(isLndWeekendWindow(at("2026-10-19T09:59:00Z"))).toBe(true); // Mon 11:59
+    expect(isLndWeekendWindow(at("2026-10-19T10:00:00Z"))).toBe(false); // Mon 12:00
+    expect(isLndWeekendWindow(at("2026-10-21T10:00:00Z"))).toBe(false); // Wed
+    expect(lndMaxAgeMs(at("2026-10-17T10:00:00Z"))).toBe(3_600_000);
+    expect(lndMaxAgeMs(at("2026-10-21T10:00:00Z"))).toBe(6 * 3_600_000);
+  });
+  it("marks old copies as stale", () => {
+    expect(isLndStale("2026-10-21T05:00:00Z", at("2026-10-21T10:00:00Z"))).toBe(false); // 5 h, weekday
+    expect(isLndStale("2026-10-21T03:59:00Z", at("2026-10-21T10:00:00Z"))).toBe(true); // > 6 h, weekday
+    expect(isLndStale("2026-10-17T09:30:00Z", at("2026-10-17T10:00:00Z"))).toBe(false); // 30 min, Saturday
+    expect(isLndStale("2026-10-17T08:59:00Z", at("2026-10-17T10:00:00Z"))).toBe(true); // > 1 h, Saturday
+    expect(isLndStale("x", at("2026-10-17T10:00:00Z"))).toBe(true);
   });
 });
