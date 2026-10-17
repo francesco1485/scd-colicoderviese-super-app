@@ -150,3 +150,30 @@ export function parseFrontFile(raw: unknown, today: string): FrontPage {
 export function frontPageEmpty(p: FrontPage): boolean {
   return !p.apertura && p.brevi.length === 0 && !p.domanda && p.altre.length === 0;
 }
+
+/** Every item of the page in display order (apertura, brevi, domanda, others). */
+export function frontItems(p: FrontPage): FrontItem[] {
+  return [...(p.apertura ? [p.apertura] : []), ...p.brevi, ...(p.domanda ? [p.domanda] : []), ...p.altre];
+}
+
+/**
+ * The Direzione's switch (UD-188, r120): drops the items switched off for the day; "*" switches the whole page off.
+ * The apertura is not replaced by another item: when it is off, the page opens on the brevi.
+ */
+export function applyHidden(p: FrontPage, hidden: readonly string[]): FrontPage {
+  if (hidden.length === 0) return p;
+  if (hidden.includes("*")) return EMPTY_FRONT_PAGE;
+  const off = new Set(hidden);
+  return {
+    apertura: p.apertura && !off.has(p.apertura.id) ? p.apertura : null,
+    brevi: p.brevi.filter((i) => !off.has(i.id)),
+    domanda: p.domanda && !off.has(p.domanda.id) ? p.domanda : null,
+    altre: p.altre.filter((i) => !off.has(i.id)),
+  };
+}
+
+/** Parses the public switch read (array of ids); anything else is "unknown" (null). */
+export function parseHidden(raw: unknown): string[] | null {
+  if (!Array.isArray(raw)) return null;
+  return raw.filter((x): x is string => typeof x === "string" && (x === "*" || /^[a-z0-9][a-z0-9-]{0,63}$/.test(x)));
+}
