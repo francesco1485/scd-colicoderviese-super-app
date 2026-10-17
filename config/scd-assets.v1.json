@@ -500,13 +500,15 @@
       "path": "apps/superapp/public/media/crovi/v3/",
       "class": "CHARACTER_CUTOUT",
       "status": "APPROVED",
-      "source": "Crovi v3, original character (UD-026), GENERATE_ORIGINAL; approved as the app mascot by the Direzione 14/10/2026 18:46 (UD-122): image only, no chat"
+      "source": "Crovi v3, original character (UD-026), GENERATE_ORIGINAL; approved as the app mascot by the Direzione 14/10/2026 18:46 (UD-122); approved as official public asset, avatar + chat on the public home (UD-184)",
+      "approval_evidence": "Francesco DG 17/10/2026 14:08: «Io voglio vedere in prima pagina app super web il crovi cavolo ma perché non si lavora qui»"
     },
     {
       "path": "apps/superapp/public/media/crovi/v3/crovi-avatar-256.webp",
       "class": "CHARACTER_AVATAR_TILE",
-      "status": "VERIFIED",
-      "source": "Crovi v3 avatar tile with background (UD-026)"
+      "status": "APPROVED",
+      "source": "Crovi v3 avatar tile with background (UD-026); chat avatar of persona 'sky' shown as Crovi (UD-184)",
+      "approval_evidence": "Francesco DG 17/10/2026 14:08: «Io voglio vedere in prima pagina app super web il crovi cavolo ma perché non si lavora qui»"
     },
     {
       "path": "apps/superapp/public/media/cast/era/",

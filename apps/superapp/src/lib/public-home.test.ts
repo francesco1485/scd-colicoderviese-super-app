@@ -261,9 +261,18 @@ describe("public home v5", () => {
     const band = code("src/components/SponsorBand.tsx");
     expect(band).not.toMatch(/useRouterState|\? "hidden"/);
     expect(code("src/routes/__root.tsx")).not.toMatch(/pathname === "\/"/);
-    // UD-134: one assistant only — the Crovi greeting bubble beside Vera's launcher is gone.
+    // UD-134 kept: no second greeting bubble beside the launcher. UD-184 (Francesco DG 17/10/2026 14:08): Crovi is on
+    // the home as a card right after the urgent notices and before the club communication, and opens the same chat.
     const chat = code("src/components/SkyChat.tsx");
     expect(chat).not.toMatch(/crovi-cameo|CroviActor|cameoLine/);
+    expect(chat).toMatch(/openedText\(e\)/);
+    const order = ["<UrgentNotices", "<CroviWelcome", "<ClubNoticeCard", "<HomeLobby"].map((t) => home.indexOf(t));
+    expect(order.every((i) => i >= 0)).toBe(true);
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    const crovi = code("src/components/home/CroviWelcome.tsx");
+    expect(crovi).toMatch(/crovi-actor/);
+    expect(crovi).toMatch(/openAssistant\(null, t\)/);
+    expect(crovi).toMatch(/Chiedi a Crovi…/);
   });
 
   it("UD-116 + light footer (16/10 05:59): reduced footer (logo, contacts, app + social, credits sentence, legal links), no link index", () => {

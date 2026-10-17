@@ -990,3 +990,12 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Calendario da correggere nel master (non modificato qui): coppa U19 del 05/09 (LND 16:00, app 19:00) e U16 del 26/09 (LND 16:00, app 17:45).
 - Motore PERSONE; misura: visite settimanali di /classifiche e del blocco Classifica delle squadre; freschezza ≤ 6 ore (≤ 1 ora nel weekend) dopo l'attivazione dello script.
 - **r116 APPLICATA** (17/10/2026 ~13:35-13:45, SCD PULSE): parti 1-2 con apply_migration; RLS, grant, 4 policy e `scd_public_lnd_results` con execute_sql. Verificato dopo: RLS attiva sulle 4 tabelle, 1 policy ciascuna, anon non inserisce, provvedimenti disciplinari non leggibili da anon, search_path della funzione con pg_temp. Lo script di lettura resta da programmare.
+
+## 2026-10-17 — chat cloud — Crovi in prima pagina: avatar + chat in cima alla home (UD-184; Francesco DG 14:08 «Io voglio vedere in prima pagina app super web il crovi cavolo ma perché non si lavora qui»)
+
+- Engine: PERSONE. Measure: chat opens from the Crovi home card (input and chips) per home visit.
+- `components/home/CroviWelcome.tsx`: compact navy/blue card right after the urgent notices, before the club communication (no hero banner); approved Crovi v3 cut-out with entrance + breathing (`.crovi-enter`, `.crovi-actor`, reduced motion still), pose by day and a line by day/time (`lib/crovi-welcome.ts`, Europe/Rome; a match only from the public calendar: next home game with a confirmed time), input «Chiedi a Crovi…» and chips «Quando si gioca?», «Allenamenti di stasera», «Pulmini», «Segnala un risultato».
+- Chat: public general chat persona is "sky" shown as Crovi (`resolveChat`), switchboard voice (Iride segreteria, Garrison Club House, Enea tornei); face cards with an area keep Iride; inside unchanged. `assistant:open` carries an optional first message (`openAssistant(area, text)`, `openedText`), SkyChat sends it on open.
+- «Segnala un risultato»: fixed reply, no model, no score written; the Segreteria checks it against the official LND source (UD-182).
+- Assets: Crovi v3 cut-outs and avatar approved with Francesco's quote (`config/scd-assets.v1.json`); PersonaAvatar shows `crovi-avatar-256.webp` instead of the 'C'.
+- UD-134 superseded only for "Crovi on public pages"; still no second greeting bubble beside the launcher.
