@@ -296,6 +296,32 @@ export function hoursLines(hours: OpeningHours | null): { day: Weekday; text: st
   });
 }
 
+/**
+ * Public wording when the facilities master has no hours (B10): one honest line,
+ * never invented hours and never the internal "da inserire" to-do on public pages.
+ */
+export const PUBLIC_HOURS_PENDING = "Orari in aggiornamento dalla società";
+
+/** Status for public pages: the open/closed label only when hours exist; null when unknown. */
+export function publicStatus(status: SpaceStatus): SpaceStatus | null {
+  return status.state === "unknown" ? null : status;
+}
+
+/** Day lines for public pages: days not filled in read "in aggiornamento" instead of "da inserire". */
+export function publicHoursLines(hours: OpeningHours | null): { day: Weekday; text: string }[] | null {
+  const lines = hoursLines(hours);
+  return lines ? lines.map((l) => (l.text === "da inserire" ? { ...l, text: "in aggiornamento" } : l)) : null;
+}
+
+/** True when at least one space lacks hours for the given weekday (or lacks hours at all). */
+export function hoursPending(spaces: readonly Pick<Space, "hours">[], weekday?: Weekday): boolean {
+  return spaces.some((s) => {
+    if (!s.hours) return true;
+    if (!weekday) return WEEKDAYS.some((d) => s.hours![d] === undefined || s.hours![d] === null);
+    return s.hours[weekday] === undefined || s.hours[weekday] === null;
+  });
+}
+
 /* ───────────────────────── Who enters ───────────────────────── */
 
 export const AUDIENCE_LABEL: Readonly<Record<Audience, string>> = {
