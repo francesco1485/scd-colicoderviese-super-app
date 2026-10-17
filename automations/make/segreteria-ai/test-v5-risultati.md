@@ -136,7 +136,20 @@ Conservazione PROPOSED: fino a quando la Segreteria riporta l'esito nel master, 
 - «forse» resta fuori da `conf_forma` («1 forse» → rotta normale, regola 17; «1 sì, 2 forse» → CONFERME, domanda di ritorno).
 - Test locali: regex, ruolo, data, protezione 10/12/15 e 138 PASS; 27 unit test e self-test PASS. Da ripetere sulle copie: T5, T12, T15 e un messaggio normale con febbre (log e rubrica senza dettagli).
 
-## «Accendi v5»: cosa cambia sul live 7979437 (v5d)
+### Risultati v5e su copie spente (17/10, 13:13–13:16Z)
+Le copie sono rigenerate con `make_test_v5.py` dai file del repo 3153638 e sono identiche ai TEST v5e. Usano solo i data store di prova 222317/222318, la rubrica 221455 e il debug 221474, senza moduli WhatsApp, mail o Sheets. Scenari creati spenti: 8014869 (Iride, webhook di prova 3922506), 8014873 (Chiedi conferme, per una lista nuova di 7 gare) e 8014882 (T15). Accesi solo per gli invii, poi cancellati insieme al webhook (VERIFIED). Live 7979437 non toccato (lastEdit 01:03:07Z, VERIFIED).
+
+| # | Caso | Esito | Note |
+|---|---|---|---|
+| T5 | «1 forse, 2 sì» | PASS | domanda di ritorno «La gara 1 si gioca? Rispondimi con 1 e 2…», nessuna finta conferma, nessuna scrittura |
+| nuovo | «1 sì, 2 forse» | PASS | «La gara 2 si gioca? Rispondimi con 1 e 2…»: la gara 1 non viene confermata (né nel testo né nei data store) |
+| T12 | «3 no, metà squadra con la febbre» | PASS | ANNULLA; nessun dato di salute in risposta, log o riga al DG |
+| T15 | errore AI (modello inesistente) + domanda «La 1 la confermo, la gara 2 si gioca?» passata ai filtri 138/139 | PASS | Resume → rotta 138; la domanda con «confermo» è sostituita dal testo fisso |
+| rotta normale | genitore (TESTIRIDE-046): «mio figlio ha la febbre alta da ieri e la tosse, sabato non viene…» | PASS | riga INTAKE_LOG, `ultimo_tema` in rubrica e «In una riga» della mail = «Messaggio con dettagli personali o di salute (non riportati)»; mail «Iride ha già risposto: messaggio di presa in carico (dettagli sanitari non riportati)» |
+
+Nota (INFERRED): il campo «AI:» della riga INTAKE_LOG riporta la risposta di Iride («Mi dispiace per il piccolo, spero stia meglio presto…»): nessun sintomo, nessun nome. Nella rubrica di prova restano voci vecchie scritte prima di v5e (v4 e v5d) con testi di salute: sono dati di prova; nel live le voci scritte prima dell'accensione restano come sono.
+
+## «Accendi v5»: cosa cambia sul live 7979437 (v5e)
 Moduli 60 (`conf_forma`), 61 (rotta CONFERME), 62 (5ª rotta), 7 (solo regola 17), 10/83/91/104 (etichetta ROUTING_RULE v5), nuovi 110-142 (140/141 gestione errori, 142 doppioni); data store veri 222315 / 222316 già nel blueprint; il phone_number_id `<WHATSAPP_PHONE_NUMBER_ID>` rimesso dal live. In più: scenario nuovo «Chiedi conferme gare» (`chiedi-conferme-v5.json`, data store 222315) creato **spento**, avvio a mano; prompt del task orario aggiornato con l'id 222316 (testo in `CALENDAR_HOURLY_TASK.md`). Rotte DG / AM- / CANCELLA / normale invariate (T14).
 **Rollback** (il task orario legge 222316 e riapplica gli esiti ogni ora; se il registro non si legge la pubblicazione si blocca e la copia pubblica resta quella di prima, esiti compresi: spegnere v5 da solo **non** toglie gli esiti già registrati):
 - annullare un singolo esito: cancellare il suo record in 222316 (chiave = id messaggio + «-» + n); al giro orario successivo la gara torna come nel master;
