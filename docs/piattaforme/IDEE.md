@@ -1,0 +1,26 @@
+# Idee per migliorare l'app — elenco unico
+
+Lo tiene **scd-direttore** (Francesco 17/10/2026: «quello che si fa lo si trasforma in comandi e sviluppo»). Ogni ricerca, richiesta di Francesco, revisione di Iride, posta o numero dell'app che porta un'idea utile diventa una riga qui. Ogni notte di Cantiere il direttore prende **una** idea pronta, la fa costruire, la fa controllare due volte e apre la richiesta di pubblicazione. Niente va online senza «pubblica» di Francesco.
+
+Punteggio = valore (SOLDI / PERSONE / TEMPO, 1–3) × urgenza (1–3) ÷ sforzo (S=1, M=2, L=3).
+Stato: Pronta · Serve ok (migrazione, spesa, servizio nuovo o messaggi a terzi) · In PR #NNN · Pubblicata · Scartata (motivo).
+
+| ID | Piattaforma | Idea (una riga) | Fonte | Motore | Sforzo | Punteggio | Stato |
+|---|---|---|---|---|---|---|---|
+| I-261017-01 | 22 Meta | Contatore anonimo delle visite (senza cookie né dati personali): visite al giorno e pagine più viste | Francesco 17/10 02:55 «quante persone la stanno guardando»; oggi 9 accessi su 360 account | PERSONE | M | 4.5 | Serve ok («ok contatore» + «applica rNNN») |
+| I-261017-02 | Tutta l'app | Home per un ragazzo, in quest'ordine: conto alla rovescia della mia gara, «Stasera», novità a storie, la mia card, sfida e quiz, il weekend; fascia FIGC/LND in fondo | Francesco 17/10 02:55; `ricerche/ragazzi-social.md` | PERSONE | L | 3 | Serve ok (riapre le storie in home, oggi escluse per scelta) |
+| I-261017-03 | 18 News | Pagina «Storia e territorio» di Colico, Dervio e Alto Lario, con fonti e date in conflitto mostrate come «da confermare» | Francesco 17/10 02:54; `ricerche/storia-territorio.md` | PERSONE | M | 2 | Pronta |
+| I-261017-04 | Tutta l'app | Card «Prossima gara» con conto alla rovescia in alto anche sul telefono (funzioni già presenti) | `ricerche/ragazzi-social.md` quick win 1 | PERSONE | S | 9 | Pronta |
+| I-261017-05 | 16 Giochi | Sfida della settimana e Quiz del giorno (anche su Colico e Dervio: 814, 1138, 1603, 1912-14), badge solo sul telefono | `ricerche/ragazzi-social.md` quick win 2; `ricerche/storia-territorio.md` | PERSONE | S | 6 | Pronta |
+| I-261017-06 | Tutta l'app | Breve vibrazione e animazione su voto Top 11, salvataggio Fantacalcio, sfida completata (rispetta «riduci movimento») | `ricerche/ragazzi-social.md` quick win 3 | PERSONE | S | 3 | Pronta |
+| I-261017-07 | 03 Segreteria | Cruscotto «siamo in regola»: scadenze FIGC 15/11 (Delegato tutela) e 30/11 (Modello Organizzativo) e Sistema Qualità | `ricerche/calcio-lombardia-idee.md` top 1 | TEMPO | M | 4.5 | Pronta |
+| I-261017-08 | 10 Allenamenti | Vista del genitore solo per la squadra del figlio + «aggiungi al calendario» (.ics) | `ricerche/calcio-lombardia-idee.md` top 2 | PERSONE | S | 6 | Pronta |
+| I-261017-09 | 01 Pulmini + app | Conferma a un tocco: presa visione, salgo/non salgo, risposta evento | `ricerche/calcio-lombardia-idee.md` top 3 | TEMPO | M | 4.5 | Serve ok se serve una tabella nuova |
+| I-261017-10 | 18 News | «Questa settimana nel tuo club», la domenica sera | `ricerche/calcio-lombardia-idee.md` top 4 | PERSONE | M | 3 | Pronta |
+| I-261017-11 | 14 Avatar | La mia card stile FC con badge e costanza a settimane (con scudo) | `ricerche/ragazzi-social.md` funzioni 4-5 | PERSONE | M | 3 | Pronta |
+| I-261017-12 | 04 Sponsor | Pagina «Diventa partner» con 3 pacchetti + report mensile dichiarato «calcolato» | `ricerche/calcio-lombardia-idee.md` top 6 | SOLDI | M | 4.5 | Pronta |
+| I-261017-13 | 05 Tornei | Torneo giovanile estivo dedicato a un luogo storico (es. «Coppa Forte Montecchio»): nome da decidere | `ricerche/storia-territorio.md` idea 1 | PERSONE | M | 2 | Serve ok (decisione di Francesco) |
+| I-261017-14 | 19 Convenzioni | Convenzioni con il territorio: Forte Montecchio Nord, battelli, scuole vela e windsurf | `ricerche/storia-territorio.md` idea 6 | SOLDI | M | 2 | Serve ok (contatti con terzi) |
+| I-261017-15 | 17 Iscriviti | Pagina «Percorso ragazze» + modulo «Provaci con noi» senza dati sensibili al primo passo | `ricerche/calcio-lombardia-idee.md` top 10 | PERSONE | M | 3 | Pronta |
+
+Le ricerche complete stanno in `docs/piattaforme/ricerche/`.
