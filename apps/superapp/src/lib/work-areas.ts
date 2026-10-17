@@ -42,7 +42,8 @@ export type WorkAreaId =
   | "quadro"
   | "planning"
   | "struttura"
-  | "intake";
+  | "intake"
+  | "rubrica";
 
 export interface DriveMaster {
   key: string;
@@ -293,6 +294,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Le richieste che arrivano da fuori in un solo catalogo: iscrizioni ai tornei, sponsor, convenzioni, affitto dei campi, visite ai centri e altro. Decide chi ha il ruolo, il pagamento lo registra la Tesoreria dopo l'accettazione.",
     sources: ["supabase", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria", "Tesoreria"],
+  },
+  rubrica: {
+    id: "rubrica", label: "Rubrica staff", path: pathOf("rubrica"), railId: "gestionale",
+    description: "Chi fa cosa nello staff: nome, ruolo e squadra dall'organigramma. Il numero si vede solo se la persona lo ha condiviso. Ognuno vede le persone del proprio ruolo.",
+    sources: ["supabase", "elencoRuoli", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria"],
   },
   quadro: {
     id: "quadro", label: "Quadro settimanale", path: pathOf("quadro"), railId: "quadro",
