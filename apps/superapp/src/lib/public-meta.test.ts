@@ -11,6 +11,7 @@ import {
   type MetaEntry,
   type PageMetaInput,
 } from "./share";
+import { SHOWCASE_SHARE } from "./team-showcase";
 import { VETTA_SHARE } from "./vetta-legnone";
 
 /**
@@ -60,7 +61,10 @@ const ROUTE_HEADS: ReadonlyArray<{ file: string; ref: string; page: PageMetaInpu
 ];
 
 /** Dynamic public routes that build their page from loader data (still through pageHead). */
-const DYNAMIC_HEADS = ["src/routes/card.$tipo.tsx", "src/routes/eventi.lotteria-dello-sport.tsx"];
+const DYNAMIC_HEADS = ["src/routes/card.$tipo.tsx", "src/routes/eventi.lotteria-dello-sport.tsx", "src/routes/squadre_.$team.tsx"];
+
+/** Vetrina squadre (UD-168): /squadre/prima, /squadre/u19, /squadre/u16 build their head from SHOWCASE_SHARE. */
+const DYNAMIC_PATHS = Object.values(SHOWCASE_SHARE).map((p) => p.path);
 
 /**
  * Public prefixes whose head() is owned elsewhere (PC chat: access, contacts, install, privacy and safeguarding,
@@ -121,7 +125,7 @@ describe("B8 public link previews", () => {
   });
 
   it("every public prefix is covered or explicitly owned elsewhere", () => {
-    const covered = new Set(ROUTE_HEADS.map((r) => r.page.path));
+    const covered = new Set([...ROUTE_HEADS.map((r) => r.page.path), ...DYNAMIC_PATHS]);
     for (const prefix of PUBLIC_PREFIXES) {
       expect(covered.has(prefix) || prefix in PUBLIC_META_ELSEWHERE, prefix).toBe(true);
     }

@@ -52,6 +52,8 @@ import { getMyRoster, type MyRoster } from "@/lib/roster.functions";
 import { CallupPanel } from "@/components/scd/CallupPanel";
 import { MatchSheetPanel } from "@/components/scd/MatchSheetPanel";
 import { MatchReportPanel } from "@/components/scd/MatchReportPanel";
+import { RosterRolesPanel } from "@/components/scd/RosterRolesPanel";
+import { isShowcaseTeam } from "@/lib/team-showcase";
 
 /**
  * Mister (boards Mister.dc.html + Mister-Oggi.dc.html): today panel of one team from the calendar
@@ -343,6 +345,27 @@ function MisterPage({ data }: { data: Loaded }) {
                       refreshKey={sheetKey}
                       home={next.homeAway === "CASA"}
                       heading={`${team.tag} – ${titleCase(next.opponent || "avversario da definire")} · ${longDate(next.date)}${next.time ? `, ${next.time}` : ""}`}
+                    />
+                  </div>
+                </Card>
+              )}
+
+              {squadKnown && squad.length > 0 && squad[0] && (
+                <Card
+                  id="mis-ruoli"
+                  title="Ruoli della rosa"
+                  sub={
+                    isShowcaseTeam(team.id)
+                      ? "Portiere, difensore, centrocampista o attaccante. Compare nella rosa pubblica della squadra (dei minorenni solo nome e iniziale) e nel Fantacalcio."
+                      : "Portiere, difensore, centrocampista o attaccante. Serve al tabellino e al Fantacalcio; la rosa di questa squadra resta interna."
+                  }
+                >
+                  <div className="px-4 pb-4 sm:px-[18px]">
+                    <RosterRolesPanel
+                      key={squad[0].teamId}
+                      teamId={squad[0].teamId}
+                      squad={squad}
+                      tag={team.tag}
                     />
                   </div>
                 </Card>
