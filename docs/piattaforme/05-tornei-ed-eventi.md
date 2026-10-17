@@ -1,6 +1,6 @@
 # 05 · Tornei ed eventi
 
-Responsabile: scd-tornei · Stato: Viva · Pagina: `/eventi` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-tornei · Stato: Attiva · Pagina: `/eventi` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

@@ -1,6 +1,6 @@
 # 12 · Nutrizionista
 
-Responsabile: scd-nutrizione · Stato: Viva · Pagina: `/nutrizionista` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-nutrizione · Stato: Attiva · Pagina: `/nutrizionista` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

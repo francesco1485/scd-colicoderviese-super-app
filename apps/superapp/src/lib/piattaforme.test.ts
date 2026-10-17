@@ -3,7 +3,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
+  AGENT_LABEL,
   AUDIENCES,
+  agentLabel,
   PLATFORMS,
   SECTORS,
   STARTER_BASE,
@@ -52,7 +54,7 @@ describe("the 26 platforms map", () => {
 
   it("points every live or partial platform, and every action, to a real route", () => {
     for (const p of PLATFORMS) {
-      if (p.status !== "in-costruzione") expect(routePaths.has(p.route), `${p.id} ${p.route}`).toBe(true);
+      if (p.status !== "in-costruzione") expect(p.route !== null && routePaths.has(p.route), `${p.id} ${p.route}`).toBe(true);
       expect(p.today.length, p.id).toBeGreaterThanOrEqual(2);
       expect(p.today.length, p.id).toBeLessThanOrEqual(3);
       for (const a of p.today) expect(routePaths.has(a.to), `${p.id} ${a.to}`).toBe(true);
@@ -68,7 +70,7 @@ describe("the 26 platforms map", () => {
         continue;
       }
       expect(p.route).toBe(`${STARTER_BASE}/${p.slug}`);
-      expect(routePaths.has(p.route), p.route).toBe(true);
+      expect(routePaths.has(p.route!), String(p.route)).toBe(true);
       const file = readFileSync(fileURLToPath(new URL(`../routes/gestionale.piattaforme.${p.slug}.tsx`, import.meta.url)), "utf8");
       // Same staff gate as the other gestionale pages.
       expect(file).toContain('getWorkAreaGate({ data: { area: "gestionale" } })');
@@ -78,6 +80,30 @@ describe("the 26 platforms map", () => {
       expect(p.starter!.person).toBe(UNKNOWN);
       for (const n of p.starter!.next) expect(ideas, n.idea).toContain(`| ${n.idea} |`);
     }
+  });
+
+  it("compares every path of the map with routeTree.gen.ts (routes, actions, planned routes)", () => {
+    const all = PLATFORMS.flatMap((p) => [p.route, ...p.today.map((a) => a.to)]).filter((x): x is NonNullable<typeof x> => x !== null);
+    const missing = [...new Set(all)].filter((r) => !routePaths.has(r));
+    expect(missing).toEqual([]);
+    for (const p of PLATFORMS) {
+      if (p.route === null) {
+        expect(p.plannedRoute, p.id).toBeTruthy();
+        expect(p.builtElsewhere, p.id).toBeTruthy();
+        // Once the other branch merges, this fails on purpose: switch `route` to the real path.
+        expect(routePaths.has(p.plannedRoute!), `${p.id}: ${p.plannedRoute} is live, set route`).toBe(false);
+      } else expect(p.plannedRoute, p.id).toBeUndefined();
+    }
+  });
+
+  it("shows plain Italian names for every agent, never the technical id", () => {
+    const ids = new Set([...PLATFORMS.flatMap((p) => [p.responsible, ...p.support]), ...SECTORS.map((s) => s.director)]);
+    for (const id of ids) {
+      expect(AGENT_LABEL[id], id).toBeTruthy();
+      expect(agentLabel(id)).not.toMatch(/scd-/);
+    }
+    expect(agentLabel("scd-segreteria")).toBe("Assistente Segreteria");
+    expect(agentLabel("scd-sconosciuto")).toBe("Assistente da confermare");
   });
 
   it("counts statuses (17/10/2026: 16 live, 4 partial, 6 in construction)", () => {

@@ -1,6 +1,6 @@
 # 14 · Avatar
 
-Responsabile: scd-avatar · Stato: Viva · Pagina: `/la-mia-scd/campione` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-avatar · Stato: Attiva · Pagina: `/la-mia-scd/campione` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

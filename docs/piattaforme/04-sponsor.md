@@ -1,6 +1,6 @@
 # 04 · Sponsor
 
-Responsabile: scd-sponsor · Stato: Viva · Pagina: `/grow` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-sponsor · Stato: Attiva · Pagina: `/grow` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

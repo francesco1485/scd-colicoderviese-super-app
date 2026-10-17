@@ -1,6 +1,6 @@
 # 01 · Servizio pulmini
 
-Responsabile: scd-pulmini · Stato: Viva · Pagina: `/pulmini` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-pulmini · Stato: Attiva · Pagina: `/pulmini` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

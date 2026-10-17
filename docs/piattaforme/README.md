@@ -16,7 +16,7 @@ Ogni piattaforma ha qui la sua **scheda viva** (`NN-nome.md`): la memoria del su
 ## Modello di scheda
 ```
 # NN · Nome piattaforma
-Responsabile: scd-… · Settore: … · Stato: Viva | In parte | Da creare
+Responsabile: scd-… · Settore: … · Stato: Attiva | In parte | In costruzione
 ## Stato reale (data)
 ## Benchmark mondo
 ## Nozioni e regole

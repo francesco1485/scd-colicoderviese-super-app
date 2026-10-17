@@ -1,6 +1,6 @@
 # 18 · News e grandi notizie
 
-Responsabile: scd-super-giornalista · Stato: Viva · Pagina: `/comunicazioni` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-super-giornalista · Stato: Attiva · Pagina: `/comunicazioni` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

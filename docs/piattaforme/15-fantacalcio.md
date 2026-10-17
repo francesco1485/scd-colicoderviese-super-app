@@ -1,6 +1,6 @@
 # 15 · Fantacalcio
 
-Responsabile: scd-community · Stato: Viva · Pagina: `/fantacalcio` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-community · Stato: Attiva · Pagina: `/fantacalcio` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
