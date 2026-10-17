@@ -15,8 +15,13 @@
      [
       {
        "a": "ruolo",
-       "b": "RESPONSABILE ATTIVITA DI BASE",
-       "o": "text:equal"
+       "b": "RESPONSABILE ATTIVIT",
+       "o": "text:contain"
+      },
+      {
+       "a": "ruolo",
+       "b": "DI BASE",
+       "o": "text:contain"
       }
      ]
     ]
@@ -233,7 +238,8 @@
          "deciso_il": "",
          "deciso_msg": "",
          "ora_nuova": "",
-         "sede_nuova": ""
+         "sede_nuova": "",
+         "data_nuova": ""
         }
        },
        "metadata": {}
@@ -264,7 +270,7 @@
          },
          {
           "name": "testo",
-          "value": "{{substring(\"Ciao \" + ifempty(first(split(trim(ifempty(1.data.nome; \"\")); \" \")); \"\") + \", sono Iride (assistente AI) ⚽ Queste gare dell'attività di base sono ancora da confermare:\" + newline + 12.text + newline + newline + \"Mi rispondi con il numero e sì/no? Per esempio: 1 sì, 2 sì, 3 no. Se cambia orario o campo scrivilo: 4 alle 16:00, 5 campo 2. Poi aggiorno io il calendario e lo pubblico.\"; 0; 1500)}}"
+          "value": "{{substring(\"Ciao \" + ifempty(first(split(trim(ifempty(1.data.nome; \"\")); \" \")); \"\") + \", sono Iride (assistente AI) ⚽ Queste gare dell'attività di base sono ancora da confermare:\" + newline + 12.text + newline + newline + \"Mi rispondi con il numero e sì/no? Per esempio: 1 sì, 2 sì, 3 no. Se cambia data, orario o campo scrivilo: 4 alle 16:00, 5 campo 2, 6 il 25/10/2026 alle 10:00. Poi aggiorno io il calendario e lo pubblico.\"; 0; 1500)}}"
          }
         ]
        },
