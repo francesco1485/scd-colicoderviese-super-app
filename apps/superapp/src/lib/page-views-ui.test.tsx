@@ -33,7 +33,11 @@ vi.mock("@/lib/page-views.server", () => ({
 }));
 vi.mock("@/lib/work-areas.functions", () => ({ getWorkAreaGate: vi.fn() }));
 
-import { NUMERI_PRIVACY_NOTE, NumeriBoards } from "@/routes/gestionale.numeri";
+import {
+  NUMERI_NOTE,
+  NUMERI_PRIVACY_NOTE,
+  NumeriBoards,
+} from "@/routes/gestionale.numeri";
 import { summarizeStats } from "./page-views";
 
 describe("Numeri dell'app boards", () => {
@@ -71,11 +75,21 @@ describe("Numeri dell'app boards", () => {
     expect(out).toContain("ven 16/10");
     expect(out).toContain("sab 17/10");
     expect(out).toContain('aria-label="Visite giorno per giorno"');
+    expect(out).toContain("Pagine aperte, non persone · dato calcolato");
   });
 
   it("states the privacy promise verbatim", () => {
     expect(NUMERI_PRIVACY_NOTE).toBe(
       "Contiamo solo numeri totali: niente cookie, niente dati delle persone, niente dati dei minori. Non contiamo i visitatori unici.",
+    );
+  });
+
+  it("names Do Not Track and Global Privacy Control in the page note", () => {
+    expect(NUMERI_NOTE).toContain(NUMERI_PRIVACY_NOTE);
+    expect(NUMERI_NOTE).toContain("Global Privacy Control");
+    expect(NUMERI_NOTE).toContain("Do Not Track");
+    expect(NUMERI_NOTE).toContain(
+      "Pagine aperte, non persone · dato calcolato",
     );
   });
 });

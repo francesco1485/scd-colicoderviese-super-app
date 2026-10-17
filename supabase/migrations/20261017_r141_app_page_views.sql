@@ -8,13 +8,11 @@
 -- Why (Francesco, DG, 16/10/2026 22:34, VERIFIED): «area dove dobbiamo sapere quanti accessi sono stati fatti, quanti
 -- sono arrivati sopra all'app… capiamo come migliorare».
 --
--- Decision still open BEFORE "applica r141" (PROPOSED, not decided by Francesco): SCD_SYSTEM_MANIFEST.json
--- analytics.access_measurement says public_nonessential_requires_consent = true, and today the cookie banner and
--- /privacy say «nessuna statistica». This counter stores nothing on the device (no cookie, no localStorage, no id)
--- and keeps only daily totals, but the privacy text must be updated in the same release that applies r141, and
--- Francesco must choose: (A) count every visit without consent (anonymous totals, nothing read or stored on the
--- device) or (B) count only visitors who accept «Statistiche» in the banner. The app code ships mode A; the counter
--- is inert until r141 exists (the RPC fails and the error is swallowed).
+-- Consent mode DECIDED by Francesco 16/10/2026 23:35 («a», option A): cookieless anonymous daily totals without
+-- consent (nothing read or stored on the device, aggregated counts only). The cookie banner and /privacy were updated
+-- in the same branch (commit 11c8739; legal basis: legitimate interest in measuring the use of the public pages in
+-- aggregated form). Cookie-based statistics would still need consent (manifest rule unchanged). The counter is inert
+-- until r141 exists.
 --
 -- What it adds (and nothing else):
 --   1. public.scd_app_page_views_daily (day, path, source, device, views): aggregated counters only. No IP, no user
@@ -23,11 +21,14 @@
 --   2. public.scd_track_page_view(p_path, p_source, p_device) SECURITY DEFINER, search_path '': +1 on today's row
 --      (Europe/Rome). Normalises the path (query string and hash cut, lower case, repeated slashes merged, uuid,
 --      numeric or unusual segments -> ':id', at most 8 segments) and refuses anything else silently (returns without
---      writing): path not starting with '/', longer than 120 characters, internal or reserved areas (mirror:
---      apps/superapp/src/lib/page-views.ts INTERNAL_PATH_PREFIXES, kept equal by page-views-migration.test.ts),
---      source outside direct/instagram/facebook/tiktok/whatsapp/google/qr/other, device outside phone/tablet/desktop.
---      Abuse caps: a row stops at 100000 views; at most 5000 distinct rows per day. Executable by anon and
---      authenticated (the public pages are visited without an account).
+--      writing): input longer than 2048 characters, path not starting with '/', longer than 120 characters, first
+--      segment outside the ALLOWLIST of public pages (home '/' plus the public prefixes of
+--      apps/superapp/src/lib/http-policy.ts without /entra; mirror: apps/superapp/src/lib/page-views.ts
+--      PUBLIC_PATH_SEGMENTS, kept equal by page-views-migration.test.ts), source outside
+--      direct/instagram/facebook/tiktok/whatsapp/google/qr/other, device outside phone/tablet/desktop.
+--      Abuse caps: a row stops at 100000 views; at most 5000 distinct rows per day. Executable ONLY by service_role:
+--      the app server calls it (server function trackPageView, per-IP limit 60/minute in memory, IP never stored or
+--      logged), so nobody can inflate or fill the counters by calling the RPC directly with the public key.
 --   3. public.scd_app_stats(p_days) SECURITY DEFINER, search_path '': the rows of the last p_days days (1..366, today
 --      included), only for the Direzione (role DIRECTION, or position direzione / presidente / direttore-generale in
 --      any organisation, via scd_has_org_role / scd_has_position as in r139); others get 42501 'forbidden'.
@@ -88,7 +89,7 @@ create table if not exists public.scd_app_page_views_daily (
 alter table public.scd_app_page_views_daily enable row level security;
 revoke all on table public.scd_app_page_views_daily from public, anon, authenticated;
 
--- ---------------------------------------------------------------- 2. +1 on today's row (anon and authenticated)
+-- ---------------------------------------------------------------- 2. +1 on today's row (service role only, called by the app server)
 create or replace function public.scd_track_page_view(p_path text, p_source text, p_device text)
 returns void language plpgsql volatile security definer set search_path = '' as $$
 declare
@@ -97,6 +98,7 @@ declare
   v_segments text[];
 begin
   if p_path is null or p_source is null or p_device is null then return; end if;
+  if char_length(p_path) > 2048 then return; end if;
   if p_source not in ('direct','instagram','facebook','tiktok','whatsapp','google','qr','other') then return; end if;
   if p_device not in ('phone','tablet','desktop') then return; end if;
   -- query string and hash never stored
@@ -114,12 +116,12 @@ begin
     from unnest(string_to_array(v_path, '/')) with ordinality as u(s, n)
    where s <> '';
   if cardinality(v_segments) > 8 then return; end if;
-  -- internal and reserved areas are never counted (mirror: lib/page-views.ts INTERNAL_PATH_PREFIXES)
-  if cardinality(v_segments) > 0 and v_segments[1] = any (array[
-    'gestionale','direzione','core','accedi','quadro','segreteria','tesoreria','famiglia','partner','crm','pulmini',
-    'magazzino','infermeria','nutrizionista','safeguarding','la-mia-scd','aree','registrati','elimina-account',
-    'ledwall','auth'
-  ]) then return; end if;
+  -- only the public pages are counted: home or an allowlisted first segment (mirror: lib/page-views.ts PUBLIC_PATH_SEGMENTS)
+  if cardinality(v_segments) > 0 and not (v_segments[1] = any (array[
+    'calendario','card','community','comunicazioni','contatti','elimina-account','eventi','fantacalcio','fornitori',
+    'guida','impianti','installa','kit','partner','privacy','rassegna-stampa','safeguarding','societa','sponsor',
+    'top11','tornei'
+  ])) then return; end if;
   v_path := '/' || array_to_string(v_segments, '/');
   if char_length(v_path) > 120 then return; end if;
   -- abuse cap: at most 5000 distinct rows per day
@@ -134,7 +136,7 @@ begin
 end;
 $$;
 revoke all on function public.scd_track_page_view(text, text, text) from public, anon, authenticated;
-grant execute on function public.scd_track_page_view(text, text, text) to anon, authenticated;
+grant execute on function public.scd_track_page_view(text, text, text) to service_role;
 
 -- ---------------------------------------------------------------- 3. read for the Direzione
 create or replace function public.scd_app_stats(p_days integer)

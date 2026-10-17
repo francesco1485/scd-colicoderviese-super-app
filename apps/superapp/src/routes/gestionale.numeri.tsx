@@ -34,6 +34,11 @@ import { getWorkAreaGate } from "@/lib/work-areas.functions";
 export const NUMERI_PRIVACY_NOTE =
   "Contiamo solo numeri totali: niente cookie, niente dati delle persone, niente dati dei minori. Non contiamo i visitatori unici.";
 
+/** Every figure on the page counts opened pages, not people, and is computed from the daily totals. */
+export const NUMERI_FIGURES_LABEL =
+  "Pagine aperte, non persone · dato calcolato";
+export const NUMERI_NOTE = `${NUMERI_PRIVACY_NOTE} Chi attiva «Do Not Track» o «Global Privacy Control» nel browser non viene contato. ${NUMERI_FIGURES_LABEL}.`;
+
 export const Route = createFileRoute("/gestionale/numeri")({
   validateSearch: (raw: Record<string, unknown>): NumeriSearch =>
     numeriSearchSchema.catch({}).parse(raw),
@@ -77,13 +82,13 @@ export function NumeriPage({ data }: { data: AppStatsDesk }) {
           <Chip tone="warn">Funzione in preparazione</Chip>
         )
       }
-      note={NUMERI_PRIVACY_NOTE}
+      note={NUMERI_NOTE}
       highlights={[
         {
           value: s ? s.total : null,
-          label: `visite negli ultimi ${data.period} giorni`,
+          label: `pagine aperte negli ultimi ${data.period} giorni`,
         },
-        { value: s ? s.today : null, label: "pagine viste oggi" },
+        { value: s ? s.today : null, label: "pagine aperte oggi" },
         { value: s ? s.socialPct : null, label: "% arrivate dai social" },
         { value: s ? s.phonePct : null, label: "% da telefono" },
       ]}
@@ -137,7 +142,8 @@ export function NumeriPage({ data }: { data: AppStatsDesk }) {
               NUMERI_PRIVACY_NOTE,
               "Una visita è una pagina pubblica aperta. Le aree riservate (gestionale, Direzione, famiglie, staff) non si contano.",
               "Da dove arrivano: dal link con utm_source, dal QR (?src=qr) o dal sito che ha mandato la persona. Senza indicazioni: «Diretto o link salvato».",
-              "Chi ha attivato «Do Not Track» nel browser non viene contato.",
+              "Chi ha attivato «Do Not Track» o «Global Privacy Control» nel browser non viene contato.",
+              `${NUMERI_FIGURES_LABEL}: una persona che apre tre pagine conta tre volte.`,
               "I numeri si cancellano da soli dopo 25 mesi.",
             ].map((t) => (
               <li
@@ -225,7 +231,7 @@ export function NumeriBoards({ s }: { s: AppStatsSummary }) {
       <Card
         id="numeri-pagine"
         title="Pagine più aperte"
-        sub="Le 10 pagine pubbliche con più visite nel periodo"
+        sub={`Le 10 pagine pubbliche più aperte nel periodo · ${NUMERI_FIGURES_LABEL}`}
       >
         <ol className="m-0 list-none p-0" aria-label="Pagine più aperte">
           {s.topPages.map((p) => (
@@ -243,7 +249,7 @@ export function NumeriBoards({ s }: { s: AppStatsSummary }) {
         <Card
           id="numeri-fonti"
           title="Da dove arrivano"
-          sub="Social, Google, QR o link diretto"
+          sub={`Social, Google, QR o link diretto · ${NUMERI_FIGURES_LABEL}`}
         >
           <ul className="m-0 list-none p-0" aria-label="Da dove arrivano">
             {s.bySource.map((x) => (
@@ -260,7 +266,7 @@ export function NumeriBoards({ s }: { s: AppStatsSummary }) {
         <Card
           id="numeri-dispositivi"
           title="Con quale dispositivo"
-          sub="Dalla larghezza dello schermo"
+          sub={`Dalla larghezza dello schermo · ${NUMERI_FIGURES_LABEL}`}
         >
           <ul className="m-0 list-none p-0" aria-label="Con quale dispositivo">
             {s.byDevice.map((x) => (
@@ -279,7 +285,7 @@ export function NumeriBoards({ s }: { s: AppStatsSummary }) {
       <Card
         id="numeri-andamento"
         title="Giorno per giorno"
-        sub="Visite di ogni giorno, dal primo giorno con dati nel periodo"
+        sub={`Pagine aperte ogni giorno, dal primo giorno con dati nel periodo · ${NUMERI_FIGURES_LABEL}`}
         className="lg:col-span-2"
       >
         <ul className="m-0 list-none p-0" aria-label="Visite giorno per giorno">

@@ -81,7 +81,7 @@ const asRole = async (role, uid, q, params = []) => {
     await db.exec("reset role");
   }
 };
-const track = (path, source = "direct", device = "phone", role = "anon") =>
+const track = (path, source = "direct", device = "phone", role = "service_role") =>
   asRole(role, null, `select public.scd_track_page_view($1, $2, $3)`, [path, source, device]);
 const rows = async () =>
   (await db.query(`select path, source, device, views from public.scd_app_page_views_daily order by path, source, device`)).rows;
@@ -100,11 +100,14 @@ for (const role of ["anon", "authenticated"]) {
   );
 }
 
-// 2. Anon and authenticated count; the same key increments one row.
+// 2. Only the service role (the app server) counts; anon and authenticated cannot call the RPC with the public key.
+for (const role of ["anon", "authenticated"]) {
+  await assert.rejects(() => track("/", "direct", "phone", role), /permission denied/);
+}
 await track("/");
 await track("/");
 await track("/calendario", "instagram", "phone");
-await track("/calendario", "instagram", "phone", "authenticated");
+await track("/calendario", "instagram", "phone");
 assert.equal(await views("/"), 2);
 assert.equal(await views("/calendario", "instagram"), 2);
 
@@ -119,18 +122,19 @@ assert.equal(await views("/eventi/:id", "whatsapp", "desktop"), 2);
 assert.equal(await views("/eventi/christmas-lario-cup-2026", "qr", "tablet"), 1);
 assert.equal(await views("/eventi/:id", "qr", "tablet"), 1);
 
-// 4. Never counted: internal or reserved areas, bad input. Nothing written, no error raised.
+// 4. Never counted: anything outside the public allowlist (internal, reserved, /entra, /grow, unknown), bad input.
 const before = await rows();
 for (const p of ["/gestionale", "/gestionale/numeri", "/GESTIONALE/richieste", "/direzione/accessi", "/core", "/accedi", "/quadro",
   "/segreteria/persone", "/tesoreria", "/famiglia", "/pulmini", "/infermeria", "/la-mia-scd", "/aree/x", "/ledwall/player",
-  "//gestionale", "/gestionale?x=1"]) await track(p);
+  "//gestionale", "/gestionale?x=1", "/entra", "/grow", "/sostieni", "/qualcosa", "/:id"]) await track(p);
+await track(`/calendario?${"x".repeat(2100)}`);
 await track("calendario");
 await track("");
 await track(`/${"a".repeat(120)}`);
 await track("/a/b/c/d/e/f/g/h/i");
 await track("/calendario", "newsletter");
 await track("/calendario", "direct", "watch");
-await asRole("anon", null, `select public.scd_track_page_view(null, 'direct', 'phone')`);
+await asRole("service_role", null, `select public.scd_track_page_view(null, 'direct', 'phone')`);
 assert.deepEqual(await rows(), before);
 
 // 5. Abuse caps: a row stops at 100000; at most 5000 distinct rows per day (existing rows still count).
@@ -139,8 +143,8 @@ await track("/");
 assert.equal(await views("/"), 100000);
 await db.exec(`insert into public.scd_app_page_views_daily (day, path, source, device, views)
   select (now() at time zone 'Europe/Rome')::date, '/fill/' || g, 'other', 'desktop', 1 from generate_series(1, 5000 - (select count(*) from public.scd_app_page_views_daily)) g`);
-await track("/nuova-pagina");
-assert.equal(await views("/nuova-pagina"), 0);
+await track("/tornei/nuova-pagina");
+assert.equal(await views("/tornei/nuova-pagina"), 0);
 await track("/calendario", "instagram", "phone");
 assert.equal(await views("/calendario", "instagram"), 4);
 await db.exec(`delete from public.scd_app_page_views_daily where path like '/fill/%'`);
@@ -182,8 +186,9 @@ for (const f of fns) {
   assert.deepEqual(f.proconfig, ['search_path=""'], f.proname);
 }
 const can = async (role, sig) => (await db.query(`select has_function_privilege($1, $2, 'execute') ok`, [role, sig])).rows[0].ok;
-assert.equal(await can("anon", "public.scd_track_page_view(text, text, text)"), true);
-assert.equal(await can("authenticated", "public.scd_track_page_view(text, text, text)"), true);
+assert.equal(await can("anon", "public.scd_track_page_view(text, text, text)"), false);
+assert.equal(await can("authenticated", "public.scd_track_page_view(text, text, text)"), false);
+assert.equal(await can("service_role", "public.scd_track_page_view(text, text, text)"), true);
 assert.equal(await can("anon", "public.scd_app_stats(integer)"), false);
 assert.equal(await can("authenticated", "public.scd_app_stats(integer)"), true);
 assert.equal(await can("anon", "public.scd_app_page_views_purge()"), false);

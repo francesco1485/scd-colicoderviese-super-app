@@ -1,6 +1,7 @@
 import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { IntakeEntry } from "@/components/intake/IntakeViews";
 import { getIntakeSummary, type IntakeSummary } from "@/lib/intake.functions";
+import { getNumeriLive } from "@/lib/page-views.functions";
 import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { EMPTY_QUADRO } from "@/lib/public-snapshots";
@@ -71,8 +72,8 @@ export const Route = createFileRoute("/gestionale/")({
     const cal = loadCalendar();
     const { quadro: q } = gate.view === "page" ? await getTrainingQuadro() : { quadro: EMPTY_QUADRO };
     const intake: IntakeSummary = gate.view === "page" ? await getIntakeSummary() : { state: "none", formReady: false };
-    // Numeri dell'app (UD-167): the entry appears only to whom the "numeri" gate opens (Direzione, or the staging preview).
-    const numeri = gate.view === "page" ? (await getWorkAreaGate({ data: { area: "numeri" } })).view === "page" : false;
+    // Numeri dell'app (UD-167): entry only for the Direzione and only when r141 answers («Niente pagine vuote»).
+    const numeri = gate.view === "page" ? await getNumeriLive() : false;
     if (gate.view !== "page") return { gate, interior: false, numeri, groups: [], events: [], sourceModifiedAt: cal.sourceModifiedAt, season: cal.season, slots: q.slots, days: q.days, quadroUTC: q.generatedUTC, quadroNote: q.note, intake };
     return {
       gate,

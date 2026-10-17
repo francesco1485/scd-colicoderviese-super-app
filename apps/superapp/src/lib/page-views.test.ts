@@ -31,7 +31,7 @@ describe("normalisePagePath", () => {
     expect(normalisePagePath(`/eventi/${"a".repeat(61)}`)).toBe("/eventi/:id");
   });
 
-  it("never counts internal or reserved areas", () => {
+  it("counts only the public allowlist (home + public prefixes, never internal, reserved, /entra or /grow)", () => {
     for (const p of [
       "/gestionale",
       "/gestionale/numeri",
@@ -45,9 +45,15 @@ describe("normalisePagePath", () => {
       "/ledwall/player",
       "//gestionale",
       "/gestionale?x=1",
+      "/entra",
+      "/grow",
+      "/sostieni",
+      "/qualcosa",
     ]) {
       expect(normalisePagePath(p), p).toBeNull();
     }
+    expect(normalisePagePath("/tornei")).toBe("/tornei");
+    expect(normalisePagePath("/sponsor/")).toBe("/sponsor");
   });
 
   it("refuses bad input", () => {
@@ -56,7 +62,10 @@ describe("normalisePagePath", () => {
     expect(normalisePagePath(null)).toBeNull();
     expect(normalisePagePath(`/${"a".repeat(120)}`)).toBeNull();
     expect(normalisePagePath("/a/b/c/d/e/f/g/h/i")).toBeNull();
-    expect(normalisePagePath("/a/b/c/d/e/f/g/h")).toBe("/a/b/c/d/e/f/g/h");
+    expect(normalisePagePath("/eventi/b/c/d/e/f/g/h")).toBe(
+      "/eventi/b/c/d/e/f/g/h",
+    );
+    expect(normalisePagePath(`/calendario?${"x".repeat(2100)}`)).toBeNull();
   });
 });
 

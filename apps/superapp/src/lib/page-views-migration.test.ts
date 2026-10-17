@@ -2,11 +2,8 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import {
-  INTERNAL_PATH_PREFIXES,
-  PAGE_DEVICES,
-  PAGE_SOURCES,
-} from "./page-views";
+import { PUBLIC_PREFIXES } from "./http-policy";
+import { PAGE_DEVICES, PAGE_SOURCES, PUBLIC_PATH_SEGMENTS } from "./page-views";
 
 // r141 is exercised in PGlite by supabase/tests/r141_app_page_views.pglite.mjs (without pg_cron); here its text is
 // checked for the guarantees that must never drift, and the SQL lists are compared with the TypeScript mirror.
@@ -67,7 +64,10 @@ describe("r141 app page views (staged, not applied)", () => {
       3,
     );
     expect(body).toContain(
-      "grant execute on function public.scd_track_page_view(text, text, text) to anon, authenticated;",
+      "grant execute on function public.scd_track_page_view(text, text, text) to service_role;",
+    );
+    expect(body).not.toMatch(
+      /scd_track_page_view\(text, text, text\) to [^;]*\b(anon|authenticated)\b/,
     );
     expect(body).toContain(
       "grant execute on function public.scd_app_stats(integer) to authenticated;",
@@ -84,13 +84,32 @@ describe("r141 app page views (staged, not applied)", () => {
     );
   });
 
-  it("internal paths, sources and devices match the TypeScript mirror", () => {
-    const internal = body.match(
-      /v_segments\[1\] = any \(array\[([\s\S]*?)\]\)/,
+  it("public allowlist, sources and devices match the TypeScript mirror and http-policy", () => {
+    const allow = body.match(
+      /not \(v_segments\[1\] = any \(array\[([\s\S]*?)\]\)\)/,
     )![1]!;
-    expect(quoted(internal)).toEqual([...INTERNAL_PATH_PREFIXES]);
-    for (const p of ["gestionale", "direzione", "core", "accedi", "quadro"])
-      expect(INTERNAL_PATH_PREFIXES).toContain(p);
+    expect(quoted(allow)).toEqual([...PUBLIC_PATH_SEGMENTS]);
+    // the allowlist is exactly the public prefixes of http-policy.ts, without the registration flow /entra
+    expect([...PUBLIC_PATH_SEGMENTS].sort()).toEqual(
+      PUBLIC_PREFIXES.filter((p) => p !== "/entra")
+        .map((p) => p.slice(1))
+        .sort(),
+    );
+    for (const p of [
+      "gestionale",
+      "direzione",
+      "core",
+      "accedi",
+      "quadro",
+      "entra",
+      "grow",
+      "segreteria",
+      "famiglia",
+    ])
+      expect(PUBLIC_PATH_SEGMENTS).not.toContain(p);
+    expect(body).toContain(
+      "if char_length(p_path) > 2048 then return; end if;",
+    );
     const src = body.match(/p_source not in \(([^)]*)\)/)![1]!;
     expect(quoted(src)).toEqual([...PAGE_SOURCES]);
     const dev = body.match(/p_device not in \(([^)]*)\)/)![1]!;

@@ -20,7 +20,7 @@ import {
   type AppStatsDesk,
   type StatsPeriod,
 } from "./page-views";
-import { readAppStats, recordPageView } from "./page-views.server";
+import { numeriLive, readAppStats, recordPageView } from "./page-views.server";
 
 /* ------------------------------------------------------------------ tracker */
 
@@ -62,3 +62,8 @@ export {
   emptyAppStatsDesk,
   type AppStatsDesk,
 } from "./page-views";
+
+/** True only when the Numeri dell'app page has real numbers to show to this session (r141 live, Direzione). */
+export const getNumeriLive = createServerFn({ method: "GET" }).handler(
+  async (): Promise<boolean> => numeriLive(),
+);

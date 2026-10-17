@@ -6,7 +6,7 @@
  *
  * What is counted: one +1 per public page opened, as a daily total per (page, source, device). Nothing is stored on
  * the device (no cookie, no localStorage, no identifier), no IP, no user id, no user agent. Unique visitors are NOT
- * counted. Internal and reserved areas are never counted.
+ * counted. Only the public pages of the allowlist are counted.
  */
 
 import type { WorkAreaGate } from "./access";
@@ -52,34 +52,38 @@ export const DEVICE_LABEL: Readonly<Record<PageDevice, string>> = {
 };
 
 /**
- * First path segments never counted: the internal work areas and the reserved areas (families, staff, partners).
- * Same list as r141 scd_track_page_view.
+ * ALLOWLIST: the only first path segments counted, besides the home "/". They are the public prefixes of
+ * http-policy.ts PUBLIC_PREFIXES without "/entra" (registration flow); everything else (work areas, reserved areas,
+ * /grow, unknown paths) is never counted. Same list as r141 scd_track_page_view, kept equal by
+ * page-views-migration.test.ts.
  */
-export const INTERNAL_PATH_PREFIXES: readonly string[] = [
-  "gestionale",
-  "direzione",
-  "core",
-  "accedi",
-  "quadro",
-  "segreteria",
-  "tesoreria",
-  "famiglia",
-  "partner",
-  "crm",
-  "pulmini",
-  "magazzino",
-  "infermeria",
-  "nutrizionista",
-  "safeguarding",
-  "la-mia-scd",
-  "aree",
-  "registrati",
+export const PUBLIC_PATH_SEGMENTS: readonly string[] = [
+  "calendario",
+  "card",
+  "community",
+  "comunicazioni",
+  "contatti",
   "elimina-account",
-  "ledwall",
-  "auth",
+  "eventi",
+  "fantacalcio",
+  "fornitori",
+  "guida",
+  "impianti",
+  "installa",
+  "kit",
+  "partner",
+  "privacy",
+  "rassegna-stampa",
+  "safeguarding",
+  "societa",
+  "sponsor",
+  "top11",
+  "tornei",
 ];
 
 export const PATH_MAX = 120;
+/** Raw input longer than this is refused before any parsing (same guard as r141). */
+export const INPUT_MAX = 2048;
 export const PATH_MAX_SEGMENTS = 8;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -89,12 +93,12 @@ const PLAIN = /^[a-z0-9][a-z0-9._-]{0,59}$/;
 /**
  * The path as the database stores it, or null when it is not counted. Same steps as r141: query string and hash cut,
  * must start with "/", at most 120 characters, lower case, empty segments dropped, uuid / numeric / unusual segments
- * -> ":id", at most 8 segments, internal areas excluded.
+ * -> ":id", at most 8 segments, first segment in the public allowlist (or the home).
  */
 export function normalisePagePath(
   raw: string | null | undefined,
 ): string | null {
-  if (typeof raw !== "string") return null;
+  if (typeof raw !== "string" || raw.length > INPUT_MAX) return null;
   const cut = raw.split("?")[0]!.split("#")[0]!;
   if (!cut.startsWith("/") || cut.length > PATH_MAX) return null;
   const segments = cut
@@ -105,7 +109,7 @@ export function normalisePagePath(
       UUID.test(s) || NUMERIC.test(s) || !PLAIN.test(s) ? ":id" : s,
     );
   if (segments.length > PATH_MAX_SEGMENTS) return null;
-  if (segments.length > 0 && INTERNAL_PATH_PREFIXES.includes(segments[0]!))
+  if (segments.length > 0 && !PUBLIC_PATH_SEGMENTS.includes(segments[0]!))
     return null;
   const path = `/${segments.join("/")}`;
   return path.length > PATH_MAX ? null : path;
