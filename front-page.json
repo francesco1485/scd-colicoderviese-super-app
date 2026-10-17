@@ -1,0 +1,13 @@
+{
+  "day": "2026-10-17",
+  "off": false,
+  "items": [
+    {"id": "apertura-sabato-colico", "slot": "apertura", "kicker": "Oggi a Colico", "title": "Oggi si gioca a Colico: vieni a bordo campo", "body": "Alle 15 la Juniores U19 Élite contro Ardor Lazzate, alle 18 l'U16 Élite contro Vis Nova Giussano. Orari e campi sempre aggiornati nell'app.", "cta": "Vedi le gare", "href": "/calendario", "verified": true, "source": "calendario pubblico dell'app (FIGC/LND, orari e campi confermati)"},
+    {"id": "breve-domenica", "slot": "breve", "kicker": "Domani", "title": "U15 a Colico, Prima Squadra a Rovagnate", "body": "Alle 10:30 i Giovanissimi U15 con Piantedo; alle 15:30 la Prima Squadra in trasferta con ARS Rovagnate.", "cta": "Calendario", "href": "/calendario", "verified": true, "source": "calendario pubblico dell'app (FIGC/LND)"},
+    {"id": "breve-christmas-lario-cup", "slot": "breve", "kicker": "Tornei", "title": "Christmas Lario Cup: mancano 52 giorni", "body": "Martedì 8 dicembre, edizione maschile e Female Edition.", "cta": "Scopri", "href": "/eventi/christmas-lario-cup", "verified": true, "source": "pagina app /eventi/christmas-lario-cup"},
+    {"id": "breve-installa-app", "slot": "breve", "kicker": "Novità", "title": "L'app del club ora si installa sul telefono", "body": "Un tocco e hai calendario e partite sempre con te.", "cta": "Installa", "href": "/installa", "verified": true, "source": "route /installa online"},
+    {"id": "domanda-sabato", "slot": "domanda", "kicker": "La domanda del sabato", "title": "Chi vieni a vedere questo weekend a Colico?", "options": ["U16 Élite, oggi alle 18", "U15, domani alle 10:30", "Le guardo dall'app"], "verified": true, "source": "calendario pubblico dell'app"},
+    {"id": "sponsor-domino-services", "slot": "sponsor", "kicker": "Con noi", "title": "Grazie a Domino Services", "body": "Ci sostiene a bordo campo, partita dopo partita.", "href": "/sponsor", "verified": true, "source": "sponsors.ts (nameVerified true), sponsor del giorno da home-promos"},
+    {"id": "app-installa", "slot": "app", "kicker": "Dentro l'app", "title": "Metti l'app sul telefono", "body": "Al campo trovi orari e campi in un tocco.", "href": "/installa", "verified": true, "source": "route /installa online"}
+  ]
+}
