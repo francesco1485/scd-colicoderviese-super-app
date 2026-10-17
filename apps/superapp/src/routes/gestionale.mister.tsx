@@ -3,9 +3,11 @@ import {
   CalendarDays,
   CircleCheck,
   Clapperboard,
+  Dumbbell,
   MapPin,
   Presentation,
   TriangleAlert,
+  Trophy,
   UsersRound,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -52,6 +54,7 @@ import { getMyRoster, type MyRoster } from "@/lib/roster.functions";
 import { CallupPanel } from "@/components/scd/CallupPanel";
 import { MatchSheetPanel } from "@/components/scd/MatchSheetPanel";
 import { MatchReportPanel } from "@/components/scd/MatchReportPanel";
+import { GapRequestsCard } from "@/components/scd/GapRequestsCard";
 
 /**
  * Mister (boards Mister.dc.html + Mister-Oggi.dc.html): today panel of one team from the calendar
@@ -452,6 +455,7 @@ function MisterPage({ data }: { data: Loaded }) {
             </div>
 
             <div className="flex min-w-0 flex-col gap-[18px]">
+              <GapRequestsCard />
               <Card
                 id="mis-strumenti"
                 title="Strumenti del mister"
@@ -459,6 +463,16 @@ function MisterPage({ data }: { data: Loaded }) {
               >
                 <ul className="m-0 list-none p-0">
                   {[
+                    {
+                      to: "/gestionale/partite",
+                      label: "Area partite: tutte le gare della stagione",
+                      icon: Trophy,
+                    },
+                    {
+                      to: "/gestionale/allenamenti",
+                      label: "Area allenamenti: sedute, presenze, dinamiche",
+                      icon: Dumbbell,
+                    },
                     {
                       to: "/calendario",
                       label: "Calendario della squadra",
