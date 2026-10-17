@@ -3989,6 +3989,24 @@
       }
     },
     {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "07:48",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-148",
+      "name": "SERVICE_AVATARS_PROACTIVE_IN_APP_SHOWCASE",
+      "sourceQuoteFragments": [
+        "Chi è avatar di cose importanti interne come infermiere e altro deve lui essere propositivo e comparire in vetrina app per proporre il servizio o presentarsi"
+      ],
+      "normalizedCommand": {
+        "rule": "Every important internal service has its own character (avatar) that is proactive: it appears in the app showcase (home and the service page) to introduce itself and propose its service with one clear action, e.g. Infermeria ('prenota una visita o segnala un infortunio'), Nutrizionista Era, Palestra Garrison, Pulmini, Club House, Fondo Solidale, Segreteria Iride. One character at a time, in rotation by context and season; short line, never invasive, dismissible, pause and reduced-motion respected. Characters are original (no copyrighted or real-person likeness), 3D on the pedestal of UD-144 when available. Health or private requests opened from the showcase go only to reserved areas (no health data in public).",
+        "scope": "SUPER_APP home showcase and service pages, scd-avatar, platform owners (06 Infermeria, 12 Nutrizionista, 08 Palestra, 01 Pulmini, 07 Club House, 24 Fondo Solidale)",
+        "supersedes": "the 'no vetrine banners' preference only for these service characters",
+        "implementationStatus": "NOT_IMPLEMENTED",
+        "implementation": "backlog docs/piattaforme/IDEE.md I-261017-20"
+      }
+    },
+    {
       "sourceDate": "2026-10-16",
       "sourceTime": "22:40",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
