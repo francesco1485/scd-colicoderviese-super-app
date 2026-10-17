@@ -1,7 +1,7 @@
-// r113 Pulmini «presa visione» — behaviour test on an in-memory Postgres (PGlite), no remote database touched.
+// r114 Pulmini «presa visione» — behaviour test on an in-memory Postgres (PGlite), no remote database touched.
 // Run from the repository root (PGlite is not a dependency of the app, so it is installed in a throwaway folder):
 //   npm install --prefix /tmp/scd-pglite @electric-sql/pglite@0.5.10
-//   PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r113_transport_ack.pglite.mjs
+//   PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r114_transport_ack.pglite.mjs
 // Exit code 0 = every assertion passed. r84 is loaded from its real file; the r33/r61/r74 objects it needs are created
 // in their minimal shape. Every id, organisation and name below is invented.
 import { readFileSync } from "node:fs";
@@ -20,7 +20,7 @@ async function loadPGlite() {
 const PGlite = await loadPGlite();
 const file = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 const R84 = file("../migrations/20261012_r84_transport_requests.sql");
-const R113 = file("../migrations/20261017_r113_transport_ack.sql");
+const R113 = file("../migrations/20261017_r114_transport_ack.sql");
 
 const ORG = "00000000-0000-0000-0000-000000000001";
 const U = (n) => `10000000-0000-0000-0000-0000000000${String(n).padStart(2, "0")}`;
@@ -60,11 +60,11 @@ insert into public.scd_family_links values ('${FAM}', '${KID}'), ('${OTHER}', '$
 insert into public.scd_transport_stops (organization_id, source_record_id, line_label, town, place) values ('${ORG}', 'F-1', 'VALTELLINA', 'Paese', 'Piazza');
 `;
 
-// prerequisites guard: r113 alone refuses to run
+// prerequisites guard: r114 alone refuses to run
 {
   const bare = new PGlite();
   await bare.exec(base);
-  await assert.rejects(bare.exec(R113), /r113 prerequisites missing/);
+  await assert.rejects(bare.exec(R113), /r114 prerequisites missing/);
 }
 
 const db = new PGlite();
@@ -141,4 +141,4 @@ const grants = (await db.query(`select has_function_privilege('anon', 'public.sc
   has_function_privilege('authenticated', 'public.scd_ack_transport_request(uuid, uuid)', 'execute') as auth`)).rows[0];
 assert.deepEqual(grants, { anon: false, auth: true });
 
-console.log("r113 transport ack: all assertions passed");
+console.log("r114 transport ack: all assertions passed");

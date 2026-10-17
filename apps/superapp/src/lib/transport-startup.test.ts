@@ -111,14 +111,14 @@ describe("privacy and wording", () => {
   });
 });
 
-describe("presa visione (r113)", () => {
+describe("presa visione (r114)", () => {
   const row = { id: "r1", eventId: "ev-1", date: "2026-10-18", teamCode: "u15", personId: "p1", name: "Mario R.", status: "CONFERMATA", acknowledged: true };
   it("is read only on a confirmed seat", () => {
     expect(parseMyRequests([row])[0]!.acknowledged).toBe(true);
     expect(parseMyRequests([{ ...row, status: "RICHIESTA" }])[0]!.acknowledged).toBe(false);
     expect(parseOfficeRequests([{ ...row, acknowledged: "yes" }])![0]!.acknowledged).toBe(false);
   });
-  it("stays off until «applica r113» and explains why", () => {
+  it("stays off until «applica r114» and explains why", () => {
     expect(TRANSPORT_ACK_LIVE).toBe(false);
     expect(requestError("unavailable")).toContain("in attivazione");
     expect(requestError("not_confirmed")).toContain("posto confermato");

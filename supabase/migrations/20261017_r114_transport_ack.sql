@@ -1,6 +1,6 @@
--- r113: Pulmini — «presa visione» of a confirmed seat by the family (start-up of the service 2026/27, 2026-10-17,
+-- r114: Pulmini — «presa visione» of a confirmed seat by the family (start-up of the service 2026/27, 2026-10-17,
 -- chat CLOUD range r110-r129). STAGED: written and tested on PGlite, NOT APPLIED. Apply only after Francesco writes
--- «applica r113». Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
+-- «applica r114». Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires r84 (scd_transport_requests, scd_transport_request_events, scd_transport_office, scd_transport_stops) and
 -- r61 (scd_my_family) already applied: a guard below stops the migration when one of them is missing.
 --
@@ -33,7 +33,7 @@ begin
      or to_regclass('public.scd_transport_stops') is null
      or to_regprocedure('public.scd_transport_office(uuid)') is null
      or to_regprocedure('public.scd_my_family(uuid)') is null then
-    raise exception 'r113 prerequisites missing (r61, r74, r84)';
+    raise exception 'r114 prerequisites missing (r61, r74, r84)';
   end if;
 end $$;
 

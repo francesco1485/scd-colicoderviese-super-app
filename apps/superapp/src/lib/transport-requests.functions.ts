@@ -80,10 +80,10 @@ export const getTransportRequests = createServerFn({ method: "GET" }).handler(as
   return list ? list.map((r) => ({ ...r, name: shortPersonName(r.name) })) : null;
 });
 
-/** PostgREST / Postgres codes for "function does not exist": r113 not applied yet. */
+/** PostgREST / Postgres codes for "function does not exist": r114 not applied yet. */
 const MISSING_FUNCTION = new Set(["PGRST202", "42883"]);
 
-/** Family «presa visione» of a confirmed seat (r113, STAGED until «applica r113»). */
+/** Family «presa visione» of a confirmed seat (r114, STAGED until «applica r114»). */
 export const ackTransportRequest = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }): Promise<RequestOutcome> => {

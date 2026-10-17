@@ -5,8 +5,8 @@
  */
 
 /**
- * «Presa visione» of a confirmed seat lives in migration r113 (STAGED). Switch to true in the same change that
- * follows «applica r113»: until then the family card does not offer the button and the office shows no ack chip.
+ * «Presa visione» of a confirmed seat lives in migration r114 (STAGED). Switch to true in the same change that
+ * follows «applica r114»: until then the family card does not offer the button and the office shows no ack chip.
  */
 export const TRANSPORT_ACK_LIVE = false;
 
@@ -42,7 +42,7 @@ export interface MyRequest {
   note: string | null;
   status: RequestState;
   decisionNote: string | null;
-  /** The family took «presa visione» of the confirmed seat (r113); false while r113 is not applied. */
+  /** The family took «presa visione» of the confirmed seat (r114); false while r114 is not applied. */
   acknowledged: boolean;
 }
 
@@ -59,7 +59,7 @@ export interface OfficeRequest {
   note: string | null;
   status: RequestState;
   decisionNote: string | null;
-  /** The family took «presa visione» of the confirmed seat (r113); false while r113 is not applied. */
+  /** The family took «presa visione» of the confirmed seat (r114); false while r114 is not applied. */
   acknowledged: boolean;
 }
 

@@ -177,7 +177,7 @@ function CancelButton({ request, onCancelled }: { request: MyRequest; onCancelle
   );
 }
 
-/** «Presa visione» of a confirmed seat (r113): the family says it has read day, stop and direction. */
+/** «Presa visione» of a confirmed seat (r114): the family says it has read day, stop and direction. */
 function AckButton({ request, onAcked }: { request: MyRequest; onAcked: () => void }) {
   const ack = useServerFn(ackTransportRequest);
   const [busy, setBusy] = useState(false);
