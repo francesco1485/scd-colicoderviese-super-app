@@ -266,9 +266,20 @@ describe("public home v5", () => {
     const chat = code("src/components/SkyChat.tsx");
     expect(chat).not.toMatch(/crovi-cameo|CroviActor|cameoLine/);
     expect(chat).toMatch(/openedText\(e\)/);
-    const order = ["<UrgentNotices", "<CroviWelcome", "<ClubNoticeCard", "<HomeLobby"].map((t) => home.indexOf(t));
+    // UD-186 (Francesco DG 17/10/2026 16:23): on the public home Crovi is only the floating chatbot; the top opens on
+    // live games and Colico weather; the Crovi card moves inside, on the member home (tesserati, convocati).
+    expect(home).not.toMatch(/<CroviWelcome/);
+    const order = ["<UrgentNotices", "<ClubNoticeCard", "<HomeLobby"].map((t) => home.indexOf(t));
     expect(order.every((i) => i >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
+    const lobby = code("src/components/home/HomeLobby.tsx");
+    expect(lobby).toMatch(/data-testid="home-weather"/);
+    expect(lobby).toMatch(/<ColicoNowChip \/>/);
+    expect(lobby).not.toMatch(/hidden lg:flex"\} min-h-11 w-full items-center gap-2 border-b/);
+    const member = code("src/components/home/MemberHome.tsx");
+    const mOrder = ["<UrgentNotices", "<CroviWelcome", "<ClubNoticeCard", "<MyWeek"].map((t) => member.indexOf(t));
+    expect(mOrder.every((i) => i >= 0)).toBe(true);
+    expect([...mOrder].sort((a, b) => a - b)).toEqual(mOrder);
     const crovi = code("src/components/home/CroviWelcome.tsx");
     expect(crovi).toMatch(/crovi-actor/);
     expect(crovi).toMatch(/openAssistant\(null, t\)/);

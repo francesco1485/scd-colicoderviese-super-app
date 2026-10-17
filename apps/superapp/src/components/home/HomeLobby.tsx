@@ -23,6 +23,7 @@ import { loginSearch } from "@/components/scd/AccessMenu";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { useMinuteClock } from "@/lib/use-minute-clock";
 import { HomeBordoCampo } from "@/components/home/HomeBordoCampo";
+import { ColicoNowChip } from "@/components/universe/MatchExtras";
 import { HomeSlides } from "@/components/home/HomeSlides";
 import { venueShort } from "@/components/home/HomeSections";
 import { groupShort } from "@/lib/board-data";
@@ -178,8 +179,9 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
   return (
     <section aria-label="Partite della settimana" className="scd-band border-b border-[#b8c5dd]/25 text-white lg:-mr-12 2xl:mr-0" data-testid="home-ticker">
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-stretch lg:flex-nowrap">
+        {/* UD-186 (17/10/2026 16:23): the top of the home opens on live games and the weather, always, on phones too. */}
         <div
-          className={`${first ? "flex" : "hidden lg:flex"} min-h-11 w-full items-center gap-2 border-b border-white/10 bg-black/20 px-4 lg:w-auto lg:border-b-0 lg:border-r lg:px-5`}
+          className="flex min-h-11 w-full flex-wrap items-center gap-x-2 gap-y-1 border-b border-white/10 bg-black/20 px-4 py-1 lg:w-auto lg:flex-nowrap lg:border-b-0 lg:border-r lg:px-5"
           data-testid="home-live-box"
         >
           <span aria-hidden="true" className={`size-2 rounded-full ${first ? "scd-live-dot bg-[#ff4d5e]" : "bg-[#5d6f94]"}`} />
@@ -192,6 +194,9 @@ function WeekStrip({ events, groups, nowMs }: { events: readonly PublicEvent[]; 
           ) : (
             <span className="font-display text-[14px] text-[#b4c3de]">nessuna gara ora</span>
           )}
+          <span className="ml-auto shrink-0 lg:ml-2" data-testid="home-weather">
+            <ColicoNowChip />
+          </span>
         </div>
         <div className="flex min-w-0 basis-full items-center lg:flex-1 lg:basis-0">
           <span className={`${LABEL} hidden shrink-0 px-4 text-[#ffd23f] lg:inline`}>Partite della settimana</span>
