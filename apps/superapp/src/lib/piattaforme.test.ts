@@ -54,7 +54,7 @@ describe("the 26 platforms map", () => {
 
   it("points every live or partial platform, and every action, to a real route", () => {
     for (const p of PLATFORMS) {
-      if (p.status !== "in-costruzione") expect(p.route !== null && routePaths.has(p.route), `${p.id} ${p.route}`).toBe(true);
+      if (p.status !== "in-costruzione") expect(routePaths.has(p.route), `${p.id} ${p.route}`).toBe(true);
       expect(p.today.length, p.id).toBeGreaterThanOrEqual(2);
       expect(p.today.length, p.id).toBeLessThanOrEqual(3);
       for (const a of p.today) expect(routePaths.has(a.to), `${p.id} ${a.to}`).toBe(true);
@@ -62,15 +62,10 @@ describe("the 26 platforms map", () => {
     expect(routePaths.has("/gestionale/piattaforme")).toBe(true);
   });
 
-  it("gives every platform without a page a starter route under the gestionale, unless it is built elsewhere", () => {
+  it("gives every platform without a page a starter route under the gestionale", () => {
     for (const p of PLATFORMS.filter((x) => x.status === "in-costruzione")) {
-      if (p.builtElsewhere) {
-        expect(p.starter, p.id).toBeUndefined();
-        expect(existsSync(fileURLToPath(new URL(`../routes/gestionale.piattaforme.${p.slug}.tsx`, import.meta.url)))).toBe(false);
-        continue;
-      }
       expect(p.route).toBe(`${STARTER_BASE}/${p.slug}`);
-      expect(routePaths.has(p.route!), String(p.route)).toBe(true);
+      expect(routePaths.has(p.route), p.route).toBe(true);
       const file = readFileSync(fileURLToPath(new URL(`../routes/gestionale.piattaforme.${p.slug}.tsx`, import.meta.url)), "utf8");
       // Same staff gate as the other gestionale pages.
       expect(file).toContain('getWorkAreaGate({ data: { area: "gestionale" } })');
@@ -83,17 +78,9 @@ describe("the 26 platforms map", () => {
   });
 
   it("compares every path of the map with routeTree.gen.ts (routes, actions, planned routes)", () => {
-    const all = PLATFORMS.flatMap((p) => [p.route, ...p.today.map((a) => a.to)]).filter((x): x is NonNullable<typeof x> => x !== null);
+    const all = PLATFORMS.flatMap((p) => [p.route, ...p.today.map((a) => a.to)]);
     const missing = [...new Set(all)].filter((r) => !routePaths.has(r));
     expect(missing).toEqual([]);
-    for (const p of PLATFORMS) {
-      if (p.route === null) {
-        expect(p.plannedRoute, p.id).toBeTruthy();
-        expect(p.builtElsewhere, p.id).toBeTruthy();
-        // Once the other branch merges, this fails on purpose: switch `route` to the real path.
-        expect(routePaths.has(p.plannedRoute!), `${p.id}: ${p.plannedRoute} is live, set route`).toBe(false);
-      } else expect(p.plannedRoute, p.id).toBeUndefined();
-    }
   });
 
   it("shows plain Italian names for every agent, never the technical id", () => {
@@ -106,8 +93,8 @@ describe("the 26 platforms map", () => {
     expect(agentLabel("scd-sconosciuto")).toBe("Assistente da confermare");
   });
 
-  it("counts statuses (17/10/2026: 16 live, 4 partial, 6 in construction)", () => {
-    expect(statusCounts()).toEqual({ live: 16, parziale: 4, "in-costruzione": 6 });
+  it("counts statuses (17/10/2026: 17 live, 4 partial, 5 in construction)", () => {
+    expect(statusCounts()).toEqual({ live: 17, parziale: 4, "in-costruzione": 5 });
   });
 
   it("filters by text (accents and case ignored, number too) and by role", () => {

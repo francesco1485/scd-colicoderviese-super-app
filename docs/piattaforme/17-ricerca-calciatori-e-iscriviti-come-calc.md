@@ -1,6 +1,6 @@
 # 17 · Ricerca calciatori e iscriviti come calciatore
 
-Responsabile: scd-scouting · Stato: In costruzione · Pagina: `/vetta-legnone` (vetrina «Vetta Legnone» in costruzione su un altro ramo) · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-scouting · Stato: Attiva · Pagina: `/vetta-legnone` (vetrina pubblica su /vetta-legnone; profili in arrivo) · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
@@ -9,6 +9,11 @@ Responsabile: scd-scouting · Stato: In costruzione · Pagina: `/vetta-legnone` 
 ## Nozioni e regole
 
 ## Visione a 3 mesi
+**Vetta Legnone** (nome scelto da Francesco il 17/10/2026, 08:2x: il Legnone è la montagna di Colico). Studio completo: `ricerche/vetta-legnone-studio.md`. Motore: PERSONE.
+- VERIFIED (codice, 17/10): vetrina pubblica `/vetta-legnone` (`apps/superapp/src/routes/vetta-legnone.tsx`, contenuti in `src/lib/vetta-legnone.ts` con test). Hero con stemma ufficiale e lago/monte in SVG, al futuro (nessuna scheda esiste ancora); contatori con fonte e data visibili sotto il numero, nessun conteggio di squadre o tesserati (UD-176: quelli citano l'export del portale LND). Un invito per pubblico legato a `PUBLIC_FORMS_LIVE`: con i moduli in pausa calciatore e genitore vanno a `/contatti` (canali ufficiali), senza promesse di tempi o richiamate; ex giocatore e mister → `/contatti`, tifoso → `/top11`. «Chi cerchiamo» onesto (ruoli da indicare dal mister, «Annata 2010: da confermare dal DS»); salita Riva → Molo → Largo → Rifugio → Vetta solo con dati verificati; 6 epoche con fonte, etichettate «Storia in ricostruzione · da confermare dalla Direzione» finché Francesco non le approva. Sulla pagina pubblica parla solo Ottavio (agli adulti; per i minori ai genitori); Lario (UD-174) resta nelle aree riservate ed è citato solo come «il DS». Fascia regole: niente valori di mercato, nome e iniziale solo con il consenso della famiglia e mai volti, segnalazioni moderate tra adulti, norme federali sui contatti (senza numero d'articolo finché manca il documento federale), consenso GDPR. Link di una riga da `/entra`.
+- VERIFIED (SCD PULSE, 17/10): `scd_person_consents` vuota → oggi nessuna scheda è pubblica; la scheda resta «in arrivo».
+- PROPOSED a 3 mesi: 1) DS e mister confermano «Chi cerchiamo» per squadra; 2) consensi e scheda in sola lettura per gli adulti (migrazione da «applica»); 3) «Hanno giocato con noi» per epoca con proposte dei tifosi decise dalla Direzione; 4) «Garantiscono per lui» moderato in `/gestionale/coda`.
+- Misura: visite a `/vetta-legnone` e tocchi su ogni invito (piattaforma Meta, dopo il consenso analitico), poi richieste ricevute dalla Segreteria per pubblico. `/vetta-legnone` è in `PUBLIC_PREFIXES` (`src/lib/http-policy.ts`) e nella lista offline di `vite.config.ts`: cache pubblica, sitemap e robots.
 
 ## Visione stile Transfermarkt (17/10)
 Richiesta di Francesco 17/10/2026 08:11; ricerca completa in `ricerche/stile-transfermarkt.md` (agente scd-scouting). PROPOSED, dentro questa piattaforma, nessuna app nuova.

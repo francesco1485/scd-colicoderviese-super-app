@@ -46,13 +46,33 @@ export interface TournamentEdition {
   link: { to: string; hash?: string; label: string } | null;
   poster: { src: string; alt: string } | null;
   source: string;
+  /** Exact start (ISO with offset) when published: drives the live countdown on /tornei. */
+  startAt?: string;
+  /** Age groups as on the official poster, one chip each ("2015" · "Squadre dilettanti"). */
+  annate?: readonly { big: string; note: string }[];
+  /**
+   * Services of the tournament that are published (text = what is confirmed and where it comes from). A service
+   * missing here is shown as "da confermare" (lib/tournament-hub.ts), never as present.
+   */
+  services?: Partial<Readonly<Record<TournamentServiceId, string>>>;
+  /** Share card of the tournament page (lib/share.ts SHARE_PAGES key). */
+  shareKey?: "christmasLarioCup";
 }
+
+/** The six service icons of a youth tournament poster (IDEE I-261017-24, Footlook-style structure). */
+export type TournamentServiceId =
+  | "partite"
+  | "ristorazione"
+  | "foto-video"
+  | "organizzazione"
+  | "ospitalita"
+  | "territorio";
 
 const clc = CHRISTMAS_LARIO_CUP;
 type CupData = {
   city: string;
   venue: string;
-  categories: readonly { title: string; note: string }[];
+  categories: readonly { big: string; title: string; note: string }[];
   confirmed: readonly { name: string; country?: string }[];
 };
 const clcMale: CupData = clc.cups[0]!;
@@ -77,6 +97,15 @@ export const TOURNAMENTS: readonly TournamentEdition[] = [
     },
     poster: { src: clc.posters[0].src, alt: clc.posters[0].alt },
     source: clc.source,
+    annate: clcMale.categories.map((c) => ({ big: c.big, note: c.note })),
+    services: {
+      ristorazione: "Area ristoro per tutta la giornata",
+      "foto-video": "Area media dedicata, foto e video solo con il consenso delle famiglie",
+      organizzazione: `S.C.D. ColicoDerviese con ${clc.coOrganizer}`,
+      territorio: "Villaggio di Natale e casette con i sapori del lago",
+    },
+    shareKey: "christmasLarioCup",
+    startAt: clc.start,
   },
   {
     id: "christmas-lario-cup-female",
@@ -98,6 +127,15 @@ export const TOURNAMENTS: readonly TournamentEdition[] = [
     },
     poster: { src: clc.posters[1].src, alt: clc.posters[1].alt },
     source: clc.source,
+    annate: clcFemale.categories.map((c) => ({ big: c.big, note: `${c.title} · ${c.note}` })),
+    services: {
+      ristorazione: "Area ristoro per tutta la giornata",
+      "foto-video": "Area media dedicata, foto e video solo con il consenso delle famiglie",
+      organizzazione: `S.C.D. ColicoDerviese con ${clc.coOrganizer}`,
+      territorio: "Villaggio di Natale e casette con i sapori del lago",
+    },
+    shareKey: "christmasLarioCup",
+    startAt: clc.start,
   },
   {
     id: "memorial-jose-nasazzi",

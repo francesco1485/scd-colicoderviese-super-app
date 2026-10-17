@@ -34,6 +34,7 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/sponsor",
   "/top11",
   "/tornei",
+  "/vetta-legnone",
 ];
 
 /**

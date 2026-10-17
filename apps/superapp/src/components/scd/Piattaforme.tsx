@@ -117,24 +117,14 @@ function PlatformRow({ p }: { p: Platform }) {
         </div>
         <p className="m-0 mt-0.5 text-[13.5px] leading-snug text-[var(--in-sub)]">{p.purpose}</p>
       </div>
-      {p.route ? (
-        <Link
-          to={p.route}
-          aria-label={`Apri ${p.name}`}
-          className="scd-focus inline-flex h-11 flex-none items-center gap-1 self-center rounded-[10px] border border-[#b9d5ef] bg-white px-3 text-[14.5px] font-semibold text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"
-        >
-          Apri
-          <ChevronRight className="size-4" strokeWidth={2.2} aria-hidden="true" />
-        </Link>
-      ) : (
-        <span
-          data-future-path={p.plannedRoute}
-          title={p.builtElsewhere}
-          className="inline-flex h-9 flex-none items-center self-center rounded-full bg-[#eef3f9] px-3 text-[13px] font-semibold text-[var(--in-sub)]"
-        >
-          presto
-        </span>
-      )}
+      <Link
+        to={p.route}
+        aria-label={`Apri ${p.name}`}
+        className="scd-focus inline-flex h-11 flex-none items-center gap-1 self-center rounded-[10px] border border-[#b9d5ef] bg-white px-3 text-[14.5px] font-semibold text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"
+      >
+        Apri
+        <ChevronRight className="size-4" strokeWidth={2.2} aria-hidden="true" />
+      </Link>
     </li>
   );
 }

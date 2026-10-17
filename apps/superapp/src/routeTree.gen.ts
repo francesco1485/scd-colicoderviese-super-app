@@ -48,6 +48,7 @@ import { Route as SquadreRouteImport } from './routes/squadre'
 import { Route as TesoreriaRouteImport } from './routes/tesoreria'
 import { Route as Top11RouteImport } from './routes/top11'
 import { Route as TorneiRouteImport } from './routes/tornei'
+import { Route as VettaLegnoneRouteImport } from './routes/vetta-legnone'
 import { Route as AccediIndexRouteImport } from './routes/accedi.index'
 import { Route as AccediCompletaRouteImport } from './routes/accedi.completa'
 import { Route as AccediConfermaRouteImport } from './routes/accedi.conferma'
@@ -322,6 +323,11 @@ const Top11Route = Top11RouteImport.update({
 const TorneiRoute = TorneiRouteImport.update({
   id: '/tornei',
   path: '/tornei',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VettaLegnoneRoute = VettaLegnoneRouteImport.update({
+  id: '/vetta-legnone',
+  path: '/vetta-legnone',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccediIndexRoute = AccediIndexRouteImport.update({
@@ -782,6 +788,7 @@ export interface FileRoutesByFullPath {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/vetta-legnone': typeof VettaLegnoneRoute
   '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
@@ -903,6 +910,7 @@ export interface FileRoutesByTo {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/vetta-legnone': typeof VettaLegnoneRoute
   '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
@@ -1024,6 +1032,7 @@ export interface FileRoutesById {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/vetta-legnone': typeof VettaLegnoneRoute
   '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
@@ -1147,6 +1156,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/vetta-legnone'
     | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
@@ -1268,6 +1278,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/vetta-legnone'
     | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
@@ -1388,6 +1399,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/vetta-legnone'
     | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
@@ -1510,6 +1522,7 @@ export interface RootRouteChildren {
   TesoreriaRoute: typeof TesoreriaRoute
   Top11Route: typeof Top11Route
   TorneiRoute: typeof TorneiRoute
+  VettaLegnoneRoute: typeof VettaLegnoneRoute
   AccediCompletaRoute: typeof AccediCompletaRoute
   AccediConfermaRoute: typeof AccediConfermaRoute
   AccediPasswordRoute: typeof AccediPasswordRoute
@@ -1859,6 +1872,13 @@ declare module '@tanstack/react-router' {
       path: '/tornei'
       fullPath: '/tornei'
       preLoaderRoute: typeof TorneiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vetta-legnone': {
+      id: '/vetta-legnone'
+      path: '/vetta-legnone'
+      fullPath: '/vetta-legnone'
+      preLoaderRoute: typeof VettaLegnoneRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/accedi/': {
@@ -2485,6 +2505,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesoreriaRoute: TesoreriaRoute,
   Top11Route: Top11Route,
   TorneiRoute: TorneiRoute,
+  VettaLegnoneRoute: VettaLegnoneRoute,
   AccediCompletaRoute: AccediCompletaRoute,
   AccediConfermaRoute: AccediConfermaRoute,
   AccediPasswordRoute: AccediPasswordRoute,

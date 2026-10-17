@@ -6,11 +6,13 @@ import { SPONSOR_FAQ, SPONSOR_PROCESS_STEPS } from "@/lib/sponsor-process";
  * "Come lavoriamo" + "Domande frequenti" on /sponsor (backlog B2). Content is pure data in lib/sponsor-process.ts.
  * Phone: the five steps as a vertical timeline, then the FAQ. Desktop: timeline on the left, FAQ on the right.
  * FAQ uses native <details>/<summary>: keyboard (Enter/Space) and screen-reader state come from the browser.
+ * `steps={false}`: FAQ only (the /sponsor page shows the three package steps instead, Francesco 17/10/2026).
  */
-export function SponsorProcess() {
+export function SponsorProcess({ steps = true, className = "mx-auto mt-14 max-w-6xl px-4" }: { steps?: boolean; className?: string } = {}) {
   return (
-    <section className="mx-auto mt-14 max-w-6xl px-4" aria-label="Come lavoriamo e domande frequenti" data-testid="sponsor-process">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
+    <section className={className} aria-label={steps ? "Come lavoriamo e domande frequenti" : "Domande frequenti"} data-testid="sponsor-process">
+      <div className={steps ? "grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12" : "grid"}>
+        {steps && (
         <div className="min-w-0" aria-labelledby="come-lavoriamo-title" role="group">
           <p className="eyebrow">Dalla prima telefonata allo spot in onda</p>
           <h2 id="come-lavoriamo-title" className="mt-1 text-3xl font-bold">Come lavoriamo</h2>
@@ -38,6 +40,7 @@ export function SponsorProcess() {
             })}
           </ol>
         </div>
+        )}
 
         <div className="min-w-0" aria-labelledby="faq-sponsor-title" role="group">
           <p className="eyebrow">Prima di scriverci</p>

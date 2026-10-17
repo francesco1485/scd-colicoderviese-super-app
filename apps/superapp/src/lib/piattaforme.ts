@@ -115,10 +115,8 @@ export interface Platform {
   /** Responsible agent (PIPELINE.md §0). */
   responsible: string;
   support: readonly string[];
-  /** Route to open today; null while the platform's own page is built on another branch (see plannedRoute). */
-  route: AppPath | null;
-  /** Path the other branch is building (not in the route tree yet): the hub shows «presto» until it is merged. */
-  plannedRoute?: string;
+  /** Route to open today (typed against the generated route tree). */
+  route: AppPath;
   status: PlatformStatus;
   purpose: string;
   /** 2-3 things a user can do today, each on an existing route. */
@@ -128,10 +126,7 @@ export interface Platform {
   engine: Engine;
   measure: string;
   starter?: StarterContent;
-  /**
-   * Set when the platform's own page is being built by another agent on another branch: the hub shows «presto»
-   * until that route is in the route tree, and no starter page is created here.
-   */
+  /** Set when the platform's page is owned by another agent outside this map (no starter page here). */
   builtElsewhere?: string;
 }
 
@@ -360,9 +355,10 @@ export const PLATFORMS: readonly Platform[] = [
   {
     id: "17", name: "Vetta Legnone · Ricerca calciatori", slug: "vetta-legnone", dossier: "17-ricerca-calciatori-e-iscriviti-come-calc.md",
     sector: "campo", responsible: "scd-scouting", support: ["scd-tesserati", "scd-legale"],
-    route: null, plannedRoute: "/vetta-legnone", status: "in-costruzione", builtElsewhere: "vetrina pubblica in costruzione su un altro ramo (Francesco 17/10/2026)",
-    purpose: "Vetta Legnone: ricerca calciatori e «iscriviti come calciatore». Oggi è attiva la richiesta di prova.",
+    route: "/vetta-legnone", status: "live", builtElsewhere: "vetrina pubblica su /vetta-legnone",
+    purpose: "Vetta Legnone: vetrina pubblica della ricerca calciatori e richiesta di prova; profili in arrivo.",
     today: [
+      { label: "Vetrina Vetta Legnone", to: "/vetta-legnone" },
       { label: "Richiedi una prova o l'open day", to: "/entra" },
       { label: "Rose delle squadre", to: "/squadre" },
     ],
