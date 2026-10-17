@@ -281,6 +281,8 @@ export const APP_GUIDE: ReadonlyArray<{ text: string; to: string }> = [
  * Public CONTEXT for Vera on public pages (≈3k tokens): next 7 days of games (fixtures only: date, time, home/away, team label,
  * opponent, venue, competition), club events, ticket office, facilities and directions, contacts, registrations,
  * sponsor offer, official result links and the app guide. Never people: no rosters, staff, notes or minors' names.
+ * Only exception (UD-167, r141): for a signed-in caller, `directory` adds the caller's own staff directory as returned by
+ * scd_staff_directory — names and roles only, never phone numbers; public pages never pass it.
  * With `area` (a chat area of Vera, UD-121) the area's notes and curated copy come first.
  */
 export function buildPublicContext(

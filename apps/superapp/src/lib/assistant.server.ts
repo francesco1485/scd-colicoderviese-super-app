@@ -233,20 +233,25 @@ export async function answerStaff(message: string, deps: StaffDeps, requested?: 
   const bypass = bypassesModel(message, area);
   if (bypass === "distress" || bypass === "safeguarding") return safety();
   // UD-167: who does what / a staff number. Deterministic, from the caller's own directory: the model never writes a
-  // number, and a number not shared becomes a hand-off to the Segreteria.
-  let directory: StaffDirectory | null | undefined;
-  if (deps.staffDirectory) directory = await deps.staffDirectory().catch(() => undefined);
-  if (directory !== undefined && isStaffContactQuestion(message)) {
-    log("staff-contact", { persona, area, found: directory ? directory.people.length : null });
-    return asReply(staffContactReply(message, directory), persona, area);
+  // number, and a number not shared becomes a hand-off to the Segreteria. The directory RPC (scd_staff_directory) runs
+  // only for a contact question or, below, when the model is about to be called with the names-and-roles context.
+  let directoryRead: Promise<StaffDirectory | null | undefined> | undefined;
+  const loadDirectory = (): Promise<StaffDirectory | null | undefined> =>
+    (directoryRead ??= deps.staffDirectory ? deps.staffDirectory().catch(() => undefined) : Promise.resolve(undefined));
+  if (deps.staffDirectory && isStaffContactQuestion(message)) {
+    const directory = await loadDirectory();
+    if (directory !== undefined) {
+      log("staff-contact", { persona, area, found: directory ? directory.people.length : null });
+      return asReply(staffContactReply(message, directory), persona, area);
+    }
   }
-  const dirLines = directoryContextLines(directory ?? null);
   if (bypass) return safety();
   if (isExplicitAppQuestion(message)) return asReply(appHelpReply(), persona, area);
   const rules = async () => (isLegacyAppHelp(message) ? asReply(appHelpReply(), persona, area) : safety());
   if (!cfg.enabled) return rules();
   const rl = staffLimiter.hit(limiterKey("user", s.user.email.toLowerCase()), (deps.now ?? Date.now)());
   if (!rl.ok) return { text: rateLimitedText(rl.retryAfterSec), mood: "alert", ai: false, persona, area };
+  const dirLines = directoryContextLines((await loadDirectory()) ?? null);
 
   const today = romeToday(new Date((deps.now ?? Date.now)()));
   let ctx: BuiltContext;

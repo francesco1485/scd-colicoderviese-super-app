@@ -108,6 +108,7 @@ begin
      or to_regclass('public.scd_athletes') is null
      or to_regclass('public.scd_team_memberships') is null
      or to_regclass('public.scd_memberships') is null
+     or to_regclass('public.scd_audit_events') is null
      or to_regclass('public.scd_person_consents_one_active_uidx') is null
      or to_regprocedure('public.scd_has_org_role(uuid, public.scd_role[])') is null
      or to_regprocedure('public.scd_has_position(uuid, text[])') is null

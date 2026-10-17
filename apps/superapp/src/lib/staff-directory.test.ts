@@ -253,6 +253,22 @@ describe("assistant wiring (UD-167)", () => {
     expect(r.text).toBe("regole");
   });
 
+  it("does not call the directory RPC when the message is not a contact question and the model is not called", async () => {
+    const f = vi.fn();
+    const dir = vi.fn(async () => DIR);
+    const r = await answerStaff("quando gioca la prima squadra?", { ...deps(["mister"], f, dir), env: {} });
+    expect(r.text).toBe("regole");
+    expect(dir).not.toHaveBeenCalled();
+    expect(f).not.toHaveBeenCalled();
+  });
+
+  it("calls the directory RPC once for a contact question", async () => {
+    const f = vi.fn();
+    const dir = vi.fn(async () => DIR);
+    await answerStaff("mi serve il numero del mister u15", deps(["famiglia"], f, dir));
+    expect(dir).toHaveBeenCalledTimes(1);
+  });
+
   it("never reaches the directory on public pages", async () => {
     const f = vi.fn();
     const r = await answerPublic({ message: "numero del mister u15", persona: "vera", ip: "10.9.9.9" }, { env: {}, fetchImpl: f as never, rules: vi.fn(async () => RULES), loadContext: vi.fn(async () => ctx()) });
