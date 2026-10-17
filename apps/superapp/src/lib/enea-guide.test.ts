@@ -120,7 +120,8 @@ describe("/sponsor page", () => {
     expect(src).toContain("<SponsorLedwallLive />");
     expect(src).toContain("<PartnerPackages onChoose={choose} />");
     expect(src).toContain('<EneaGuide ctx="sponsor"');
-    expect(src).toContain("<SponsorLogo sponsor={s}");
+    expect(src).toContain("<SponsorWall />");
+    expect(src).toContain("<SponsorIdeas onChoose={choose} />");
     expect(src).not.toMatch(/€|grayscale/);
   });
 });

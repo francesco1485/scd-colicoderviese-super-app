@@ -4,7 +4,7 @@
  * Pure data. Every sentence is a process fact already stated in the repo:
  * - spot flow (proposto → approvato / modifiche richieste → in onda) and LED master size: `sponsor-spots.ts`
  *   (SPOT_FLOW, LED_MASTER, socialCaption, HANDLE_PLACEHOLDER), UD-119;
- * - prices "in approvazione", packages "da soli o insieme", audience numbers "da misurare", contratto e fattura
+ * - no price: «proposta su misura» defined by the Presidente (Francesco 17/10/2026 09:42), packages "da soli o insieme", audience numbers "da misurare", contratto e fattura
  *   by the club, no online payment: `sponsor-packages.ts` and `PartnerPackages.tsx`;
  * - LED wall at the Colico pitch: `sponsor-packages.ts` (ledwall package) and the home "Sul LED wall" block.
  * No prices, no audience/reach numbers, no tax or legal claims. Tested in sponsor-process.test.ts.
@@ -36,7 +36,7 @@ export const SPONSOR_PROCESS_STEPS: readonly ProcessStep[] = [
   {
     id: "pacchetto",
     title: "Scelta del pacchetto",
-    text: "Scegliete insieme il pacchetto: LED wall, maglie, tornei o app. Si possono prendere da soli o insieme.",
+    text: "Scegliete insieme il pacchetto o l'idea: LED wall, maglie, tornei, app, pulmini, palestra o Fondo Solidale. Da soli o insieme.",
   },
   {
     id: "spot",
@@ -59,7 +59,7 @@ export const SPONSOR_FAQ: readonly SponsorFaq[] = [
   {
     id: "costo",
     q: "Quanto costa?",
-    a: "I prezzi dei pacchetti sono in approvazione dalla Direzione. Scrivici e ti facciamo una proposta.",
+    a: "Non c'è un listino. La proposta è su misura: la definisce il Presidente con te, in base a quello che ti interessa. Scrivici e ti richiamiamo.",
   },
   {
     id: "spot-chi",

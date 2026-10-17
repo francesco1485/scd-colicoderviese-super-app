@@ -344,7 +344,7 @@ export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC
   b.line(`Affiliazioni: ${input.registration.affiliations.map((a) => `${a.nome} (${a.descrizione})`).join(", ")}.`);
 
   b.section("Sponsor e partner");
-  b.line("Prezzi dei pacchetti non pubblicati: si chiede una proposta [link: /sponsor].", "/sponsor");
+  b.line("Nessun prezzo pubblicato e nessun listino: la proposta è su misura e la definisce il Presidente con l'azienda [link: /sponsor].", "/sponsor");
   for (const p of input.sponsorPackages) b.line(`- ${p.nome} (${p.tier}): ${p.pitch} Include: ${p.include.join(", ")}.`);
   if (input.sponsorNames.length) b.line(`Sponsor della stagione 2026/27: ${input.sponsorNames.join(", ")}.`);
 

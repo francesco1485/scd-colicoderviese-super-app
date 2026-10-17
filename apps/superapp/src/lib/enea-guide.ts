@@ -103,8 +103,13 @@ function sponsorLines(today: string, list?: readonly TournamentEdition[]): EneaL
   lines.push(
     {
       id: "sponsor-proposta",
-      reason: "I prezzi li approva la Direzione: scrivi cosa ti interessa, la società ti richiama e prepara una proposta su misura.",
+      reason: "Non c'è un listino: scrivi cosa ti interessa e la proposta la definisce il Presidente con te, su misura per la tua azienda.",
       action: { label: "Diventa partner", to: "/sponsor", hash: "proposta" },
+    },
+    {
+      id: "sponsor-idee",
+      reason: "Non solo maglie e LED: tornei, pulmini, la nuova palestra, l'infermeria e il Fondo Solidale. Scegli l'idea che somiglia alla tua azienda.",
+      action: { label: "Guarda le idee", to: "/sponsor", hash: "idee" },
     },
     {
       id: "sponsor-sostieni",

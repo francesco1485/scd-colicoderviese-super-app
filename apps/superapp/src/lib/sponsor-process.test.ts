@@ -61,9 +61,9 @@ describe("sponsor FAQ", () => {
     for (const f of SPONSOR_FAQ) expect(`${f.q} ${f.a}`, f.id).not.toMatch(/[0-9€]/);
   });
 
-  it("the cost answer says prices are in approval and asks for a proposal", () => {
+  it("the cost answer: no listino, the Presidente defines the proposal with you", () => {
     const a = SPONSOR_FAQ.find((f) => f.id === "costo")?.a ?? "";
-    expect(a).toMatch(/in approvazione dalla Direzione/);
+    expect(a).toMatch(/la definisce il Presidente con te/);
     expect(a).toMatch(/proposta/);
   });
 
