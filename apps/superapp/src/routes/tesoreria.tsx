@@ -7,6 +7,7 @@ import { Card } from "@/components/scd/interior-ui";
 
 import { PurchaseSteps, SubAreaList, TariffWarning, TillPreview } from "@/components/scd/tesoreria";
 import { SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead } from "@/components/scd/work-area-ui";
+import { LISTINO_TAB_LABELS } from "@/lib/club-catalog";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /** Tesoreria (board Tesoreria-sottoaree.dc.html): sub-areas, purchases, Club House till. No amounts. */
@@ -104,7 +105,7 @@ function TesoreriaRoute() {
             <TillPreview
               title="Cassa Club House"
               path="/tesoreria/club-house"
-              tabs={["Bar", "Cucina", "Merchandising"]}
+              tabs={LISTINO_TAB_LABELS}
               emptyTitle="Listino non ancora caricato"
               emptyText="Prodotti e prezzi del Club House: i tasti della cassa si creeranno dal listino."
               loadLabel="Carica listino"

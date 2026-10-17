@@ -4288,6 +4288,29 @@
       }
     },
     {
+      "id": "UD-181",
+      "name": "TESSERE_CONVENZIONI_CLUB_HOUSE_DATA_ENTRY_READY",
+      "sourceDate": "2026-10-17",
+      "sourceTime": "12:22",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "sourceQuoteFragments": [
+        "quando sarà pronta la piattaforma delle tessere, convenzioni e delle Club House per lavorarci e iniziare a inserire tutto"
+      ],
+      "normalizedCommand": {
+        "rule": "Club House (platform 07: opening hours of Colico and Dervio, price list, group menus; evening events in Attività in struttura r135/r137), Convenzioni (platform 19: partner, offer, validity, how to use it, category, cards, link) and club cards (benefits, rules, other card types added to the Direzione policy config/scd-club-cards.v1.json) get a data-entry path inside the existing gestionale pages, one register for the three (scd_club_catalog). Writers: Direzione everywhere, Responsabile Club House for Club House, Segreteria for Tessere; nobody's permissions are changed. Public pages show only published rows inside their validity; missing = «da confermare», never an invented price, partner or hour.",
+        "scope": "SUPER_APP /tesoreria/club-house, /gestionale/piattaforme/convenzioni, /impianti, /card, /card/$tipo",
+        "supersedes": "none",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "migration r115 (APPLIED on SCD PULSE 17/10/2026 after «applica r115 r116»: part1 r115_club_catalog_part1_tables ~12:55, part2 r115_club_catalog_part2_clean_save ~13:20; part3 r115_part3_clean_strict_dates ~13:50 = strict date strip and LISTINO SERVIZI_FOTO in scd_club_catalog_clean, verified on DB), apps/superapp/src/lib/club-catalog.ts, club-catalog.functions.ts, features/club-catalog/ClubCatalogEditor.tsx, components/scd/ClubCatalogPublic.tsx",
+        "engines": [
+          "SOLDI",
+          "TEMPO"
+        ],
+        "measure": "published rows per platform (scd_club_catalog status PUBBLICATA), days from first BOZZA to PUBBLICATA, public «da confermare» blocks trending to zero"
+      }
+    },
+    {
       "sourceDate": "2026-10-17",
       "sourceTime": "12:33",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
