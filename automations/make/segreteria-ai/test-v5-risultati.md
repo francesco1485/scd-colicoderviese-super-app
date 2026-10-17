@@ -4,7 +4,7 @@
 
 Richiesta di Francesco (17/10): 00:11 «iride scrive a federico formigari e chiede se può confermare o annullare tutte le gare di calendario di questa settimana … così lei le aggiorna e pubblica»; 00:14 «federico è il responsabile attività di base e lui può confermare o cambiare o revocare gare, spostare campi e spogliatoi … fino alla annata 2014»; 00:17 «è iride che deve fare il lavoro non io».
 
-Stato: **PROPOSED, non applicato.** Live 7979437 = v4 (lastEdit 16/10 16:35:18Z, blueprint identico a `blueprint-v4.json`, VERIFIED 17/10 00:49Z). Nessuna scrittura su Make, sul master o su INTAKE_LOG.
+Stato: **PROPOSED, non applicato.** Live 7979437: v4 fino al 17/10 01:03:07Z, poi **v4.1** (modifica fatta direttamente in Make, non da questo agente e non presente nel repo: nuovo STILE, blocco «PRIMA DI DIRE CHE MANCA», riga CONVERSAZIONE, CONOSCENZA 9000 caratteri, temperatura 0.4; VERIFIED con scenarios_get alle 01:0xZ). **v5 è costruita sopra v4.1** (non la annulla) e `system-prompt.it.md` ora riporta il testo live + regola 17. Nessuna scrittura su Make, sul master o su INTAKE_LOG da parte di questo agente.
 
 ## Cosa fa v5
 1. **Chiedi conferme** (scenario nuovo `chiedi-conferme-v5.json`, da creare SPENTO, avvio solo a mano finché Francesco non dice altro): trova in rubrica il numero con `ruolo` verificato RESPONSABILE ATTIVITA DI BASE; legge la copia pubblica del calendario; prende le gare di Primi Calci, Piccoli Amici, Pulcini, Esordienti 2014/2015 da oggi a +8 giorni con orario o campo da confermare (o amichevoli del club); le numera 1…n, le salva nel data store «conferme in attesa» (le liste vecchie diventano SOSTITUITA) e manda l'elenco su WhatsApp se lui ha scritto a Iride nelle ultime 23 ore, altrimenti una mail alla segreteria.
@@ -18,8 +18,8 @@ Stato: **PROPOSED, non applicato.** Live 7979437 = v4 (lastEdit 16/10 16:35:18Z,
 - `system-prompt.it.md`: unica modifica la **regola 17** (un responsabile che risponde su gare senza numero: Iride non dice mai di aver registrato niente e chiede la forma «1 sì, 2 no, 3 alle 16:00»). Regole 1-16 identiche. Diff: `prompt-diff-v4-v5.txt`.
 - `prompt-conferme-gare.it.md`: prompt nuovo del modulo 116 (solo JSON, temperatura 0).
 
-## Moduli cambiati rispetto a v4
-60 (+ `conf_forma`), 61 (rotta `CONFERME` prima di `NORMALE`, solo ruolo RESPONSABILE ATTIVITA DI BASE), 62 (5ª rotta), 7 (prompt v5), 10/83/91/104 (solo l'etichetta ROUTING_RULE v4 → v5). Nuovi 110-139. Rotte DG / AM- / CANCELLA / normale invariate.
+## Moduli cambiati rispetto al live v4.1
+60 (+ `conf_forma`), 61 (rotta `CONFERME` prima di `NORMALE`, solo ruolo RESPONSABILE ATTIVITA DI BASE), 62 (5ª rotta), 7 (solo regola 17), 10/83/91/104 (solo l'etichetta ROUTING_RULE v4 → v5). Nuovi 110-139. Rotte DG / AM- / CANCELLA / normale invariate.
 
 ## Test fatti (17/10/2026)
 | # | Cosa | Esito |
