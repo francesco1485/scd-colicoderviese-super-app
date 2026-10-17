@@ -31,11 +31,14 @@ Mapping (Francesco 17/10: conferma = CONFIRMED, annulla = CANCELLED, sposta = RE
 - SPOSTA:   MATCH_STATUS = RESCHEDULED; DATE / TIME / VENUE = the new values given; TIME_STATUS and VENUE_STATUS =
             CONFIRMED; VARIATION = "Variazione SCD dd/mm" (CAMBIA, the v5 draft name, is read as SPOSTA).
 Always: NOTES += "Iride dd/mm: <azione> dal Resp. attività di base [IRIDE <hash>]", LAST_VERIFIED, ROW_VERSION + 1,
-CHANGE_FLAG = IRIDE (dd/mm = the day Iride registered it, so the hourly result is the same every hour).
+CHANGE_FLAG = IRIDE. TIME_STATUS / VENUE_STATUS become CONFIRMED only when the time / venue is not empty
+(dd/mm = the day Iride registered it, so the hourly result is the same every hour).
 Never touched: CONFLICT_STATUS (a field conflict stays open), other rows, other sheets.
 
-Safety: an outcome is skipped (and reported) when the EVENT_ID is missing, the date or time in the master is no longer the
-one Iride showed (someone changed the master since: the master wins), the category is outside the attività di base
+Safety: an outcome is skipped (and reported) when the EVENT_ID is missing, the date, time or MATCH_STATUS in the master is
+no longer the one Iride showed (match_status_prima when recorded; without it any cancelled / withdrawn status, since Iride
+only lists published games), LAST_VERIFIED in the master is later than the day Iride registered the outcome (the
+Segreteria worked on the row since: the master wins), the category is outside the attività di base
 (up to annata 2014: Esordienti, Pulcini, Primi Calci, Piccoli Amici), the action / date / time / pitch is not valid
 (new pitch only COLICO - CAMPO 1 / 2 and only for a home game; new date inside the season), or the [IRIDE <hash>] tag is
 already in NOTES (idempotent). Exit 2 = nothing written.
@@ -61,6 +64,7 @@ DATE_RX = re.compile(r"^(\d{2})/(\d{2})/(\d{4})$")
 SEASON = (dt.date(2026, 7, 1), dt.date(2027, 6, 30))
 ALIAS = {"CAMBIA": "SPOSTA"}
 LABEL = {"CONFERMA": "confermata", "ANNULLA": "annullata", "SPOSTA": "spostata"}
+GONE_RX = re.compile(r"RITIRAT|ANNULLAT|CANCEL|WITHDRAWN|^REST$|^REJECTED$", re.I)  # never in a list Iride sends
 MAX_RECORDS = 100  # Make returns at most 100 records per list call: a full page may hide outcomes
 
 
@@ -229,6 +233,23 @@ def parse_new_date(s: str) -> dt.date | None:
     return d if SEASON[0] <= d <= SEASON[1] else None
 
 
+def as_day(v) -> dt.date | None:
+    """LAST_VERIFIED of the master: Excel serial, dd/mm/yyyy or yyyy-mm-dd (with or without time)."""
+    if isinstance(v, float):
+        return dt.date(1899, 12, 30) + dt.timedelta(days=int(v))
+    s = str(v or "").strip()
+    try:
+        m = re.match(r"^(\d{1,2})/(\d{1,2})/(\d{4})", s)
+        if m:
+            return dt.date(int(m[3]), int(m[2]), int(m[1]))
+        m = re.match(r"^(\d{4})-(\d{2})-(\d{2})", s)
+        if m:
+            return dt.date(int(m[1]), int(m[2]), int(m[3]))
+    except ValueError:
+        return None
+    return None
+
+
 def plan(head, by_id, outcomes: list[dict], today: dt.date):
     applied, skipped, edits = [], [], {}
     for o in sorted(outcomes, key=lambda x: (str(x.get("data", {}).get("quando", "")), key_tag(str(x.get("key", ""))))):
@@ -258,6 +279,13 @@ def plan(head, by_id, outcomes: list[dict], today: dt.date):
                 why = "data cambiata nel master dopo la richiesta"
             elif d.get("ora_prima") and as_time(cur.get("_TIME", rec.get("TIME"))) != as_time(d["ora_prima"]):
                 why = "orario cambiato nel master dopo la richiesta"
+            elif d.get("match_status_prima") and str(cur.get("MATCH_STATUS", rec.get("MATCH_STATUS")) or "").strip().upper() \
+                    != str(d["match_status_prima"]).strip().upper():
+                why = "stato gara cambiato nel master dopo la richiesta"
+            elif not d.get("match_status_prima") and GONE_RX.search(str(cur.get("MATCH_STATUS", rec.get("MATCH_STATUS")) or "").strip()):
+                why = "stato gara cambiato nel master dopo la richiesta"
+            elif as_day(rec.get("LAST_VERIFIED")) and as_day(rec.get("LAST_VERIFIED")) > day_of(d, dt.date.max):
+                why = "riga aggiornata nel master dopo la richiesta"
             elif az == "SPOSTA":
                 if not (data_n or ora_n or sede_n):
                     why = "spostamento senza data, orario né campo"
@@ -278,8 +306,11 @@ def plan(head, by_id, outcomes: list[dict], today: dt.date):
         if az == "ANNULLA":
             e["MATCH_STATUS"] = "CANCELLED"
         else:
-            e["TIME_STATUS"] = "CONFIRMED"
-            e["VENUE_STATUS"] = "CONFIRMED"
+            # a missing time or venue is never «confirmed»: the public copy keeps «Orario o sede da verificare»
+            if (ora_n if az == "SPOSTA" and ora_n else str(cur.get("_TIME", rec.get("TIME")) or "").strip()):
+                e["TIME_STATUS"] = "CONFIRMED"
+            if (sede_n if az == "SPOSTA" and sede_n else str(cur.get("VENUE", rec.get("VENUE")) or "").strip()):
+                e["VENUE_STATUS"] = "CONFIRMED"
             if "OPERATIONAL_STATUS" in head and str(rec.get("OPERATIONAL_STATUS") or "") in ("OFFICIAL_TO_VERIFY", "CLUB_TO_VERIFY", ""):
                 e["OPERATIONAL_STATUS"] = "READY"  # a field conflict (BLOCKED_CONFLICT) stays as it is
         if az == "SPOSTA":
@@ -320,7 +351,9 @@ def typed(value, original):
         if kind == "date":
             return float((v - dt.date(1899, 12, 30)).days) if isinstance(original, float) else v.strftime("%d/%m/%Y")
         h, mi = TIME_RX.match(v).groups()
-        return (int(h) * 60 + int(mi)) / 1440 if isinstance(original, float) or original in (None, "") else v
+        # a number only if the master cell is already a (styled) number: a bare fraction in an empty cell would be
+        # read back as 0.666… and stop the converter
+        return (int(h) * 60 + int(mi)) / 1440 if isinstance(original, float) else v
     return value
 
 

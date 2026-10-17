@@ -189,6 +189,75 @@ class Overlay(Base):
         self.assertEqual((ev["EVT-PA-1A-F-CASA"]["date"], ev["EVT-PA-1A-F-CASA"]["time"]), ("2026-11-01", "09:30"))
 
 
+class MasterWins(Base):
+    def reason(self, o, src=None):
+        rep = aio.apply(src or self.src, [o], self.out, dt.date(2026, 10, 17))
+        self.assertEqual(rep["applied"], [], rep)
+        return rep["skipped"][0]["motivo"]
+
+    def custom(self, **fields):
+        src = os.path.join(self.tmp, "custom.xlsx")
+        r = aio.master_row("EVT-PUL-9A-Z-CASA", dt.datetime(2026, 10, 25), dt.time(15, 0), "Pulcini Misti 7v7", "CASA",
+                           "COLICO - CAMPO 1")
+        for k, v in fields.items():
+            r[aio.HEAD.index(k)] = v
+        aio.make_master(src, [r], aio.HEAD)
+        return src
+
+    def test_status_differs_from_what_iride_saw(self):
+        src = self.custom(MATCH_STATUS="OFFICIAL_CALENDAR")
+        o = aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "ANNULLA", "25/10", "15:00", match_status_prima="CLUB_EVENT")
+        self.assertEqual(self.reason(o, src), "stato gara cambiato nel master dopo la richiesta")
+
+    def test_same_status_applies(self):
+        src = self.custom(MATCH_STATUS="CLUB_EVENT")
+        o = aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "ANNULLA", "25/10", "15:00", match_status_prima="CLUB_EVENT")
+        self.assertEqual(len(aio.apply(src, [o], self.out, dt.date(2026, 10, 17))["applied"]), 1)
+
+    def test_cancelled_in_master_without_recorded_status(self):
+        src = self.custom(MATCH_STATUS="CANCELLED")
+        o = aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "CONFERMA", "25/10", "15:00")
+        self.assertEqual(self.reason(o, src), "stato gara cambiato nel master dopo la richiesta")
+
+    def test_reinstated_by_segreteria_after_iride(self):
+        # Iride cancelled on 17/10; on 19/10 the Segreteria reinstated the game (status back, LAST_VERIFIED 19/10)
+        src = self.custom(MATCH_STATUS="OFFICIAL_CALENDAR", LAST_VERIFIED="19/10/2026")
+        o = aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "ANNULLA", "25/10", "15:00", match_status_prima="OFFICIAL_CALENDAR")
+        self.assertEqual(self.reason(o, src), "riga aggiornata nel master dopo la richiesta")
+        ev, _ = self.events(src)
+        self.assertIsNotNone(ev["EVT-PUL-9A-Z-CASA"])
+
+    def test_verified_same_day_or_before_still_applies(self):
+        src = self.custom(LAST_VERIFIED=dt.datetime(2026, 10, 17))
+        o = aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "CONFERMA", "25/10", "15:00")
+        self.assertEqual(len(aio.apply(src, [o], self.out, dt.date(2026, 10, 17))["applied"]), 1)
+
+    def test_empty_time_sposta_writes_text_and_converter_reads_it(self):
+        src = self.custom(TIME=None)
+        o = aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "SPOSTA", "25/10", "", ora_nuova="16:00")
+        self.assertEqual(len(aio.apply(src, [o], self.out, dt.date(2026, 10, 17))["applied"]), 1)
+        ev, raw = self.events()
+        self.assertEqual(raw["EVT-PUL-9A-Z-CASA"]["TIME"], "16:00")
+        self.assertEqual(ev["EVT-PUL-9A-Z-CASA"]["time"], "16:00")
+        self.assertTrue(ev["EVT-PUL-9A-Z-CASA"]["verification"]["time_confirmed"])
+
+    def test_conferma_with_empty_time_does_not_confirm_time(self):
+        src = self.custom(TIME=None)
+        o = aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "CONFERMA", "25/10", "")
+        aio.apply(src, [o], self.out, dt.date(2026, 10, 17))
+        ev, raw = self.events()
+        self.assertEqual(raw["EVT-PUL-9A-Z-CASA"]["TIME_STATUS"], "DEFAULT_TO_VERIFY")
+        self.assertEqual(raw["EVT-PUL-9A-Z-CASA"]["VENUE_STATUS"], "CONFIRMED")
+        self.assertIn("Orario o sede da verificare", ev["EVT-PUL-9A-Z-CASA"]["notice"])
+
+    def test_conferma_with_empty_venue_does_not_confirm_venue(self):
+        src = self.custom(VENUE=None)
+        aio.apply(src, [aio.outcome(FAKE_KEY, "EVT-PUL-9A-Z-CASA", "CONFERMA", "25/10", "15:00")], self.out, dt.date(2026, 10, 17))
+        _, raw = self.events()
+        self.assertEqual((raw["EVT-PUL-9A-Z-CASA"]["TIME_STATUS"], raw["EVT-PUL-9A-Z-CASA"]["VENUE_STATUS"]),
+                         ("CONFIRMED", "DEFAULT_TO_VERIFY"))
+
+
 class Cli(Base):
     def cli(self, *args):
         return subprocess.run([sys.executable, "-I", "-B", SCRIPT, *args], capture_output=True, text=True)

@@ -43,7 +43,19 @@
     "formatSpreadsheets": "text/csv",
     "formatPresentations": "application/pdf"
    },
-   "metadata": {}
+   "metadata": {},
+   "filter": {
+    "name": "Solo il ruolo verificato Responsabile attività di base (inizia con RESPONSABILE ATTIVIT, contiene DI BASE)",
+    "conditions": [
+     [
+      {
+       "a": "{{if(indexOf(upper(ifempty(1.data.ruolo; \"\")); \"RESPONSABILE ATTIVIT\") = 0 & indexOf(upper(ifempty(1.data.ruolo; \"\")); \" DI BASE\") > 0; true; false)}}",
+       "b": "true",
+       "o": "boolean:equal"
+      }
+     ]
+    ]
+   }
   },
   {
    "id": 3,
@@ -82,7 +94,8 @@
     "home_away": "{{4.home_away}}",
     "venue": "{{4.venue}}",
     "opponent": "{{4.opponent}}",
-    "conflict": "{{4.verification.facility_review_required}}"
+    "conflict": "{{4.verification.facility_review_required}}",
+    "match_status": "{{4.match_status}}"
    },
    "metadata": {},
    "filter": {
@@ -240,7 +253,8 @@
          "deciso_msg": "",
          "ora_nuova": "",
          "sede_nuova": "",
-         "data_nuova": ""
+         "data_nuova": "",
+         "match_status": "{{10.match_status}}"
         }
        },
        "metadata": {}

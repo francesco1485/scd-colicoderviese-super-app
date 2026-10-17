@@ -21,10 +21,14 @@ records the confirm / cancel / move decisions of the Responsabile attività di b
 task lists that store and applies it to the downloaded copy of the master with `tools/sync/apply_iride_outcomes.py`
 (overlay: conferma = TIME/VENUE_STATUS CONFIRMED, annulla = MATCH_STATUS CANCELLED, sposta = MATCH_STATUS RESCHEDULED
 with the new date / time / pitch), then converts the patched copy as before. The master always wins: an outcome whose
-game was changed in the master since Iride showed it is skipped. Unit tests: `tools/sync/test_apply_iride_outcomes.py`
-(CI: `.github/workflows/sync-tools.yml`). The scheduled task receives this prompt with the real id only at «accendi v5»;
-until then (placeholder still in the configured prompt) it skips steps 1b and 5b (outcomes = empty list, fingerprint
-of `[]`). An empty register leaves the public copy unchanged.
+game was changed in the master since Iride showed it (date, time, MATCH_STATUS, or LAST_VERIFIED later than
+the outcome) is skipped and listed in the report. Unit tests: `tools/sync/test_apply_iride_outcomes.py`
+(CI: `.github/workflows/sync-tools.yml`). The id 222316 is written only in the prompt block of
+this repository file: the live scheduled task (cloud chat) keeps the placeholder `<ESITI_DATASTORE_ID>` and is updated
+with this text only after Francesco's «accendi v5». With the placeholder it skips steps 1b and 5b (outcomes = empty
+list, fingerprint of `[]`) and publishes from the master alone. An empty register leaves the public copy unchanged.
+Undo: delete an outcome's record in 222316 to drop it at the next run; put the placeholder back to stop using the
+register; an unreadable register blocks publication and keeps the previous copy (outcomes included).
 
 ## Prompt (as configured in the scheduled task)
 
