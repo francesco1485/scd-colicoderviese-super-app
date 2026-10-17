@@ -1,5 +1,5 @@
 /**
- * Risultati & Classifiche — official LND data only (UD-181, Francesco DG 17/10/2026 12:33 «ok classifiche LND»).
+ * Risultati & Classifiche — official LND data only (UD-182, Francesco DG 17/10/2026 12:33 «ok classifiche LND»).
  *
  * The app publishes standings and results only as copied from gare.lnd.it, always with the source link and the
  * fetch time. Nothing is computed, typed by hand or estimated: a missing value stays missing.

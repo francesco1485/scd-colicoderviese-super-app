@@ -12,7 +12,7 @@ import {
 } from "@/lib/lnd-standings";
 
 /**
- * Official LND blocks (UD-181): standings table, results list, badge «Ufficiale LND» and the source line.
+ * Official LND blocks (UD-182): standings table, results list, badge «Ufficiale LND» and the source line.
  * Only what gare.lnd.it publishes is shown; a missing table says so in plain words.
  */
 

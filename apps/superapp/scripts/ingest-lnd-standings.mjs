@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ingestion of official LND standings and results (UD-181, Francesco DG 17/10/2026 «ok classifiche LND").
+ * Ingestion of official LND standings and results (UD-182, Francesco DG 17/10/2026 «ok classifiche LND").
  *
  * Reads gare.lnd.it for the 4 championships and 3 cups of LND_COMPETITIONS (src/lib/lnd-standings.ts) and builds the
  * snapshot src/data/classifiche-lnd-snapshot.json: standings rows exactly as LND publishes them, our played matches with

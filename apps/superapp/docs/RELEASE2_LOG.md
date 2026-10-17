@@ -970,7 +970,7 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Test: `supabase/tests/r142_public_team_showcase.pglite.mjs`, `src/lib/team-showcase.test.ts`, `src/components/scd/TeamShowcase.test.tsx`, http-policy/public-meta/SkyJolly aggiornati.
 
 
-## 2026-10-17 — chat cloud — Risultati & Classifiche R1+R2: solo dati ufficiali LND, con fonte e link (UD-181; Francesco DG 12:33 «ok classifiche LND»)
+## 2026-10-17 — chat cloud — Risultati & Classifiche R1+R2: solo dati ufficiali LND, con fonte e link (UD-182; Francesco DG 12:33 «ok classifiche LND»)
 
 - Regola cambiata in `lib/official-links.ts` (`PUBLICATION_RULE`): da «l'app non pubblica punteggi propri» a «Pubblichiamo solo i dati ufficiali LND, con fonte e link». I link dei campionati vengono dall'unico registro `LND_COMPETITIONS` (`lib/lnd-standings.ts`): Prima Squadra PR/D, Juniores RI/C, U16 Y6/A, U15 GS/A; coppe CR/11, CG/6, DL/15. Attività di base: nessuna classifica (SGS).
 - **R1 dati**: migrazione `supabase/migrations/20261017_r116_lnd_standings.sql` (scritta, NON applicata; test PGlite `supabase/tests/r116_lnd_standings.pglite.mjs` verde): `scd_competitions`, `scd_standings_snapshots`, campi ufficiali LND su `scd_matches` (solo fonte, id LND, punteggio, ora di lettura), `scd_official_notices`, `scd_disciplinary_items` (solo staff). Lettura pubblica, scrittura solo service role.

@@ -33,7 +33,7 @@ describe("official result links", () => {
     expect(VERIFIED_CHAMPIONSHIPS["prima"]).toEqual({ name: "Promozione", group: "Girone D" });
   });
 
-  it("states the UD-181 rule: only official LND data, with source and link", () => {
+  it("states the UD-182 rule: only official LND data, with source and link", () => {
     expect(PUBLICATION_RULE).toBe("Pubblichiamo solo i dati ufficiali LND, con fonte e link.");
   });
 });

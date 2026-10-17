@@ -5,7 +5,7 @@
 -- Requires r33 (scd_organizations, scd_people, scd_events), r35 (scd_has_org_role) and r51 (scd_matches) applied:
 -- a guard below stops the migration when one of them is missing.
 --
--- Why (Francesco DG, 17/10/2026 12:33: «ok classifiche LND», UD-181): the app rule «l'app non pubblica punteggi
+-- Why (Francesco DG, 17/10/2026 12:33: «ok classifiche LND», UD-182): the app rule «l'app non pubblica punteggi
 -- propri» becomes «pubblichiamo solo i dati ufficiali LND, con fonte e link». Standings and results are copied from
 -- gare.lnd.it with source URL and fetch time; nothing is computed or typed by hand.
 -- Engine: PERSONE (families and fans find standings and results in the app and come back after every matchday).

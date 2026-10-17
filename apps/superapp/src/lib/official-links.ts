@@ -1,7 +1,7 @@
 /**
  * Official result sources for the public hall (calendar, match cards, team pages, /classifiche).
  *
- * Rule (UD-181, Francesco DG 17/10/2026 12:33 «ok classifiche LND»): we publish only the official LND data, with
+ * Rule (UD-182, Francesco DG 17/10/2026 12:33 «ok classifiche LND»): we publish only the official LND data, with
  * source and link. Standings and results are copied from gare.lnd.it (src/lib/lnd-standings.ts, snapshot
  * src/data/classifiche-lnd-snapshot.json) and always shown with the badge «Ufficiale LND», the fetch date and the link;
  * the app never computes, types or estimates a score or a standing of its own. Attività di base: no standings (SGS).

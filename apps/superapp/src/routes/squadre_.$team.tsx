@@ -252,7 +252,7 @@ function TeamPage({ data }: { data: TeamData }) {
   const followed = follows.includes(channel.key);
   const c = VERIFIED_CHAMPIONSHIPS[id];
   const champ = c ? `${c.name} ${c.group}`.trim() : null;
-  // Official LND data only (UD-181): standings and last results with source and fetch date. None for base activity.
+  // Official LND data only (UD-182): standings and last results with source and fetch date. None for base activity.
   const league = base
     ? null
     : (competitionsOfTeam(LND_SNAPSHOT, id).find(

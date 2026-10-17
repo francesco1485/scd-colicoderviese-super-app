@@ -9,7 +9,7 @@ import { PUBLICATION_RULE } from "@/lib/official-links";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /**
- * Classifiche (UD-181, Francesco DG 17/10/2026 12:33 «ok classifiche LND»): the 4 championships and 3 cups of the
+ * Classifiche (UD-182, Francesco DG 17/10/2026 12:33 «ok classifiche LND»): the 4 championships and 3 cups of the
  * competitive teams, only as published by gare.lnd.it, each with the badge «Ufficiale LND», the fetch date and the
  * link to the source. Public page: club names and scores only, no people. Attività di base: no standings (SGS).
  * Engine PERSONE; measure: weekly visits of /classifiche.

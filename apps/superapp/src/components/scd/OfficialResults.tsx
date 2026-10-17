@@ -7,7 +7,7 @@ const verifiedOn = RESULTS_VERIFIED_ON.split("-").reverse().join("/");
 
 /**
  * "Risultati ufficiali" block: the federation pages where scores and standings live, plus the link to /classifiche
- * (UD-181: only official LND data, with source and link; the app computes no score of its own). Tone "light" on white pages, "dark" on the outside palette.
+ * (UD-182: only official LND data, with source and link; the app computes no score of its own). Tone "light" on white pages, "dark" on the outside palette.
  */
 export function OfficialResults({ tone = "light", className = "" }: { tone?: "light" | "dark"; className?: string }) {
   const dark = tone === "dark";
