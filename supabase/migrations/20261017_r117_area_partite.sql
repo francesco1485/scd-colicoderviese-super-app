@@ -1,4 +1,4 @@
--- r117: Area partite per squadra (UD-183, Francesco DG 17/10/2026 12:36). STAGED: NOT APPLIED.
+-- r117: Area partite per squadra (UD-183, Francesco DG 17/10/2026 12:36). APPLIED on SCD PULSE 17/10/2026 ~14:15-14:25 after Francesco wrote «applica r117 r118» (r117 in 4 parts, r118 in 6 parts; verified: RLS on 4 tables, no client grants, no anon execute, 2 storage policies, internal helpers closed).
 -- Apply on SCD PULSE (ndevtxxijbcnskgysdit) only after Francesco writes "applica r117". Never on dfnwzwutvnwiitiffwvr.
 --
 -- What already existed and is REUSED, not duplicated (audit 2026-10-17):

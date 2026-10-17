@@ -4209,7 +4209,7 @@
         "scope": "SUPER_APP /gestionale/partite, /gestionale/allenamenti, /segreteria/verifiche, /famiglia; SCD PULSE migrations r117 (Area partite) and r118 (Area allenamenti + monthly requests)",
         "supersedes": "none",
         "implementationStatus": "IN_PROGRESS",
-        "implementation": "Phase 1 code + PGlite/vitest tests on branch feat/area-partite-allenamenti; r117/r118 STAGED NOT APPLIED; UI disabled until «applica». Phase 2: drawable pitch, sessions generated from the quadro, team feed/interaction, scheduled monthly run."
+        "implementation": "Phase 1 code + PGlite/vitest tests on branch feat/area-partite-allenamenti; r117/r118 APPLIED on SCD PULSE 17/10/2026 ~14:15-14:25 after Francesco wrote «applica r117 r118» (r117 in 4 parts, r118 in 6 parts; verified: RLS on 4 tables, no client grants, no anon execute, 2 storage policies, internal helpers closed); UI live. Phase 2: drawable pitch, sessions generated from the quadro, team feed/interaction, scheduled monthly run."
       }
     }
   ],

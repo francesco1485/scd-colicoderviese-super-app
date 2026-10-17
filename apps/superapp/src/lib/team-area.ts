@@ -3,15 +3,14 @@
  * the family card and the Segreteria monthly check. The database (r117, r118) decides who may read and write; these
  * helpers only shape input and output, and compute the «Provvisorio» state of the mister's tabellino.
  *
- * Until Francesco writes «applica r117» / «applica r118» the new screens show a disabled state (AREA_PARTITE_LIVE /
- * AREA_ALLENAMENTI_LIVE false) and call nothing that does not exist yet. The pre-existing tools (convocazione r62,
+ * r117 and r118 were applied on 17/10/2026 after «applica r117 r118»: AREA_PARTITE_LIVE / AREA_ALLENAMENTI_LIVE are true. The pre-existing tools (convocazione r62,
  * distinta r70, tabellino r92) keep working as today.
  */
 
 /** r117 applied on SCD PULSE? Flip to true only in the change that follows «applica r117». */
-export const AREA_PARTITE_LIVE = false;
+export const AREA_PARTITE_LIVE = true;
 /** r118 applied on SCD PULSE? Flip to true only in the change that follows «applica r118». */
-export const AREA_ALLENAMENTI_LIVE = false;
+export const AREA_ALLENAMENTI_LIVE = true;
 
 export const NOT_LIVE_TEXT = {
   partite: "Resoconto, avversari e documenti si attivano quando la Direzione approva l'aggiornamento del database (r117). Convocazione, distinta e tabellino funzionano già.",

@@ -25,11 +25,11 @@ const r117 = readFileSync(resolve(__dirname, "../../../../supabase/migrations/20
 const r118 = readFileSync(resolve(__dirname, "../../../../supabase/migrations/20261017_r118_area_allenamenti.sql"), "utf8");
 
 describe("Area squadra helpers (UD-183)", () => {
-  it("stays off until «applica r117 / r118»", () => {
-    expect(AREA_PARTITE_LIVE).toBe(false);
-    expect(AREA_ALLENAMENTI_LIVE).toBe(false);
-    expect(r117).toMatch(/STAGED: NOT APPLIED/);
-    expect(r118).toMatch(/STAGED: NOT APPLIED/);
+  it("is live after «applica r117 r118» (17/10/2026)", () => {
+    expect(AREA_PARTITE_LIVE).toBe(true);
+    expect(AREA_ALLENAMENTI_LIVE).toBe(true);
+    expect(r117).toMatch(/APPLIED on SCD PULSE 17\/10\/2026/);
+    expect(r118).toMatch(/APPLIED on SCD PULSE 17\/10\/2026/);
   });
 
   it("marks the mister's tabellino Provvisorio until it equals the official LND score", () => {
