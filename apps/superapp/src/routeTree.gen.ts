@@ -76,11 +76,13 @@ import { Route as EventiChristmasLarioCupRouteImport } from './routes/eventi.chr
 import { Route as EventiLezioniTecnicoCoordinativeRouteImport } from './routes/eventi.lezioni-tecnico-coordinative'
 import { Route as EventiLotteriaDelloSportRouteImport } from './routes/eventi.lotteria-dello-sport'
 import { Route as GestionaleIndexRouteImport } from './routes/gestionale.index'
+import { Route as GestionaleAllenamentiRouteImport } from './routes/gestionale.allenamenti'
 import { Route as GestionaleCodaRouteImport } from './routes/gestionale.coda'
 import { Route as GestionaleMappaRouteImport } from './routes/gestionale.mappa'
 import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister'
 import { Route as GestionaleNumeriRouteImport } from './routes/gestionale.numeri'
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
+import { Route as GestionalePartiteRouteImport } from './routes/gestionale.partite'
 import { Route as GestionalePlanningRouteImport } from './routes/gestionale.planning'
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
 import { Route as GestionalePulminiRouteImport } from './routes/gestionale.pulmini'
@@ -96,6 +98,7 @@ import { Route as SegreteriaCertificatiRouteImport } from './routes/segreteria_.
 import { Route as SegreteriaPersoneRouteImport } from './routes/segreteria_.persone'
 import { Route as SegreteriaRichiesteRouteImport } from './routes/segreteria_.richieste'
 import { Route as SegreteriaStoriaRouteImport } from './routes/segreteria_.storia'
+import { Route as SegreteriaVerificheRouteImport } from './routes/segreteria_.verifiche'
 import { Route as SostieniIndexRouteImport } from './routes/sostieni.index'
 import { Route as SostieniDonaMaterialeRouteImport } from './routes/sostieni.dona-materiale'
 import { Route as SostieniFondoSolidaleRouteImport } from './routes/sostieni.fondo-solidale'
@@ -472,6 +475,11 @@ const GestionaleIndexRoute = GestionaleIndexRouteImport.update({
   path: '/gestionale/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleAllenamentiRoute = GestionaleAllenamentiRouteImport.update({
+  id: '/gestionale/allenamenti',
+  path: '/gestionale/allenamenti',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleCodaRoute = GestionaleCodaRouteImport.update({
   id: '/gestionale/coda',
   path: '/gestionale/coda',
@@ -495,6 +503,11 @@ const GestionaleNumeriRoute = GestionaleNumeriRouteImport.update({
 const GestionaleOrganigrammaRoute = GestionaleOrganigrammaRouteImport.update({
   id: '/gestionale/organigramma',
   path: '/gestionale/organigramma',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestionalePartiteRoute = GestionalePartiteRouteImport.update({
+  id: '/gestionale/partite',
+  path: '/gestionale/partite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestionalePlanningRoute = GestionalePlanningRouteImport.update({
@@ -570,6 +583,11 @@ const SegreteriaRichiesteRoute = SegreteriaRichiesteRouteImport.update({
 const SegreteriaStoriaRoute = SegreteriaStoriaRouteImport.update({
   id: '/segreteria_/storia',
   path: '/segreteria/storia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SegreteriaVerificheRoute = SegreteriaVerificheRouteImport.update({
+  id: '/segreteria_/verifiche',
+  path: '/segreteria/verifiche',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SostieniIndexRoute = SostieniIndexRouteImport.update({
@@ -834,11 +852,13 @@ export interface FileRoutesByFullPath {
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
+  '/gestionale/allenamenti': typeof GestionaleAllenamentiRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/numeri': typeof GestionaleNumeriRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/partite': typeof GestionalePartiteRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
@@ -853,6 +873,7 @@ export interface FileRoutesByFullPath {
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/segreteria/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria/storia': typeof SegreteriaStoriaRoute
+  '/segreteria/verifiche': typeof SegreteriaVerificheRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
@@ -960,11 +981,13 @@ export interface FileRoutesByTo {
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
+  '/gestionale/allenamenti': typeof GestionaleAllenamentiRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/numeri': typeof GestionaleNumeriRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/partite': typeof GestionalePartiteRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
@@ -978,6 +1001,7 @@ export interface FileRoutesByTo {
   '/segreteria/persone': typeof SegreteriaPersoneRoute
   '/segreteria/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria/storia': typeof SegreteriaStoriaRoute
+  '/segreteria/verifiche': typeof SegreteriaVerificheRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
@@ -1086,11 +1110,13 @@ export interface FileRoutesById {
   '/eventi/christmas-lario-cup': typeof EventiChristmasLarioCupRoute
   '/eventi/lezioni-tecnico-coordinative': typeof EventiLezioniTecnicoCoordinativeRoute
   '/eventi/lotteria-dello-sport': typeof EventiLotteriaDelloSportRoute
+  '/gestionale/allenamenti': typeof GestionaleAllenamentiRoute
   '/gestionale/coda': typeof GestionaleCodaRoute
   '/gestionale/mappa': typeof GestionaleMappaRoute
   '/gestionale/mister': typeof GestionaleMisterRoute
   '/gestionale/numeri': typeof GestionaleNumeriRoute
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
+  '/gestionale/partite': typeof GestionalePartiteRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
@@ -1105,6 +1131,7 @@ export interface FileRoutesById {
   '/segreteria_/persone': typeof SegreteriaPersoneRoute
   '/segreteria_/richieste': typeof SegreteriaRichiesteRoute
   '/segreteria_/storia': typeof SegreteriaStoriaRoute
+  '/segreteria_/verifiche': typeof SegreteriaVerificheRoute
   '/sostieni/dona-materiale': typeof SostieniDonaMaterialeRoute
   '/sostieni/fondo-solidale': typeof SostieniFondoSolidaleRoute
   '/sostieni/proponi': typeof SostieniProponiRoute
@@ -1214,11 +1241,13 @@ export interface FileRouteTypes {
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
+    | '/gestionale/allenamenti'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/numeri'
     | '/gestionale/organigramma'
+    | '/gestionale/partite'
     | '/gestionale/planning'
     | '/gestionale/posta'
     | '/gestionale/pulmini'
@@ -1233,6 +1262,7 @@ export interface FileRouteTypes {
     | '/segreteria/persone'
     | '/segreteria/richieste'
     | '/segreteria/storia'
+    | '/segreteria/verifiche'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
@@ -1340,11 +1370,13 @@ export interface FileRouteTypes {
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
+    | '/gestionale/allenamenti'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/numeri'
     | '/gestionale/organigramma'
+    | '/gestionale/partite'
     | '/gestionale/planning'
     | '/gestionale/posta'
     | '/gestionale/pulmini'
@@ -1358,6 +1390,7 @@ export interface FileRouteTypes {
     | '/segreteria/persone'
     | '/segreteria/richieste'
     | '/segreteria/storia'
+    | '/segreteria/verifiche'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
@@ -1465,11 +1498,13 @@ export interface FileRouteTypes {
     | '/eventi/christmas-lario-cup'
     | '/eventi/lezioni-tecnico-coordinative'
     | '/eventi/lotteria-dello-sport'
+    | '/gestionale/allenamenti'
     | '/gestionale/coda'
     | '/gestionale/mappa'
     | '/gestionale/mister'
     | '/gestionale/numeri'
     | '/gestionale/organigramma'
+    | '/gestionale/partite'
     | '/gestionale/planning'
     | '/gestionale/posta'
     | '/gestionale/pulmini'
@@ -1484,6 +1519,7 @@ export interface FileRouteTypes {
     | '/segreteria_/persone'
     | '/segreteria_/richieste'
     | '/segreteria_/storia'
+    | '/segreteria_/verifiche'
     | '/sostieni/dona-materiale'
     | '/sostieni/fondo-solidale'
     | '/sostieni/proponi'
@@ -1592,11 +1628,13 @@ export interface RootRouteChildren {
   EventiChristmasLarioCupRoute: typeof EventiChristmasLarioCupRoute
   EventiLezioniTecnicoCoordinativeRoute: typeof EventiLezioniTecnicoCoordinativeRoute
   EventiLotteriaDelloSportRoute: typeof EventiLotteriaDelloSportRoute
+  GestionaleAllenamentiRoute: typeof GestionaleAllenamentiRoute
   GestionaleCodaRoute: typeof GestionaleCodaRoute
   GestionaleMappaRoute: typeof GestionaleMappaRoute
   GestionaleMisterRoute: typeof GestionaleMisterRoute
   GestionaleNumeriRoute: typeof GestionaleNumeriRoute
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
+  GestionalePartiteRoute: typeof GestionalePartiteRoute
   GestionalePlanningRoute: typeof GestionalePlanningRoute
   GestionalePostaRoute: typeof GestionalePostaRoute
   GestionalePulminiRoute: typeof GestionalePulminiRoute
@@ -1611,6 +1649,7 @@ export interface RootRouteChildren {
   SegreteriaPersoneRoute: typeof SegreteriaPersoneRoute
   SegreteriaRichiesteRoute: typeof SegreteriaRichiesteRoute
   SegreteriaStoriaRoute: typeof SegreteriaStoriaRoute
+  SegreteriaVerificheRoute: typeof SegreteriaVerificheRoute
   SostieniDonaMaterialeRoute: typeof SostieniDonaMaterialeRoute
   SostieniFondoSolidaleRoute: typeof SostieniFondoSolidaleRoute
   SostieniProponiRoute: typeof SostieniProponiRoute
@@ -2122,6 +2161,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/allenamenti': {
+      id: '/gestionale/allenamenti'
+      path: '/gestionale/allenamenti'
+      fullPath: '/gestionale/allenamenti'
+      preLoaderRoute: typeof GestionaleAllenamentiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/coda': {
       id: '/gestionale/coda'
       path: '/gestionale/coda'
@@ -2155,6 +2201,13 @@ declare module '@tanstack/react-router' {
       path: '/gestionale/organigramma'
       fullPath: '/gestionale/organigramma'
       preLoaderRoute: typeof GestionaleOrganigrammaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/partite': {
+      id: '/gestionale/partite'
+      path: '/gestionale/partite'
+      fullPath: '/gestionale/partite'
+      preLoaderRoute: typeof GestionalePartiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestionale/planning': {
@@ -2260,6 +2313,13 @@ declare module '@tanstack/react-router' {
       path: '/segreteria/storia'
       fullPath: '/segreteria/storia'
       preLoaderRoute: typeof SegreteriaStoriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/segreteria_/verifiche': {
+      id: '/segreteria_/verifiche'
+      path: '/segreteria/verifiche'
+      fullPath: '/segreteria/verifiche'
+      preLoaderRoute: typeof SegreteriaVerificheRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sostieni/': {
@@ -2607,11 +2667,13 @@ const rootRouteChildren: RootRouteChildren = {
   EventiChristmasLarioCupRoute: EventiChristmasLarioCupRoute,
   EventiLezioniTecnicoCoordinativeRoute: EventiLezioniTecnicoCoordinativeRoute,
   EventiLotteriaDelloSportRoute: EventiLotteriaDelloSportRoute,
+  GestionaleAllenamentiRoute: GestionaleAllenamentiRoute,
   GestionaleCodaRoute: GestionaleCodaRoute,
   GestionaleMappaRoute: GestionaleMappaRoute,
   GestionaleMisterRoute: GestionaleMisterRoute,
   GestionaleNumeriRoute: GestionaleNumeriRoute,
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
+  GestionalePartiteRoute: GestionalePartiteRoute,
   GestionalePlanningRoute: GestionalePlanningRoute,
   GestionalePostaRoute: GestionalePostaRoute,
   GestionalePulminiRoute: GestionalePulminiRoute,
@@ -2626,6 +2688,7 @@ const rootRouteChildren: RootRouteChildren = {
   SegreteriaPersoneRoute: SegreteriaPersoneRoute,
   SegreteriaRichiesteRoute: SegreteriaRichiesteRoute,
   SegreteriaStoriaRoute: SegreteriaStoriaRoute,
+  SegreteriaVerificheRoute: SegreteriaVerificheRoute,
   SostieniDonaMaterialeRoute: SostieniDonaMaterialeRoute,
   SostieniFondoSolidaleRoute: SostieniFondoSolidaleRoute,
   SostieniProponiRoute: SostieniProponiRoute,

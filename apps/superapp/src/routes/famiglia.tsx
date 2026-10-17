@@ -8,6 +8,8 @@ import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { CastHelpersCard } from "@/components/scd/CastPresence";
 import { ClubHouseOrderCard } from "@/components/scd/ClubHouseOrderCard";
 import { EraNutritionCard } from "@/components/scd/EraNutritionCard";
+import { FamilyTrainingCard } from "@/components/scd/FamilyTrainingCard";
+import { ReasonPicker } from "@/components/scd/ReasonPicker";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { PushCard } from "@/components/scd/PushCard";
@@ -24,6 +26,8 @@ import { registrationLabel } from "@/lib/roster";
 import { getMyFamily, type FamilyMember } from "@/lib/roster.functions";
 import { FAMILY_GROUP_LABEL, euro, familyNext, type FeeGroup, type MyFee } from "@/lib/fees";
 import { getMyFees } from "@/lib/fees.functions";
+import { AREA_PARTITE_LIVE, type ReasonCode } from "@/lib/team-area";
+import { reportImpediment } from "@/lib/team-area.functions";
 import { loadCalendar } from "@/lib/public-snapshots";
 import { awayMatchesFor, type AwayMatch } from "@/lib/transport-requests";
 import { getFamilyTransport, type FamilyTransport } from "@/lib/transport-requests.functions";
@@ -103,6 +107,8 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
           </div>
         </Card>
 
+        <FamilyTrainingCard />
+
         <Card id="fam-ragazzi" title={kids.length ? "I miei ragazzi" : "La mia scheda"} sub="Dati della segreteria: tesseramento e certificato medico.">
           {members.length === 0 ? (
             <div className="px-4 pb-4 sm:px-[18px]">
@@ -163,6 +169,9 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
 
 function CallupCard({ c, onAnswered }: { c: MyCallup; onAnswered: (r: CallupResponse) => void }) {
   const answer = useServerFn(respondCallup);
+  const impediment = useServerFn(reportImpediment);
+  const [reason, setReason] = useState<ReasonCode>("SCUOLA");
+  const [reasonNote, setReasonNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [reporting, setReporting] = useState(false);
@@ -171,7 +180,10 @@ function CallupCard({ c, onAnswered }: { c: MyCallup; onAnswered: (r: CallupResp
     setBusy(true);
     setNote(null);
     try {
-      const res = await answer({ data: { callupId: c.callupId, response } });
+      // r117: with the Area partite live the impediment carries a reason category (no health details).
+      const res = response === "DECLINED" && AREA_PARTITE_LIVE
+        ? await impediment({ data: { callupId: c.callupId, code: reason, note: reasonNote } })
+        : await answer({ data: { callupId: c.callupId, response } });
       setNote(res.message);
       if (res.ok) {
         onAnswered(response);
@@ -210,6 +222,11 @@ function CallupCard({ c, onAnswered }: { c: MyCallup; onAnswered: (r: CallupResp
         {reporting ? (
           <div className="mt-1 rounded-[10px] border border-[var(--in-line)] bg-[#fff8ec] p-3" role="group" aria-labelledby={noteId}>
             <p id={noteId} className="m-0 text-[14px] leading-snug">{FAMILY_CALLUP_COPY.reportNote}</p>
+            {AREA_PARTITE_LIVE && (
+              <div className="mt-2">
+                <ReasonPicker code={reason} note={reasonNote} onCode={setReason} onNote={setReasonNote} disabled={busy} />
+              </div>
+            )}
             <div className="mt-2 flex flex-wrap gap-2">
               <button type="button" disabled={busy} onClick={() => void send("DECLINED")}
                 className="scd-focus inline-flex h-11 items-center justify-center rounded-[10px] bg-[#9a1d14] px-4 text-[15px] font-semibold text-white disabled:opacity-60" data-testid="callup-report-confirm">
