@@ -1,12 +1,13 @@
 /**
- * Contratti e logica pura per gli snapshot pubblici di prova (pacchetti Drive RC8 Quadro / RC1 Calendario).
- * DATI DI PROVA · FOTOGRAFIA 09.10.2026 · NON LIVE · NON PUBBLICARE.
+ * Contratti e logica pura per gli snapshot di consultazione (quadro allenamenti 09/10/2026, calendario).
+ * Il calendario è la STESSA copia del Master Calendario usata dal resto dell'app (src/data/calendario-snapshot.json,
+ * generata da tools/sync/calendar_public_payload.py): niente seconda copia locale che invecchia (17/10/2026).
  */
 import trasportiJson from './data/trasporti_pubblico.json';
-import calendarioJson from './data/calendario_pubblico.json';
+import calendarioJson from '@/data/calendario-snapshot.json';
 
-export const SNAPSHOT_WATERMARK = 'DATI DI PROVA / FOTOGRAFIA 09.10.2026 — NON PUBBLICARE';
-export const SNAPSHOT_DATE = '2026-10-09';
+/** Filigrana del quadro allenamenti (pacchetto Drive RC8, fotografia 09/10/2026). */
+export const QUADRO_WATERMARK = 'DATI DI PROVA / FOTOGRAFIA 09.10.2026 — NON PUBBLICARE';
 
 export type Day = 'LUNEDÌ' | 'MARTEDÌ' | 'MERCOLEDÌ' | 'GIOVEDÌ' | 'VENERDÌ';
 export type Room = 'SP1' | 'SP2' | 'SP3' | 'SP4';
@@ -29,7 +30,11 @@ export interface CalendarioSnapshot { schema: string; season: string; snapshot_s
  */
 export const EMPTY_QUADRO_SNAPSHOT: QuadroSnapshot = { schema: '', audience: '', generatedUTC: '', days: [], slots: [], rotations: [], rooms: [], note: '' };
 export const trasporti = trasportiJson as TrasportiSnapshot;
-export const calendario = calendarioJson as CalendarioSnapshot;
+export const calendario = calendarioJson as unknown as CalendarioSnapshot;
+/** Giorno della copia del Master Calendario (ISO). */
+export const SNAPSHOT_DATE = calendario.source_modified_at.slice(0, 10);
+/** Filigrana del calendario: copia del master, non live. */
+export const SNAPSHOT_WATERMARK = `COPIA DEL MASTER CALENDARIO ${SNAPSHOT_DATE.split('-').reverse().join('.')} — NON LIVE`;
 
 export const ROOMS: Room[] = ['SP1', 'SP2', 'SP3', 'SP4'];
 

@@ -43,18 +43,113 @@ export const GROUP_FORMAT: Readonly<Record<string, MatchFormat>> = {
   piccoli: 3,
 };
 
-/** Team names shown in the UI (team names only). */
+/**
+ * The 9 active teams of the 2026/27 season (VERIFIED, Direzione 17/10/2026), in hall order.
+ * `id` is the calendar group of the Master Calendario snapshot. U18 Élite is WITHDRAWN (see
+ * {@link WITHDRAWN_TEAMS}); U14 does not exist on its own (2012 and 2013 train and play together
+ * as U15). Annate only where the Direzione stated them; unknown stays null ("da confermare").
+ */
+export interface SeasonTeam {
+  id: string;
+  label: string;
+  /** Birth years as stated by the Direzione, null = da confermare. */
+  annate: string | null;
+  /** FIGC/SGS category (U-label), null when not applicable. */
+  category: string | null;
+  competitions: string;
+}
+
+export const SEASON_TEAMS_2026_27: readonly SeasonTeam[] = [
+  {
+    id: "prima",
+    label: "Prima Squadra",
+    annate: null,
+    category: null,
+    competitions: "Promozione + Coppa Italia Promozione",
+  },
+  {
+    id: "u19",
+    label: "Juniores U19 Élite",
+    annate: null,
+    category: "U19",
+    competitions: "Campionato Juniores U19 Élite + coppa",
+  },
+  {
+    id: "u16",
+    label: "U16 Élite",
+    annate: "2011",
+    category: "U16",
+    competitions: "Campionato U16 Élite",
+  },
+  {
+    id: "u15",
+    label: "U15 Giovanissimi",
+    annate: "2012-2013",
+    category: "U15",
+    competitions:
+      "Campionato Giovanissimi U15 (2012 e 2013 insieme, nessuna U14 separata)",
+  },
+  {
+    id: "2014",
+    label: "Esordienti 2014",
+    annate: "2014",
+    category: "U13",
+    competitions: "Esordienti",
+  },
+  {
+    id: "2015",
+    label: "Esordienti 2015",
+    annate: "2015 (+ alcuni 2016)",
+    category: "U12",
+    competitions: "Esordienti",
+  },
+  {
+    id: "pulcini",
+    label: "Pulcini 2016-2017",
+    annate: "2016-2017",
+    category: "U11",
+    competitions: "Pulcini",
+  },
+  {
+    id: "primicalci",
+    label: "Primi Calci 2018-2019",
+    annate: "2018-2019",
+    category: null,
+    competitions: "Primi Calci",
+  },
+  {
+    id: "piccoli",
+    label: "Piccoli Amici 2020-2021",
+    annate: "2020-2021",
+    category: null,
+    competitions: "Piccoli Amici",
+  },
+];
+
+/**
+ * Teams that are NOT active in 2026/27: never in planning, rotation, training slots or match
+ * lists. History (old calendar rows, "ex U18" notes on the training board) is kept as written.
+ */
+export const WITHDRAWN_TEAMS: readonly {
+  id: string;
+  label: string;
+  note: string;
+}[] = [
+  {
+    id: "u18",
+    label: "U18 Élite",
+    note: "Ritirata nella stagione 2026/27: nessun allenamento e nessuna gara",
+  },
+];
+
+/** True for a calendar group of a withdrawn team (fail closed on the id). */
+export const isWithdrawnGroup = (group: string): boolean =>
+  WITHDRAWN_TEAMS.some((t) => t.id === group.trim().toLowerCase());
+
+/** Team names shown in the UI (team names only), from {@link SEASON_TEAMS_2026_27}. */
 export const GROUP_LABEL: Readonly<Record<string, string>> = {
-  prima: "Prima Squadra",
-  u19: "Juniores U19",
-  u16: "U16 Élite",
-  u15: "U15",
-  "2014": "Esordienti 2014",
-  "2015": "Esordienti 2015",
-  esordienti: "Esordienti",
-  pulcini: "Pulcini",
-  primicalci: "Primi Calci",
-  piccoli: "Piccoli Amici",
+  ...Object.fromEntries(SEASON_TEAMS_2026_27.map((t) => [t.id, t.label])),
+  esordienti: "Esordienti (annata da verificare)",
 };
 
 /** Short tags (board "E14 + U19"). */
@@ -236,11 +331,13 @@ export function homePitchOf(venue: string): PitchId | null {
 
 /**
  * Home matches of the snapshot as rotation matches, sorted by day and time.
- * Events with an unknown format, no start time or not at Colico are left out.
+ * Events with an unknown format, no start time or not at Colico are left out,
+ * and so are the rows of withdrawn teams (U18 Élite, 2026/27).
  */
 export function homeMatches(events: readonly SnapshotEvent[]): RotationMatch[] {
   const out: RotationMatch[] = [];
   for (const e of events) {
+    if (isWithdrawnGroup(e.group)) continue;
     const pitch = homePitchOf(e.venue);
     const format = GROUP_FORMAT[e.group];
     const start = toMinutes(e.time);
@@ -1247,3 +1344,81 @@ export const shortDay = (iso: string): string => {
 };
 export const ddmm = (iso: string): string =>
   `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
+
+/* ------------------------------------------------------------------ */
+/* Conflict suggestions                                                */
+/* ------------------------------------------------------------------ */
+
+/** One proposed way out of an over-capacity on Colico campo 1 (a proposal, nothing is moved). */
+export interface ConflictSuggestion {
+  matchId: string;
+  label: string;
+  pitch: PitchId;
+  start: number;
+  end: number;
+  /** "same-time": same kick-off on another pitch; "other-time": first free window on the same pitch. */
+  kind: "same-time" | "other-time";
+}
+
+/** Day window in which free slots are proposed (09:00–21:00). */
+export const SUGGEST_FROM_MIN = 9 * 60;
+export const SUGGEST_TO_MIN = 21 * 60;
+
+/**
+ * Proposals for each use in conflict on Colico campo 1 that day: the same kick-off on
+ * Colico campo 2 or (youth 11v11 only, see `dervioAllowed`) Dervio when it fits there,
+ * otherwise the first free window on campo 1 long enough for it. Pure, deterministic,
+ * at most `perMatch` proposals per use; the Prima Squadra always stays on campo 1.
+ */
+export function conflictSuggestions(
+  report: Pick<DayReport, "matches" | "over">,
+  opts: Pick<ScenarioOptions, "startDate" | "dervioClosedInWinter"> & {
+    buffer: number;
+  },
+  perMatch = 2,
+): ConflictSuggestion[] {
+  const out: ConflictSuggestion[] = [];
+  const inConflict = report.matches.filter(
+    (m) => m.pitch === "C1" && report.over.C1.has(m.id) && m.group !== "prima",
+  );
+  for (const m of inConflict) {
+    const others = report.matches.filter((x) => x.id !== m.id);
+    const duration = m.end - m.start;
+    const found: ConflictSuggestion[] = [];
+    const targets: PitchId[] = dervioAllowed(m, opts) ? ["C2", "DV"] : ["C2"];
+    for (const pitch of targets) {
+      if (m.format !== "full" && PITCH_UNITS[pitch][m.format] === null)
+        continue;
+      if (
+        checkSlot(others, pitch, m.start, duration, m.format, opts.buffer).fits
+      )
+        found.push({
+          matchId: m.id,
+          label: m.label,
+          pitch,
+          start: m.start,
+          end: m.end,
+          kind: "same-time",
+        });
+    }
+    if (found.length < perMatch) {
+      const win = freeWindows(others, "C1", {
+        from: SUGGEST_FROM_MIN,
+        to: SUGGEST_TO_MIN,
+        minLength: duration,
+        buffer: opts.buffer,
+      })[0];
+      if (win)
+        found.push({
+          matchId: m.id,
+          label: m.label,
+          pitch: "C1",
+          start: win.start,
+          end: win.start + duration,
+          kind: "other-time",
+        });
+    }
+    out.push(...found.slice(0, perMatch));
+  }
+  return out;
+}
