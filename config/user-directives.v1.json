@@ -4191,6 +4191,25 @@
         "implementationStatus": "IN_PROGRESS",
         "implementation": "scd-figc-lnd, scd-tesserati reconciliation; Vetta Legnone counts"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "11:11-11:13",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-167",
+      "name": "STAFF_DIRECTORY_ROLE_BASED_VISIBILITY_AND_PHONE_CONSENT",
+      "sourceQuoteFragments": [
+        "applica"
+      ],
+      "context": "Francesco (Direttore Generale) 17/10/2026 asked that staff and contacts information be available to everyone entitled (gestionale, CRM, Iride chatbot and cast avatars) with role-based visibility, and answered «applica» to the four-point plan below. Implemented on branch feat/rubrica-staff-consensi: migration r141 STAGED (not applied), lib/staff-directory.ts, /gestionale/rubrica, family card on /famiglia, own consent on /la-mia-scd, Iride hand-off.",
+      "normalizedCommand": {
+        "rule": "1) One staff directory inside the gestionale (SCD PULSE, the organigram registry scd_structure_roles + scd_people): Direzione and Segreteria see every staff member; each mister sees the staff of his own teams plus the club-level responsibles (pulmini, campi, magazzino, palestra, segreteria); families see only their child's team staff plus the Segreteria. 2) Iride and the cast know who does what (names, roles, teams) from the same source; they reveal a phone number ONLY to a logged-in member with a verified role allowed by rule 1 AND only if that staff member consented; otherwise they hand the message over to the Segreteria. 3) Per-person consent «share my number with families and staff of my teams», default NO until answered. 4) External contacts (AC Monza affiliation, FIGC Sondrio, Comuni, Croce Rossa, AVIS, other associations) belong to the SCD GROW CRM area, separate from staff. Minors are never in the directory; no phone numbers in code, tests, migrations or logs.",
+        "scope": "SCD PULSE scd_people / scd_structure_roles / scd_person_consents, /gestionale/rubrica, /famiglia, /la-mia-scd, Iride (assistant.server.ts), GROW CRM",
+        "supersedes": "none",
+        "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
+        "implementation": "r141 (needs r132 first): consent type TELEFONO_STAFF_CONDIVISO, scd_structure_roles.needs_review, scd_staff_directory / scd_set_my_phone_share / scd_person_phone, people policy narrowed to rule 1, phone column out of direct reads, organigram 2026/27 seed with hashed names, U18 staff roles closed; app: staff-directory.ts, staff-directory.functions.ts, StaffDirectory.tsx, gestionale.rubrica.tsx"
+      }
     }
   ],
   "completionGate": {

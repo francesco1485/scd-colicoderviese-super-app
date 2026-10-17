@@ -283,7 +283,13 @@ export const APP_GUIDE: ReadonlyArray<{ text: string; to: string }> = [
  * sponsor offer, official result links and the app guide. Never people: no rosters, staff, notes or minors' names.
  * With `area` (a chat area of Vera, UD-121) the area's notes and curated copy come first.
  */
-export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC_CONTEXT_TOKENS, area?: CastAreaContext | null): BuiltContext {
+export function buildPublicContext(
+  input: PublicContextInput,
+  maxTokens = PUBLIC_CONTEXT_TOKENS,
+  area?: CastAreaContext | null,
+  /** UD-167: only for a signed-in member (the caller's own directory, r141); public pages never pass it. */
+  directory?: readonly string[],
+): BuiltContext {
   const b = new ContextBuilder(Math.floor(maxTokens * CHARS_PER_TOKEN));
   b.line(`Oggi è ${italianDate(input.today)} ${input.today.slice(0, 4)} (fuso Europe/Rome). Stagione 2026/27.`);
 
@@ -292,6 +298,7 @@ export function buildPublicContext(input: PublicContextInput, maxTokens = PUBLIC
     b.section(area.title);
     for (const l of area.lines) b.line(l.text, l.to);
   }
+  directorySection(b, directory);
 
   b.section("Contatti ufficiali");
   b.line(`Sede: ${input.contacts.address}. E-mail segreteria: ${input.contacts.email}. PEC: ${input.contacts.pec}. Sito: ${input.contacts.site}`, input.contacts.site, "/contatti");
@@ -365,6 +372,15 @@ export interface StaffContextInput {
   query: string;
   matches: readonly KbItem[];
   due: readonly KbItem[];
+  /** UD-167: "Nome: ruolo · squadra" lines of the caller's own staff directory (r141). Never numbers. */
+  directory?: readonly string[];
+}
+
+/** UD-167: who does what, from the caller's own directory (names, roles, teams). Numbers never enter the CONTEXT. */
+function directorySection(b: ContextBuilder, lines: readonly string[] | undefined): void {
+  if (!lines || lines.length === 0) return;
+  b.section("Chi fa cosa nello staff (solo le persone che questa persona può vedere; i numeri li dà solo la Rubrica)");
+  for (const l of lines) if (!b.line(l)) break;
 }
 
 function kbLine(it: KbItem, today: string): string {
@@ -397,6 +413,7 @@ export function buildStaffContext(input: StaffContextInput, maxTokens = STAFF_CO
   const due = input.due.filter((it) => !seen.has(it.id));
   if (due.length === 0) b.line("Nessuna altra scadenza in vista.");
   for (const it of due) if (!b.line(kbLine(it, input.today), it.link)) break;
+  directorySection(b, input.directory);
   return b.build([], []);
 }
 
