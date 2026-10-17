@@ -48,6 +48,7 @@ import { detectDistress } from "./cast-safety";
 import { directionsReply, isClubDirectionsQuestion } from "./club-directions";
 import type { KbResult } from "./knowledge";
 import { REQUEST_RE, skyIntent, type SkyReply } from "./sky.functions";
+import { directoryContextLines, isStaffContactQuestion, staffContactReply, type StaffDirectory } from "./staff-directory";
 
 type Env = Readonly<Record<string, string | undefined>>;
 
@@ -209,6 +210,11 @@ export interface StaffDeps extends AnswerDeps {
   /** scd_kb_search with the caller's own session; null when the database refuses or is not configured. */
   kbSearch: (q: { query: string | null; onlyDue: boolean; limit: number }) => Promise<KbResult | null>;
   loadPublicContext: () => Promise<PublicContextInput>;
+  /**
+   * UD-167: the caller's own staff directory (scd_staff_directory, r141, caller's session). undefined = not available
+   * (r141 not applied or read failed); null = signed in without a verified role. Numbers are only in this object.
+   */
+  staffDirectory?: () => Promise<StaffDirectory | null | undefined>;
 }
 
 /**
@@ -224,12 +230,28 @@ export async function answerStaff(message: string, deps: StaffDeps, requested?: 
   const { persona, area } = resolveChat("inside", { roles: s.roles, age15plus: null }, requested);
   const cfg = assistantConfig(deps.env);
   const safety = async () => asReply(await deps.rules({ message, persona, area }), persona, area);
-  if (bypassesModel(message, area)) return safety();
+  const bypass = bypassesModel(message, area);
+  if (bypass === "distress" || bypass === "safeguarding") return safety();
+  // UD-167: who does what / a staff number. Deterministic, from the caller's own directory: the model never writes a
+  // number, and a number not shared becomes a hand-off to the Segreteria. The directory RPC (scd_staff_directory) runs
+  // only for a contact question or, below, when the model is about to be called with the names-and-roles context.
+  let directoryRead: Promise<StaffDirectory | null | undefined> | undefined;
+  const loadDirectory = (): Promise<StaffDirectory | null | undefined> =>
+    (directoryRead ??= deps.staffDirectory ? deps.staffDirectory().catch(() => undefined) : Promise.resolve(undefined));
+  if (deps.staffDirectory && isStaffContactQuestion(message)) {
+    const directory = await loadDirectory();
+    if (directory !== undefined) {
+      log("staff-contact", { persona, area, found: directory ? directory.people.length : null });
+      return asReply(staffContactReply(message, directory), persona, area);
+    }
+  }
+  if (bypass) return safety();
   if (isExplicitAppQuestion(message)) return asReply(appHelpReply(), persona, area);
   const rules = async () => (isLegacyAppHelp(message) ? asReply(appHelpReply(), persona, area) : safety());
   if (!cfg.enabled) return rules();
   const rl = staffLimiter.hit(limiterKey("user", s.user.email.toLowerCase()), (deps.now ?? Date.now)());
   if (!rl.ok) return { text: rateLimitedText(rl.retryAfterSec), mood: "alert", ai: false, persona, area };
+  const dirLines = directoryContextLines((await loadDirectory()) ?? null);
 
   const today = romeToday(new Date((deps.now ?? Date.now)()));
   let ctx: BuiltContext;
@@ -238,7 +260,7 @@ export async function answerStaff(message: string, deps: StaffDeps, requested?: 
     // Vera with an area never reads the Cervellone: public projection + the area notes.
     try {
       const data = await deps.loadPublicContext();
-      ctx = buildPublicContext(data, PUBLIC_CONTEXT_TOKENS, await areaFor(area, today, deps));
+      ctx = buildPublicContext(data, PUBLIC_CONTEXT_TOKENS, await areaFor(area, today, deps), dirLines);
     } catch {
       log("fallback", { persona, area, level, reason: "context", status: null, ms: 0 });
       return rules();
@@ -253,9 +275,9 @@ export async function answerStaff(message: string, deps: StaffDeps, requested?: 
     const kb = matches ?? due;
     if (kb) {
       level = kb.level;
-      ctx = buildStaffContext({ today, level: kb.level, query: message, matches: matches?.items ?? [], due: due?.items ?? [] });
+      ctx = buildStaffContext({ today, level: kb.level, query: message, matches: matches?.items ?? [], due: due?.items ?? [], directory: dirLines });
     } else {
-      ctx = buildPublicContext(await deps.loadPublicContext());
+      ctx = buildPublicContext(await deps.loadPublicContext(), PUBLIC_CONTEXT_TOKENS, null, dirLines);
     }
   } catch {
     log("fallback", { persona, area, level, reason: "context", status: null, ms: 0 });

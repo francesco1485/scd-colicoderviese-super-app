@@ -2,6 +2,8 @@ import { describe, expect, test } from 'vitest';
 import { QUADRO_SNAPSHOT as quadro } from '@/lib/quadro-data.server';
 import { calendario, trasporti, filterEvents, slotsForDay, rotationFor, roomsFor, logoFor, rangeOf, shiftAnchor, mondayOf, activeEvents, coreSteps, rubricaGroups, ROOMS } from './snapshot';
 import { sources } from './sources';
+import canonicalCalendar from '@/data/calendario-snapshot.json';
+import { SNAPSHOT_DATE } from './snapshot';
 
 describe('Snapshot Quadro', () => {
   test('15 fasce solo lun-ven', () => {
@@ -28,10 +30,12 @@ describe('Snapshot Quadro', () => {
 });
 
 describe('Snapshot Calendario', () => {
-  test('156 eventi 2026/27 non live', () => {
-    expect(calendario.events.length).toBe(156);
+  test('stessa copia del Master Calendario del resto dell\'app (171 eventi 2026/27, non live)', () => {
+    expect(calendario).toBe(canonicalCalendar);
+    expect(calendario.events.length).toBe(171);
     expect(calendario.season).toBe('2026/27');
-    expect(calendario.snapshot_status).toMatch(/^ANTEPRIMA_NON_LIVE/);
+    expect(calendario.snapshot_status).toBe('COPIA_AUTOMATICA_DAL_MASTER');
+    expect(SNAPSHOT_DATE).toBe('2026-10-15');
   });
   test('U18 esclusa dagli eventi attivi', () => activeEvents(calendario.events).forEach(e => expect(e.category).not.toMatch(/U18/)));
   test('filtro casa restituisce solo CASA', () => {
@@ -98,12 +102,12 @@ describe('Rifinitura 2', () => {
 
 import { isProvisional, needsFacility } from './snapshot';
 describe('Hotfix verifiche calendario', () => {
-  test('31 orario/sede da confermare', () => expect(calendario.events.filter(isProvisional).length).toBe(31));
+  test('46 orario/sede da confermare', () => expect(calendario.events.filter(isProvisional).length).toBe(46));
   test('14 risorsa impianto da verificare', () => expect(calendario.events.filter(needsFacility).length).toBe(14));
   test('ogni evento ha verification', () => calendario.events.forEach(e => expect(e.verification).toBeDefined()));
-  test('Penta Piateda 11/10 14:30 in annata 2015', () => {
+  test('Penta Piateda 11/10 15:00 (master 15/10) in annata 2015', () => {
     const e = calendario.events.find(x => x.id === 'EVT-ES-20261011-PENTAPIATEDA-CASA')!;
-    expect(e.group).toBe('2015'); expect(e.date).toBe('2026-10-11'); expect(e.time).toBe('14:30');
+    expect(e.group).toBe('2015'); expect(e.date).toBe('2026-10-11'); expect(e.time).toBe('15:00');
     expect(filterEvents(calendario.events, { group: '2015', homeAway: 'TUTTE', view: 'settimana', anchor: '2026-10-05' }).map(x => x.id)).toContain(e.id);
   });
   test('nessun codice interno', () => expect(JSON.stringify(calendario)).not.toMatch(/BLOCKED_CONFLICT/));
@@ -143,15 +147,15 @@ describe('Fasi orarie per intersezione', () => {
 });
 
 import { upcoming as _up, toVerify as _tv } from './snapshot';
-import rc3 from './data/calendario_pubblico.json';
-describe('RC3 calendario gestione', () => {
-  test('revisione RC3, 156 id unici', () => {
-    expect((rc3 as { projection_revision: string }).projection_revision).toBe('RC3_MOBILE_20261009');
-    expect(new Set(calendario.events.map(e => e.id)).size).toBe(156);
+const rc3 = canonicalCalendar;
+describe('Calendario gestione (copia del master)', () => {
+  test('revisione della copia, 171 id unici', () => {
+    expect(calendario.projection_revision).toBe('SCD_RC7_MASTER_SYNC');
+    expect(new Set(calendario.events.map(e => e.id)).size).toBe(171);
   });
-  test('31 da confermare in Gestione, nessuno marcato confermato', () => {
+  test('46 da confermare in Gestione, nessuno marcato confermato', () => {
     const v = _tv(calendario.events);
-    expect(v.length).toBe(31);
+    expect(v.length).toBe(46);
     expect(v.every(e => !e.verification!.time_confirmed || !e.verification!.venue_confirmed)).toBe(true);
   });
   test('prossime gare ordinate dalla data snapshot', () => {

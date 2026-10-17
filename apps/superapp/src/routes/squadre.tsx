@@ -13,6 +13,7 @@ import { romeParts } from "@/lib/home-week";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 import { BASE_ACTIVITY_TEAMS } from "@/lib/social";
 import { publicTeamCrest } from "@/lib/team-crest";
+import { isShowcaseTeam } from "@/lib/team-showcase";
 
 /**
  * Teams are inside (UD-100, Direzione 13/10/2026): rosters, team pages, next matches and news stay for members.
@@ -266,8 +267,8 @@ function PublicTeamsScreen({ teams }: { teams: readonly PublicTeam[] }) {
       title="Le nostre squadre"
       intro={
         teams.length > 0
-          ? `${teams.length} squadre tra Colico e Dervio, dalla Prima Squadra ai più piccoli. Le gare sono nel calendario pubblico; rose, convocazioni e notizie di ogni squadra sono nell'area soci.`
-          : "Dalla Prima Squadra ai più piccoli, tra Colico e Dervio. Rose, convocazioni e notizie di ogni squadra sono nell'area soci."
+          ? `${teams.length} squadre tra Colico e Dervio, dalla Prima Squadra ai più piccoli. Le gare sono nel calendario pubblico; le rose di Prima Squadra, Juniores U19 Élite e Allievi U16 Élite sono aperte a tutti. Le convocazioni sono nell'area soci.`
+          : "Dalla Prima Squadra ai più piccoli, tra Colico e Dervio. Le convocazioni sono nell'area soci."
       }
       next="/squadre"
       lead={
@@ -307,9 +308,9 @@ function PublicTeamRow({ t }: { t: PublicTeam }) {
         <span className="mt-1 block text-[13.5px] font-semibold leading-snug text-[#3e5272]">{t.line}</span>
         {t.years && <span className="block text-[13px] text-[#4a5d7a]">{t.years}</span>}
       </span>
-      {t.annata && (
+      {(t.annata || isShowcaseTeam(t.id)) && (
         <span className="inline-flex shrink-0 items-center gap-1 text-[13.5px] font-bold text-[#0457af]">
-          Gare
+          {isShowcaseTeam(t.id) ? "Rosa" : "Gare"}
           <span aria-hidden="true">›</span>
         </span>
       )}
@@ -317,6 +318,18 @@ function PublicTeamRow({ t }: { t: PublicTeam }) {
   );
   const cls =
     "relative flex min-h-[72px] items-center gap-3 overflow-hidden rounded-[16px] bg-white py-3 pl-4 pr-3.5 text-[#13254d] shadow-[0_2px_10px_rgb(11_42_91/0.08)]";
+  // Vetrina squadre (UD-168): the three showcase teams open their public page (roster, staff, stats).
+  if (isShowcaseTeam(t.id))
+    return (
+      <Link
+        to="/squadre/$team"
+        params={{ team: t.id }}
+        className={`scd-focus ${cls} transition-colors hover:border-[#9fbde4] hover:bg-white`}
+        aria-label={`ColicoDerviese ${t.name}: ${t.line}. Apri la rosa, aperta a tutti`}
+      >
+        {body}
+      </Link>
+    );
   return t.annata ? (
     <Link
       to="/calendario"

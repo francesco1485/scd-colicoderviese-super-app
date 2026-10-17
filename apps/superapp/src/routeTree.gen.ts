@@ -84,6 +84,7 @@ import { Route as GestionalePlanningRouteImport } from './routes/gestionale.plan
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
 import { Route as GestionalePulminiRouteImport } from './routes/gestionale.pulmini'
 import { Route as GestionaleRichiesteRouteImport } from './routes/gestionale.richieste'
+import { Route as GestionaleRubricaRouteImport } from './routes/gestionale.rubrica'
 import { Route as GestionaleStrutturaRouteImport } from './routes/gestionale.struttura'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as LaMiaScdCampioneRouteImport } from './routes/la-mia-scd_.campione'
@@ -510,6 +511,11 @@ const GestionaleRichiesteRoute = GestionaleRichiesteRouteImport.update({
   path: '/gestionale/richieste',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleRubricaRoute = GestionaleRubricaRouteImport.update({
+  id: '/gestionale/rubrica',
+  path: '/gestionale/rubrica',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleStrutturaRoute = GestionaleStrutturaRouteImport.update({
   id: '/gestionale/struttura',
   path: '/gestionale/struttura',
@@ -830,6 +836,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
@@ -954,6 +961,7 @@ export interface FileRoutesByTo {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
@@ -1078,6 +1086,7 @@ export interface FileRoutesById {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd_/campione': typeof LaMiaScdCampioneRoute
@@ -1204,6 +1213,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/gestionale/impianti'
     | '/la-mia-scd/campione'
@@ -1328,6 +1338,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/la-mia-scd/campione'
     | '/ledwall/player'
@@ -1451,6 +1462,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/gestionale_/impianti'
     | '/la-mia-scd_/campione'
@@ -1576,6 +1588,7 @@ export interface RootRouteChildren {
   GestionalePostaRoute: typeof GestionalePostaRoute
   GestionalePulminiRoute: typeof GestionalePulminiRoute
   GestionaleRichiesteRoute: typeof GestionaleRichiesteRoute
+  GestionaleRubricaRoute: typeof GestionaleRubricaRoute
   GestionaleStrutturaRoute: typeof GestionaleStrutturaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   LaMiaScdCampioneRoute: typeof LaMiaScdCampioneRoute
@@ -2152,6 +2165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleRichiesteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/rubrica': {
+      id: '/gestionale/rubrica'
+      path: '/gestionale/rubrica'
+      fullPath: '/gestionale/rubrica'
+      preLoaderRoute: typeof GestionaleRubricaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/struttura': {
       id: '/gestionale/struttura'
       path: '/gestionale/struttura'
@@ -2575,6 +2595,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionalePostaRoute: GestionalePostaRoute,
   GestionalePulminiRoute: GestionalePulminiRoute,
   GestionaleRichiesteRoute: GestionaleRichiesteRoute,
+  GestionaleRubricaRoute: GestionaleRubricaRoute,
   GestionaleStrutturaRoute: GestionaleStrutturaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   LaMiaScdCampioneRoute: LaMiaScdCampioneRoute,

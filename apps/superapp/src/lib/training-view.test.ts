@@ -60,10 +60,15 @@ describe("trainingKids", () => {
     expect(trainingKids([m("Anna Rossi", 2015, true)], q.slots)).toEqual([{ firstName: "Anna", key: "2015" }]);
   });
 
-  it("falls back to the team category, never guessing U13=2014 or similar", () => {
+  it("finds the board sessions from the birth year through the verified annata table (2011 = U16)", () => {
     const out = trainingKids([m("Marco Rossi", 2011, true, "FIGLIO", ["u16"])], q.slots);
+    expect(out).toEqual([{ firstName: "Marco", key: "2011" }]);
+    expect(findSessions(q.slots, "2011")).toEqual(findSessions(q.slots, "U16"));
+  });
+
+  it("falls back to the team category when the year is outside the 2026/27 table", () => {
+    const out = trainingKids([m("Marco Rossi", 2007, true, "FIGLIO", ["u16"])], q.slots);
     expect(out).toEqual([{ firstName: "Marco", key: "U16" }]);
-    expect(findSessions(q.slots, "U16").length).toBeGreaterThan(0);
   });
 
   it("a child whose year and team are not on the board gets no key (no empty week)", () => {
