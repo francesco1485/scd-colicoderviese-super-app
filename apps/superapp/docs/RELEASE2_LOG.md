@@ -955,3 +955,13 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Locandine ufficiali pubblicate così come approvate dalla Direzione 17/10/2026 (la grafica riporta «S.D.C.»; i testi dell'app usano sempre «S.C.D. ColicoDerviese»). Le immagini mostrano il recapito pubblico dell'organizzatore.
 - «Iscrivi la squadra» apre il sito dell'organizzatore (https, nuova scheda, `rel="noopener noreferrer"`). Nessun numero di telefono nei testi.
 - Revisioni scd-revisore + scd-sicurezza: PASS × 2.
+
+## 2026-10-17 — chat cloud — Tessere, Convenzioni e Club House: si può iniziare a inserire (Francesco 12:22 «quando sarà pronta la piattaforma delle tessere, convenzioni e delle Club House per lavorarci e iniziare a inserire tutto»; UD-181)
+
+- Un solo registro per le tre piattaforme: `scd_club_catalog` (migrazione **r115, STAGED, non applicata**: si attiva con «applica r115»; test PGlite `supabase/tests/r115_club_catalog.pglite.mjs`). Nessun ruolo o permesso cambiato: scrivono Direzione (DIRECTION, presidente, direttore-generale) ovunque, `responsabile-club-house` per la Club House, Segreteria (SECRETARIAT, segreteria) per le tessere; le convenzioni solo la Direzione.
+- Inserimento dentro le pagine esistenti: «Inserisci: Club House» in `/tesoreria/club-house` (orari Colico/Dervio, listino Bar/Cucina/Merchandising, menu per gruppi; serate → Attività in struttura r135/r137); «Inserisci: Convenzioni» e «Inserisci: Tessere e card» in `/gestionale/piattaforme/convenzioni`. Stati Bozza / Pubblicata / Archiviata, mai cancellazioni, audit append-only.
+- In pubblico solo righe pubblicate e valide: Club House su `/impianti`, convenzioni e novità delle card su `/card` e `/card/<tipo>`. Senza dati o registro non attivo: «da confermare». Prezzo mancante = «prezzo da confermare», mai 0. Niente e-mail o telefoni nei testi (contatto del partner solo via link https).
+- Le tre card restano la policy della Direzione (`config/scd-club-cards.v1.json`): il registro aggiunge vantaggi, regole e altri tipi di tessera, non le copia.
+- Motori SOLDI e TEMPO; misura: righe pubblicate per piattaforma, giorni da BOZZA a PUBBLICATA (`scd_club_catalog_events`), blocchi «da confermare» pubblici verso zero.
+- Test: `src/lib/club-catalog.test.ts`, `src/features/club-catalog/ClubCatalogEditor.test.tsx`, PGlite r115. Nota: su `/tesoreria/club-house` compare a tratti un errore di idratazione React #418 già presente prima di questo lavoro (riprodotto sulla build precedente del ramo pulmini, senza queste modifiche).
+
