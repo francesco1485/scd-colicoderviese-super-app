@@ -88,7 +88,7 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
       "Title partner di un torneo: il tuo nome accanto al nome del torneo",
       "Premio fair play con il tuo marchio, consegnato in campo",
       "Spazio nel villaggio del torneo per farti conoscere",
-      "Christmas Lario Cup l'8 dicembre 2026, maschile e femminile; Memorial Nasazzi a maggio 2027 (date da confermare)",
+      "Christmas Lario Cup l'8 dicembre 2026, maschile e femminile; Memorial José Nasazzi il 22–23 maggio 2027 a Colico, con la Female Edition a Dervio",
     ],
     audience:
       "Squadre ospiti, accompagnatori e famiglie che vengono a Colico e Dervio per i tornei.",

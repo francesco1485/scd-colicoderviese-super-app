@@ -464,7 +464,7 @@ const ENUM_LABEL: Readonly<Record<string, Readonly<Record<string, string>>>> = {
   tournament: {
     "christmas-lario-cup-maschile": "Christmas Lario Cup",
     "christmas-lario-cup-female": "Christmas Lario Cup · Female",
-    "memorial-jose-nasazzi": "Memorial José Nasazzi",
+    "memorial-jose-nasazzi": "Memorial José Nasazzi (con la Female Edition)",
     "memorial-sandro-guattini": "Memorial Sandro Guattini",
   },
 };
