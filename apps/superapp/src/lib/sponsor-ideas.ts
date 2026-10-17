@@ -176,7 +176,7 @@ function kitIdea(): SponsorIdea | null {
     title: "Il kit dei Primi Calci",
     scene: "kit",
     where: "Sul materiale del kit dei più piccoli",
-    community: "Il primo kit da calciatore dei bambini dei Primi Calci: lo indossano agli allenamenti e se lo portano a casa.",
+    community: "Il primo kit da calciatore dei bambini dei Primi Calci: lo indossano agli allenamenti.",
     gets: [
       "Il tuo marchio sul materiale del kit, da definire con il Presidente e il fornitore",
       "Il tuo nome nella presentazione del kit alle famiglie",
