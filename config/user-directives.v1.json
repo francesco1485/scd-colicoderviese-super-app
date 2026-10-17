@@ -4427,13 +4427,13 @@
         "Da sola, solo voci VERIFIED (16:40)"
       ],
       "normalizedCommand": {
-        "rule": "The Super Giornalista's Prima pagina of the day goes online by itself on the public home every morning, right under the live + weather band: one apertura, up to four brevi, the question of the day (one tap opens the club chat with the answer), then persone / sponsor / dentro l'app. VERIFIED items only (the database refuses the others); the Direzione can switch a story off and it stays off if the agent republishes. With no front page for the day the block is not shown (no invented story). The Google Doc draft in 02_BOZZA_PRONTA stays as the newsroom copy.",
-        "scope": "SUPER_APP components/home/FrontPage.tsx, PublicHome.tsx, HomeLobby.tsx (lead slot), routes/index.tsx loader, lib/front-page.ts, lib/front-page.functions.ts; SCD PULSE migration r145 (scd_front_page_items, scd_front_page_publish, scd_public_front_page, scd_front_page_hide); .claude/agents/scd-super-giornalista.md; scheduled task «SCD Prima pagina · Super Giornalista»",
+        "rule": "The Super Giornalista's Prima pagina of the day goes online by itself on the public home every morning, right under the live + weather band: one apertura, up to four brevi, the question of the day (one tap opens the club chat with the answer), then persone / sponsor / dentro l'app. VERIFIED items only. Channel (scd-sicurezza 17/10/2026): the agent commits one file front-page.json to the data branch data/front-page, never a database write; the server reads it and shows it only on its own Rome day, through a whitelist parser and a personal-data filter. Switch-off: «spegni la prima pagina» in chat rewrites the file with off: true. With no file for the day the block is not shown (no invented story). The Google Doc draft in 02_BOZZA_PRONTA stays as the newsroom copy.",
+        "scope": "SUPER_APP components/home/FrontPage.tsx, PublicHome.tsx, HomeLobby.tsx (lead slot), routes/index.tsx loader, lib/front-page.ts, lib/front-page.functions.ts; data branch data/front-page (front-page.json); .claude/agents/scd-super-giornalista.md; scheduled task «SCD Prima pagina · Super Giornalista» (Supabase connector removed)",
         "supersedes": "the 'drafts only, never change the app' boundary of the Super Giornalista for the front page items (social posting stays draft-only)",
         "engine": "PERSONE",
         "measure": "days with an apertura online; items online per day; app visits from the home front page",
         "implementationStatus": "IMPLEMENTED",
-        "implementation": "branch feat/front-page-agent (PR to staging/superapp); migration r145 STAGED until «applica r145»; tests lib/front-page.test.ts, supabase/tests/r145_front_page.pglite.mjs"
+        "implementation": "branch feat/front-page-agent (PR to staging/superapp); tests lib/front-page.test.ts; no migration"
       }
     }
   ],

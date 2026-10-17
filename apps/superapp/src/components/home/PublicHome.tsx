@@ -42,6 +42,7 @@ export function PublicHome({
   notice = null,
   training = null,
   front = EMPTY_FRONT_PAGE,
+  frontDay,
   nowMs,
   today,
 }: {
@@ -56,6 +57,8 @@ export function PublicHome({
   training?: PublicTrainingDay | null;
   /** UD-187: the Super Giornalista's front page of the day (r145, VERIFIED items only); hidden when empty. */
   front?: FrontPageData;
+  /** Rome day of the front page (server day, QA day honoured). */
+  frontDay?: string;
   nowMs: number;
   today: string;
 }) {
@@ -84,7 +87,7 @@ export function PublicHome({
         today={today}
         lead={
           <>
-            <FrontPage page={front} today={today} />
+            <FrontPage page={front} today={frontDay ?? today} />
             <ClubNoticeCard notice={notice} />
           </>
         }
