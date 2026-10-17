@@ -4025,6 +4025,25 @@
       }
     },
     {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "07:52",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-167",
+      "name": "DRIVE_AND_MAIL_FUEL_ALL_PLATFORMS",
+      "sourceQuoteFragments": [
+        "Il drive di sportclubcolico@gmail.com e la mail sono un serbatoio pieno di benzina informazioni per riempire tutte le piattaforme e la memoria di ogni cosa: recuperare tutto e lavora e riempi",
+        "Rendi piena la super app, rendila attraente, interattiva, fluida, dinamica e super intelligente"
+      ],
+      "normalizedCommand": {
+        "rule": "The Drive and the mailbox of sportclubcolico@gmail.com are the fuel of the app. Every Cantiere run (scd-direttore) first refuels the platform of the night: it reads the Cervellone catalogue (Drive folder 'SCD CERVELLONE · Catalogo e Memoria', 1XG59Y1AWe9PApzEmfNMzuhX4-DkH8Y7m), searches Drive and Gmail for that platform's real content (calendars, timetables, events, tournaments, sponsors, convenzioni, prices, rules, history, photos of places), extends the catalogue (originals never moved) and turns what it finds into app content and IDEE rows. Public pages get only public, verified facts with source; personal data (minors, health, IBAN, contacts, ISEE, documents) never goes into public pages, the repo or the catalogue text: it stays in Drive and enters reserved areas only through approved data paths (SCD PULSE, consents). Masters stay the source of truth: the app reads copies, never builds parallel registers. Goal for the whole app: full, attractive, interactive, fluid, dynamic and intelligent; quick wins from docs/piattaforme/ricerche/ragazzi-social.md first.",
+        "scope": "SUPER_APP all 26 platforms, scd-direttore, Cantiere piattaforme, Cervellone",
+        "supersedes": "none; operationalises the Cervellone directive of 12/10/2026",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": ".claude/agents/scd-direttore.md step 0 (Refuel); Cantiere scheduled task"
+      }
+    },
+    {
       "sourceDate": "2026-10-16",
       "sourceTime": "22:40",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
