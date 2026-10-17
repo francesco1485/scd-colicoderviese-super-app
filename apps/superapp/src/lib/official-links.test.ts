@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { CLUB_PROFILE, hallTeams, pitchFacts } from "./club-profile";
-import { OFFICIAL_RESULT_LINKS, RESULT_LINKS, SECONDARY_RESULT_LINKS, VERIFIED_CHAMPIONSHIPS, resultLinkFor } from "./official-links";
+import { OFFICIAL_RESULT_LINKS, PUBLICATION_RULE, RESULT_LINKS, SECONDARY_RESULT_LINKS, VERIFIED_CHAMPIONSHIPS, resultLinkFor } from "./official-links";
 import { loadCalendar } from "./public-snapshots";
 
 describe("official result links", () => {
@@ -22,12 +22,19 @@ describe("official result links", () => {
     expect(SECONDARY_RESULT_LINKS.map((l) => new URL(l.url).hostname)).toEqual(["www.tuttocampo.it"]);
   });
 
-  it("links the two verified championships to their gare.lnd.it group", () => {
+  it("links the four verified championships to their gare.lnd.it group", () => {
     expect(resultLinkFor("prima")?.url).toBe("https://gare.lnd.it/competizione/lombardia?campionato=PR&girone=D");
     expect(resultLinkFor("u19")?.url).toBe("https://gare.lnd.it/competizione/lombardia?campionato=RI&girone=C");
-    expect(resultLinkFor("u15")).toBeNull();
+    expect(resultLinkFor("u16")?.url).toBe("https://gare.lnd.it/competizione/lombardia?campionato=Y6&girone=A");
+    expect(resultLinkFor("u15")?.url).toBe("https://gare.lnd.it/competizione/lombardia?campionato=GS&girone=A");
+    // Attività di base: no standings link, ever (SGS).
+    for (const g of ["pulcini", "primicalci", "piccoli", "esordienti", "2014", "2015"]) expect(resultLinkFor(g), g).toBeNull();
     expect(resultLinkFor(undefined)).toBeNull();
-    expect(VERIFIED_CHAMPIONSHIPS["prima"]).toEqual({ name: "Promozione Lombardia", group: "Girone D" });
+    expect(VERIFIED_CHAMPIONSHIPS["prima"]).toEqual({ name: "Promozione", group: "Girone D" });
+  });
+
+  it("states the UD-181 rule: only official LND data, with source and link", () => {
+    expect(PUBLICATION_RULE).toBe("Pubblichiamo solo i dati ufficiali LND, con fonte e link.");
   });
 });
 
@@ -41,7 +48,7 @@ describe("club profile", () => {
     expect(ids).not.toContain("esordienti");
     expect(teams.some((t) => /U18|under\s?18/i.test(t.label))).toBe(false);
     // Championship only where verified; others carry the category only.
-    expect(teams.filter((t) => t.championship).map((t) => t.id).sort()).toEqual(["prima", "u19"]);
+    expect(teams.filter((t) => t.championship).map((t) => t.id).sort()).toEqual(["prima", "u15", "u16", "u19"]);
     // A team without matches never links to an empty calendar filter.
     for (const t of teams) expect(t.annata === null, t.id).toBe(t.matches === 0);
   });

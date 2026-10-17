@@ -1,14 +1,23 @@
 /**
- * Official result sources for the public hall (calendar, match cards, team pages).
+ * Official result sources for the public hall (calendar, match cards, team pages, /classifiche).
  *
- * The app does not publish standings or scores of its own: it points to the
- * federation sources that do. Every link is labelled:
+ * Rule (UD-181, Francesco DG 17/10/2026 12:33 «ok classifiche LND»): we publish only the official LND data, with
+ * source and link. Standings and results are copied from gare.lnd.it (src/lib/lnd-standings.ts, snapshot
+ * src/data/classifiche-lnd-snapshot.json) and always shown with the badge «Ufficiale LND», the fetch date and the link;
+ * the app never computes, types or estimates a score or a standing of its own. Attività di base: no standings (SGS).
+ * Supersedes the rule «l'app non pubblica punteggi propri» (2026-10-11).
+ *
+ * Every link is labelled:
  * - "official": federation (LND / CR Lombardia) pages and the federation app;
  * - "secondary": useful but not official (shown under "Altre fonti (non ufficiali)").
  *
- * Championship and group of the Prima Squadra and the Juniores were verified on
- * gare.lnd.it on 2026-10-11. Other teams carry their category only.
+ * Championships and groups of the four competitive teams were verified on gare.lnd.it on 2026-10-17.
  */
+
+import { LND_COMPETITIONS, LND_TEAM_LABEL, competitionUrl } from "./lnd-standings";
+
+/** The publication rule shown and asserted in the app. */
+export const PUBLICATION_RULE = "Pubblichiamo solo i dati ufficiali LND, con fonte e link.";
 
 export type LinkAuthority = "official" | "secondary";
 
@@ -23,25 +32,20 @@ export interface ResultLink {
   group?: string;
 }
 
-export const RESULTS_VERIFIED_ON = "2026-10-11";
+export const RESULTS_VERIFIED_ON = "2026-10-17";
+
+/** Championship links come from the one LND registry (LND_COMPETITIONS): no second list. */
+const CHAMPIONSHIP_LINKS: ResultLink[] = LND_COMPETITIONS.filter((c) => c.kind === "CAMPIONATO").map((c) => ({
+  id: `lnd-${c.id}`,
+  label: `${LND_TEAM_LABEL[c.team] ?? c.team} · ${c.label} ${c.groupLabel.replace("Girone", "girone")}`,
+  detail: "Risultati e classifica su gare.lnd.it",
+  url: competitionUrl(c),
+  authority: "official" as const,
+  group: c.team,
+}));
 
 export const RESULT_LINKS: readonly ResultLink[] = [
-  {
-    id: "lnd-promozione-d",
-    label: "Prima Squadra · Promozione girone D",
-    detail: "Risultati e classifica su gare.lnd.it",
-    url: "https://gare.lnd.it/competizione/lombardia?campionato=PR&girone=D",
-    authority: "official",
-    group: "prima",
-  },
-  {
-    id: "lnd-juniores-elite-c",
-    label: "Juniores · Regionale U19 Élite girone C",
-    detail: "Risultati e classifica su gare.lnd.it",
-    url: "https://gare.lnd.it/competizione/lombardia?campionato=RI&girone=C",
-    authority: "official",
-    group: "u19",
-  },
+  ...CHAMPIONSHIP_LINKS,
   {
     id: "crl-comunicati",
     label: "CR Lombardia · comunicati ufficiali",
@@ -78,7 +82,6 @@ export function resultLinkFor(group: string | undefined | null): ResultLink | nu
  * Championship of a team, VERIFIED on gare.lnd.it on {@link RESULTS_VERIFIED_ON}.
  * Teams not listed show their category only: nothing is inferred.
  */
-export const VERIFIED_CHAMPIONSHIPS: Readonly<Record<string, { name: string; group: string }>> = {
-  prima: { name: "Promozione Lombardia", group: "Girone D" },
-  u19: { name: "Regionale U19 Élite", group: "Girone C" },
-};
+export const VERIFIED_CHAMPIONSHIPS: Readonly<Record<string, { name: string; group: string }>> = Object.fromEntries(
+  LND_COMPETITIONS.filter((c) => c.kind === "CAMPIONATO").map((c) => [c.team, { name: c.label, group: c.groupLabel }]),
+);

@@ -3,7 +3,6 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Bell,
   ChevronLeft,
-  ExternalLink,
   Share2,
   ShieldCheck,
   Users,
@@ -36,7 +35,20 @@ import {
 } from "@/lib/public-roster";
 import { getPublicRoster } from "@/lib/public-roster.functions";
 import { publicTeamCrest } from "@/lib/team-crest";
-import { resultLinkFor, VERIFIED_CHAMPIONSHIPS } from "@/lib/official-links";
+import { VERIFIED_CHAMPIONSHIPS } from "@/lib/official-links";
+import {
+  OfficialBadge,
+  ResultsList,
+  SourceLine,
+  StandingsTable,
+  standingSummary,
+} from "@/components/scd/LndStandings";
+import { LND_SNAPSHOT } from "@/lib/lnd-snapshot";
+import {
+  competitionsOfTeam,
+  latestResults,
+  ourStanding,
+} from "@/lib/lnd-standings";
 import {
   channelsFrom,
   isBaseActivityChannel,
@@ -185,7 +197,14 @@ function TeamPage({ data }: { data: TeamData }) {
   const followed = follows.includes(channel.key);
   const c = VERIFIED_CHAMPIONSHIPS[id];
   const champ = c ? `${c.name} ${c.group}`.trim() : null;
-  const results = resultLinkFor(id);
+  // Official LND data only (UD-181): standings and last results with source and fetch date. None for base activity.
+  const league = base
+    ? null
+    : (competitionsOfTeam(LND_SNAPSHOT, id).find(
+        (x) => x.kind === "CAMPIONATO",
+      ) ?? null);
+  const lastResults = base ? [] : latestResults(LND_SNAPSHOT, id, 5);
+  const us = ourStanding(league?.standings ?? null);
 
   const toggle = async () => {
     if (!social.signedIn) {
@@ -351,6 +370,78 @@ function TeamPage({ data }: { data: TeamData }) {
           )}
         </section>
 
+        {league && (
+          <section
+            className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+            aria-labelledby="classifica-title"
+            data-testid="team-standings"
+          >
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <h2
+                id="classifica-title"
+                className="m-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]"
+              >
+                CLASSIFICA
+              </h2>
+              <OfficialBadge />
+            </div>
+            <p className="m-0 text-[14px] text-[#3e5272]">
+              {league.label} · {league.group_label}
+            </p>
+            {us && league.standings ? (
+              <p className="m-0 mt-1 font-uv text-[24px] leading-none text-[#0b2a5b]">
+                {standingSummary(us, league.standings.length)}
+              </p>
+            ) : (
+              <p className="m-0 mt-1 text-[14px] text-[#3e5272]">
+                {league.standings_note ?? "Classifica non disponibile: vedi la fonte."}
+              </p>
+            )}
+            {league.standings && (
+              <details className="mt-2.5">
+                <summary className="scd-focus inline-flex min-h-11 cursor-pointer items-center text-[14px] font-bold text-[#0457af]">
+                  Vedi tutta la classifica
+                </summary>
+                <div className="mt-1.5">
+                  <StandingsTable
+                    rows={league.standings}
+                    caption={`Classifica ${league.label} ${league.group_label}`}
+                  />
+                </div>
+              </details>
+            )}
+            <SourceLine
+              url={league.source_url}
+              fetchedAt={league.fetched_at}
+              className="mt-2"
+            />
+          </section>
+        )}
+
+        {!base && lastResults.length > 0 && (
+          <section
+            className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+            aria-labelledby="risultati-title"
+            data-testid="team-results"
+          >
+            <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
+              <h2
+                id="risultati-title"
+                className="m-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]"
+              >
+                ULTIMI RISULTATI
+              </h2>
+              <OfficialBadge />
+            </div>
+            <ResultsList results={lastResults} showCompetition />
+            <SourceLine
+              url={lastResults[0]!.competition.source_url}
+              fetchedAt={lastResults[0]!.competition.fetched_at}
+              className="mt-2.5"
+            />
+          </section>
+        )}
+
         <div className="grid grid-cols-2 gap-2.5">
           <Link
             to="/allenamenti"
@@ -364,21 +455,19 @@ function TeamPage({ data }: { data: TeamData }) {
               Giorni, orari e campo
             </span>
           </Link>
-          {results ? (
-            <a
-              href={results.url}
-              target="_blank"
-              rel="noopener noreferrer"
+          {!base ? (
+            <Link
+              to="/classifiche"
               className="scd-focus grid gap-2 rounded-[18px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
             >
               <span className="grid size-10 place-items-center rounded-[12px] bg-[var(--uv-gold)] text-[#0b1e3a]">
-                <ExternalLink className="size-5" aria-hidden="true" />
+                <ShieldCheck className="size-5" aria-hidden="true" />
               </span>
-              <b className="text-[15px]">Classifica</b>
+              <b className="text-[15px]">Classifiche</b>
               <span className="text-[13px] text-[#5a6b85]">
-                Fonte ufficiale LND
+                Campionati e coppe · ufficiali LND
               </span>
-            </a>
+            </Link>
           ) : (
             <div className="grid gap-2 rounded-[18px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
               <span className="grid size-10 place-items-center rounded-[12px] bg-[#e3eefb] text-[#0b2a5b]">
