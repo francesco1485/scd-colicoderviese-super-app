@@ -1,6 +1,6 @@
 # 06 · Infermeria
 
-Responsabile: scd-infermeria · Stato: Viva · Pagina: `/infermeria` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-infermeria · Stato: Attiva · Pagina: `/infermeria` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

@@ -12,6 +12,10 @@
  * src/lib/work-areas.functions.ts); `audiences` only drives the role filter of the hub and is INFERRED from
  * each page's own description. No personal data, no amounts, no minors' names: unknown is «da confermare».
  */
+import type { FileRoutesByTo } from "@/routeTree.gen";
+
+/** Every path the router knows (generated route tree): routes and actions are typed against it. */
+export type AppPath = keyof FileRoutesByTo;
 
 export type PlatformStatus = "live" | "parziale" | "in-costruzione";
 
@@ -77,8 +81,8 @@ export type PlatformIcon =
 
 export interface PlatformAction {
   label: string;
-  /** Existing route of the app (checked against the route tree). */
-  to: string;
+  /** Existing route of the app (typed against the generated route tree). */
+  to: AppPath;
 }
 
 export interface PlannedItem {
@@ -111,8 +115,8 @@ export interface Platform {
   /** Responsible agent (PIPELINE.md §0). */
   responsible: string;
   support: readonly string[];
-  /** Route to open today. */
-  route: string;
+  /** Route to open today (typed against the generated route tree). */
+  route: AppPath;
   status: PlatformStatus;
   purpose: string;
   /** 2-3 things a user can do today, each on an existing route. */
@@ -122,21 +126,20 @@ export interface Platform {
   engine: Engine;
   measure: string;
   starter?: StarterContent;
-  /**
-   * Set when the platform's own page is being built by another agent on another branch: the hub shows «presto»
-   * until that route is in the route tree, and no starter page is created here.
-   */
+  /** Set when the platform's page is owned by another agent outside this map (no starter page here). */
   builtElsewhere?: string;
 }
 
 export const STARTER_BASE = "/gestionale/piattaforme";
-export const HUB_PATH = "/gestionale/piattaforme";
+export const HUB_PATH: AppPath = "/gestionale/piattaforme";
 export const UNKNOWN = "da confermare";
 
-const starterPath = (slug: string) => `${STARTER_BASE}/${slug}`;
+type StarterSlug = AppPath extends infer P ? (P extends `${typeof STARTER_BASE}/${infer S}` ? S : never) : never;
+/** Starter path; the slug is constrained to the starter routes of the tree, so the result is a known path. */
+const starterPath = (slug: StarterSlug): AppPath => `${STARTER_BASE}/${slug}` as AppPath;
 
 /** Shared «Chiedi» path: the existing improvement / request form (UD-113), read by the staff. */
-export const ASK_PATH = "/sostieni/proponi";
+export const ASK_PATH: AppPath = "/sostieni/proponi";
 
 export const PLATFORMS: readonly Platform[] = [
   {
@@ -245,7 +248,7 @@ export const PLATFORMS: readonly Platform[] = [
       ],
       sources: [
         { name: "Sedi e impianti", note: "master impianti di Colico e Dervio" },
-        { name: "Supabase SCD · attività in struttura", note: "area Palestra (r135)" },
+        { name: "Supabase SCD · attività in struttura", note: "area Palestra (r135, applicata il 16/10/2026)" },
         { name: "Inserimenti a Sky", note: "registro delle proposte di inserimento" },
       ],
       person: UNKNOWN,
@@ -352,9 +355,10 @@ export const PLATFORMS: readonly Platform[] = [
   {
     id: "17", name: "Vetta Legnone · Ricerca calciatori", slug: "vetta-legnone", dossier: "17-ricerca-calciatori-e-iscriviti-come-calc.md",
     sector: "campo", responsible: "scd-scouting", support: ["scd-tesserati", "scd-legale"],
-    route: "/vetta-legnone", status: "in-costruzione", builtElsewhere: "vetrina pubblica in costruzione su un altro ramo (Francesco 17/10/2026)",
-    purpose: "Vetta Legnone: ricerca calciatori e «iscriviti come calciatore». Oggi è attiva la richiesta di prova.",
+    route: "/vetta-legnone", status: "live", builtElsewhere: "vetrina pubblica su /vetta-legnone",
+    purpose: "Vetta Legnone: vetrina pubblica della ricerca calciatori e richiesta di prova; profili in arrivo.",
     today: [
+      { label: "Vetrina Vetta Legnone", to: "/vetta-legnone" },
       { label: "Richiedi una prova o l'open day", to: "/entra" },
       { label: "Rose delle squadre", to: "/squadre" },
     ],
@@ -515,6 +519,57 @@ export const PLATFORMS: readonly Platform[] = [
     engine: "TEMPO", measure: "idee decise (fatte o scartate) a settimana",
   },
 ];
+
+/**
+ * Plain Italian names of the agents shown to the staff (ids stay in the dossiers and PIPELINE.md §0).
+ * Every agent used in PLATFORMS and SECTORS has a label (piattaforme.test.ts).
+ */
+export const AGENT_LABEL: Readonly<Record<string, string>> = {
+  "scd-segreteria": "Segreteria",
+  "scd-squadre": "Squadre",
+  "scd-impianti": "Impianti e campi",
+  "scd-cfo": "Direzione finanziaria",
+  "scd-commerciale": "Commerciale",
+  "scd-pulmini": "Pulmini",
+  "scd-tesoreria": "Tesoreria",
+  "scd-rendicontazione": "Rendicontazione",
+  "scd-tesserati": "Tesseramenti",
+  "scd-figc-lnd": "FIGC e LND",
+  "scd-documenti": "Documenti",
+  "scd-sponsor": "Sponsor",
+  "scd-ledwall": "Ledwall",
+  "scd-tornei": "Tornei",
+  "scd-negoziazione": "Trattative",
+  "scd-infermeria": "Infermeria",
+  "scd-legale": "Consulenza legale",
+  "scd-clubhouse": "Club House",
+  "scd-community": "Comunità",
+  "scd-convenzioni": "Convenzioni",
+  "scd-palestra": "Palestra",
+  "scd-sociale": "Solidarietà",
+  "scd-atleti": "Atleti",
+  "scd-nutrizione": "Nutrizione",
+  "scd-social": "Social",
+  "scd-comunicazione": "Comunicazione",
+  "scd-avatar": "Avatar e personaggi",
+  "scd-crescita": "Crescita",
+  "scd-grafica": "Grafica",
+  "scd-relazioni": "Relazioni",
+  "scd-scouting": "Osservatori",
+  "scd-super-giornalista": "Redazione",
+  "scd-magazzino": "Magazzino",
+  "scd-analisi": "Analisi",
+  "scd-sviluppo": "Sviluppo",
+  "scd-bandi": "Bandi",
+  "scd-stratega": "Strategia",
+  "scd-skill": "Competenze",
+};
+
+/** «Assistente Segreteria» for "scd-segreteria"; an unknown id is never shown raw. */
+export function agentLabel(id: string): string {
+  const l = AGENT_LABEL[id];
+  return l ? `Assistente ${l}` : "Assistente da confermare";
+}
 
 export const STATUS_LABEL: Readonly<Record<PlatformStatus, string>> = {
   live: "Attiva",

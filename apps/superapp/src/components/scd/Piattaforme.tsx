@@ -43,15 +43,17 @@ import {
   HUB_PATH,
   PLATFORMS,
   STATUS_LABEL,
+  agentLabel,
   bySector,
   filterPlatforms,
   sectorOf,
+  type AppPath,
   type AudienceId,
   type Platform,
   type PlatformIcon,
   type PlatformStatus,
 } from "@/lib/piattaforme";
-import { Card, Chip, SourceLine, useRouteExists, type ChipTone } from "./interior-ui";
+import { Card, Chip, SourceLine, type ChipTone } from "./interior-ui";
 
 export const PLATFORM_ICON: Record<PlatformIcon, LucideIcon> = {
   bus: Bus,
@@ -105,7 +107,6 @@ function PlatformBadge({ p }: { p: Platform }) {
 }
 
 function PlatformRow({ p }: { p: Platform }) {
-  const exists = useRouteExists(p.route);
   return (
     <li className="flex items-start gap-3 border-t border-[var(--in-line)] px-4 py-3.5 first:border-t-0 sm:px-[18px]" data-platform={p.id}>
       <PlatformBadge p={p} />
@@ -116,20 +117,14 @@ function PlatformRow({ p }: { p: Platform }) {
         </div>
         <p className="m-0 mt-0.5 text-[13.5px] leading-snug text-[var(--in-sub)]">{p.purpose}</p>
       </div>
-      {exists ? (
       <Link
-        to={p.route as never}
+        to={p.route}
         aria-label={`Apri ${p.name}`}
         className="scd-focus inline-flex h-11 flex-none items-center gap-1 self-center rounded-[10px] border border-[#b9d5ef] bg-white px-3 text-[14.5px] font-semibold text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"
       >
         Apri
         <ChevronRight className="size-4" strokeWidth={2.2} aria-hidden="true" />
       </Link>
-      ) : (
-        <span data-future-path={p.route} title={p.builtElsewhere} className="inline-flex h-9 flex-none items-center self-center rounded-full bg-[#eef3f9] px-3 text-[13px] font-semibold text-[var(--in-sub)]">
-          presto
-        </span>
-      )}
     </li>
   );
 }
@@ -159,7 +154,7 @@ export function PlatformHub() {
             className="scd-focus h-11 w-full rounded-[10px] border border-[#b9d5ef] bg-white pl-10 pr-3 text-[16px] text-[var(--in-ink)] placeholder:text-[var(--in-sub)]"
           />
         </div>
-        <div role="group" aria-label="Filtra per ruolo" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5">
+        <div role="group" aria-label="Filtra per ruolo" className="flex flex-wrap gap-2">
           {[{ id: null, label: "Tutti" } as const, ...AUDIENCES].map((a) => {
             const on = audience === a.id;
             return (
@@ -168,7 +163,7 @@ export function PlatformHub() {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setAudience(a.id)}
-                className={`scd-focus h-10 flex-none whitespace-nowrap rounded-full border px-3.5 text-[14px] font-semibold transition-colors ${
+                className={`scd-focus h-10 whitespace-nowrap rounded-full border px-3.5 text-[14px] font-semibold transition-colors ${
                   on ? "border-[var(--in-rail)] bg-[var(--in-rail)] text-white" : "border-[#b9d5ef] bg-white text-[var(--in-info)] hover:bg-[var(--in-info-bg)]"
                 }`}
               >
@@ -196,7 +191,7 @@ export function PlatformHub() {
             id={`settore-${sector.id}`}
             className="xl:self-start"
             title={sector.label}
-            sub={`Direttore di settore: ${sector.director}`}
+            sub={`Coordina il settore: ${agentLabel(sector.director)}`}
             aside={<Chip tone="info">{items.length}</Chip>}
           >
             <ul className="m-0 list-none border-t border-[var(--in-line)] p-0">
@@ -211,11 +206,11 @@ export function PlatformHub() {
   );
 }
 
-function ActionRow({ label, to }: { label: string; to: string }) {
+function ActionRow({ label, to }: { label: string; to: AppPath }) {
   return (
     <li className="border-t border-[var(--in-line)] first:border-t-0">
       <Link
-        to={to as never}
+        to={to}
         className="scd-focus flex min-h-12 items-center gap-3 px-4 py-2.5 text-[15px] font-semibold text-[var(--in-info)] hover:bg-[var(--in-info-bg)] sm:px-[18px]"
       >
         <span className="min-w-0 flex-1">{label}</span>
@@ -241,7 +236,7 @@ export function PlatformStarter({ p }: { p: Platform }) {
   const Icon = PLATFORM_ICON[p.icon];
   return (
     <div className="flex flex-col gap-[18px]">
-      <Link to={HUB_PATH as never} className="scd-focus inline-flex w-fit items-center gap-1.5 text-[14.5px] font-semibold text-[var(--in-info)] underline-offset-4 hover:underline">
+      <Link to={HUB_PATH} className="scd-focus inline-flex w-fit items-center gap-1.5 text-[14.5px] font-semibold text-[var(--in-info)] underline-offset-4 hover:underline">
         <ArrowLeft className="size-4" strokeWidth={2.2} aria-hidden="true" />
         Tutte le 26 piattaforme
       </Link>
@@ -296,9 +291,9 @@ export function PlatformStarter({ p }: { p: Platform }) {
           <Card id="chi" title="Chi è responsabile">
             <dl className="m-0 border-t border-[var(--in-line)]">
               <Fact label="Persona del club">{s?.person ?? "da confermare"}</Fact>
-              <Fact label="Agente responsabile">{p.responsible}</Fact>
-              <Fact label="Supporto">{p.support.join(", ")}</Fact>
-              <Fact label="Direttore di settore">{sector.director}</Fact>
+              <Fact label="Assistente responsabile">{agentLabel(p.responsible)}</Fact>
+              <Fact label="Supporto">{p.support.map(agentLabel).join(", ")}</Fact>
+              <Fact label="Coordina il settore">{agentLabel(sector.director)}</Fact>
               <Fact label="Motore e misura">
                 {p.engine} · {p.measure}
               </Fact>

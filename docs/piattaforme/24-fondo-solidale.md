@@ -1,6 +1,6 @@
 # 24 · Fondo Solidale
 
-Responsabile: scd-sociale · Stato: Viva · Pagina: `/tesoreria/fondo-solidale` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-sociale · Stato: Attiva · Pagina: `/tesoreria/fondo-solidale` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

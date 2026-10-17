@@ -1,6 +1,6 @@
 # 25 · Dona e adotta
 
-Responsabile: scd-sociale · Stato: Viva · Pagina: `/sostieni` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-sociale · Stato: Attiva · Pagina: `/sostieni` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

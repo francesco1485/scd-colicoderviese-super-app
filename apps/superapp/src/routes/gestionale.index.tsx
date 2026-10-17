@@ -476,7 +476,7 @@ function PiattaformeEntry() {
   const c = statusCounts();
   return (
     <Link
-      to={HUB_PATH as never}
+      to={HUB_PATH}
       className="scd-focus flex flex-wrap items-center gap-4 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 shadow-[var(--in-card-shadow)] transition-colors duration-150 hover:bg-[var(--in-info-bg)] sm:flex-nowrap sm:px-6"
     >
       <span className="flex size-12 flex-none items-center justify-center rounded-xl bg-[var(--in-action)] text-[var(--in-ink)]">

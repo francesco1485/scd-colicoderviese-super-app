@@ -1,6 +1,6 @@
 # 02 · Tesoreria
 
-Responsabile: scd-tesoreria · Stato: Viva · Pagina: `/tesoreria` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-tesoreria · Stato: Attiva · Pagina: `/tesoreria` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

@@ -1,6 +1,6 @@
 # 17 · Ricerca calciatori e iscriviti come calciatore
 
-Responsabile: scd-scouting · Stato: In costruzione · Pagina: `/vetta-legnone` (vetrina «Vetta Legnone» in costruzione su un altro ramo) · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-scouting · Stato: Attiva · Pagina: `/vetta-legnone` (vetrina pubblica su /vetta-legnone; profili in arrivo) · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

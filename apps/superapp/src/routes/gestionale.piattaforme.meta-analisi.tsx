@@ -31,7 +31,7 @@ function MetaAnalisiPageGate() {
   return (
     <WorkAreaGateView id="gestionale" gate={gate}>
       {gate.preview && <StagingBanner />}
-      <InteriorShell title={PLATFORM.name} path={PLATFORM.route} activeAreaId="gestionale" roles={PREVIEW_ROLES} roleLabel="Anteprima staff">
+      <InteriorShell title={PLATFORM.name} path={Route.fullPath} activeAreaId="gestionale" roles={PREVIEW_ROLES} roleLabel="Anteprima staff">
         <PlatformStarter p={PLATFORM} />
       </InteriorShell>
     </WorkAreaGateView>

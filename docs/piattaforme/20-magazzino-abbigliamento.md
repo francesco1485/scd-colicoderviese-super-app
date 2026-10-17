@@ -1,6 +1,6 @@
 # 20 · Magazzino abbigliamento
 
-Responsabile: scd-magazzino · Stato: Viva · Pagina: `/magazzino` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
+Responsabile: scd-magazzino · Stato: Attiva · Pagina: `/magazzino` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
