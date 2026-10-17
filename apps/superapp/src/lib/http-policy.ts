@@ -9,7 +9,9 @@
 /**
  * Pages anyone may see without signing in (and that may be cached by the offline worker).
  * /squadre and /allenamenti are not here: teams, rosters and training schedules are inside after sign-in (UD-100,
- * Direzione 13/10/2026), so those pages are private, no-store and out of robots.txt and the sitemap.
+ * Direzione 13/10/2026), so those pages are private, no-store and out of robots.txt and the sitemap. Exception: the
+ * three showcase teams /squadre/prima, /squadre/u16, /squadre/u19 (UD-168, DG 17/10/2026 «ok vetrina squadre»): their
+ * page is the same for every visitor and the roster comes from the public showcase r142 (age rule in the database).
  */
 export const PUBLIC_PREFIXES: readonly string[] = [
   "/calendario",
@@ -32,6 +34,9 @@ export const PUBLIC_PREFIXES: readonly string[] = [
   "/safeguarding",
   "/societa",
   "/sponsor",
+  "/squadre/prima",
+  "/squadre/u16",
+  "/squadre/u19",
   "/top11",
   "/tornei",
   "/vetta-legnone",

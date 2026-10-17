@@ -35,6 +35,10 @@ import {
   type RosterPlayer,
 } from "@/lib/public-roster";
 import { getPublicRoster } from "@/lib/public-roster.functions";
+import { isShowcaseTeam, SHOWCASE_SHARE } from "@/lib/team-showcase";
+import { pageHead } from "@/lib/share";
+import { getTeamShowcase } from "@/lib/team-showcase.functions";
+import { TeamShowcaseSection } from "@/components/scd/TeamShowcase";
 import { publicTeamCrest } from "@/lib/team-crest";
 import { resultLinkFor, VERIFIED_CHAMPIONSHIPS } from "@/lib/official-links";
 import {
@@ -51,6 +55,11 @@ import {
 } from "@/lib/social.functions";
 import { itemState, orderTeams } from "@/lib/universe";
 
+/** Public head of a showcase team (UD-168): link preview without player names. */
+function showcaseHead(id: string) {
+  return isShowcaseTeam(id) ? pageHead(SHOWCASE_SHARE[id]) : membersOnlyHead("Squadra");
+}
+
 /**
  * Pagina squadra (UD-089, foglio 3): testata con il colore ufficiale dell'annata, "Segui", prossima gara, le gare
  * che vengono, la rosa (r94: nomi per le squadre agonistiche con la regola dell'età, solo il numero per l'attività
@@ -60,14 +69,20 @@ import { itemState, orderTeams } from "@/lib/universe";
 async function loadTeam(team: string) {
   const id = team.toLowerCase();
   if (!/^[a-z0-9_-]{1,40}$/.test(id)) throw notFound();
-  // Teams are inside (UD-100): no team data for anonymous visitors, only the members-only screen.
+  // Teams are inside (UD-100), except the three showcase teams (UD-168, DG 17/10/2026): Prima Squadra, Juniores U19
+  // Élite and Allievi U16 Élite are open to everyone. Their roster comes from the public showcase (r142) for every
+  // visitor, signed in or not, so the page is the same for all and never carries a member-only roster.
+  const showcase = isShowcaseTeam(id);
   const session = await getSession();
-  if (!session.user) return { signedIn: false as const, id };
-  const [calendar, social, posts, roster] = await Promise.all([
+  if (!session.user && !showcase) return { signedIn: false as const, id };
+  const [calendar, social, posts, roster, vetrina] = await Promise.all([
     getPublicCalendarSnapshot(),
     getPublicSocial(),
     getChannelFeed({ data: { channel: teamChannel(id) } }),
-    getPublicRoster({ data: { team: id } }),
+    showcase
+      ? Promise.resolve(null)
+      : getPublicRoster({ data: { team: id } }),
+    showcase ? getTeamShowcase({ data: { team: id } }) : Promise.resolve(null),
   ]);
   const group = calendar.groups.find((g) => g.id === id);
   if (!group) throw notFound();
@@ -77,6 +92,7 @@ async function loadTeam(team: string) {
     new Date(serverNow).toISOString().slice(0, 10);
   return {
     signedIn: true as const,
+    member: !!session.user,
     id,
     group,
     groups: calendar.groups,
@@ -84,6 +100,7 @@ async function loadTeam(team: string) {
     social,
     posts,
     roster,
+    vetrina,
     serverNow,
     today,
   };
@@ -93,18 +110,20 @@ export const Route = createFileRoute("/squadre_/$team")({
   loader: ({ params }) => loadTeam(params.team),
   head: ({ loaderData }) =>
     loaderData?.signedIn
-      ? {
-          meta: [
-            {
-              title: `${loaderData.group.label} — S.C.D. ColicoDerviese`,
-            },
-            {
-              name: "description",
-              content: `Gare, notizie e dirette della squadra ${loaderData.group.label} della S.C.D. ColicoDerviese. Segui la squadra nell'app.`,
-            },
-            { name: "robots", content: "noindex" },
-          ],
-        }
+      ? loaderData.vetrina
+        ? showcaseHead(loaderData.id)
+        : {
+            meta: [
+              {
+                title: `${loaderData.group.label} — S.C.D. ColicoDerviese`,
+              },
+              {
+                name: "description",
+                content: `Gare, notizie e dirette della squadra ${loaderData.group.label} della S.C.D. ColicoDerviese. Segui la squadra nell'app.`,
+              },
+              { name: "robots", content: "noindex" },
+            ],
+          }
       : membersOnlyHead("Squadra"),
   notFoundComponent: () => (
     <main className="min-h-dvh bg-[#f2f6fb] px-4 pt-8 text-center text-[#0b1e3a]">
@@ -140,6 +159,8 @@ function TeamPage({ data }: { data: TeamData }) {
     social,
     posts: initialPosts,
     roster,
+    vetrina,
+    member,
     serverNow,
     today,
   } = data;
@@ -253,8 +274,8 @@ function TeamPage({ data }: { data: TeamData }) {
           className="absolute inset-0 bg-[linear-gradient(180deg,rgb(7_29_66/0.25),rgb(11_42_91/0.95))]"
         />
         <Link
-          to="/squadre"
-          aria-label="Tutte le squadre"
+          to={member ? "/squadre" : "/"}
+          aria-label={member ? "Tutte le squadre" : "Torna alla home"}
           className="scd-focus absolute left-3 top-3.5 grid size-11 place-items-center rounded-[12px] bg-white/14 text-white"
         >
           <ChevronLeft className="size-6" aria-hidden="true" />
@@ -316,14 +337,18 @@ function TeamPage({ data }: { data: TeamData }) {
       </div>
 
       <div className="mx-auto grid max-w-[720px] grid-cols-1 gap-3.5 px-3 pt-3.5">
-        <RosterSection
-          teamId={id}
-          color={team.color}
-          base={base}
-          count={roster.count}
-          players={roster.players}
-          signedIn={social.signedIn}
-        />
+        {vetrina ? (
+          <TeamShowcaseSection showcase={vetrina} color={team.color} />
+        ) : roster ? (
+          <RosterSection
+            teamId={id}
+            color={team.color}
+            base={base}
+            count={roster.count}
+            players={roster.players}
+            signedIn={social.signedIn}
+          />
+        ) : null}
         <section className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
           <h2 className="mb-2.5 mt-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]">
             PROSSIMA GARA
@@ -418,7 +443,9 @@ function TeamPage({ data }: { data: TeamData }) {
           />
           {base
             ? "Attività di base: i nomi e le foto dei bambini restano nell'area riservata a staff e famiglie."
-            : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
+            : vetrina
+              ? "Rosa aperta a tutti per decisione della Direzione. Dei minorenni compare il nome con l'iniziale del cognome; il nome intero solo con il consenso registrato della famiglia. Niente foto dei ragazzi, niente date di nascita né contatti."
+              : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
         </p>
       </div>
       <SkyCameo message={sky} onClose={() => setSky(null)} persona={isKidsPath(`/squadre/${id}`) ? "sky" : "vera"} />
