@@ -931,3 +931,13 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Causa: sul sito live /sw.js arrivava troncato (23436 su 23956 byte, misurato 17/10 00:05): Nitro (node-server) registra size/etag dei file pubblici prima che vite-plugin-pwa completi sw.js e serve la Content-Length vecchia. Il browser rifiutava il service worker («ServiceWorker script evaluation failed») e non offriva «Installa app».
 - Misura: `scripts/fix-public-asset-meta.mjs` dopo `vite build` (anche `build:node`) riallinea size, etag e mtime in `.output/server/index.mjs` (accetta le dimensioni esponenziali 2e3; avviso se la tabella non è riconosciuta; scrittura atomica). Test: `src/lib/public-asset-meta.test.ts`.
 - Dopo il deploy: verificare che la Content-Length di /sw.js sia uguale alla dimensione reale e che Chrome offra «Installa app».
+
+## B10 — /impianti: orari solo dal master, una riga "Orari in aggiornamento dalla società" · 2026-10-17
+
+Backlog cloud B10. Motori: PERSONE (una famiglia che apre la mappa non legge più un "da fare" interno ripetuto su ogni spazio) e TEMPO (meno domande sugli orari quando il master li avrà: si mostrano da soli).
+- Prima (VERIFIED): il master impianti `config/scd-facilities.v1.json` ha 21 spazi e 0 con orari; su /impianti ogni spazio diceva "Orari da inserire" (elenco, scheda, legenda, biglietteria).
+- `lib/facilities.ts`: `PUBLIC_HOURS_PENDING`, `publicStatus()` (nasconde solo lo stato sconosciuto, aperto/chiuso veri restano), `publicHoursLines()` ("in aggiornamento" al posto di "da inserire"), `hoursPending()`. Nessun orario inventato.
+- `FacilityMap` in modalità pubblica: una sola riga in legenda "Orari in aggiornamento dalla società", nessuno stato sconosciuto nell'elenco e nel chip; scheda "— orari in aggiornamento dalla società"; biglietteria "orari in aggiornamento". Modalità staff (/gestionale/mappa) invariata.
+- Test: 4 nuovi in `facilities.test.ts`. Gate: tsc 0, build 0, vitest 199 file / 2877 test, test:bundle 11/11, test:manifest PASS, test:claude-hooks PASS.
+- Revisione: scd-revisore PASS, scd-sicurezza PASS (solo note basse). Note rimandate a B11: altre diciture interne pubbliche sulla mappa ("posizione da inserire", "ingresso da inserire", "regole da inserire", nota fonte); legenda per giorno (`hoursPending(spaces, weekday)`) quando il master avrà orari parziali; commento in testa a FacilityMap; test di render al posto del controllo sul sorgente.
+- Stato: DONE, commit `7d42460`, **pubblicato** 17/10 01:08 UTC (Render `dep-db9ckdm1egvs73eopaj0`, live). Sito reale 390/1440 su /impianti e /: HTTP 200, nessun errore in console, nessuno scroll orizzontale; "in aggiornamento dalla società" una volta sola.
