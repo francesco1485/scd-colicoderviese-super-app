@@ -148,7 +148,7 @@ export function sessionBadge(roles: ReadonlySet<string>): string {
     ["direzione", "Direzione"],
     ["segreteria", "Segreteria"],
     ["tesoreria", "Tesoreria"],
-    ["responsabile-trasporti", "Responsabile trasporti"],
+    ["responsabile-trasporti", "Responsabile servizio pulmini"],
     ["dirigente-annata", "Dirigente"],
     ["mister", "Mister"],
     ["autista", "Autista"],
