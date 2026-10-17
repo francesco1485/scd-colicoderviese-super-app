@@ -118,8 +118,8 @@ describe("presa visione (r114)", () => {
     expect(parseMyRequests([{ ...row, status: "RICHIESTA" }])[0]!.acknowledged).toBe(false);
     expect(parseOfficeRequests([{ ...row, acknowledged: "yes" }])![0]!.acknowledged).toBe(false);
   });
-  it("stays off until «applica r114» and explains why", () => {
-    expect(TRANSPORT_ACK_LIVE).toBe(false);
+  it("is live after «applica r114» and explains errors", () => {
+    expect(TRANSPORT_ACK_LIVE).toBe(true);
     expect(requestError("unavailable")).toContain("in attivazione");
     expect(requestError("not_confirmed")).toContain("posto confermato");
   });

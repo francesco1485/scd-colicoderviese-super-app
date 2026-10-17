@@ -1,5 +1,5 @@
 -- r114: Pulmini — «presa visione» of a confirmed seat by the family (start-up of the service 2026/27, 2026-10-17,
--- chat CLOUD range r110-r129). STAGED: written and tested on PGlite, NOT APPLIED. Apply only after Francesco writes
+-- chat CLOUD range r110-r129). APPLIED on SCD PULSE 17/10/2026 (tested on PGlite) after Francesco wrote
 -- «applica r114». Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires r84 (scd_transport_requests, scd_transport_request_events, scd_transport_office, scd_transport_stops) and
 -- r61 (scd_my_family) already applied: a guard below stops the migration when one of them is missing.

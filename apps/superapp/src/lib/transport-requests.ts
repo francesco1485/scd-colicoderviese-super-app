@@ -5,10 +5,10 @@
  */
 
 /**
- * «Presa visione» of a confirmed seat lives in migration r114 (STAGED). Switch to true in the same change that
- * follows «applica r114»: until then the family card does not offer the button and the office shows no ack chip.
+ * «Presa visione» of a confirmed seat lives in migration r114, applied on SCD PULSE on 17/10/2026 after Francesco's
+ * «applica» (given as «applica r113», renumbered because r113 was already taken).
  */
-export const TRANSPORT_ACK_LIVE = false;
+export const TRANSPORT_ACK_LIVE = true;
 
 export const DIRECTIONS = ["ANDATA_RITORNO", "ANDATA", "RITORNO"] as const;
 export type Direction = (typeof DIRECTIONS)[number];
