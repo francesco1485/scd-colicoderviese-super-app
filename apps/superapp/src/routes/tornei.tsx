@@ -8,6 +8,7 @@ import {
   Castle,
   Church,
   ClipboardList,
+  ExternalLink,
   Handshake,
   MapPin,
   Mountain,
@@ -50,6 +51,8 @@ import {
  * - Enea, master guide (UD-149): one reason + one action, rotating, dismissible, reduced motion respected;
  * - one card per published tournament: annate chips in a row, the six service icons (unknown = «da confermare»),
  *   confirmed guest teams («la tua squadra c'è?»), the official poster once as a thumbnail that enlarges;
+ *   «Iscrivi la squadra» opens the organiser's public site in a new tab when registrations live there
+ *   (Memorial José Nasazzi 2027, `registerUrl`), otherwise the tournament's internal registration section;
  * - tournaments without a published programme: one compact «In arrivo» row each, never an empty trophy card;
  * - «Vivi il Lago»: verified facts about Colico, Forte Montecchio Nord, Dervio and the lake (lib/tournament-hub.ts).
  * No minors' names, no faces, no results: guest teams are club names from the official posters.
@@ -98,6 +101,20 @@ function useNow(serverNow: number) {
 }
 
 function RegisterLink({ t, className = GOLD_CTA }: { t: TournamentEdition; className?: string }) {
+  if (t.registerUrl?.startsWith("https://"))
+    return (
+      <a
+        href={t.registerUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+        data-testid={`tornei-iscrivi-${t.id}`}
+      >
+        Iscrivi la squadra
+        <ExternalLink className="size-5" aria-hidden="true" />
+        <span className="sr-only">(sito dell'organizzatore Sport Pro Experience, si apre in una nuova scheda)</span>
+      </a>
+    );
   if (!t.link) return null;
   return (
     <Link
@@ -253,6 +270,8 @@ function TournamentCard({ t }: { t: TournamentEdition }) {
           )}
         </div>
       </div>
+
+      <p className="m-0 text-[14px] leading-snug text-[#24385a]">{t.text}</p>
 
       {t.annate && t.annate.length > 0 && (
         <div>

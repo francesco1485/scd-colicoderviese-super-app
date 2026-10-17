@@ -117,7 +117,7 @@ export const SHARE_PAGES = {
     path: "/tornei",
     title: "Tornei — S.C.D. ColicoDerviese",
     description:
-      "I tornei della S.C.D. ColicoDerviese: Christmas Lario Cup maschile e Female Edition (8 dicembre 2026), Memorial José Nasazzi 2027, Memorial Sandro Guattini.",
+      "I tornei della S.C.D. ColicoDerviese: Christmas Lario Cup maschile e Female Edition (8 dicembre 2026), Memorial José Nasazzi e Female Edition (22–23 maggio 2027), Memorial Sandro Guattini.",
     ogDescription: "Tornei giovanili maschili e femminili organizzati dalla ColicoDerviese a Colico e Dervio.",
     shareText: "I tornei della ColicoDerviese a Colico e Dervio: calendario e iscrizioni.",
     image: CREST_SHARE_IMAGE,

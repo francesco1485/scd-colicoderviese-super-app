@@ -19,18 +19,23 @@ import { TOURNAMENTS, type TournamentEdition } from "./tournaments";
 const read = (p: string) => readFileSync(resolve(__dirname, "../..", p), "utf8");
 
 describe("tournament board (/tornei)", () => {
-  it("before the Christmas Lario Cup: hero = CLC, both editions as full cards, the rest «In arrivo»", () => {
+  it("before the Christmas Lario Cup: hero = CLC, CLC and Nasazzi editions as full cards, Guattini «In arrivo»", () => {
     const b = tournamentBoard("2026-10-17");
     expect(b.hero?.id).toBe("christmas-lario-cup-maschile");
-    expect(b.published.map((t) => t.id)).toEqual(["christmas-lario-cup-maschile", "christmas-lario-cup-female"]);
-    expect(b.coming.map((t) => t.id)).toEqual(["memorial-jose-nasazzi", "memorial-sandro-guattini"]);
+    expect(b.published.map((t) => t.id)).toEqual([
+      "christmas-lario-cup-maschile",
+      "christmas-lario-cup-female",
+      "memorial-jose-nasazzi",
+      "memorial-jose-nasazzi-female",
+    ]);
+    expect(b.coming.map((t) => t.id)).toEqual(["memorial-sandro-guattini"]);
     expect(sameDayEditions(b.hero, b.published)).toHaveLength(2);
   });
 
-  it("after the Christmas Lario Cup: no hero invented, unpublished tournaments stay compact", () => {
+  it("after the Christmas Lario Cup: no hero invented (Nasazzi has no published start time), Guattini stays compact", () => {
     const b = tournamentBoard("2026-12-09");
     expect(b.hero).toBeNull();
-    expect(b.published).toEqual([]);
+    expect(b.published.map((t) => t.id)).toEqual(["memorial-jose-nasazzi", "memorial-jose-nasazzi-female"]);
     expect(b.coming.length).toBeGreaterThan(0);
     expect(sameDayEditions(b.hero, b.published)).toEqual([]);
   });
@@ -100,5 +105,38 @@ describe("/tornei page", () => {
     expect(src.match(/<PosterZoom/g)).toHaveLength(1);
     expect(src).toContain("<EneaGuide ctx=\"tornei\"");
     expect(src).toContain("pageHead(SHARE_PAGES.tornei)");
+  });
+});
+
+describe("Memorial José Nasazzi 2027 (official posters, Direzione 17/10/2026)", () => {
+  const main = TOURNAMENTS.find((t) => t.id === "memorial-jose-nasazzi")!;
+  const female = TOURNAMENTS.find((t) => t.id === "memorial-jose-nasazzi-female")!;
+
+  it("only the services printed on the poster are confirmed", () => {
+    const by = Object.fromEntries(serviceFacts(main).map((s) => [s.id, s]));
+    expect(by["ristorazione"]?.confirmed).toBe(true);
+    expect(by["ospitalita"]?.text).toBe("Possibilità di pernottamento su richiesta");
+    expect(by["organizzazione"]?.text).toContain("Sport Pro Experience");
+    expect(by["partite"]?.confirmed).toBe(false);
+    expect(by["foto-video"]?.confirmed).toBe(false);
+    expect(by["territorio"]?.confirmed).toBe(false);
+    const fem = Object.fromEntries(serviceFacts(female).map((s) => [s.id, s]));
+    expect(Object.values(fem).filter((s) => s.confirmed).map((s) => s.id)).toEqual(["organizzazione"]);
+  });
+
+  it("registrations on the organiser site, https, no phone numbers, official club name, posters on disk", () => {
+    for (const t of [main, female]) {
+      expect(t.registerUrl).toBe(CHRISTMAS_LARIO_CUP.infoUrl);
+      expect(t.registerUrl?.startsWith("https://")).toBe(true);
+      expect(t.source).toBe("Locandine ufficiali 7ª edizione (Direzione 17/10/2026)");
+      const copy = JSON.stringify(t);
+      expect(copy).not.toMatch(/\d{3}\s?\d{3}\s?\d{4}|\+39/);
+      expect(copy).not.toContain("S.D.C.");
+      expect(t.poster?.alt).toContain("S.C.D. ColicoDerviese");
+      expect(() => readFileSync(resolve(__dirname, "../../public", t.poster!.src.slice(1)))).not.toThrow();
+    }
+    // The flags on the poster are decoration: no nations listed; the charity is not named.
+    expect(main.confirmedTeams.some((n) => /\(/.test(n))).toBe(false);
+    expect(main.text).toContain("un'associazione benefica");
   });
 });

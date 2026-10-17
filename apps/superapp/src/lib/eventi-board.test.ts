@@ -32,12 +32,14 @@ describe("eventi board helpers", () => {
     expect(dateBlock("2027-02-30x")).toBeNull();
   });
 
-  it("other tournaments exclude the featured cup and keep Nasazzi 22–23 May 2027", () => {
+  it("other tournaments exclude the featured cup and keep Nasazzi (confirmed, with the Female Edition) 22–23 May 2027", () => {
     const list = otherTournaments("2026-10-16");
     expect(list.some((t) => t.id.startsWith("christmas-lario-cup"))).toBe(false);
     const nasazzi = list.find((t) => t.id === "memorial-jose-nasazzi");
     expect(nasazzi?.when).toBe("22–23 maggio 2027");
     expect(nasazzi?.date).toBe("2027-05-22");
+    expect(nasazzi?.status).toBe("ISCRIZIONI_APERTE");
+    expect(list.find((t) => t.id === "memorial-jose-nasazzi-female")?.place).toContain("Dervio");
   });
 
   it("one club colour per kind, with purpose", () => {
