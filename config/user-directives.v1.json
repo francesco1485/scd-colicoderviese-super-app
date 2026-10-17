@@ -4208,7 +4208,7 @@
         "scope": "SCD PULSE scd_people / scd_structure_roles / scd_person_consents, /gestionale/rubrica, /famiglia, /la-mia-scd, Iride (assistant.server.ts), GROW CRM",
         "supersedes": "none",
         "implementationStatus": "IMPLEMENTED_STAGING_MIGRATION_NOT_APPLIED",
-        "implementation": "r141 (needs r132 first): consent type TELEFONO_STAFF_CONDIVISO, scd_structure_roles.needs_review, scd_staff_directory / scd_set_my_phone_share / scd_person_phone, people policy narrowed to rule 1, phone column out of direct reads, organigram 2026/27 seed with hashed names, U18 staff roles closed; app: staff-directory.ts, staff-directory.functions.ts, StaffDirectory.tsx, gestionale.rubrica.tsx"
+        "implementation": "r141 (r132 already applied): consent type TELEFONO_STAFF_CONDIVISO, scd_structure_roles.needs_review (doubtful roles inserted inactive, ignored by scd_my_team_ids and the public view), scd_staff_directory / scd_set_my_phone_share / scd_person_phone (audited), people policy narrowed to rule 1, phone and contact_phone columns out of direct reads, organigram 2026/27 seed loaded at apply time from a private session table (no names in the repository), U18 staff roles closed; app: staff-directory.ts, staff-directory.functions.ts, StaffDirectory.tsx, gestionale.rubrica.tsx"
       }
     }
   ],

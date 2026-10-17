@@ -2,8 +2,15 @@
 -- chat PC (range r130-r149).
 -- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r141". Never apply from an agent.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
--- Requires r132 (scd_person_consents one-active index and audit columns, STAGED): apply "applica r132" first. The
--- guard below stops the migration when r132 or one of the r33 / r59 / r61 / r65_1 / r74 objects is missing.
+-- Requires r132 (scd_person_consents one-active index and audit columns), APPLIED on SCD PULSE 15/10/2026 (coordinator,
+-- 17/10/2026). The guard below still stops the migration when r132 or one of the r33 / r59 / r61 / r65_1 / r74 objects
+-- is missing (fresh environments).
+--
+-- HOW TO APPLY (the organigram names are NOT in this public repository):
+--   run, in ONE execution / session, first the private seed file kept outside git
+--   (scratchpad annate/r141_seed_private.sql, generated from organigramma_dichiarato.csv: it creates and fills the
+--   session table pg_temp.r141_seed), then this migration. Without the private table the migration applies everything
+--   else, skips the organigram seed with a NOTICE and can be re-run later with the seed (idempotent).
 --
 -- Why (Francesco, Direttore Generale, 17/10/2026 11:11-11:13, plan answered «applica»; UD-167):
 --   1. One staff directory inside the gestionale. Direzione / Segreteria see everybody; a mister sees the staff of
@@ -26,22 +33,32 @@
 --   4. scd_staff_directory(org) -> {viewer, callerAdult, people[{personId, name, roles[], phoneState, phone}], me}:
 --      the ONE read used by the Rubrica staff page, the family page and Iride. phone is filled only when rule 1
 --      lets the caller see the person, the person agreed (TELEFONO_STAFF_CONDIVISO granted, not revoked), the caller
---      is an adult and a number exists. Staff who are minors are never listed. USER_BASE (not verified) gets null.
+--      is an adult and a number exists. Caller adult = office or staff role, or a linked person with a KNOWN birth
+--      date of 18+; unknown age = minor = no numbers. Staff who are minors are never listed. USER_BASE gets null.
 --   5. scd_set_my_phone_share(org, share): the staff member's own answer, written as a new consent row (the previous
 --      active one is revoked, history kept, given_by_role SELF, channel APP).
 --   6. scd_person_phone(org, person): phone for the office roles only (DIRECTION, SECRETARIAT, REGISTRATION, same
---      as the r63 people policy), used by /segreteria/persone after the column hardening below.
+--      as the r63 people policy), used by /segreteria/persone after the column hardening below; every read is
+--      written to scd_audit_events (action PHONE_READ, ids only, never the number).
 --   7. RLS (rule 1): the staff branch of scd_people_select_member (r63_1) is NARROWED from "every adult with a
 --      structure role" to the people of scd_staff_visible_person_ids; office and own-family branches unchanged.
+--      Column grants after 8 (documented on the column): authenticated reads every scd_people column except phone,
+--      every scd_structure_roles column except contact_phone; row policies unchanged; anon nothing.
 --   8. Column hardening (rule 3): authenticated loses SELECT on scd_people.phone (every other column stays
 --      readable as before, the row policy still applies). Phones are read only through 4 (with consent) and 6 (office).
 --      The unused view scd_v_people_active (select p.*) can no longer be read by authenticated: no app code uses it.
---   9. Seed of the organigram 2026/27 declared by the Direzione 17/10/2026 (79 rows: names, roles, teams, NO phones):
---      people are matched by a SHA-256 key of the normalised name (the repository is public: no names in clear),
---      only ACTIVE adult people of the club, exactly one match or the row is skipped and reported (counts and row
---      numbers only). Surname-only rows match only a person who already holds a structure role. An existing role of
---      the same person on the same team and kind (or the same club label) is left untouched. 7 rows whose name is
---      "da confermare" are NOT in the seed; 13 "Contatti esterni" rows are NOT here (GROW CRM follow-up).
+--   9. Seed of the organigram 2026/27 declared by the Direzione 17/10/2026 (names, roles, teams, NO phones), read at
+--      apply time from the private session table pg_temp.r141_seed (never committed; dropped at the end). Only ACTIVE
+--      adult people of the club, exactly one match of the normalised full name or the row is skipped and reported
+--      (row numbers and reasons only). Surname-only rows match only a person who already holds a structure role.
+--      FAIL CLOSED: every row declared with a doubt (surname only, inferred person, homonym, "squadre da confermare")
+--      is inserted INACTIVE with needs_review = true, so it grants no roster, call-up or directory access until the
+--      Direzione confirms it in the gestionale. An existing role of the same person on the same team and kind (or the
+--      same club label, or the same seed row) is left untouched. Names "da confermare" and "Contatti esterni" rows
+--      are not in the private seed (GROW CRM follow-up).
+--  11. scd_my_team_ids (r65_1 text) and the public staff view scd_v_structure_public (r59) ignore needs_review roles.
+--  12. Column hardening also for the legacy duplicate scd_structure_roles.contact_phone (not readable by
+--      authenticated); anon keeps no privilege on scd_people.
 --  10. U18 Élite (withdrawn, Direzione 17/10/2026 10:15): its active staff roles are closed (active false,
 --      valid_to 17/10/2026) with a CAMBIO_RUOLO row in scd_person_events. Athlete memberships are NOT touched.
 --
@@ -69,6 +86,8 @@
 --   drop function if exists public.scd_staff_phone_shared(uuid);
 --   drop function if exists public.scd_staff_club_areas();
 --   drop function if exists public.scd_staff_office(uuid);
+--   grant select on public.scd_structure_roles to authenticated;
+--   -- r65_1 scd_my_team_ids and r59 scd_v_structure_public: re-run their original text
 --   -- seeded roles: update public.scd_structure_roles set active = false, valid_to = current_date
 --   --   where source_record_id like 'r141:%';  (U18 roles: re-open by hand from scd_person_events if ever needed)
 --   -- consent rows TELEFONO_STAFF_CONDIVISO must be deleted before the r132 check is restored
@@ -195,7 +214,7 @@ as $$
       ) as member
   ),
   roles as (
-    select r.id, r.team_id, r.area_id
+    select r.id, r.team_id, r.area_id, coalesce(r.needs_review, false) as review
     from public.scd_structure_roles r
     join public.scd_people p on p.id = r.person_id and p.organization_id = p_organization_id and p.status = 'ACTIVE'
     where r.organization_id = p_organization_id and r.active and r.show_in_app
@@ -216,10 +235,10 @@ as $$
   select r.id
   from roles r, ctx
   where ctx.office
-     or (ctx.staff and (
+     or (not r.review and ctx.staff and (
            (r.team_id is not null and r.team_id in (select id from staff_teams))
            or (r.team_id is null and r.area_id = any(public.scd_staff_club_areas()))))
-     or (ctx.member and (
+     or (not r.review and ctx.member and (
            (r.team_id is not null and r.team_id in (select team_id from family_teams))
            or (r.team_id is null and r.area_id = 'segreteria')));
 $$;
@@ -257,26 +276,27 @@ begin
   ) then
     return null;
   end if;
-  -- A caller bound to a minor (or with no verified person and only the ATHLETE role) never receives a number:
-  -- no 1:1 adult-minor contact.
-  v_adult := not exists (
-      select 1 from public.scd_people p
-      where p.id in (select public.scd_my_person_ids(p_organization_id))
-        and coalesce(public.scd_is_minor(p.birth_date), false)
-    )
-    and not (
-      public.scd_has_org_role(p_organization_id, array['ATHLETE']::public.scd_role[])
-      and not exists (
-        select 1 from public.scd_people p
-        where p.id in (select public.scd_my_person_ids(p_organization_id)) and p.birth_date is not null
-      )
-    );
   v_office := public.scd_staff_office(p_organization_id);
   v_staff := public.scd_has_org_role(p_organization_id, array['MISTER','STAFF','MANAGER','TOURNAMENTS','REGISTRATION']::public.scd_role[])
     or exists (
       select 1 from public.scd_structure_roles r
       where r.organization_id = p_organization_id and r.active and (r.valid_to is null or r.valid_to >= current_date)
         and r.person_id in (select public.scd_my_person_ids(p_organization_id))
+    );
+  -- Adult caller (no 1:1 adult-minor contact): office or staff role, or a linked person with a KNOWN birth date of 18+,
+  -- and never a caller bound to a minor. Unknown age = minor = no numbers.
+  v_adult := not exists (
+      select 1 from public.scd_people p
+      where p.id in (select public.scd_my_person_ids(p_organization_id))
+        and coalesce(public.scd_is_minor(p.birth_date), false)
+    )
+    and (
+      v_office or v_staff
+      or exists (
+        select 1 from public.scd_people p
+        where p.id in (select public.scd_my_person_ids(p_organization_id))
+          and p.birth_date is not null and public.scd_is_minor(p.birth_date) = false
+      )
     );
 
   select coalesce(jsonb_agg(x.j order by x.name), '[]'::jsonb) into v_people
@@ -382,14 +402,28 @@ $$;
 -- ---------------------------------------------------------------- 6. office read of a phone (after 8)
 create or replace function public.scd_person_phone(p_organization_id uuid, p_person_id uuid)
 returns text
-language sql
-stable
+language plpgsql
+volatile
 security definer
 set search_path to 'public'
 as $$
-  select p.phone from public.scd_people p
-  where p.id = p_person_id and p.organization_id = p_organization_id
-    and public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT','REGISTRATION']::public.scd_role[]);
+declare
+  v_phone text;
+begin
+  if not public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT','REGISTRATION']::public.scd_role[]) then
+    return null;
+  end if;
+  select p.phone into v_phone from public.scd_people p
+  where p.id = p_person_id and p.organization_id = p_organization_id;
+  if not found then
+    return null;
+  end if;
+  -- Every office read is traced (ids only, never the number), like CONTATTO_LETTO in r139.
+  insert into public.scd_audit_events (organization_id, actor_user_id, action, entity_type, entity_id, payload)
+  values (p_organization_id, (select auth.uid()), 'PHONE_READ', 'scd_people', p_person_id,
+          jsonb_build_object('source', 'r141', 'hasPhone', v_phone is not null));
+  return v_phone;
+end;
 $$;
 
 revoke all on function public.scd_staff_office(uuid) from public, anon;
@@ -430,8 +464,68 @@ begin
   where c.table_schema = 'public' and c.table_name = 'scd_people' and c.column_name <> 'phone';
   execute 'revoke select on public.scd_people from authenticated';
   execute format('grant select (%s) on public.scd_people to authenticated', v_cols);
+  select string_agg(quote_ident(c.column_name), ', ' order by c.ordinal_position) into v_cols
+  from information_schema.columns c
+  where c.table_schema = 'public' and c.table_name = 'scd_structure_roles' and c.column_name <> 'contact_phone';
+  execute 'revoke select on public.scd_structure_roles from authenticated';
+  execute format('grant select (%s) on public.scd_structure_roles to authenticated', v_cols);
 end;
 $$;
+revoke all on public.scd_people from anon;
+revoke all on public.scd_structure_roles from anon;
+comment on column public.scd_people.phone is
+  'r141: not readable by authenticated (column grant). Read through scd_staff_directory (consent, rule 1) or scd_person_phone (office, audited).';
+comment on column public.scd_structure_roles.contact_phone is
+  'r141: legacy duplicate, not readable by authenticated; the phone lives once on scd_people.phone.';
+
+-- ---------------------------------------------------------------- 11. roles "da confermare" grant nothing
+-- scd_my_team_ids: r65_1 text, plus "not needs_review" on the two structure-role branches.
+create or replace function public.scd_my_team_ids(p_organization_id uuid)
+returns setof uuid
+language sql
+stable
+security definer
+set search_path to 'public'
+as $$
+  with me as (
+    select m.scope from public.scd_memberships m
+    where m.organization_id = p_organization_id and m.user_id = (select auth.uid()) and m.active
+  )
+  select t.id
+  from public.scd_teams t
+  where t.organization_id = p_organization_id
+    and (
+      public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT','REGISTRATION']::public.scd_role[])
+      or exists (select 1 from me where coalesce(me.scope->'positions', '[]'::jsonb) ? 'coordinatore-attivita-sportiva')
+      or exists (select 1 from me where coalesce(me.scope->'teams', '[]'::jsonb) ? t.code)
+      or exists (
+        select 1 from public.scd_structure_roles r
+        where r.organization_id = p_organization_id and r.active and r.role_kind = 'RESPONSABILE'
+          and r.area_id = 'coordinamento-sportivo' and (r.valid_to is null or r.valid_to >= current_date)
+          and not coalesce(r.needs_review, false)
+          and r.person_id in (select public.scd_my_person_ids(p_organization_id))
+      )
+      or exists (
+        select 1 from public.scd_structure_roles r
+        where r.team_id = t.id and r.active and r.role_kind in ('MISTER','DIRIGENTE','STAFF','RESPONSABILE')
+          and (r.valid_to is null or r.valid_to >= current_date)
+          and not coalesce(r.needs_review, false)
+          and r.person_id in (select public.scd_my_person_ids(p_organization_id))
+      )
+    );
+$$;
+revoke all on function public.scd_my_team_ids(uuid) from public, anon;
+grant execute on function public.scd_my_team_ids(uuid) to authenticated;
+
+-- Public "omini" view (r59 text, same columns): roles "da confermare" are not shown.
+create or replace view public.scd_v_structure_public
+with (security_invoker = true) as
+  select s.id, s.organization_id, s.display_name, s.role_label, s.role_kind, s.team_code, s.team_name, s.area_id
+  from public.scd_v_structure_active s
+  join public.scd_people p on p.id = s.person_id
+  where s.show_in_app = true
+    and coalesce(public.scd_is_minor(p.birth_date), false) = false
+    and not exists (select 1 from public.scd_structure_roles x where x.id = s.id and x.needs_review);
 
 -- ---------------------------------------------------------------- 9-10. organigram 2026/27 and U18 closure
 -- Session-only helpers (pg_temp): they disappear with the session, nothing callable stays in the database.
@@ -440,9 +534,9 @@ returns text
 language sql
 immutable
 as $$
-  select encode(sha256(convert_to(regexp_replace(lower(translate(coalesce(p_text, ''),
+  select regexp_replace(lower(translate(coalesce(p_text, ''),
     'ÀÁÂÄÃÈÉÊËÌÍÎÏÒÓÔÖÕÙÚÛÜÇÑàáâäãèéêëìíîïòóôöõùúûüçñ',
-    'aaaaaeeeeiiiiooooouuuucnaaaaaeeeeiiiiooooouuuucn')), '[^a-z]', '', 'g'), 'UTF8')), 'hex');
+    'aaaaaeeeeiiiiooooouuuucnaaaaaeeeeiiiiooooouuuucn')), '[^a-z]', '', 'g');
 $$;
 
 create or replace function pg_temp.scd_r141_seed(p_organization_id uuid, p_rows jsonb, p_source text)
@@ -452,11 +546,14 @@ as $$
 declare
   r jsonb;
   v_keys text[];
+  v_words text[];
+  v_review boolean;
   v_season uuid;
   v_team uuid;
   v_person uuid;
   v_n integer;
   v_inserted integer := 0;
+  v_inactive integer := 0;
   v_present integer := 0;
   v_skipped jsonb := '[]'::jsonb;
 begin
@@ -465,7 +562,16 @@ begin
   order by s.starts_on desc limit 1;
 
   for r in select value from jsonb_array_elements(p_rows) loop
-    v_keys := array(select jsonb_array_elements_text(r -> 'keys'));
+    -- Full name, and without the last given name for 3+ words ("Surname Name Second" -> "Surname Name").
+    v_words := regexp_split_to_array(btrim(coalesce(r ->> 'person', '')), '\s+');
+    v_keys := array[pg_temp.scd_r141_key(r ->> 'person')];
+    if coalesce(array_length(v_words, 1), 0) >= 3 then
+      v_keys := v_keys || pg_temp.scd_r141_key(array_to_string(v_words[1:array_length(v_words, 1) - 1], ' '));
+    end if;
+    if coalesce(pg_temp.scd_r141_key(r ->> 'person'), '') = '' then
+      v_skipped := v_skipped || jsonb_build_object('n', r -> 'n', 'reason', 'NO_NAME');
+      continue;
+    end if;
     v_team := null;
     if r ->> 'team' is not null then
       select count(*), (array_agg(t.id))[1] into v_n, v_team
@@ -481,7 +587,6 @@ begin
     from public.scd_people p
     where p.organization_id = p_organization_id and p.status = 'ACTIVE'
       and coalesce(public.scd_is_minor(p.birth_date), false) = false
-      and (r ->> 'bornBefore' is null or (p.birth_date is not null and p.birth_date < (r ->> 'bornBefore')::date))
       and case
         when r ->> 'mode' = 'SURNAME' then
           pg_temp.scd_r141_key(p.last_name) = any(v_keys)
@@ -508,24 +613,33 @@ begin
           (v_team is not null and x.team_id = v_team and x.role_kind = r ->> 'kind')
           or (v_team is null and x.team_id is null and lower(x.role_label) = lower(r ->> 'label'))
         )
+    ) or exists (
+      select 1 from public.scd_structure_roles x
+      where x.organization_id = p_organization_id and x.person_id = v_person and x.source_record_id = 'r141:' || (r ->> 'n')
     ) then
       v_present := v_present + 1;
       continue;
     end if;
 
+    -- FAIL CLOSED: a row declared with a doubt is stored inactive and "da confermare": no access until confirmed.
+    v_review := coalesce((r ->> 'review')::boolean, false) or r ->> 'mode' = 'SURNAME';
     insert into public.scd_structure_roles
       (organization_id, person_id, season_id, role_label, role_kind, team_id, area_id, show_in_app,
        valid_from, active, source_id, source_record_id, needs_review)
     values
       (p_organization_id, v_person, v_season, r ->> 'label', r ->> 'kind', v_team, r ->> 'area', true,
-       date '2026-10-17', true, p_source, 'r141:' || (r ->> 'n'), coalesce((r ->> 'review')::boolean, false));
+       date '2026-10-17', not v_review, p_source, 'r141:' || (r ->> 'n'), v_review);
     insert into public.scd_person_events (organization_id, person_id, event_type, event_date, reason, note)
     values (p_organization_id, v_person, 'CAMBIO_RUOLO', date '2026-10-17',
-            'Organigramma 2026/27 dichiarato dalla Direzione', 'r141: ' || (r ->> 'label'));
+            'Organigramma 2026/27 dichiarato dalla Direzione',
+            'r141: ' || (r ->> 'label') || case when v_review then ' (da confermare, non attivo)' else '' end);
     v_inserted := v_inserted + 1;
+    if v_review then
+      v_inactive := v_inactive + 1;
+    end if;
   end loop;
 
-  return jsonb_build_object('rows', jsonb_array_length(p_rows), 'inserted', v_inserted,
+  return jsonb_build_object('rows', jsonb_array_length(p_rows), 'inserted', v_inserted, 'insertedInactive', v_inactive,
                             'alreadyPresent', v_present, 'skipped', v_skipped);
 end;
 $$;
@@ -562,6 +676,7 @@ do $do$
 declare
   v_org uuid;
   v_seed jsonb;
+  v_rows jsonb;
   v_u18 integer;
 begin
   select o.id into v_org from public.scd_organizations o where o.slug = 'scd-colicoderviese';
@@ -569,90 +684,15 @@ begin
     raise notice 'r141: organization scd-colicoderviese not found, organigram seed and U18 closure skipped';
     return;
   end if;
-  -- Organigramma dichiarato dalla Direzione 17/10/2026 (row n = line of the private declaration file).
-  -- keys = SHA-256 of the normalised "surname name" (and of it without the last given name for 3+ words).
-  v_seed := pg_temp.scd_r141_seed(v_org, $seed$
-[
-  {"n":2,"team":"prima","label":"Mister","kind":"MISTER","area":null,"mode":"FULL","keys":["88e632ded6e5c6a3e88346bf0a746448daf8b791d5a0668c5c3d6936becec164"],"bornBefore":null,"review":false},
-  {"n":3,"team":"prima","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["6e7d0228933d4c89df0b6228735d7f05af79cdd4e1513137d785d5ce08851d86"],"bornBefore":null,"review":false},
-  {"n":4,"team":"prima","label":"Team manager","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["71f66fa4984ee14937b44b8d76c04c4c2118504a62417aee5afd842582ec94cf"],"bornBefore":null,"review":false},
-  {"n":5,"team":"prima","label":"Preparatore atletico","kind":"STAFF","area":null,"mode":"FULL","keys":["0c904116866fad9ee12847531fad0a59d2b4a96598772a31dd5ba8b1dcc98991"],"bornBefore":null,"review":false},
-  {"n":6,"team":"prima","label":"Preparatore portieri","kind":"STAFF","area":null,"mode":"FULL","keys":["ad83e3ea854a93d1ab29886706e7a5eddfc9177a7226394a275c01a649b7b875"],"bornBefore":null,"review":false},
-  {"n":7,"team":"u19","label":"Mister","kind":"MISTER","area":null,"mode":"SURNAME","keys":["202225986848353e63e4ff54761073613d487acdfcbe5f6917017543cc1f54c7"],"bornBefore":null,"review":true},
-  {"n":8,"team":"u19","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["1f203639fb8542ce5c53294808c18f0248ddcc1d5090c15b8a7f955d7ab3a716"],"bornBefore":null,"review":false},
-  {"n":9,"team":"u19","label":"Dirigente accompagnatore","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["4511f60ddf2e0d388b78e123abd23879200346412dc06ad5beb28eb969965405"],"bornBefore":null,"review":false},
-  {"n":10,"team":"u19","label":"Dirigente accompagnatore","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["3cf9f7ba2f1c8d33c9a6a88cbba5186b884d194b69b601a452e7228a5ab1f12e"],"bornBefore":null,"review":false},
-  {"n":11,"team":"u16","label":"Mister","kind":"MISTER","area":null,"mode":"FULL","keys":["e533406dbbbd3c9d493e7d2cb9239061d112e0afe094bcef4a2c09c92f010190"],"bornBefore":null,"review":false},
-  {"n":12,"team":"u16","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["510e3302ec4f4ab28d6854db648a12e11ead284d78ae99041a5c2d44b40183e6"],"bornBefore":null,"review":false},
-  {"n":13,"team":"u15","label":"Mister","kind":"MISTER","area":null,"mode":"FULL","keys":["b1c43eecdc3c0e9134ba726b46551f5d33140f19637b5fffc3159b54ff35e094"],"bornBefore":null,"review":false},
-  {"n":14,"team":"u15","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"SURNAME","keys":["01cb5c9a4afa48fb74a0eca872b6085c00916eca09a7f35b23163d434da48280"],"bornBefore":null,"review":true},
-  {"n":15,"team":"u15","label":"Dirigente accompagnatore","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["68b5bdf22770b8887cb9a1ef872ccf2f480d34f9660cf54b5461cd3088588c06"],"bornBefore":null,"review":false},
-  {"n":16,"team":"2014","label":"Mister","kind":"MISTER","area":null,"mode":"SURNAME","keys":["c564b5299484bc18cac31adc54dc7d2eb4a7a43612918f2db18e01323630e146"],"bornBefore":null,"review":true},
-  {"n":17,"team":"2014","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["4de407d1356bebf8ef24028c99d19730a89d667dac057b601123b80ea403b5a9"],"bornBefore":null,"review":false},
-  {"n":18,"team":"2015","label":"Mister","kind":"MISTER","area":null,"mode":"FULL","keys":["38e92d90148f4fb954d70b97be1e128ac95c1c33e7a822edc831647fd1f745c1","04a3b97776f00041936573e959ea86db0f94a2928ab7c60f004165b3a2527b98"],"bornBefore":null,"review":false},
-  {"n":19,"team":"2015","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["96b80ba2d3096962d397dd2a3f641c6eea55cd169fefa08f7daaea845ebce8f4"],"bornBefore":null,"review":false},
-  {"n":20,"team":"2015","label":"Dirigente accompagnatore","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["0eb4af0ddc3c9980274cb07ea1d408bce2ef2989f12e403dcd94e98b56050390"],"bornBefore":null,"review":false},
-  {"n":21,"team":"pulcini","label":"Mister","kind":"MISTER","area":null,"mode":"FULL","keys":["4327449595ba52ea005e111f36f76ff52e4242741b9ef9822daeaa3a6cd8ac9d","98c48ac9d7c9b8c7a329d97451dc6c8efc0d791423a3f318ab9a7cd0785a1f34"],"bornBefore":null,"review":false},
-  {"n":22,"team":"pulcini","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["3fd38566c4c24dec572b34151262186450e3fdde1beb82f801fa69409466e214"],"bornBefore":null,"review":false},
-  {"n":23,"team":"primicalci","label":"Mister","kind":"MISTER","area":null,"mode":"FULL","keys":["1be537e74a23b1fe6f8a2eb16d261f81378dccfde4c20e9ba0386268bfa21e28","ae2773ae6fe746da06c0f9bac542f2ebb8ceb7102f5ae5e6ddc401c5d2b069d0"],"bornBefore":null,"review":false},
-  {"n":24,"team":"primicalci","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["5803ededd092651d31ec7f6074bd74436a2ca8b52eb3dc93595036d4fc8b3434"],"bornBefore":null,"review":false},
-  {"n":25,"team":"primicalci","label":"Dirigente accompagnatore","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["9b47f21c3b9888aa02925f3331f8a36a5c24c78d6324ced936a5447f33a677ca"],"bornBefore":null,"review":true},
-  {"n":26,"team":"piccoliamici","label":"Mister","kind":"MISTER","area":null,"mode":"SURNAME","keys":["121224acd3bd0b816afe508ac0d628a41881c6a0772f1eb43015a6d11fd0bb05"],"bornBefore":null,"review":true},
-  {"n":27,"team":"piccoliamici","label":"Secondo allenatore","kind":"MISTER","area":null,"mode":"FULL","keys":["3c92565755ce3ffa6792ab72be3ab95b957e02e3713c612dca980bc4d7711b05"],"bornBefore":null,"review":false},
-  {"n":28,"team":null,"label":"Preparatore portieri Settore Giovanile","kind":"STAFF","area":"settore-giovanile","mode":"FULL","keys":["ae7559edc0dfe76c95a17fa59bd39777989e38d9b2325e678982e77828cd5047","b8d7e7439edb6c24ac2f16bd5d2289752a20fd447e7cc98b3fb9d7e4e04e3add"],"bornBefore":null,"review":false},
-  {"n":29,"team":null,"label":"Massaggiatore","kind":"STAFF","area":"infermeria","mode":"FULL","keys":["0b359c0d3fa8f4b6217a48f22f3fa91f29d5cefbdf49bb838576c4801ceb4184","a537b1f5a8957cfc060f021ee91069876c7cda1c08454f2a8011bb3c07eb5e8b"],"bornBefore":null,"review":true},
-  {"n":30,"team":null,"label":"Massaggiatore","kind":"STAFF","area":"infermeria","mode":"FULL","keys":["be2ff159ae70139976200df37b2eb40d750ebd8fb53812112ed9f0fd65b4e49d"],"bornBefore":null,"review":true},
-  {"n":31,"team":null,"label":"Segreteria e responsabile da remoto","kind":"RESPONSABILE","area":"segreteria","mode":"FULL","keys":["3f51f1f112499774ad8069855136909e4071edf9ff18dd7cd333d86ed129f57c"],"bornBefore":null,"review":false},
-  {"n":32,"team":null,"label":"Segreteria front office","kind":"STAFF","area":"segreteria","mode":"FULL","keys":["44f1538193073206cc54522671798429c69a039699fec3050452dfc4df0fc4c9"],"bornBefore":null,"review":false},
-  {"n":33,"team":null,"label":"Responsabile Safeguarding (tutela minori)","kind":"RESPONSABILE","area":"safeguarding","mode":"FULL","keys":["d4d307e27a6d1bea9defff5ed065a435213e1314b3a9198d84abc34e43e047f5"],"bornBefore":null,"review":false},
-  {"n":34,"team":null,"label":"Responsabile campi e manutenzione","kind":"RESPONSABILE","area":"campi","mode":"FULL","keys":["0db191ce111b8b5a0f1bcf331c64f0519f120baee67183e646549dd9f5203895"],"bornBefore":"1970-01-01","review":true},
-  {"n":36,"team":null,"label":"Collaboratore pulizie e lavanderia","kind":"STAFF","area":"pulizie","mode":"FULL","keys":["3adc765da97249d1067e69a83311213b65a0cd2f8b69ba0dc584af37be122405"],"bornBefore":null,"review":false},
-  {"n":37,"team":null,"label":"Collaboratore pulizie e lavanderia","kind":"STAFF","area":"pulizie","mode":"FULL","keys":["0fcb4af5ec027e80e3948401f8944aa28c4b78970fd437110c095a9e3c18501e"],"bornBefore":null,"review":false},
-  {"n":38,"team":null,"label":"Responsabile bar e ristorante Club House Colico e Dervio","kind":"RESPONSABILE","area":"club-house","mode":"FULL","keys":["0bc766706d42c83f864351f2951cdc6df8e3b8493de8fbc6180c630a3cf3158f"],"bornBefore":null,"review":false},
-  {"n":39,"team":null,"label":"Tesoreria","kind":"RESPONSABILE","area":"tesoreria","mode":"FULL","keys":["8f9ec293160357b7c2656ccad68defe056e4cf6fb550741cbd7457c3178120af"],"bornBefore":null,"review":false},
-  {"n":40,"team":null,"label":"Biglietteria","kind":"STAFF","area":"biglietteria","mode":"FULL","keys":["44f1538193073206cc54522671798429c69a039699fec3050452dfc4df0fc4c9"],"bornBefore":null,"review":false},
-  {"n":41,"team":null,"label":"Biglietteria","kind":"STAFF","area":"biglietteria","mode":"FULL","keys":["1526941b1efbce7fe0dc2cb247384f7c6b8f2e720d4499e9a83dc6210d5ff1aa"],"bornBefore":null,"review":false},
-  {"n":42,"team":null,"label":"Addetta collaboratrice Club House","kind":"STAFF","area":"club-house","mode":"FULL","keys":["7dfd11057bf555f0557008c5b2bea1598a2544f0bf0eca3c1dcb7bc4372986de"],"bornBefore":null,"review":false},
-  {"n":43,"team":null,"label":"Coordinatore attività sportive","kind":"RESPONSABILE","area":"coordinamento-sportivo","mode":"FULL","keys":["1f203639fb8542ce5c53294808c18f0248ddcc1d5090c15b8a7f955d7ab3a716"],"bornBefore":null,"review":false},
-  {"n":44,"team":null,"label":"Responsabile attività di base","kind":"RESPONSABILE","area":"attivita-base","mode":"FULL","keys":["28a344a02a0659d218cf1ee99b43f8f25e6ee6d5a63b532c5f574ef0961b3ce0","e341e3666b9377a14964cb35886357dc065687901475806d4a3539264e702403"],"bornBefore":null,"review":false},
-  {"n":45,"team":null,"label":"Responsabile area tecnica","kind":"RESPONSABILE","area":"area-tecnica","mode":"FULL","keys":["9f911ee87633bd0ace3ac4cbc7a03297482a16e5517562ed79adb50cde48aabb"],"bornBefore":null,"review":false},
-  {"n":47,"team":null,"label":"Dirigente autista pulmini","kind":"AUTISTA","area":"pulmini","mode":"FULL","keys":["6baec6f5af8f2ca48e6f2d6723298a03b93c6ba05aa3db711820f34fd13865ec"],"bornBefore":null,"review":false},
-  {"n":48,"team":null,"label":"Responsabile servizio pulmini","kind":"RESPONSABILE","area":"pulmini","mode":"FULL","keys":["1972c545c7cf21b20d153568fdca12e94b1c9fb0375543a77625670bc41b3eb4"],"bornBefore":null,"review":false},
-  {"n":49,"team":null,"label":"Dirigente autista pulmini","kind":"AUTISTA","area":"pulmini","mode":"FULL","keys":["1972c545c7cf21b20d153568fdca12e94b1c9fb0375543a77625670bc41b3eb4"],"bornBefore":null,"review":false},
-  {"n":50,"team":null,"label":"Dirigente autista pulmini","kind":"AUTISTA","area":"pulmini","mode":"FULL","keys":["1be537e74a23b1fe6f8a2eb16d261f81378dccfde4c20e9ba0386268bfa21e28","ae2773ae6fe746da06c0f9bac542f2ebb8ceb7102f5ae5e6ddc401c5d2b069d0"],"bornBefore":null,"review":false},
-  {"n":51,"team":null,"label":"Dirigente autista pulmini","kind":"AUTISTA","area":"pulmini","mode":"FULL","keys":["c556030deebda21cb5b7733b531a633c2abcb597037e4a9b10096e2df89d8778"],"bornBefore":null,"review":false},
-  {"n":52,"team":"u16","label":"Dirigente accompagnatore","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["e33c3944019c59d1673ce939d82414aebc81fee3055cbcbeb2034a1a6f308496"],"bornBefore":null,"review":false},
-  {"n":53,"team":null,"label":"Dirigente responsabile arbitri","kind":"DIRIGENTE","area":"arbitri","mode":"FULL","keys":["7b32a96b9427614062a7e72761cad5082d77add72a1a574fbe20b8c00c4e5a5a"],"bornBefore":null,"review":false},
-  {"n":54,"team":"pulcini","label":"Dirigente accompagnatore","kind":"DIRIGENTE","area":null,"mode":"FULL","keys":["7465142098a7ac1ab45026c9013ab1d4b8ae94e64c37659f1cf24bed5cacb905"],"bornBefore":null,"review":false},
-  {"n":55,"team":null,"label":"Direttore Generale","kind":"ORGANO_SOCIETARIO","area":"direzione","mode":"FULL","keys":["b5a0b2ed9e963604fc041904f4cd257a9634fedb69913f450dd7f1fdc2bd6eac"],"bornBefore":null,"review":false},
-  {"n":56,"team":null,"label":"Presidente","kind":"ORGANO_SOCIETARIO","area":"direzione","mode":"FULL","keys":["8cf3223119c1faa36040404283bfa8638eade339ad7d342633538637480657ea"],"bornBefore":null,"review":false},
-  {"n":57,"team":null,"label":"Consigliere","kind":"ORGANO_SOCIETARIO","area":"direzione","mode":"FULL","keys":["cd5381dc263d4bbaae2f3095f982216e141dbd0ba16ddde566f0e12eb3cedb49"],"bornBefore":null,"review":false},
-  {"n":58,"team":null,"label":"Vicepresidente","kind":"ORGANO_SOCIETARIO","area":"direzione","mode":"FULL","keys":["1f11c04bd8b92362a6041ac3352eb82fc63905fbc646704f7da92973be6b75f2"],"bornBefore":null,"review":false},
-  {"n":59,"team":null,"label":"Direttore sportivo Prima Squadra e Juniores","kind":"ORGANO_SOCIETARIO","area":"direzione","mode":"FULL","keys":["8d8d9962f20b50be4e085ef1e206cfe48c27dd18afd8957bbab6d86adf63e286"],"bornBefore":null,"review":false},
-  {"n":61,"team":null,"label":"Responsabile magazzino attrezzi","kind":"RESPONSABILE","area":"magazzino","mode":"FULL","keys":["0eb4af0ddc3c9980274cb07ea1d408bce2ef2989f12e403dcd94e98b56050390"],"bornBefore":null,"review":false},
-  {"n":62,"team":null,"label":"Responsabile magazzino attrezzi","kind":"RESPONSABILE","area":"magazzino","mode":"FULL","keys":["3adc765da97249d1067e69a83311213b65a0cd2f8b69ba0dc584af37be122405"],"bornBefore":null,"review":false},
-  {"n":63,"team":null,"label":"Responsabile magazzino abbigliamento e kit","kind":"RESPONSABILE","area":"magazzino","mode":"FULL","keys":["0bc766706d42c83f864351f2951cdc6df8e3b8493de8fbc6180c630a3cf3158f"],"bornBefore":null,"review":true},
-  {"n":64,"team":null,"label":"Responsabile magazzino abbigliamento e kit","kind":"RESPONSABILE","area":"magazzino","mode":"FULL","keys":["44f1538193073206cc54522671798429c69a039699fec3050452dfc4df0fc4c9"],"bornBefore":null,"review":true},
-  {"n":65,"team":null,"label":"Responsabile palestra","kind":"RESPONSABILE","area":"palestra","mode":"FULL","keys":["0c904116866fad9ee12847531fad0a59d2b4a96598772a31dd5ba8b1dcc98991"],"bornBefore":null,"review":false},
-  {"n":66,"team":null,"label":"Responsabile calendari, quadro settimanale e rotazione campi","kind":"RESPONSABILE","area":"calendari","mode":"FULL","keys":["28a344a02a0659d218cf1ee99b43f8f25e6ee6d5a63b532c5f574ef0961b3ce0","e341e3666b9377a14964cb35886357dc065687901475806d4a3539264e702403"],"bornBefore":null,"review":false},
-  {"n":67,"team":null,"label":"Responsabile calendari, quadro settimanale e rotazione campi","kind":"RESPONSABILE","area":"calendari","mode":"FULL","keys":["1f203639fb8542ce5c53294808c18f0248ddcc1d5090c15b8a7f955d7ab3a716"],"bornBefore":null,"review":false},
-  {"n":68,"team":null,"label":"Responsabile calendari, quadro settimanale e rotazione campi","kind":"RESPONSABILE","area":"calendari","mode":"FULL","keys":["b5a0b2ed9e963604fc041904f4cd257a9634fedb69913f450dd7f1fdc2bd6eac"],"bornBefore":null,"review":false},
-  {"n":70,"team":null,"label":"Responsabile sponsor e stampa","kind":"RESPONSABILE","area":"sponsor","mode":"FULL","keys":["b5a0b2ed9e963604fc041904f4cd257a9634fedb69913f450dd7f1fdc2bd6eac"],"bornBefore":null,"review":false},
-  {"n":71,"team":null,"label":"Responsabile sponsor e stampa","kind":"RESPONSABILE","area":"sponsor","mode":"FULL","keys":["8cf3223119c1faa36040404283bfa8638eade339ad7d342633538637480657ea"],"bornBefore":null,"review":false},
-  {"n":72,"team":null,"label":"Responsabile sponsor e stampa","kind":"RESPONSABILE","area":"sponsor","mode":"FULL","keys":["cd5381dc263d4bbaae2f3095f982216e141dbd0ba16ddde566f0e12eb3cedb49"],"bornBefore":null,"review":false},
-  {"n":73,"team":null,"label":"Segretario verbalizzatore","kind":"ORGANO_SOCIETARIO","area":"direzione","mode":"FULL","keys":["8f9ec293160357b7c2656ccad68defe056e4cf6fb550741cbd7457c3178120af"],"bornBefore":null,"review":false},
-  {"n":75,"team":null,"label":"Responsabile eventi e tornei","kind":"RESPONSABILE","area":"tornei","mode":"FULL","keys":["b5a0b2ed9e963604fc041904f4cd257a9634fedb69913f450dd7f1fdc2bd6eac"],"bornBefore":null,"review":false},
-  {"n":76,"team":null,"label":"Responsabile acquisti e magazzino acquisti","kind":"RESPONSABILE","area":"acquisti","mode":"FULL","keys":["b5a0b2ed9e963604fc041904f4cd257a9634fedb69913f450dd7f1fdc2bd6eac"],"bornBefore":null,"review":false},
-  {"n":77,"team":null,"label":"Responsabile acquisti e magazzino acquisti","kind":"RESPONSABILE","area":"acquisti","mode":"FULL","keys":["8cf3223119c1faa36040404283bfa8638eade339ad7d342633538637480657ea"],"bornBefore":null,"review":false},
-  {"n":78,"team":null,"label":"Responsabile acquisti e magazzino acquisti","kind":"RESPONSABILE","area":"acquisti","mode":"FULL","keys":["0bc766706d42c83f864351f2951cdc6df8e3b8493de8fbc6180c630a3cf3158f"],"bornBefore":null,"review":false},
-  {"n":79,"team":null,"label":"Responsabile rapporti con altre società e affiliazioni","kind":"RESPONSABILE","area":"affiliazioni","mode":"FULL","keys":["28a344a02a0659d218cf1ee99b43f8f25e6ee6d5a63b532c5f574ef0961b3ce0","e341e3666b9377a14964cb35886357dc065687901475806d4a3539264e702403"],"bornBefore":null,"review":false},
-  {"n":80,"team":null,"label":"Responsabile rapporti con altre società e affiliazioni","kind":"RESPONSABILE","area":"affiliazioni","mode":"FULL","keys":["1f203639fb8542ce5c53294808c18f0248ddcc1d5090c15b8a7f955d7ab3a716"],"bornBefore":null,"review":false},
-  {"n":81,"team":null,"label":"Responsabile rapporti con altre società e affiliazioni","kind":"RESPONSABILE","area":"affiliazioni","mode":"FULL","keys":["b5a0b2ed9e963604fc041904f4cd257a9634fedb69913f450dd7f1fdc2bd6eac"],"bornBefore":null,"review":false},
-  {"n":82,"team":null,"label":"Responsabile organizzazione iniziative FIGC e affiliazioni","kind":"RESPONSABILE","area":"affiliazioni","mode":"FULL","keys":["28a344a02a0659d218cf1ee99b43f8f25e6ee6d5a63b532c5f574ef0961b3ce0","e341e3666b9377a14964cb35886357dc065687901475806d4a3539264e702403"],"bornBefore":null,"review":false},
-  {"n":83,"team":null,"label":"Responsabile organizzazione iniziative FIGC e affiliazioni","kind":"RESPONSABILE","area":"affiliazioni","mode":"FULL","keys":["b5a0b2ed9e963604fc041904f4cd257a9634fedb69913f450dd7f1fdc2bd6eac"],"bornBefore":null,"review":false},
-  {"n":84,"team":null,"label":"Responsabile organizzazione iniziative FIGC e affiliazioni","kind":"RESPONSABILE","area":"affiliazioni","mode":"FULL","keys":["1f203639fb8542ce5c53294808c18f0248ddcc1d5090c15b8a7f955d7ab3a716"],"bornBefore":null,"review":false},
-  {"n":87,"team":null,"label":"Tuttofare struttura","kind":"STAFF","area":"campi","mode":"FULL","keys":["513a89bb9f6b2b387e55daf86c6d57bd8f2dbae1cbc3d1f6b7337084d5dc8293"],"bornBefore":null,"review":false}
-]$seed$::jsonb, 'DIREZIONE_2026-10-17');
+  -- Organigram declared by the Direzione 17/10/2026, from the private session table (row n = line of the private
+  -- declaration file). Not in this repository.
+  if to_regclass('pg_temp.r141_seed') is null then
+    raise notice 'r141: private seed pg_temp.r141_seed not loaded, organigram seed skipped (re-run with it)';
+    v_seed := null;
+  else
+    execute 'select coalesce(jsonb_agg(to_jsonb(s) order by s.n), ''[]''::jsonb) from pg_temp.r141_seed s' into v_rows;
+    v_seed := pg_temp.scd_r141_seed(v_org, v_rows, 'DIREZIONE_2026-10-17');
+  end if;
   v_u18 := pg_temp.scd_r141_close_u18(v_org);
   raise notice 'r141 organigram seed: %', v_seed;
   raise notice 'r141 U18 Élite staff roles closed: %', v_u18;
@@ -662,5 +702,6 @@ $do$;
 drop function if exists pg_temp.scd_r141_close_u18(uuid);
 drop function if exists pg_temp.scd_r141_seed(uuid, jsonb, text);
 drop function if exists pg_temp.scd_r141_key(text);
+drop table if exists pg_temp.r141_seed;
 
 commit;

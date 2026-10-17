@@ -150,14 +150,11 @@ describe.skipIf(!built)("client bundle keeps the staff directory and its numbers
     expect(list.every((p) => server.includes(p))).toBe(true);
   });
 
-  it("finds no staff directory RPC and no seed key of r141 in .output/public", () => {
-    const sql = readFileSync(resolve(APP, "../../supabase/migrations/20261017_r141_staff_directory.sql"), "utf8");
-    const keys = [...new Set([...sql.matchAll(/"([0-9a-f]{64})"/g)].map((m) => m[1]!))];
-    expect(keys.length).toBeGreaterThan(50);
+  it("finds no staff directory RPC in .output/public", () => {
     const hits: string[] = [];
     for (const f of files(PUBLIC_DIR)) {
       const src = readFileSync(f, "utf8");
-      for (const p of [...list, ...keys]) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p.slice(0, 24)}`);
+      for (const p of list) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p}`);
     }
     expect(hits).toEqual([]);
   });

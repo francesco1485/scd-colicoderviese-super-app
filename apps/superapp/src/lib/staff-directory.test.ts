@@ -44,7 +44,7 @@ describe("r141 migration (STAGED, rules mirrored in the app)", () => {
   it("is staged behind 'applica r141', after r132, with rollback, engines and measure", () => {
     expect(SQL).toMatch(/^-- r141:/);
     expect(SQL).toMatch(/STAGED: NOT APPLIED\. Apply only after Francesco writes "applica r141"/);
-    expect(SQL).toMatch(/applica r132/);
+    expect(SQL).toMatch(/r132 .*APPLIED on SCD PULSE 15\/10\/2026/);
     expect(SQL).toMatch(/Never on dfnwzwutvnwiitiffwvr/);
     expect(SQL).toMatch(/-- Rollback/);
     expect(SQL).toMatch(/Engines: PERSONE .* and TEMPO/);
@@ -66,7 +66,8 @@ describe("r141 migration (STAGED, rules mirrored in the app)", () => {
     expect(BODY).toMatch(/add column if not exists needs_review boolean not null default false/);
     expect(BODY).toContain("'TELEFONO_STAFF_CONDIVISO'");
     for (const t of ["'IMMAGINI_ISTITUZIONALI'", "'COMM_EMAIL'", "'PRESA_VISIONE_AUTISTA'"]) expect(BODY).toContain(t);
-    expect(BODY).not.toMatch(/contact_phone/);
+    // contact_phone is only hardened (column grant), never written.
+    expect(BODY).not.toMatch(/insert into public\.scd_structure_roles[^;]*contact_phone/);
     expect(BODY).toMatch(/revoke select on public\.scd_people from authenticated/);
     expect(BODY).toMatch(/column_name <> 'phone'/);
   });
@@ -74,7 +75,7 @@ describe("r141 migration (STAGED, rules mirrored in the app)", () => {
   it("defines every public function as SECURITY DEFINER with a fixed search_path and no anon grant", () => {
     const fns = [...BODY.matchAll(/create or replace function public\.(\w+)\(([^)]*)\)([\s\S]*?)\$\$;/g)];
     expect(fns.map((f) => f[1]).sort()).toEqual(
-      ["scd_person_phone", "scd_set_my_phone_share", "scd_staff_club_areas", "scd_staff_directory", "scd_staff_office", "scd_staff_phone_shared", "scd_staff_visible_person_ids", "scd_staff_visible_role_ids"].sort(),
+      ["scd_my_team_ids", "scd_person_phone", "scd_set_my_phone_share", "scd_staff_club_areas", "scd_staff_directory", "scd_staff_office", "scd_staff_phone_shared", "scd_staff_visible_person_ids", "scd_staff_visible_role_ids"].sort(),
     );
     for (const f of fns) {
       expect(f[3], f[1]).toMatch(/set search_path to 'public'/);
@@ -94,21 +95,32 @@ describe("r141 migration (STAGED, rules mirrored in the app)", () => {
     expect(fn).toMatch(/when v_adult and public\.scd_staff_phone_shared\(p\.id\) then/);
   });
 
-  it("seeds the organigram with hashed names only (public repository): no clear names, no numbers", () => {
-    const block = SQL.match(/\$seed\$([\s\S]*?)\$seed\$/)?.[1] ?? "";
-    const rows = JSON.parse(block) as Array<{ n: number; keys: string[]; label: string; kind: string; team: string | null; area: string | null; mode: string }>;
-    expect(rows.length).toBe(79);
-    for (const r of rows) {
-      expect(r.keys.length).toBeGreaterThan(0);
-      for (const k of r.keys) expect(k).toMatch(/^[0-9a-f]{64}$/);
-      expect(["MISTER", "DIRIGENTE", "AUTISTA", "RESPONSABILE", "STAFF", "ORGANO_SOCIETARIO"]).toContain(r.kind);
-      expect(r.team === null || ["prima", "u19", "u16", "u15", "2014", "2015", "pulcini", "primicalci", "piccoliamici"].includes(r.team)).toBe(true);
-      expect(["FULL", "SURNAME"]).toContain(r.mode);
-    }
-    expect(rows.some((r) => r.team === "u18")).toBe(false);
-    // No sequence that looks like a phone number anywhere outside the hashes.
-    expect(block.replace(/"[0-9a-f]{64}"/g, "")).not.toMatch(/\d{6,}/);
+  it("keeps the organigram names out of the public repository: seed only from the private session table", () => {
+    expect(SQL).not.toMatch(/\$seed\$/);
+    expect(SQL).not.toMatch(/[0-9a-f]{64}/);
+    expect(SQL).not.toMatch(/bornBefore/);
+    expect(BODY).toContain("to_regclass('pg_temp.r141_seed') is null");
+    expect(BODY).toMatch(/drop table if exists pg_temp\.r141_seed;/);
     expect(BODY).toMatch(/t\.code = 'u18'/);
+    // No sequence that looks like a phone number in the migration.
+    expect(BODY).not.toMatch(/\d{7,}/);
+  });
+
+  it("is fail-closed on roles declared with a doubt", () => {
+    expect(BODY).toMatch(/v_review := coalesce\(\(r ->> 'review'\)::boolean, false\) or r ->> 'mode' = 'SURNAME'/);
+    expect(BODY).toMatch(/date '2026-10-17', not v_review, p_source/);
+    const team = BODY.match(/create or replace function public\.scd_my_team_ids[\s\S]*?\n\$\$;/)?.[0] ?? "";
+    expect(team.match(/not coalesce\(r\.needs_review, false\)/g)?.length).toBe(2);
+    expect(BODY).toMatch(/create or replace view public\.scd_v_structure_public[\s\S]*?x\.needs_review\);/);
+  });
+
+  it("treats an unknown age as a minor for numbers and audits office reads", () => {
+    const fn = BODY.match(/function public\.scd_staff_directory[\s\S]*?\n\$\$;/)?.[0] ?? "";
+    expect(fn).toMatch(/p\.birth_date is not null and public\.scd_is_minor\(p\.birth_date\) = false/);
+    const ph = BODY.match(/function public\.scd_person_phone[\s\S]*?\n\$\$;/)?.[0] ?? "";
+    expect(ph).toMatch(/insert into public\.scd_audit_events[\s\S]*'PHONE_READ'/);
+    expect(BODY).toMatch(/revoke all on public\.scd_people from anon;/);
+    expect(BODY).toMatch(/column_name <> 'contact_phone'/);
   });
 });
 

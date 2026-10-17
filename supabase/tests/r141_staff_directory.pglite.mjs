@@ -9,7 +9,6 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 
 async function loadPGlite() {
   const dir = process.env.PGLITE_DIR;
@@ -269,46 +268,103 @@ await db.exec("reset role");
   await assert.rejects(() => as(U.kid, `select public.scd_set_my_phone_share('${ORG}', true)`), /not a staff member/);
 }
 
-// 9. Seed mechanics with invented rows (the session-only helpers of the migration, same text).
+// 9. Seed mechanics with invented rows (the session-only helpers of the migration, same text). Rows declared with a
+//    doubt (review, surname only) are stored INACTIVE: they grant no roster access.
 {
   const fns = [...R141.matchAll(/create or replace function pg_temp\.scd_r141_\w+\([\s\S]*?\n\$\$;/g)].map((m) => m[0]);
   assert.equal(fns.length, 3);
   for (const f of fns) await db.exec(f);
-  const key = (s) => createHash("sha256").update(s.normalize("NFC").toLowerCase().replace(/[^a-z]/g, ""), "utf8").digest("hex");
   await db.exec(`
+    insert into auth.users (id) values ('10000000-0000-0000-0000-000000000009');
+    insert into public.scd_memberships (organization_id, user_id, role, scope) values ('${ORG}', '10000000-0000-0000-0000-000000000009', 'STAFF', '{}');
     insert into public.scd_people (id, organization_id, first_name, last_name, birth_date) values
       ('50000000-0000-0000-0000-000000000001', '${ORG}', 'Anna Maria', 'Nuova', '1988-01-01'),
       ('50000000-0000-0000-0000-000000000002', '${ORG}', 'Ugo', 'Doppio', '1960-01-01'),
       ('50000000-0000-0000-0000-000000000003', '${ORG}', 'Ugo', 'Doppio', '2010-01-01'),
       ('50000000-0000-0000-0000-000000000004', '${ORG}', 'Ivo', 'Omonimo', '1980-01-01'),
       ('50000000-0000-0000-0000-000000000005', '${ORG}', 'Ivo', 'Omonimo', '1985-01-01'),
-      ('50000000-0000-0000-0000-000000000006', '${ORG}', 'Zeno', 'Senzaruolo', '1985-01-01');`);
+      ('50000000-0000-0000-0000-000000000006', '${ORG}', 'Zeno', 'Senzaruolo', '1985-01-01');
+    insert into public.scd_identity_links (organization_id, user_id, person_id, link_state, match_method, confidence) values
+      ('${ORG}', '10000000-0000-0000-0000-000000000009', '50000000-0000-0000-0000-000000000001', 'VERIFIED_BY_STAFF', 'MANUAL_STAFF', 100);`);
   const rows = [
-    { n: 1, team: "prima", label: "Secondo allenatore", kind: "MISTER", area: null, mode: "FULL", keys: [key("Nuova Anna Maria"), key("Nuova Anna")], bornBefore: null, review: false },
-    { n: 2, team: null, label: "Responsabile palestra", kind: "RESPONSABILE", area: "palestra", mode: "FULL", keys: [key("Doppio Ugo")], bornBefore: "1970-01-01", review: true },
-    { n: 3, team: null, label: "Biglietteria", kind: "STAFF", area: "biglietteria", mode: "FULL", keys: [key("Omonimo Ivo")], bornBefore: null, review: false },
-    { n: 4, team: "u15", label: "Mister", kind: "MISTER", area: null, mode: "SURNAME", keys: [key("Allenatore")], bornBefore: null, review: true },
-    { n: 5, team: "u17", label: "Mister", kind: "MISTER", area: null, mode: "FULL", keys: [key("Nuova Anna Maria")], bornBefore: null, review: false },
-    { n: 6, team: null, label: "Tesoreria", kind: "RESPONSABILE", area: "tesoreria", mode: "SURNAME", keys: [key("Senzaruolo")], bornBefore: null, review: true },
-    { n: 7, team: null, label: "Tuttofare", kind: "STAFF", area: "campi", mode: "FULL", keys: [key("Assente Persona")], bornBefore: null, review: false },
+    { n: 1, team: "prima", label: "Secondo allenatore", kind: "MISTER", area: null, mode: "FULL", person: "Nuova Anna Maria Seconda", review: false },
+    { n: 2, team: null, label: "Responsabile palestra", kind: "RESPONSABILE", area: "palestra", mode: "FULL", person: "Doppio Ugo", review: true },
+    { n: 3, team: null, label: "Biglietteria", kind: "STAFF", area: "biglietteria", mode: "FULL", person: "Omonimo Ivo", review: false },
+    { n: 4, team: "u15", label: "Mister", kind: "MISTER", area: null, mode: "SURNAME", person: "Allenatore", review: true },
+    { n: 5, team: "u17", label: "Mister", kind: "MISTER", area: null, mode: "FULL", person: "Nuova Anna Maria", review: false },
+    { n: 6, team: null, label: "Tesoreria", kind: "RESPONSABILE", area: "tesoreria", mode: "SURNAME", person: "Senzaruolo", review: true },
+    { n: 7, team: null, label: "Tuttofare", kind: "STAFF", area: "campi", mode: "FULL", person: "Assente Persona", review: false },
+    { n: 8, team: "u15", label: "Dirigente accompagnatore", kind: "DIRIGENTE", area: null, mode: "SURNAME", person: "Nuova", review: false },
   ];
   const run = async () => (await db.query(`select pg_temp.scd_r141_seed('${ORG}', $1::jsonb, 'TEST') s`, [JSON.stringify(rows)])).rows[0].s;
   const s1 = await run();
-  assert.equal(s1.inserted, 2, JSON.stringify(s1));
+  assert.equal(s1.inserted, 3, JSON.stringify(s1));
+  assert.equal(s1.insertedInactive, 2, "review row and surname-only row are inactive");
   assert.equal(s1.alreadyPresent, 1, "surname-only Mister U15 already holds the role");
   const reasons = Object.fromEntries(s1.skipped.map((x) => [x.n, x.reason]));
   assert.deepEqual(reasons, { 3: "PERSON_AMBIGUOUS", 5: "TEAM_NOT_FOUND", 6: "PERSON_NOT_FOUND", 7: "PERSON_NOT_FOUND" });
-  const ins = await db.query(`select person_id::text p, role_label, needs_review, season_id::text s, source_record_id from public.scd_structure_roles where source_id = 'TEST' order by source_record_id`);
+  const ins = await db.query(`select person_id::text p, role_label, active, needs_review, season_id::text s, source_record_id from public.scd_structure_roles where source_id = 'TEST' order by source_record_id`);
   assert.deepEqual(ins.rows, [
-    { p: "50000000-0000-0000-0000-000000000001", role_label: "Secondo allenatore", needs_review: false, s: SEASON, source_record_id: "r141:1" },
-    { p: "50000000-0000-0000-0000-000000000002", role_label: "Responsabile palestra", needs_review: true, s: SEASON, source_record_id: "r141:2" },
+    { p: "50000000-0000-0000-0000-000000000001", role_label: "Secondo allenatore", active: true, needs_review: false, s: SEASON, source_record_id: "r141:1" },
+    { p: "50000000-0000-0000-0000-000000000002", role_label: "Responsabile palestra", active: false, needs_review: true, s: SEASON, source_record_id: "r141:2" },
+    { p: "50000000-0000-0000-0000-000000000001", role_label: "Dirigente accompagnatore", active: false, needs_review: true, s: SEASON, source_record_id: "r141:8" },
   ]);
   const s2 = await run();
-  assert.equal(s2.inserted, 0, "second run inserts nothing");
-  assert.equal(s2.alreadyPresent, 3);
-  // SQL key == the generator's key (accents folded, punctuation dropped).
+  assert.equal(s2.inserted, 0, "second run inserts nothing (also the inactive rows)");
+  // A doubtful role never opens a roster: the inactive U15 row and even an ACTIVE needs_review row are ignored.
+  await db.exec(`insert into public.scd_structure_roles (organization_id, person_id, role_label, role_kind, team_id, needs_review)
+    values ('${ORG}', '50000000-0000-0000-0000-000000000001', 'Mister', 'MISTER', '${T.u19}', true);`);
+  const teams = await as("10000000-0000-0000-0000-000000000009", `select array_agg(x.id::text order by x.id) t from public.scd_my_team_ids('${ORG}') x(id)`);
+  assert.deepEqual(teams.rows[0].t, [T.prima]);
+  const pub = await as(U.dir, `select count(*)::int n from public.scd_v_structure_public where team_code = 'u19' and display_name = 'Anna Maria Nuova'`);
+  assert.equal(pub.rows[0].n, 0, "roles da confermare are not in the public staff view");
+  const misDir = await dir(U.mis);
+  assert.equal(JSON.stringify(misDir).includes("Anna Maria Nuova"), false);
+  // SQL key: accents folded, punctuation dropped.
   const k = await db.query(`select pg_temp.scd_r141_key('Dell''Àquila  Bruno') k`);
-  assert.equal(k.rows[0].k, key("dellaquilabruno"));
+  assert.equal(k.rows[0].k, "dellaquilabruno");
+}
+
+// 9b. Full migration path with the PRIVATE seed table (invented row): read, applied, table dropped.
+{
+  await db.exec(`
+    insert into public.scd_people (id, organization_id, first_name, last_name, birth_date) values
+      ('50000000-0000-0000-0000-000000000007', '${ORG}', 'Pia', 'Privata', '1977-01-01');
+    create temp table r141_seed (n integer primary key, team text, label text not null, kind text not null, area text, mode text not null, person text not null, review boolean not null);
+    insert into pg_temp.r141_seed values (901, null, 'Responsabile palestra', 'RESPONSABILE', 'palestra', 'FULL', 'Privata Pia', false);`);
+  await db.exec(R141);
+  const r = await db.query(`select active, source_record_id from public.scd_structure_roles where person_id = '50000000-0000-0000-0000-000000000007'`);
+  assert.deepEqual(r.rows, [{ active: true, source_record_id: "r141:901" }]);
+  const gone = await db.query(`select to_regclass('pg_temp.r141_seed') t`);
+  assert.equal(gone.rows[0].t, null, "the private seed table does not survive the migration");
+}
+
+// 9c. Unknown age = minor: a family account bound to a person without birth date gets no numbers.
+{
+  await db.exec(`
+    insert into auth.users (id) values ('10000000-0000-0000-0000-000000000010');
+    insert into public.scd_memberships (organization_id, user_id, role, scope) values ('${ORG}', '10000000-0000-0000-0000-000000000010', 'FAMILY', '{}');
+    insert into public.scd_people (id, organization_id, first_name, last_name, birth_date) values ('50000000-0000-0000-0000-000000000008', '${ORG}', 'Nina', 'Senzadata', null);
+    insert into public.scd_identity_links (organization_id, user_id, person_id, link_state, match_method, confidence) values
+      ('${ORG}', '10000000-0000-0000-0000-000000000010', '50000000-0000-0000-0000-000000000008', 'VERIFIED_BY_STAFF', 'MANUAL_STAFF', 100);
+    insert into public.scd_family_members (family_id, person_id, relationship, is_guardian) values
+      ('30000000-0000-0000-0000-000000000001', '50000000-0000-0000-0000-000000000008', 'GENITORE', true);`);
+  const d = await dir("10000000-0000-0000-0000-000000000010");
+  assert.equal(d.callerAdult, false);
+  assert.ok(d.people.some((p) => p.name === "Mario Allenatore"));
+  for (const p of d.people) assert.equal(p.phone, null);
+}
+
+// 9d. Office phone reads are audited (ids only); contact_phone of the structure roles is not readable.
+{
+  const a = await db.query(`select count(*)::int n, bool_or(payload::text like '%TEL-%') leak from public.scd_audit_events where action = 'PHONE_READ'`);
+  assert.equal(a.rows[0].n, 1);
+  assert.equal(a.rows[0].leak, false);
+  await assert.rejects(() => as(U.dir, `select contact_phone from public.scd_structure_roles`), /permission denied/);
+  const ok = await as(U.dir, `select count(*)::int n from public.scd_structure_roles`);
+  assert.ok(ok.rows[0].n > 0);
+  const anon = await db.query(`select has_table_privilege('anon', 'public.scd_people', 'select') a`);
+  assert.equal(anon.rows[0].a, false);
 }
 
 // 10. No anon grant on any r141 function; the internal consent helper is not callable by members.
