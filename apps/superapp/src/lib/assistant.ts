@@ -358,7 +358,7 @@ export function buildPublicContext(
   if (input.sponsorNames.length) b.line(`Sponsor della stagione 2026/27: ${input.sponsorNames.join(", ")}.`);
 
   b.section("Risultati e classifiche (fonti ufficiali)");
-  b.line("L'app non pubblica risultati propri: rimanda a queste fonti.");
+  b.line("Pubblichiamo solo i dati ufficiali LND, con fonte e link: classifiche e ultimi risultati [link: /classifiche].", "/classifiche");
   for (const l of input.resultLinks) b.line(`- ${l.label}: ${l.detail} ${l.url}`, l.url);
 
   b.section("Guida all'app");

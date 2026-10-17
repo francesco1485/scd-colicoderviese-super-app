@@ -4302,12 +4302,30 @@
         "scope": "SUPER_APP /tesoreria/club-house, /gestionale/piattaforme/convenzioni, /impianti, /card, /card/$tipo",
         "supersedes": "none",
         "implementationStatus": "IMPLEMENTED",
-        "implementation": "migration r115 (APPLIED on SCD PULSE 17/10/2026 after «applica r115 r116»: part1 r115_club_catalog_part1_tables ~12:55, part2 r115_club_catalog_part2_clean_save ~13:20; part3 = strict date strip and LISTINO SERVIZI_FOTO in scd_club_catalog_clean, pending main session), apps/superapp/src/lib/club-catalog.ts, club-catalog.functions.ts, features/club-catalog/ClubCatalogEditor.tsx, components/scd/ClubCatalogPublic.tsx",
+        "implementation": "migration r115 (APPLIED on SCD PULSE 17/10/2026 after «applica r115 r116»: part1 r115_club_catalog_part1_tables ~12:55, part2 r115_club_catalog_part2_clean_save ~13:20; part3 r115_part3_clean_strict_dates ~13:50 = strict date strip and LISTINO SERVIZI_FOTO in scd_club_catalog_clean, verified on DB), apps/superapp/src/lib/club-catalog.ts, club-catalog.functions.ts, features/club-catalog/ClubCatalogEditor.tsx, components/scd/ClubCatalogPublic.tsx",
         "engines": [
           "SOLDI",
           "TEMPO"
         ],
         "measure": "published rows per platform (scd_club_catalog status PUBBLICATA), days from first BOZZA to PUBBLICATA, public «da confermare» blocks trending to zero"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "12:33",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-182",
+      "name": "OFFICIAL_LND_STANDINGS_AND_RESULTS_WITH_SOURCE",
+      "sourceQuoteFragments": [
+        "ok classifiche LND"
+      ],
+      "normalizedCommand": {
+        "rule": "The app publishes standings and results only as official LND data, with source and link: rows and scores are copied from gare.lnd.it, each block shows the badge 'Ufficiale LND', the fetch date and the link to the source page. The app never computes, types or estimates a score or a standing of its own; a missing value stays missing. Attività di base (Piccoli Amici, Primi Calci, Pulcini, Esordienti) never shows standings (SGS). Club names only, no people.",
+        "scope": "SUPER_APP /classifiche (4 championships + 3 cups), team pages (Classifica, Ultimi risultati), official-links.ts, assistant knowledge, migration r116 (scd_competitions, scd_standings_snapshots, official LND fields on scd_matches, scd_official_notices, scd_disciplinary_items STAFF only)",
+        "supersedes": "the 2026-10-11 rule in apps/superapp/src/lib/official-links.ts 'the app does not publish standings or scores of its own'",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "Phases R1+R2: apps/superapp/src/lib/lnd-standings.ts (parser + registry), scripts/ingest-lnd-standings.mjs (not scheduled; plan every 6 h, hourly on match weekends), snapshot src/data/classifiche-lnd-snapshot.json, /classifiche, team pages; r116 APPLIED on SCD PULSE 17/10/2026 ~13:35-13:45 after «applica r115 r116» (verified: RLS on 4 tables, 1 policy each, anon no insert, disciplinary items staff only); ingestion job not scheduled yet"
       }
     }
   ],

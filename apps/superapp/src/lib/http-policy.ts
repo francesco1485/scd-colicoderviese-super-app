@@ -16,6 +16,7 @@
 export const PUBLIC_PREFIXES: readonly string[] = [
   "/calendario",
   "/card",
+  "/classifiche",
   "/community",
   "/comunicazioni",
   "/contatti",

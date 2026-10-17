@@ -41,6 +41,7 @@ const ROUTE_HEADS: ReadonlyArray<{ file: string; ref: string; page: PageMetaInpu
   { file: "src/routes/community.tsx", ref: "PUBLIC_PAGES.community", page: PUBLIC_PAGES.community },
   { file: "src/routes/comunicazioni.tsx", ref: "PUBLIC_PAGES.comunicazioni", page: PUBLIC_PAGES.comunicazioni },
   { file: "src/routes/top11.tsx", ref: "PUBLIC_PAGES.top11", page: PUBLIC_PAGES.top11 },
+  { file: "src/routes/classifiche.tsx", ref: "PUBLIC_PAGES.classifiche", page: PUBLIC_PAGES.classifiche },
   { file: "src/routes/rassegna-stampa.tsx", ref: "PUBLIC_PAGES.rassegnaStampa", page: PUBLIC_PAGES.rassegnaStampa },
   { file: "src/routes/fantacalcio.tsx", ref: "PUBLIC_PAGES.fantacalcio", page: PUBLIC_PAGES.fantacalcio },
   { file: "src/routes/guida.tsx", ref: "PUBLIC_PAGES.guida", page: PUBLIC_PAGES.guida },
