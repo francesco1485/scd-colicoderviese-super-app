@@ -15,13 +15,27 @@ export const ASSISTANT_OPEN_EVENT = "assistant:open";
 export const VERA_OPEN_EVENTS = ["vera:open", "genny:open", "crovi:open"] as const;
 
 export interface AssistantOpenDetail {
-  /** Area of Vera's chat asked by the page; null opens her general chat. */
+  /** Area of Vera's chat asked by the page; null opens the general chat (Crovi on public pages, UD-184). */
   area: ChatAreaId | null;
+  /** First message sent as soon as the chat opens (Crovi's home card: input and chips, UD-184). */
+  text?: string;
 }
 
-export function openAssistant(area: ChatAreaId | null = null): void {
+/** Longest first message a page may send (same cap as the chat input, assistant.ts MAX_INPUT_CHARS). */
+const MAX_OPEN_TEXT = 400;
+
+export function openAssistant(area: ChatAreaId | null = null, text?: string): void {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new CustomEvent<AssistantOpenDetail>(ASSISTANT_OPEN_EVENT, { detail: { area } }));
+  const t = text?.trim().slice(0, MAX_OPEN_TEXT);
+  window.dispatchEvent(new CustomEvent<AssistantOpenDetail>(ASSISTANT_OPEN_EVENT, { detail: t ? { area, text: t } : { area } }));
+}
+
+/** First message carried by an open event (trimmed, capped); null when absent or empty. */
+export function openedText(e: Event): string | null {
+  const d = (e as CustomEvent<{ text?: unknown } | null>).detail;
+  if (!d || typeof d !== "object" || typeof d.text !== "string") return null;
+  const t = d.text.trim().slice(0, MAX_OPEN_TEXT);
+  return t || null;
 }
 
 /**

@@ -3,7 +3,7 @@
  * - personas (UD-121, Direzione 14/10/2026: "una sola assistente chat in tutta l'app, di nome VERA"): Vera, the club
  *   reception, everywhere — public pages and inside for staff and members 15+; Sky only for the younger members and
  *   the under-14 world (UD-026, UD-091). An area of the cast (cast-personas.ts) is only a CONTEXT of Vera's chat,
- *   never a separate persona. Legacy ids ("genny", "crovi") are aliases of "vera" ({@link normalizePersona});
+ *   never a separate persona. Legacy ids are aliases ("genny" of "vera", "crovi" of "sky", {@link normalizePersona});
  * - grounding by retrieval: compact CONTEXT blocks built from real server data (public projection, Cervellone results
  *   filtered by the database for staff) with a size cap;
  * - system prompts in Italian with the hard rules (CONTEXT only, quote the source, no minors' names, no health data,
@@ -33,9 +33,9 @@ export type AssistantLevel = "PUBLIC" | "INTERNO" | "RISERVATO";
 
 /**
  * Persona ids that may still arrive from older clients, events, links or logs, mapped to today's persona: "genny" (the
- * name before UD-121) and "crovi" (the public helper, not an APPROVED asset, absorbed by Vera).
+ * name before UD-121) and "crovi", the visible name of persona "sky" (approved character, public chat since UD-184).
  */
-export const LEGACY_PERSONA_ALIASES: Readonly<Record<string, AssistantPersona>> = { genny: "vera", crovi: "vera" };
+export const LEGACY_PERSONA_ALIASES: Readonly<Record<string, AssistantPersona>> = { genny: "vera", crovi: "sky" };
 
 /** Today's persona for an id (current or legacy alias); null when unknown. */
 export function normalizePersona(id: unknown): AssistantPersona | null {
@@ -119,17 +119,22 @@ export interface ResolvedChat {
 
 /**
  * One rule for the browser (SkyChat) and the server (assistant.functions.ts), UD-121:
- * - public pages: always Vera; an area only when it has public data (ticket office, tournaments, sponsor);
+ * - public pages: Crovi (persona "sky", UD-184) for the general chat; Iride (persona "vera") only with an area that has
+ *   public data (Club House, ticket office, tournaments, sponsor);
  * - inside: Vera for staff and adult members ({@link veraEligible}), with the area when the area is allowed inside;
  *   a younger member or an unknown age keeps Sky, the only helper of the under-14s, and never an area.
  * `requested` may be an area id or a legacy value (tip-only character, persona id): see {@link normalizeChatArea}.
  */
 export function resolveChat(surface: "public" | "inside", viewer: HelperViewer | null | undefined, requested?: string | null): ResolvedChat {
-  const persona: AssistantPersona = surface === "public" ? "vera" : insidePersonaFor(viewer?.roles, viewer?.age15plus ?? null);
   const area = normalizeChatArea(requested);
+  if (surface === "public") {
+    // UD-184 (Francesco DG 17/10/2026 14:08): the general chat of public pages is Crovi (persona "sky"); a face card
+    // with a public area (Club House, sponsor, tornei, biglietteria) keeps Iride ("vera") with that area.
+    return area && CAST_PERSONAS[area].surfaces.public ? { persona: "vera", area } : { persona: "sky", area: null };
+  }
+  const persona = insidePersonaFor(viewer?.roles, viewer?.age15plus ?? null);
   if (persona !== "vera" || !area) return { persona, area: null };
-  const allowed = surface === "public" ? CAST_PERSONAS[area].surfaces.public : CAST_PERSONAS[area].surfaces.inside;
-  return { persona, area: allowed ? area : null };
+  return { persona, area: CAST_PERSONAS[area].surfaces.inside ? area : null };
 }
 
 /** Persona of the chat for a surface and a viewer ({@link resolveChat}). */
@@ -144,7 +149,7 @@ const HELPER_VOICE: Readonly<Record<AssistantPersona, string>> = {
   vera:
     "Sei Iride, l'assistente AI della segreteria della S.C.D. ColicoDerviese e l'unica assistente della chat dell'app (la stessa Iride che risponde su WhatsApp): un personaggio originale ispirato alla messaggera degli dei, non una persona reale, e sei un'intelligenza artificiale e non lo nascondi mai. Calda, serena, diretta, con passione per il calcio; risposte brevi. Accogliente, sveglia e precisa, hai tutto sotto controllo: rispondi con i dati veri del club e dici sempre da dove vengono, indirizzi la persona al volto giusto dell'area (Garrison, lo Chef della Club House; il Volto sponsor; Enea, il Mentore dei tornei) e, quando serve una persona, invita ad aprire una richiesta alla segreteria. Rispondi anche su biglietti, gratuità e card. Tono cordiale e diretto, mai ammiccante.",
   sky:
-    "Sei Crovi, il personaggio della S.C.D. ColicoDerviese per bambini e famiglie (un personaggio originale dell'app, non una persona reale), e parli con soci giovani. Tono allegro, semplice e gentile, frasi corte, nessun linguaggio da adulti.",
+    "Sei Crovi, il personaggio della S.C.D. ColicoDerviese (un personaggio originale dell'app, non una persona reale): un signore di settant'anni sempre sorridente, tifoso esperto del calcio di paese, simpatico e un po' saputello ma mai offensivo, amato dai più giovani e dalle famiglie. Accogli sulle pagine pubbliche e nell'app dei soci più giovani, e fai da centralinista: rispondi in breve con i dati del CONTESTO e passi la palla alla persona giusta (Iride per la segreteria, Garrison per la Club House, Enea per i tornei). Tono allegro, semplice e gentile, frasi corte, nessun linguaggio da adulti, nessun nome di ragazzi. Non scrivi né confermi mai risultati: si pubblicano solo quelli ufficiali LND, li verifica la segreteria.",
 };
 
 /** Vera's hard rules on top of the shared ones (UD-121). */

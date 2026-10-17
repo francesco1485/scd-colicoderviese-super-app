@@ -2,7 +2,7 @@
  * Signed-out public home on board VR-009 (UD-133, then UD-134 Francesco 15/10/2026 09:18).
  *
  * Rebuilt from scratch on the Eurobet structure (Francesco 15/10/2026 22:04): urgent notices (R20 alerts, only when
- * there are) → the one club communication chosen by the Direzione → HomeLobby (team chips, one static match banner,
+ * there are) → Crovi's card (UD-184: avatar + chat entry, CroviWelcome) → the one club communication chosen by the Direzione → HomeLobby (team chips, one static match banner,
  * "In programma" event cards, "Dal club", services, "Perché la ColicoDerviese"; desktop right rail "Entra nel club")
  * → weekend results (only with a real source;
  * "Vittoria" and confetti only on a ColicoDerviese win) → footer ("Chi sei?" removed, UD-152). Partners scroll in the fixed SponsorBand on every
@@ -19,7 +19,8 @@ import { urgentNotices } from "@/lib/home-today";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 import type { PublicTrainingDay } from "@/lib/public-training";
 
-import { HomeLobby } from "@/components/home/HomeLobby";
+import { CroviWelcome } from "@/components/home/CroviWelcome";
+import { HomeLobby, nextHome } from "@/components/home/HomeLobby";
 import {
   ClubNoticeCard,
   UrgentNotices,
@@ -57,6 +58,11 @@ export function PublicHome({
     [feed, nowMs],
   );
   const results = useMemo(() => weekendResults(feed, today), [feed, today]);
+  // Crovi names a match only from the public calendar: the next home game with a confirmed time (UD-184).
+  const croviMatch = useMemo(() => {
+    const n = nextHome(calendar.events, nowMs);
+    return n && n.e.timeConfirmed ? { date: n.e.date, time: n.e.time, opponent: n.e.opponent } : null;
+  }, [calendar.events, nowMs]);
   // Order (16/10/2026 07:05–07:36): urgent notices → the one club communication → HomeLobby (games bar, club,
   // "Stasera al campo", "In che anno sei nato?", "Gioca con la ColicoDerviese", "Dal club") → weekend results.
   return (
@@ -69,6 +75,7 @@ export function PublicHome({
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
       </h1>
       <UrgentNotices items={alerts} />
+      <CroviWelcome nowMs={nowMs} match={croviMatch} />
       <ClubNoticeCard notice={notice} />
       <HomeLobby calendar={calendar} vetrina={vetrina} training={training} nowMs={nowMs} today={today} />
       <WeekendResults rows={results} />

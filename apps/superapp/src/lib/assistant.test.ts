@@ -268,9 +268,10 @@ describe("persona routing (UD-121: one chat, Iride)", () => {
     expect(insidePersonaFor(null)).toBe("sky");
   });
 
-  it("has a single chat persona id 'vera' (plus Sky for the under-14 world)", () => {
-    expect(chatPersonaFor("public", null)).toBe("vera");
-    expect(chatPersonaFor("public", { roles: ["segreteria"], age15plus: null })).toBe("vera");
+  it("has two chat persona ids: 'sky' (Crovi, public general chat UD-184 and the younger members) and 'vera' (Iride)", () => {
+    expect(chatPersonaFor("public", null)).toBe("sky");
+    expect(chatPersonaFor("public", { roles: ["segreteria"], age15plus: null })).toBe("sky");
+    expect(chatPersonaFor("public", null, "biglietteria")).toBe("vera");
     expect(chatPersonaFor("inside", { roles: ["segreteria"], age15plus: null })).toBe("vera");
     const seen = new Set<string>();
     for (const surface of ["public", "inside"] as const)
@@ -279,15 +280,15 @@ describe("persona routing (UD-121: one chat, Iride)", () => {
     expect([...seen].sort()).toEqual(["sky", "vera"]);
   });
 
-  it("accepts the old ids as aliases of Iride (persisted ids, events, older clients)", () => {
+  it("accepts the old ids as aliases (genny = Iride, crovi = persona 'sky' shown as Crovi)", () => {
     expect(normalizePersona("genny")).toBe("vera");
-    expect(normalizePersona("crovi")).toBe("vera");
+    expect(normalizePersona("crovi")).toBe("sky");
     expect(normalizePersona("vera")).toBe("vera");
     expect(normalizePersona("sky")).toBe("sky");
     expect(normalizePersona("era")).toBeNull();
     expect(normalizePersona("constructor")).toBeNull();
     expect(normalizePersona(undefined)).toBeNull();
-    expect(LEGACY_PERSONA_ALIASES).toEqual({ genny: "vera", crovi: "vera" });
+    expect(LEGACY_PERSONA_ALIASES).toEqual({ genny: "vera", crovi: "sky" });
     // A legacy "genny" request is never an area: Vera's general chat.
     expect(resolveChat("inside", { roles: ["segreteria"], age15plus: null }, "genny")).toEqual({ persona: "vera", area: null });
     expect(normalizeChatArea("genny")).toBeNull();

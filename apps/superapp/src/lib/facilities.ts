@@ -313,6 +313,23 @@ export function publicHoursLines(hours: OpeningHours | null): { day: Weekday; te
   return lines ? lines.map((l) => (l.text === "da inserire" ? { ...l, text: "in aggiornamento" } : l)) : null;
 }
 
+/**
+ * Public wording for facts the master does not have yet (B11): families read "in aggiornamento",
+ * never the internal "da inserire" to-do. Staff keep the internal wording.
+ */
+export const PUBLIC_PENDING = "in aggiornamento";
+
+/** Public wording for a position or route drawn from a design board and not yet checked on site (B11). */
+export const PUBLIC_INDICATIVE = "indicativo";
+
+/**
+ * Source of a rule for public pages (B11): never a repository path, board name or master sheet code.
+ * Facts from the club masters read "la società"; rules still to be checked read "la società, da confermare".
+ */
+export function publicRuleSource(source: string): string {
+  return isProposed(source) || /\bblocker\b/i.test(source) ? "la società, da confermare" : "la società";
+}
+
 /** True when at least one space lacks hours for the given weekday (or lacks hours at all). */
 export function hoursPending(spaces: readonly Pick<Space, "hours">[], weekday?: Weekday): boolean {
   return spaces.some((s) => {
@@ -397,6 +414,9 @@ export function slotTimes(slots: readonly TrainingSlot[], quadroDay: string): { 
 
 /* ───────────────────────── Public projection ───────────────────────── */
 
+/** Plan note for public pages (B11): the master note names design boards and technical reports, families read this. */
+export const PUBLIC_PLAN_NOTE = "Schema non in scala: serve a orientarsi, non è un rilievo.";
+
 /**
  * What the public page may show: every space with its hours and public-safe
  * fields, only entrances and routes for the public, no training-board link
@@ -405,6 +425,7 @@ export function slotTimes(slots: readonly TrainingSlot[], quadroDay: string): { 
 export function publicSite(site: Site): Site {
   return {
     ...site,
+    plan: { ...site.plan, note: PUBLIC_PLAN_NOTE },
     responsible_role: null,
     entrances: site.entrances ? site.entrances.filter((e) => e.audience === "public") : null,
     routes: site.routes ? site.routes.filter((r) => r.audience === "public") : null,

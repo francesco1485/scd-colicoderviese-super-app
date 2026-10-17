@@ -412,3 +412,30 @@ describe("answerPublic · club directions (B7)", () => {
     expect(f).toHaveBeenCalled();
   });
 });
+
+describe("Crovi on public pages (UD-184) and result reports (UD-182)", () => {
+  const systemOf = (f: ReturnType<typeof vi.fn>): string =>
+    (JSON.parse(String((f.mock.calls[0] as unknown as [string, RequestInit])[1].body)) as { system: string }).system;
+  it("answers «Segnala un risultato» with the fixed hand-off: no model, no score written", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"3-1 per noi!"}'));
+    const t = pub(ON, f, "Segnala un risultato");
+    const r = await t.run();
+    expect(f).not.toHaveBeenCalled();
+    expect(r.ai).toBe(false);
+    expect(r.text).toMatch(/fonte ufficiale LND/);
+    expect(r.text).toMatch(/Segreteria/);
+    expect(r.links?.map((l) => l.to)).toEqual(["/contatti", "/classifiche"]);
+  });
+
+  it("speaks with Crovi's switchboard voice for persona 'sky'", async () => {
+    const f = vi.fn(async () => claudeResponse('{"text":"Ciao!"}'));
+    await answerPublic(
+      { message: "Quando gioca la prima squadra?", persona: "sky", ip: nextIp() },
+      { env: ON, fetchImpl: f as never, rules: vi.fn(async () => RULES), loadContext: vi.fn(async () => ctxInput()) },
+    );
+    const sys = systemOf(f);
+    expect(sys).toContain("Sei Crovi");
+    expect(sys).toMatch(/centralinista/);
+    expect(sys).toMatch(/Iride per la segreteria, Garrison per la Club House, Enea per i tornei/);
+  });
+});

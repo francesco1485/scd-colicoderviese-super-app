@@ -4194,6 +4194,26 @@
     },
     {
       "sourceDate": "2026-10-17",
+      "sourceTime": "12:36",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-183",
+      "name": "TEAM_AREA_MATCHES_TRAININGS_AND_MONTHLY_CHECK",
+      "sourceQuoteFragments": [
+        "se i nostri mister e dirigenti possono inserire dentro al loro portale distinte convocazione e resoconto o altro anche altre annate si possono creare e si crea tutto, anche goal chi segna e tutto",
+        "bisogna che loro devono poter caricare referto, distinte e convocazioni di entrambe le squadre e poi inserire altro, c'è bisogno di un'area partite e un'area allenamenti dove loro possono fare appunti creare dinamiche da gioco da condividere, fare anche live per spiegare cose, fare videoconferenze, creare interazione e cercare di far migliorare anche i ragazzi e renderli partecipi, anche presenze assenze e tutto",
+        "poi se manca ogni mese la segreteria in automatico fa delle verifiche sulle singole aree e se manca qualcosa chiede di integrare o giustificare"
+      ],
+      "normalizedCommand": {
+        "rule": "Inside the existing mister/staff area, every team (all current and future annate, no team hard-coded) has an Area partite and an Area allenamenti. Per match the team's mister/dirigenti (plus Direzione and Segreteria) do convocazione, distinta, tabellino (scorers, assists, cards, minutes by roster id; opponents as text), resoconto, and upload referto and distinte of both teams to private storage; the tabellino stays «Provvisorio» until it matches the official LND result. Per training: session, attendance present/absent/justified, private mister notes, notes and «dinamiche di gioco» shared with the team, a Google Meet link for live explanations/videoconferences (the app streams and records nothing; no recording of minors). Athletes and families see only their own convocazioni, shared notes and their own attendance, and answer with presa visione or a motivated impediment / advance absence (no health details). Monthly, the Segreteria runs a check per team and month and creates requests to integrate or justify what is missing; the automatic schedule (1st of month 08:00 Europe/Rome) waits for Francesco's approval.",
+        "scope": "SUPER_APP /gestionale/partite, /gestionale/allenamenti, /segreteria/verifiche, /famiglia; SCD PULSE migrations r117 (Area partite) and r118 (Area allenamenti + monthly requests)",
+        "supersedes": "none",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "Phase 1 code + PGlite/vitest tests on branch feat/area-partite-allenamenti; r117/r118 APPLIED on SCD PULSE 17/10/2026 ~14:15-14:25 after Francesco wrote «applica r117 r118» (r117 in 4 parts, r118 in 6 parts; verified: RLS on 4 tables, no client grants, no anon execute, 2 storage policies, internal helpers closed); UI live. Phase 2: drawable pitch, sessions generated from the quadro, team feed/interaction, scheduled monthly run."
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
       "sourceTime": "11:11-11:13",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
@@ -4326,6 +4346,28 @@
         "supersedes": "the 2026-10-11 rule in apps/superapp/src/lib/official-links.ts 'the app does not publish standings or scores of its own'",
         "implementationStatus": "IMPLEMENTED",
         "implementation": "Phases R1+R2: apps/superapp/src/lib/lnd-standings.ts (parser + registry), scripts/ingest-lnd-standings.mjs (not scheduled; plan every 6 h, hourly on match weekends), snapshot src/data/classifiche-lnd-snapshot.json, /classifiche, team pages; r116 APPLIED on SCD PULSE 17/10/2026 ~13:35-13:45 after «applica r115 r116» (verified: RLS on 4 tables, 1 policy each, anon no insert, disciplinary items staff only); ingestion job not scheduled yet"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "14:08",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-184",
+      "name": "CROVI_ON_THE_PUBLIC_HOME_AND_PUBLIC_CHAT",
+      "sourceQuoteFragments": [
+        "Io voglio vedere in prima pagina app super web il crovi cavolo ma perché non si lavora qui",
+        "Crovi è avatar + chatbot in cima alla home; divertente da parlarci; si possono chiedere cose o segnalare risultati velocemente; internamente passa la palla agli altri personaggi come un centralinista (15/10/2026)",
+        "crovi per i più giovani"
+      ],
+      "normalizedCommand": {
+        "rule": "Crovi (approved Crovi v3 realistic character, config/scd-assets.v1.json) is on the first page of the Super App: a compact card at the top of the public home, right after the urgent safety notices and before the club communication (no hero banner, phone first), with the cut-out that breathes and greets (reduced motion respected), a pose by day (weekday wave, Fri-Sun point, Monday thumbs), a short warm line by day and time (Europe/Rome; a match only from the public calendar), an input «Chiedi a Crovi…» and the chips «Quando si gioca?», «Allenamenti di stasera», «Pulmini», «Segnala un risultato» that open the app chat with the text sent. The general chat of public pages is Crovi (persona id 'sky'), a switchboard who passes to Iride (segreteria), Garrison (Club House) and Enea (tornei); area face cards keep Iride; reserved areas keep Iride for staff and adults. «Segnala un risultato» never writes a score: fixed hand-off to the Segreteria, which checks it against the official LND source (UD-182).",
+        "scope": "SUPER_APP public home (components/home/CroviWelcome.tsx, PublicHome.tsx), lib/crovi-welcome.ts, lib/assistant.ts resolveChat + Crovi voice, lib/assistant.server.ts result-report hand-off, lib/assistant-open.ts first message, SkyChat.tsx, SkyJolly.tsx PersonaAvatar, config/scd-assets.v1.json",
+        "supersedes": "UD-134 only for 'Crovi on public pages' (one assistant at a time stays: no second greeting bubble beside the launcher); UD-121 public general chat persona 'vera' -> 'sky' shown as Crovi; UD-122 'image only, no chat' for Crovi",
+        "engine": "PERSONE",
+        "measure": "chat opens from the Crovi home card (input and chips) per home visit; share of public questions answered without hand-off",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "branch feat/crovi-home-2 (PR to staging/superapp); tests lib/crovi-welcome.test.ts, lib/assistant-open.test.ts; assistant, cast-personas, SkyJolly and public-home tests updated"
       }
     }
   ],

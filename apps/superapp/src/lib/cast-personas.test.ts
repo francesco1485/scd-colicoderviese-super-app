@@ -180,9 +180,9 @@ describe("area routing (one rule for chat, button and server)", () => {
   const athlete = { roles: ["atleta"], age15plus: null };
   const staff = { roles: ["segreteria"], age15plus: null };
 
-  it("keeps Iride's general chat when nothing or something unknown is asked", () => {
-    expect(resolveChat("public", null)).toEqual({ persona: "vera", area: null });
-    expect(resolveChat("public", null, "hacker")).toEqual({ persona: "vera", area: null });
+  it("gives the general chat (Crovi outside, UD-184; Iride inside) when nothing or something unknown is asked", () => {
+    expect(resolveChat("public", null)).toEqual({ persona: "sky", area: null });
+    expect(resolveChat("public", null, "hacker")).toEqual({ persona: "sky", area: null });
     expect(resolveChat("inside", staff, "vera")).toEqual({ persona: "vera", area: null });
     expect(resolveChat("inside", athlete, null)).toEqual({ persona: "sky", area: null });
   });
@@ -191,7 +191,8 @@ describe("area routing (one rule for chat, button and server)", () => {
     expect(resolveChat("public", null, "biglietteria")).toEqual({ persona: "vera", area: "biglietteria" });
     expect(resolveChat("public", null, "mentore-tornei")).toEqual({ persona: "vera", area: "mentore-tornei" });
     expect(resolveChat("public", null, "volto-sponsor")).toEqual({ persona: "vera", area: "volto-sponsor" });
-    expect(resolveChat("public", family, "accoglienza-chef")).toEqual({ persona: "vera", area: null });
+    // Not a public area: Crovi's general chat (UD-184).
+    expect(resolveChat("public", family, "accoglienza-chef")).toEqual({ persona: "sky", area: null });
   });
 
   it("opens areas inside only for staff and adult members; younger members and unknown ages keep Sky, without area", () => {
