@@ -55,7 +55,7 @@ export function PublicHome({
   notice?: ClubNotice | null;
   /** Public training evening (UD-140): timetable only, from getPublicTrainings. */
   training?: PublicTrainingDay | null;
-  /** UD-187: the Super Giornalista's front page of the day (r145, VERIFIED items only); hidden when empty. */
+  /** UD-187: the Super Giornalista's front page of the day (data/front-page, VERIFIED items only); hidden when empty. */
   front?: FrontPageData;
   /** Rome day of the front page (server day, QA day honoured). */
   frontDay?: string;

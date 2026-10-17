@@ -69,7 +69,9 @@ export function safeHref(v: unknown): string {
 export function looksPersonal(text: string): boolean {
   const t = text.toUpperCase();
   if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/.test(t)) return true;
-  if (/(?:\+|\b)\d[\d .]{6,}\d\b/.test(t.replace(/\b\d{1,2}[:.]\d{2}\b/g, ""))) return true;
+  // Times ("15:30") and birth-year groups ("annate 2013 2014") are not phone numbers.
+  const noTimes = t.replace(/\b\d{1,2}[:.]\d{2}\b/g, "").replace(/\b(?:19|20)\d{2}\b/g, "");
+  if (/(?:\+|\b)\d[\d .]{6,}\d\b/.test(noTimes)) return true;
   if (/\b\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}\b/.test(t) || /\b\d{4}-\d{2}-\d{2}\b/.test(t)) return true;
   if (/\b[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]\b/.test(t)) return true;
   if (/\bIT\d{2}[A-Z]\d{10}[A-Z0-9]{12}\b/.test(t.replace(/\s+/g, ""))) return true;

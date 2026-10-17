@@ -4411,7 +4411,7 @@
         "engine": "PERSONE",
         "measure": "public home first screen shows live box + weather; Crovi chat opens from the launcher per visit; Crovi card chat opens on the member home",
         "implementationStatus": "IMPLEMENTED",
-        "implementation": "branch feat/home-top-live-weather (PR to staging/superapp); lib/public-home.test.ts updated"
+        "implementation": "branch feat/home-top-live-weather (PR #201), carried into feat/front-page-agent with UD-187; lib/public-home.test.ts updated"
       }
     },
     {

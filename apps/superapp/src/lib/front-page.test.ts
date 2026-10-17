@@ -49,7 +49,7 @@ describe("front page parser (UD-187)", () => {
   it("drops anything that looks like personal data, keeps match facts", () => {
     for (const bad of ["Chiama il 333 1234567", "+39 0341 940000", "scrivi a mario.rossi@example.org", "nato il 12/03/2012", "il 2012-03-12", "RSSMRA80A01F205X", "IT60X0542811101000000123456"])
       expect(looksPersonal(bad)).toBe(true);
-    for (const ok of ["Alle 15:30 la Prima Squadra", "U16 Élite alle 18.00", "vinta 2-1", "stagione 2026/27", "6ª giornata", "Matricola FIGC 26020", "mancano 52 giorni"])
+    for (const ok of ["Alle 15:30 la Prima Squadra", "U16 Élite alle 18.00", "vinta 2-1", "stagione 2026/27", "6ª giornata", "Matricola FIGC 26020", "mancano 52 giorni", "Annate 2013 2014", "U15 2011 2012 in campo"])
       expect(looksPersonal(ok)).toBe(false);
     expect(parseFrontItem(item({ body: "Info al 333 1234567" }))).toBeNull();
     expect(parseFrontItem(item({ slot: "domanda", options: ["scrivi a a@b.it"] }))).toBeNull();
