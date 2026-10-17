@@ -1,6 +1,6 @@
 /**
  * «Vetrina squadre» on the server (UD-168, r142). Public by decision of the Direttore Generale (17/10/2026): no session
- * needed. One database function, scd_public_team_showcase, applies the age and consent rule, so full surnames of
+ * needed. One database function, scd_public_team_showcase, applies the age rule (full name for adults only), so full surnames of
  * minors never leave the database; the answer is then parsed with a whitelist (team-showcase.ts) before it reaches
  * the page. Only prima, u19 and u16 are asked: any other team is refused here without a database call.
  */

@@ -215,9 +215,9 @@ assert.deepEqual(prima.staff, [{ name: "Mario Misterone", role: "Allenatore" }, 
 
 const u16 = await showcase("u16");
 const names16 = u16.players.map((p) => p.name).sort();
-// 13 with guardian consent -> full; 15 guardian only -> short (14+ needs own consent too); 16 guardian + own -> full;
-// consent given by a non-guardian -> short; revoked -> short; membership ended -> not listed
-assert.deepEqual(names16, ["Carlo Consensato", "Ettore Q.", "Fabio Doppiafirma", "Gino N.", "Ivo R."]);
+// minors are ALWAYS first name + initial in r142, whatever consent rows exist (guardian, own, revoked, non-guardian);
+// membership ended -> not listed
+assert.deepEqual(names16, ["Carlo C.", "Ettore Q.", "Fabio D.", "Gino N.", "Ivo R."]);
 assert.deepEqual(u16.staff, [{ name: "Ugo Altromister", role: "Allenatore" }]);
 assert.ok(u16.players.every((p) => p.shirt === null && p.stats === null));
 
@@ -231,13 +231,32 @@ for (const team of ["prima", "u19", "u16", "u15"]) {
     const out = await showcase(team, uid);
     keysOk(out);
     const s = JSON.stringify(out);
-    for (const secret of ["Zetaminore", "Quindicenne", "Ignotissimo", "Nonguardiano", "Revocatissimo", "Vicestaffminore", "Senzadata", "Partitissimo",
+    for (const secret of ["Consensato", "Doppiafirma", "Zetaminore", "Quindicenne", "Ignotissimo", "Nonguardiano", "Revocatissimo", "Vicestaffminore", "Senzadata", "Partitissimo",
       "example.org", "000 ", "XXX", "Genitrice", "Estranea", "333 1234567", "40000000-", "30000000-", "birth", "phone", "email", "fiscal"]) {
       assert.ok(!s.includes(secret), `${team} as ${uid ?? "anon"} leaks ${secret}`);
     }
     assert.ok(!/\d{4}-\d{2}-\d{2}/.test(s), `${team} leaks a date`);
   }
 }
+
+// ---------------------------------------------------------------- adults only, exactly at 18; malformed team ids
+{
+  const r = (await db.query(`select public.scd_showcase_full_name(null, ${ago(18)}) a, public.scd_showcase_full_name(null, (current_date - interval '18 years' + interval '1 day')::date) b,
+    public.scd_showcase_full_name(null, null) c`)).rows[0];
+  assert.deepEqual(r, { a: true, b: false, c: false });
+  // an event whose metadata team_id is not a uuid must not break the public read
+  await db.exec(`insert into public.scd_events (organization_id, starts_at, metadata) values ('${ORG}', now(), '{"team_id":"not-a-uuid"}'), ('${ORG}', now(), '{"team_id":""}')`);
+  await db.exec(`insert into public.scd_matches (organization_id, event_id) select '${ORG}', id from public.scd_events where metadata->>'team_id' in ('not-a-uuid', '')`);
+  assert.equal((await showcase("prima")).available, true);
+}
+
+// ---------------------------------------------------------------- staff flagged needs_review (r141 column) is left out
+// r142 was created above without the column (r141 not applied); adding it later needs no re-creation of r142.
+await db.exec(`alter table public.scd_structure_roles add column needs_review boolean not null default false`);
+await db.exec(`update public.scd_structure_roles set needs_review = true where person_id = '${P(16)}'`);
+assert.deepEqual((await showcase("prima")).staff, [{ name: "Mario Misterone", role: "Allenatore" }]);
+await db.exec(`update public.scd_structure_roles set needs_review = false where person_id = '${P(16)}'`);
+await db.exec(R142); // re-applies after r141 too
 
 // ---------------------------------------------------------------- mister desk: read and write roles
 await assert.rejects(as(null, `select public.scd_staff_team_roles($1, $2)`, [ORG, T.prima]), /not allowed/);

@@ -72,7 +72,7 @@ export function RosterRolesPanel({
     <div className="flex flex-col gap-3" data-testid="roster-roles">
       <p className="m-0 text-[14px] text-[var(--in-sub)]">
         {withRole} di {players.length} con un ruolo
-        {state === "error" ? " · lettura dei ruoli salvati non riuscita: parti dai ruoli vuoti" : ""}
+        {state === "error" ? " · ruoli salvati non leggibili: salvataggio non disponibile (serve r142)" : ""}
       </p>
       <ul className="m-0 list-none overflow-hidden rounded-xl border border-[var(--in-line)] p-0" aria-label={`Ruoli della rosa ${tag}`}>
         {players.map((p) => {
@@ -114,11 +114,11 @@ export function RosterRolesPanel({
         <button
           type="button"
           onClick={submit}
-          disabled={busy || changes.length === 0}
+          disabled={busy || state === "error" || changes.length === 0}
           className="scd-focus inline-flex h-11 items-center gap-2 rounded-[10px] bg-[var(--scd-blue)] px-4 text-[15px] font-semibold text-white disabled:opacity-50"
         >
           <Check className="size-4" aria-hidden="true" />
-          {changes.length > 0 ? `Salva ${changes.length} ${changes.length === 1 ? "ruolo" : "ruoli"}` : "Nessuna modifica"}
+          {state === "error" ? "Salva · serve r142" : changes.length > 0 ? `Salva ${changes.length} ${changes.length === 1 ? "ruolo" : "ruoli"}` : "Nessuna modifica"}
         </button>
         <span className="text-[13px] text-[var(--in-sub)]">P portiere · D difensore · C centrocampista · A attaccante. Tocca di nuovo per togliere.</span>
       </div>

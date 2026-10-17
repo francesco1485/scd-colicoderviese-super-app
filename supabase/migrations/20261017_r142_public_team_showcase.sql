@@ -3,7 +3,7 @@
 -- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r142". Never apply from an agent.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires (r33, r51, r59, r61, r62, r70, r92): scd_teams, scd_seasons, scd_team_memberships, scd_athletes.fanta_role,
--- scd_people, scd_family_members, scd_person_consents, scd_structure_roles, scd_matches, scd_events,
+-- scd_people, scd_structure_roles, scd_matches, scd_events,
 -- scd_match_performance, scd_match_team_stats, scd_match_sheets, scd_audit_events, scd_has_org_role, scd_my_team_ids,
 -- scd_my_person_ids. A guard below stops the migration when one of them is missing.
 --
@@ -13,21 +13,22 @@
 --   * public, no login, ONLY team codes prima, u19, u16 of the active season;
 --   * adults (18+ on the day, from scd_people.birth_date): first name + surname, role, shirt number if recorded, stats;
 --   * minors (<18) and people whose birth date is unknown: first name + surname initial («Luca R.»), role, stats.
---     Full name only with a recorded consent: IMMAGINE_NOME granted, not revoked, given by a guardian of the same
---     family (scd_family_members.is_guardian); from 14 years also a second, own consent row of the player. With the
---     r132 "one active choice per person and type" index the two rows cannot coexist, so 14-17 year olds stay
---     «nome + iniziale» until the consent model gets a co-signature (fail closed, by design). No photos at all;
+--     ALWAYS, with no consent exception in this version (review 17/10/2026: the consent table is empty; a
+--     consent-based full name will be a separate, reviewed migration). No photos at all;
 --   * never birth dates, ages, birth years, towns, contacts, fiscal codes or internal ids in the payload (players get a
 --     positional key "p1", "p2", ...);
 --   * stats only from recorded matches of the team in the active season (r92 tabellino: scd_match_performance with a
 --     saved scd_match_team_stats row): presenze (minutes > 0), gol, ammonizioni, espulsioni. A player without any
 --     recorded row gets stats null (the page writes «da confermare», never 0: UNKNOWN != ZERO);
 --   * role = scd_athletes.fanta_role (P/D/C/A, r92) or null («ruolo da confermare»);
---   * staff of the team (scd_structure_roles, the organigram registry r59, seeded by r141): adults only, name and
---     role label, never phone or e-mail. Labels that look like a phone number or an e-mail are not returned.
+--   * staff of the team (scd_structure_roles, the organigram registry r59, seeded by r141): adults only, active roles
+--     only, name and role label, never phone or e-mail. Labels that look like a phone number or an e-mail are not
+--     returned. Roles flagged needs_review (column added by r141) are left out; the flag is read through
+--     to_jsonb(row) so r142 applies before or after r141 (no reference to a column that may not exist yet).
 --
 -- What it adds (no new table, no new column, no new login, no parallel registry):
---   1. scd_showcase_full_name(person_id, birth_date) -> boolean: internal helper of the name rule (no grant).
+--   1. scd_showcase_full_name(person_id, birth_date) -> boolean: internal helper of the name rule (no grant): true
+--      only for a known birth date at least 18 years ago.
 --   2. scd_public_team_showcase(org_slug, team_code) -> jsonb: the ONE public read of the showcase (anon, authenticated).
 --   3. scd_staff_team_roles(org, team_id) -> jsonb [{athleteId, role}]: current roles of the caller's team
 --      (scd_my_team_ids: staff of that team or office roles), for the mister desk.
@@ -63,8 +64,6 @@ begin
      or to_regclass('public.scd_team_memberships') is null
      or to_regclass('public.scd_athletes') is null
      or to_regclass('public.scd_people') is null
-     or to_regclass('public.scd_family_members') is null
-     or to_regclass('public.scd_person_consents') is null
      or to_regclass('public.scd_structure_roles') is null
      or to_regclass('public.scd_matches') is null
      or to_regclass('public.scd_events') is null
@@ -84,9 +83,9 @@ end;
 $$;
 
 -- ---------------------------------------------------------------- 1. name rule (internal)
--- true = first name + surname may be shown in public. Adults: yes. Unknown birth date: no (treated as a minor).
--- Minors: a guardian consent IMMAGINE_NOME (granted, not revoked, given by a guardian of the same family) and, from
--- 14 years, also an own consent row of the player (given by the player or with no giver). Photos are never returned.
+-- true = first name + surname may be shown in public: ONLY adults with a known birth date (18+ on the day).
+-- Minors and unknown birth dates: false, always (no consent exception in r142). Photos are never returned.
+-- p_person_id is kept in the signature for a later, separately reviewed consent rule.
 create or replace function public.scd_showcase_full_name(p_person_id uuid, p_birth_date date)
 returns boolean
 language sql
@@ -94,27 +93,7 @@ stable
 security definer
 set search_path to 'public'
 as $$
-  select case
-    when p_birth_date is null then false
-    when p_birth_date <= current_date - interval '18 years' then true
-    else exists (
-        select 1
-        from public.scd_person_consents c
-        where c.person_id = p_person_id and c.consent_type = 'IMMAGINE_NOME' and c.granted and c.revoked_at is null
-          and c.given_by_person_id is not null and c.given_by_person_id <> p_person_id
-          and exists (
-            select 1
-            from public.scd_family_members g
-            join public.scd_family_members k on k.family_id = g.family_id and k.person_id = p_person_id
-            where g.person_id = c.given_by_person_id and g.is_guardian))
-      and (
-        p_birth_date > current_date - interval '14 years'
-        or exists (
-          select 1
-          from public.scd_person_consents s
-          where s.person_id = p_person_id and s.consent_type = 'IMMAGINE_NOME' and s.granted and s.revoked_at is null
-            and (s.given_by_person_id is null or s.given_by_person_id = p_person_id)))
-  end;
+  select p_birth_date is not null and p_birth_date <= current_date - interval '18 years';
 $$;
 revoke all on function public.scd_showcase_full_name(uuid, date) from public, anon, authenticated;
 
@@ -146,7 +125,8 @@ as $$
   team_matches as (
     select m.id as match_id, e.starts_at
     from team
-    join public.scd_events e on nullif(e.metadata->>'team_id', '')::uuid = team.id
+    join public.scd_events e on (case when (e.metadata->>'team_id') ~ '^[0-9a-f-]{36}$'
+                                      then (e.metadata->>'team_id')::uuid end) = team.id
       and e.starts_at >= team.starts_on and e.starts_at < team.ends_on + 1
     join public.scd_matches m on m.event_id = e.id
   ),
@@ -216,6 +196,7 @@ as $$
     join public.scd_structure_roles r on r.team_id = team.id and r.active and r.show_in_app
       and (r.valid_to is null or r.valid_to >= current_date)
       and r.role_kind in ('MISTER', 'DIRIGENTE', 'STAFF', 'RESPONSABILE')
+      and not coalesce((to_jsonb(r)->>'needs_review')::boolean, false)
     join public.scd_people p on p.id = r.person_id
     where p.left_at is null and coalesce(p.status, 'ACTIVE') = 'ACTIVE'
       and p.birth_date is not null and p.birth_date <= current_date - interval '18 years'

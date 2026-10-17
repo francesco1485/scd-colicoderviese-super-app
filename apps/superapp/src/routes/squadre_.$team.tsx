@@ -444,7 +444,7 @@ function TeamPage({ data }: { data: TeamData }) {
           {base
             ? "Attività di base: i nomi e le foto dei bambini restano nell'area riservata a staff e famiglie."
             : vetrina
-              ? "Rosa aperta a tutti per decisione della Direzione. Dei minorenni compare il nome con l'iniziale del cognome; il nome intero solo con il consenso registrato della famiglia. Niente foto dei ragazzi, niente date di nascita né contatti."
+              ? "Rosa aperta a tutti per decisione della Direzione. Dei minorenni compare sempre e solo il nome con l'iniziale del cognome. Niente foto dei ragazzi, niente date di nascita né contatti."
               : "Rosa dalle liste ufficiali della stagione. Dei minorenni compare solo il nome con l'iniziale del cognome; niente foto dei ragazzi."}
         </p>
       </div>

@@ -1,8 +1,7 @@
 /**
  * «Vetrina squadre» (UD-168, Francesco DG 17/10/2026 11:27-11:28): the rosters of Prima Squadra, Juniores U19 Élite
  * and Allievi U16 Élite are public, without sign-in. The age rule is applied by the database (r142
- * scd_public_team_showcase): adults first name + surname, minors and unknown ages first name + surname initial unless
- * a recorded consent exists; no photos, birth dates, ages, towns or contacts. Pure logic here: parse the payload with
+ * scd_public_team_showcase): adults first name + surname, minors and unknown ages always first name + surname initial; no photos, birth dates, ages, towns or contacts. Pure logic here: parse the payload with
  * a whitelist (any field the database might add never reaches the page), label roles and unknown values.
  * Engine: PERSONE. Measure: visits to the three pages, share of players with a role, share with recorded stats.
  */

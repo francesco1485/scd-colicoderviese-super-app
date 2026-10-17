@@ -1,5 +1,5 @@
 /**
- * «Vetrina squadre» (UD-168, r142): public payload safety and UNKNOWN != ZERO. The age/consent rule itself is tested on
+ * «Vetrina squadre» (UD-168, r142): public payload safety and UNKNOWN != ZERO. The age rule itself is tested on
  * the SQL function in supabase/tests/r142_public_team_showcase.pglite.mjs; here the server mapping is tested with
  * fixtures (invented names): whatever the database returns, only whitelisted fields reach the page.
  */
