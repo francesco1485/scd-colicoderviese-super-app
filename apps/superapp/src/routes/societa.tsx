@@ -93,7 +93,7 @@ function Societa() {
               ))}
             </ul>
             <p className="m-0 mt-3 text-[14px] leading-snug text-[var(--scd-sub)]">
-              Centro sportivo di Colico in Via Lido SNC, gestito dalla società; a Dervio giochiamo sul campo comunale. Misure dal master impianti della società.
+              Centro sportivo di Colico in Via Lido SNC, gestito dalla società; a Dervio giochiamo sul campo comunale. Misure dai dati degli impianti della società.
             </p>
             <Link to="/impianti" className="mt-3 inline-flex h-11 items-center gap-2 rounded-[10px] border-2 border-[var(--scd-blue)] px-4 text-[15px] font-bold text-[var(--scd-blue)]">
               <MapPin className="size-[18px]" aria-hidden="true" /> Mappa dei campi

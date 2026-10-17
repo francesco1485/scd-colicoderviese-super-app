@@ -25,6 +25,9 @@ import {
   hoursLines,
   hoursPending,
   PUBLIC_HOURS_PENDING,
+  PUBLIC_INDICATIVE,
+  PUBLIC_PENDING,
+  publicRuleSource,
   publicHoursLines,
   publicStatus,
   isProposed,
@@ -244,7 +247,7 @@ export function FacilityMap({ mode, slots = [], now, initialSiteId = "SED-COL", 
             <MapPin className="mr-1 inline size-4 align-[-3px]" strokeWidth={1.8} aria-hidden="true" />
             <span className="font-semibold text-[var(--in-ink)]">{site.name}</span>
             {" · "}
-            {site.address ?? "indirizzo da verificare"}, {site.municipality}
+            {site.address ?? (staff ? "indirizzo da verificare" : `indirizzo ${PUBLIC_PENDING}`)}, {site.municipality}
             {!site.managed_by_scd && <> · impianto non gestito dalla SCD</>}
           </p>
         </div>
@@ -517,7 +520,7 @@ function spaceAria(s: Space, use: UseEntry[], moment: ViewMoment | null, staff: 
   const status = !raw ? "stato in caricamento" : staff ? raw.label : (publicStatus(raw)?.label ?? PUBLIC_HOURS_PENDING.toLowerCase());
   const parts = [s.name, TYPE_LABEL[s.type], status];
   if (staff && s.quadro_key) parts.push(use.length ? `in uso: ${use.map((u) => u.group).join(" e ")}` : "libero in questa fascia");
-  if (s.provenance.source === "board") parts.push("da board, da verificare");
+  if (s.provenance.source === "board") parts.push(staff ? "da board, da verificare" : `posizione ${PUBLIC_INDICATIVE}`);
   return parts.join(", ");
 }
 
@@ -733,11 +736,11 @@ function Legend({
         item(<circle cx="13" cy="8" r="5" fill="none" stroke={PLAN.sub} strokeWidth="2" strokeDasharray="3 3" />, staff ? "Orari da inserire" : PUBLIC_HOURS_PENDING)}
       {item(<circle cx="13" cy="8" r="6" fill="#16683f" />, "Aperto")}
       {item(<circle cx="13" cy="8" r="6" fill="#a3241b" />, "Chiuso")}
-      {hasBoard && item(<rect x="1" y="1" width="24" height="14" rx="3" fill="#fff" stroke={PLAN.sub} strokeWidth="2" strokeDasharray="5 3" />, "Da board, da verificare")}
+      {hasBoard && item(<rect x="1" y="1" width="24" height="14" rx="3" fill="#fff" stroke={PLAN.sub} strokeWidth="2" strokeDasharray="5 3" />, staff ? "Da board, da verificare" : "Posizione indicativa")}
       {layers.has("percorsi") && (site.routes?.length ?? 0) > 0 && (
         <>
           {staff && item(<line x1="1" y1="8" x2="25" y2="8" stroke={PLAN.teamsRoute} strokeWidth="4" strokeDasharray="8 5" />, "Percorso squadre (da verificare)")}
-          {item(<line x1="2" y1="8" x2="25" y2="8" stroke={PLAN.publicRoute} strokeWidth="4" strokeLinecap="round" strokeDasharray="1 6" />, "Percorso pubblico (da verificare)")}
+          {item(<line x1="2" y1="8" x2="25" y2="8" stroke={PLAN.publicRoute} strokeWidth="4" strokeLinecap="round" strokeDasharray="1 6" />, staff ? "Percorso pubblico (da verificare)" : `Percorso pubblico (${PUBLIC_INDICATIVE})`)}
         </>
       )}
     </ul>
@@ -791,8 +794,8 @@ function SpaceIndex({
                   const status = raw && !staff ? publicStatus(raw) : raw;
                   const meta = [
                     moment ? (status?.label ?? null) : "—",
-                    !s.layout ? "posizione da inserire" : null,
-                    s.provenance.source === "board" ? "da verificare" : null,
+                    !s.layout ? (staff ? "posizione da inserire" : `posizione ${PUBLIC_PENDING}`) : null,
+                    s.provenance.source === "board" ? (staff ? "da verificare" : `posizione ${PUBLIC_INDICATIVE}`) : null,
                   ].filter((x): x is string => x !== null);
                   return (
                     <li key={s.id}>
@@ -866,6 +869,7 @@ function SpaceDetails({
   const who = whoMayEnter(s.access);
   const entrances = s.entrances === null ? null : (site.entrances ?? []).filter((e) => s.entrances!.includes(e.id));
   const fromBoard = s.provenance.source === "board";
+  const pending = staff ? "da inserire" : PUBLIC_PENDING;
   return (
     <div>
       <div className="px-4 pb-3 pt-4 sm:px-5">
@@ -879,7 +883,13 @@ function SpaceDetails({
           ) : moment ? null : (
             <Chip>Stato in caricamento</Chip>
           )}
-          {fromBoard ? <Chip tone="warn">Da board, da verificare</Chip> : <Chip tone="info">Dal master impianti</Chip>}
+          {staff ? (
+            fromBoard ? <Chip tone="warn">Da board, da verificare</Chip> : <Chip tone="info">Dal master impianti</Chip>
+          ) : fromBoard ? (
+            <Chip tone="warn">Posizione indicativa</Chip>
+          ) : (
+            <Chip tone="info">Dati della società</Chip>
+          )}
         </div>
         <p className="m-0 mt-2 text-[13px] text-[var(--in-sub)]">{moment?.live ? "Stato adesso" : `Stato a: ${momentLabel}`} (ora di Roma)</p>
       </div>
@@ -910,7 +920,7 @@ function SpaceDetails({
               {s.size ? ` · ${s.size.text}` : ""}
             </>
           ) : (
-            <Missing />
+            <Missing>{pending}</Missing>
           )}
         </Row>
         <Row icon={<Clock3 className="size-[18px]" strokeWidth={1.8} />} label="Orari">
@@ -929,7 +939,7 @@ function SpaceDetails({
         </Row>
         <Row icon={<DoorOpen className="size-[18px]" strokeWidth={1.8} />} label="Da dove si entra">
           {entrances === null ? (
-            <Missing>ingresso da inserire</Missing>
+            <Missing>{`ingresso ${pending}`}</Missing>
           ) : entrances.length === 0 ? (
             <Missing>{staff ? "ingresso da inserire" : "ingresso riservato, non pubblico"}</Missing>
           ) : (
@@ -937,7 +947,7 @@ function SpaceDetails({
               {entrances.map((e) => (
                 <li key={e.id}>
                   {e.label}
-                  {!e.provenance.verified && <span className="text-[13px] text-[var(--in-warn)]"> · da board, da verificare</span>}
+                  {!e.provenance.verified && <span className="text-[13px] text-[var(--in-warn)]"> · {staff ? "da board, da verificare" : PUBLIC_INDICATIVE}</span>}
                 </li>
               ))}
             </ul>
@@ -950,7 +960,7 @@ function SpaceDetails({
               {isProposed(s.access!.source) && <span className="block text-[13px] text-[var(--in-warn)]">Regola proposta, da confermare</span>}
             </>
           ) : (
-            <Missing />
+            <Missing>{pending}</Missing>
           )}
         </Row>
         <Row icon={<RouteIcon className="size-[18px]" strokeWidth={1.8} />} label="Regole d'uso">
@@ -959,12 +969,12 @@ function SpaceDetails({
               {s.rules.map((r) => (
                 <li key={r.text}>
                   {r.text}
-                  <span className="block text-[12.5px] text-[var(--in-sub)]">Fonte: {r.source}</span>
+                  <span className="block text-[12.5px] text-[var(--in-sub)]">Fonte: {staff ? r.source : publicRuleSource(r.source)}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <Missing>regole da inserire</Missing>
+            <Missing>{`regole ${pending}`}</Missing>
           )}
         </Row>
         {staff && (

@@ -4,7 +4,7 @@ import { CalendarDays, CreditCard, MapPin, Navigation, Ticket } from "lucide-rea
 import { CastPresence } from "@/components/scd/CastPresence";
 import { FacilityMap } from "@/components/scd/FacilityMap";
 import { TicketRules } from "@/components/scd/TicketRules";
-import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
+import { siteById, spaceById } from "@/lib/facilities";
 import { siteMapsUrl } from "@/lib/maps-link";
 import { romeDay } from "@/lib/public-window";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
@@ -80,8 +80,8 @@ function ImpiantiPage() {
           />
         </div>
         <p className="m-0 mt-4 text-[13px] leading-snug text-[var(--in-sub)]">
-          Fonte: master impianti della società ({FACILITIES.sources.master.label}). Posizioni schematiche, non in scala. Quello che non è ancora confermato è scritto
-          "da inserire" o "da verificare".
+          Fonte: dati degli impianti della società. Posizioni schematiche, non in scala. Quello che non è ancora confermato è scritto
+          "in aggiornamento" o "indicativo".
         </p>
       </div>
     </main>
@@ -109,7 +109,7 @@ function Directions() {
                 <MapPin className="mt-0.5 size-5 flex-none text-[#1556c4]" aria-hidden="true" />
                 <span className="grid gap-0.5">
                   <b className="text-[16px] leading-tight text-[#0b1e3a]">{s.name}</b>
-                  <span className="text-[15px] text-[#4a5d7a]">{s.address ? `${s.address}, ${s.municipality}` : `${s.municipality} · indirizzo da verificare`}</span>
+                  <span className="text-[15px] text-[#4a5d7a]">{s.address ? `${s.address}, ${s.municipality}` : `${s.municipality} · indirizzo in aggiornamento`}</span>
                 </span>
               </span>
               {url && (
