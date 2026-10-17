@@ -250,9 +250,17 @@ await fails(`select public.scd_merge_people('${P_KID}', '${P_PARENT2}', 'x')`, /
 // Section grants move only with the Direzione.
 await db.exec(`insert into public.scd_people (id, organization_id, first_name, last_name) values
   ('20000000-0000-0000-0000-000000000016', '${ORG}', 'Gino', 'Viola'), ('20000000-0000-0000-0000-000000000017', '${ORG}', 'Gino', 'Viola');
+  update public.scd_people set birth_date = '1970-07-07' where id = '20000000-0000-0000-0000-000000000016';
   insert into public.scd_person_grants (organization_id, person_id, section_code) values ('${ORG}', '20000000-0000-0000-0000-000000000017', 'quadro');`);
 await as(SEG);
 await fails(`select public.scd_merge_people('20000000-0000-0000-0000-000000000016', '20000000-0000-0000-0000-000000000017', 'x')`, /only the Direzione moves/);
+// The other way round too: grants on the kept card, an account on the merged one (review 17/10, second round).
+await db.exec(`insert into public.scd_people (id, organization_id, first_name, last_name, birth_date) values
+  ('20000000-0000-0000-0000-000000000018', '${ORG}', 'Rita', 'Blu', '1977-01-01'), ('20000000-0000-0000-0000-000000000019', '${ORG}', 'Rita', 'Blu', null);
+  insert into public.scd_person_grants (organization_id, person_id, section_code) values ('${ORG}', '20000000-0000-0000-0000-000000000018', 'tesoreria');
+  insert into public.scd_identity_links (organization_id, user_id, person_id, link_state) values ('${ORG}', '10000000-0000-0000-0000-000000000019', '20000000-0000-0000-0000-000000000019', 'VERIFIED_BY_STAFF');`);
+await fails(`select public.scd_merge_people('20000000-0000-0000-0000-000000000018', '20000000-0000-0000-0000-000000000019', 'x')`, /only the Direzione moves/);
+await fails(`select public.scd_merge_people('${P_Y}', '${P_DATELESS_ATHLETE}', 'x')`, /no birth date on either card|minor card/);
 await as(DG);
 await db.query(`select public.scd_merge_people('20000000-0000-0000-0000-000000000016', '20000000-0000-0000-0000-000000000017', 'x')`);
 assert.equal((await one(`select count(*)::int n from public.scd_person_grants where person_id = '20000000-0000-0000-0000-000000000016'`)).n, 1);
@@ -278,4 +286,12 @@ assert.equal((await one(`select count(*)::int n from public.scd_people where id 
 assert.equal((await one(`select count(*)::int n from public.scd_athletes where person_id = '${P_KID}'`)).n, 1, "athlete record stays with the child");
 assert.equal((await one(`select count(*)::int n from public.scd_family_members where person_id = '${P_PARENT2}' and is_guardian`)).n, 1, "parent is guardian once, never of self");
 
+// Father and son with the same name, no account: the father's card has no birth date and a seat (review 17/10, round 2).
+await db.exec(`insert into public.scd_people (id, organization_id, first_name, last_name, birth_date) values
+  ('20000000-0000-0000-0000-000000000020', '${ORG}', 'Marco', 'Rosa', null), ('20000000-0000-0000-0000-000000000021', '${ORG}', 'Marco', 'Rosa', '2012-02-02');
+  insert into public.scd_athletes (organization_id, person_id) values ('${ORG}', '20000000-0000-0000-0000-000000000021');
+  insert into public.scd_structure_roles (organization_id, person_id, role_label, role_kind, position_code) values ('${ORG}', '20000000-0000-0000-0000-000000000020', 'Consigliere', 'ORGANO_SOCIETARIO', 'consigliere');`);
+await as(DG);
+await fails(`select public.scd_merge_people('20000000-0000-0000-0000-000000000020', '20000000-0000-0000-0000-000000000021', 'x')`, /minor card with an adult card/);
+await fails(`select public.scd_merge_people('20000000-0000-0000-0000-000000000021', '20000000-0000-0000-0000-000000000020', 'x')`, /minor card with an adult card/);
 console.log("r121 people merge + multi-role approval: all assertions passed");

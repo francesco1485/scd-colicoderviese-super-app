@@ -125,7 +125,12 @@ export function isSeatPosition(code: string): boolean {
 }
 
 /** Pairs of active cards with the same name (accents and case folded), to check as possible duplicates. */
-export function duplicateNamePairs<P extends { id: string; displayName: string; status: string; birthYear: number | null }>(people: readonly P[]): Array<[P, P]> {
+export function duplicateNamePairs<P extends { id: string; displayName: string; status: string; birthYear: number | null; roles?: readonly unknown[] }>(
+  people: readonly P[],
+  currentYear: number = new Date().getFullYear(),
+): Array<[P, P]> {
+  const minor = (p: P) => p.birthYear !== null && currentYear - p.birthYear < 18;
+  const maybeAdult = (p: P) => p.birthYear === null || (p.roles?.length ?? 0) > 0;
   const key = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
   const groups = new Map<string, P[]>();
   for (const p of people) {
@@ -142,6 +147,8 @@ export function duplicateNamePairs<P extends { id: string; displayName: string; 
         const y = g[j]!;
         // Two different known birth years are two people (often parent and child with the same name).
         if (x.birthYear !== null && y.birthYear !== null && x.birthYear !== y.birthYear) continue;
+        // A minor next to a card that may be an adult (no year, or organigram roles) is a parent and a child.
+        if ((minor(x) && maybeAdult(y)) || (minor(y) && maybeAdult(x))) continue;
         out.push([x, y]);
       }
   }

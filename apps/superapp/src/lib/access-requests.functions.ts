@@ -193,6 +193,8 @@ export function multiOutcome(error: { code?: string | null; message?: string | n
   if (/only Presidente or Direttore Generale/.test(m)) return { ok: false, message: "Le schede o i ruoli di Presidente e Direttore generale li gestiscono solo loro due." };
   if (/card is not the requester/.test(m)) return { ok: false, message: "Una scheda scelta è di un'altra persona (data di nascita diversa o atleta): forse è il figlio. Toglila e collegala come figlio." };
   if (/two different accounts/.test(m)) return { ok: false, message: "Le schede sono collegate a due account diversi: sono due persone, non si uniscono." };
+  if (/minor card with an adult card/.test(m)) return { ok: false, message: "Una scheda è di un minorenne e l'altra può essere di un adulto: sono genitore e figlio, non si uniscono. Aggiungi prima la data di nascita." };
+  if (/no birth date on either card/.test(m)) return { ok: false, message: "Nessuna delle due schede ha la data di nascita: aggiungila prima di unire." };
   if (/minor card with an account/.test(m)) return { ok: false, message: "Una scheda è di un minorenne: non si unisce alla scheda di un adulto con account." };
   if (/own card/.test(m)) return { ok: false, message: "Non puoi unire la tua stessa scheda: chiedi a un'altra persona della Direzione." };
   if (/only the Direzione moves/.test(m)) return { ok: false, message: "La scheda da unire ha sezioni dell'app aperte: l'unione la fa la Direzione." };

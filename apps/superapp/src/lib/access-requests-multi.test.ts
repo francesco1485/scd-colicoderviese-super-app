@@ -71,3 +71,17 @@ describe("duplicate cards by name", () => {
     expect(pairs.map(([x, y]) => `${x.id}${y.id}`)).toEqual(["ab"]);
   });
 });
+
+describe("father and son with the same name (review 17/10)", () => {
+  it("are never proposed as one person", async () => {
+    const { duplicateNamePairs } = await import("./access-requests");
+    const p = (id: string, birthYear: number | null, roles: unknown[] = []) => ({ id, displayName: "Marco Rosa", birthYear, status: "ACTIVE", roles });
+    expect(duplicateNamePairs([p("dad", null), p("kid", 2012)], 2026)).toEqual([]);
+    expect(duplicateNamePairs([p("dad", 1980, ["consigliere"]), p("kid", 2012)], 2026)).toEqual([]);
+    expect(duplicateNamePairs([p("a", 1980), p("b", null)], 2026).length).toBe(1);
+  });
+  it("explains the refusal", () => {
+    expect(multiOutcome({ code: "22023", message: "merge: a minor card with an adult card" }).message).toMatch(/genitore e figlio/);
+    expect(multiOutcome({ code: "22023", message: "merge: no birth date on either card" }).message).toMatch(/data di nascita/);
+  });
+});

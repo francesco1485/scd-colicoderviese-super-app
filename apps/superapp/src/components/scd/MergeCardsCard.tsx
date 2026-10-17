@@ -23,7 +23,8 @@ export function MergeCardsCard({ people, canWrite, onChanged }: { people: Person
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
-  const pairs = useMemo(() => duplicateNamePairs(people).slice(0, 8), [people]);
+  const allPairs = useMemo(() => duplicateNamePairs(people), [people]);
+  const pairs = allPairs.slice(0, 8);
   const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const results = useMemo(() => {
     const t = fold(q.trim());
@@ -82,6 +83,7 @@ export function MergeCardsCard({ people, canWrite, onChanged }: { people: Person
                 <span className="shrink-0 text-[13px] text-[var(--in-sub)]">{x.kind} + {y.kind}</span>
               </button>
             ))}
+            {allPairs.length > pairs.length && <p className="m-0 text-[13px] text-[var(--in-sub)]">E altre {allPairs.length - pairs.length}: cerca per nome.</p>}
           </div>
         )}
         {(!a || !b) && (

@@ -19,9 +19,10 @@
 --      deletes drop. Fail closed: different organisations, different birth dates, two athlete records, two active
 --      grants on the same section, two active consents of the same type, the same tesseramento or transport request
 --      on both, cards of two different accounts, a minor's card with an account, a card linked to the caller,
---      section grants moved by anyone but the Direzione -> exception, nothing changes (one transaction). Who: a
+--      section grants on either card moved by anyone but the Direzione, two cards without a birth date -> exception, nothing changes (one transaction). Who: a
 --      signed-in Direzione or Segreteria person only (no session = refused: agents never merge); when either card holds
---      a Presidente / Direttore Generale position, only a role creator (r111: Presidente or DG).
+--      a Presidente / Direttore Generale position, only a role creator (r111: Presidente or DG). Deliberately closed:
+--      if any multi-column foreign key to scd_people ever appears, every merge stops until this function is updated.
 --   2. scd_approve_access_request_multi(request, person, merge_ids[], role, positions jsonb, child_ids[], note) -> uuid:
 --      the same approval as r64 (account, base role that only goes up, verified identity link) after merging the
 --      chosen duplicate cards into `person`, then every child as guardian link and every position from the catalogue
@@ -106,8 +107,7 @@ begin
   -- Two accounts are two people: cards linked to different accounts are never merged.
   if exists (select 1 from public.scd_identity_links a join public.scd_identity_links b
                on b.person_id = p_drop and b.user_id <> a.user_id
-              and b.link_state in ('AUTO_VERIFIED', 'VERIFIED_BY_STAFF')
-             where a.person_id = p_keep and a.link_state in ('AUTO_VERIFIED', 'VERIFIED_BY_STAFF')) then
+             where a.person_id = p_keep) then
     raise exception 'merge: cards of two different accounts' using errcode = '22023';
   end if;
   -- A minor's card (under 18, or an athlete with no birth date) never joins a card that has an account.
@@ -118,8 +118,24 @@ begin
      and exists (select 1 from public.scd_identity_links l where l.person_id in (p_keep, p_drop)) then
     raise exception 'merge: a minor card with an account' using errcode = '22023';
   end if;
+  -- A minor's card never joins a card that may be an adult's: no birth date, organigram roles, or guardian of a
+  -- family the minor belongs to (a parent and a child with the same name, review 17/10).
+  if (((d.birth_date is not null and d.birth_date > current_date - interval '18 years')
+         or (d.birth_date is null and exists (select 1 from public.scd_athletes a where a.person_id = p_drop)))
+        and (k.birth_date is null
+             or exists (select 1 from public.scd_structure_roles r where r.person_id = p_keep and r.active)
+             or exists (select 1 from public.scd_family_members g join public.scd_family_members c on c.family_id = g.family_id
+                        where g.person_id = p_keep and g.is_guardian and c.person_id = p_drop)))
+     or (((k.birth_date is not null and k.birth_date > current_date - interval '18 years')
+         or (k.birth_date is null and exists (select 1 from public.scd_athletes a where a.person_id = p_keep)))
+        and (d.birth_date is null
+             or exists (select 1 from public.scd_structure_roles r where r.person_id = p_drop and r.active)
+             or exists (select 1 from public.scd_family_members g join public.scd_family_members c on c.family_id = g.family_id
+                        where g.person_id = p_drop and g.is_guardian and c.person_id = p_keep))) then
+    raise exception 'merge: a minor card with an adult card' using errcode = '22023';
+  end if;
   -- Section grants are the Direzione's (r100): only the Direzione moves them.
-  if exists (select 1 from public.scd_person_grants g where g.person_id = p_drop and g.revoked_at is null)
+  if exists (select 1 from public.scd_person_grants g where g.person_id in (p_keep, p_drop) and g.revoked_at is null)
      and not public.scd_has_org_role(k.organization_id, array['DIRECTION']::public.scd_role[]) then
     raise exception 'merge: sections only the Direzione moves' using errcode = '42501';
   end if;
@@ -131,6 +147,10 @@ begin
 
   if k.birth_date is not null and d.birth_date is not null and k.birth_date <> d.birth_date then
     raise exception 'merge: different birth dates' using errcode = '22023';
+  end if;
+  -- At least one card must say when the person was born: two dateless cards are not proof of one human.
+  if k.birth_date is null and d.birth_date is null then
+    raise exception 'merge: no birth date on either card' using errcode = '22023';
   end if;
 
   -- Conflicts a person must solve by hand (fail closed, nothing changes).
