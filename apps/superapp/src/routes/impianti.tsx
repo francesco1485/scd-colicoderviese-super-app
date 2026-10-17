@@ -2,8 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarDays, CreditCard, MapPin, Navigation, Ticket } from "lucide-react";
 
 import { CastPresence } from "@/components/scd/CastPresence";
+import { ClubHousePublicCard } from "@/components/scd/ClubCatalogPublic";
 import { FacilityMap } from "@/components/scd/FacilityMap";
 import { TicketRules } from "@/components/scd/TicketRules";
+import { catalogWithin } from "@/lib/club-catalog";
+import { getPublicClubCatalog } from "@/lib/club-catalog.functions";
 import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
 import { siteMapsUrl } from "@/lib/maps-link";
 import { romeDay } from "@/lib/public-window";
@@ -18,14 +21,16 @@ export const Route = createFileRoute("/impianti")({
     const today = romeDay(Date.now());
     const [{ loadCalendar }, { nextHomeMatchText }] = await Promise.all([import("@/lib/public-snapshots"), import("@/lib/cast-live")]);
     const cal = loadCalendar();
-    return { today, nextHome: nextHomeMatchText(cal.groups, cal.events, today) };
+    // Club House hours, price list and group menus entered in the gestionale (r115); "da confermare" otherwise.
+    const catalog = await catalogWithin(getPublicClubCatalog(), { ready: false, entries: [] });
+    return { today, nextHome: nextHomeMatchText(cal.groups, cal.events, today), catalog };
   },
   head: () => pageHead(PUBLIC_PAGES.impianti),
   component: ImpiantiPage,
 });
 
 function ImpiantiPage() {
-  const { today, nextHome } = Route.useLoaderData();
+  const { today, nextHome, catalog } = Route.useLoaderData();
   const colico = siteById("SED-COL")!;
   const ticket = spaceById("SPA-COL-BIG")!;
   return (
@@ -52,7 +57,7 @@ function ImpiantiPage() {
             </Link>
             <span className="inline-flex min-h-12 items-center gap-2 rounded-[12px] border border-white/40 px-4 text-[15px] font-semibold">
               <Ticket className="size-5" strokeWidth={1.8} aria-hidden="true" />
-              Biglietteria a Colico · {ticket.hours ? "orari nella mappa" : "orari da inserire"}
+              Biglietteria a Colico · {ticket.hours ? "orari nella mappa" : "orari in aggiornamento"}
             </span>
           </div>
         </div>
@@ -61,6 +66,9 @@ function ImpiantiPage() {
         <Directions />
         <div className="mt-5">
           <FacilityMap mode="public" />
+        </div>
+        <div className="mt-5">
+          <ClubHousePublicCard entries={catalog.entries} />
         </div>
         <figure className="scd-card m-0 mt-5 overflow-hidden p-0" data-testid="pianta-colico">
           <figcaption className="flex flex-wrap items-baseline justify-between gap-2 px-4 pt-4 sm:px-5">

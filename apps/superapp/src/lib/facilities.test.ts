@@ -10,6 +10,10 @@ import {
   correctionRow,
   correctionTsv,
   hoursLines,
+  hoursPending,
+  PUBLIC_HOURS_PENDING,
+  publicHoursLines,
+  publicStatus,
   isProposed,
   publicSite,
   publicSpace,
@@ -226,5 +230,37 @@ describe("correction row for the Drive register", () => {
     expect(correctionProblems(input)).toEqual([]);
     expect(correctionProblems({ ...input, role: " ", description: "x", spaceId: "NOPE", link: "ftp://x" })).toHaveLength(4);
     expect(CORRECTION_KINDS.map((k) => k.id)).toContain("responsabile");
+  });
+});
+
+describe("public hours wording (B10)", () => {
+  const mon1730 = { weekday: "mon" as const, minutes: 17 * 60 + 30 };
+  it("hides the unknown status on public pages and keeps real open/closed labels", () => {
+    expect(publicStatus(spaceStatus(null, mon1730))).toBeNull();
+    expect(publicStatus(spaceStatus({ mon: null }, mon1730))).toBeNull();
+    expect(publicStatus(spaceStatus({ mon: [{ from: "17:00", to: "19:00" }] }, mon1730))).toEqual({ state: "open", label: "Aperto fino alle 19:00" });
+    expect(publicStatus(spaceStatus({ mon: [] }, mon1730))?.state).toBe("closed");
+  });
+  it("never says 'da inserire' in public day lines and never invents hours", () => {
+    expect(publicHoursLines(null)).toBeNull();
+    const lines = publicHoursLines({ mon: [{ from: "17:00", to: "19:00" }], tue: [] })!;
+    expect(lines.find((l) => l.day === "mon")?.text).toBe("17:00–19:00");
+    expect(lines.find((l) => l.day === "tue")?.text).toBe("chiuso");
+    expect(lines.find((l) => l.day === "wed")?.text).toBe("in aggiornamento");
+    expect(lines.some((l) => l.text.includes("inserire"))).toBe(false);
+  });
+  it("reports pending hours from the master, per week or per day", () => {
+    expect(hoursPending([{ hours: null }])).toBe(true);
+    expect(hoursPending([{ hours: { mon: [], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] } }])).toBe(false);
+    expect(hoursPending([{ hours: { mon: [] } }], "mon")).toBe(false);
+    expect(hoursPending([{ hours: { mon: [] } }], "tue")).toBe(true);
+    expect(PUBLIC_HOURS_PENDING).toBe("Orari in aggiornamento dalla società");
+  });
+  it("the public map and /impianti never print the internal 'da inserire' hours to-do", () => {
+    const map = readFileSync(fileURLToPath(new URL("../components/scd/FacilityMap.tsx", import.meta.url)), "utf8");
+    const page = readFileSync(fileURLToPath(new URL("../routes/impianti.tsx", import.meta.url)), "utf8");
+    expect(page).not.toMatch(/orari da inserire/i);
+    // In the map the internal wording survives only behind the staff flag.
+    for (const line of map.split("\n").filter((l) => /orari da inserire/i.test(l))) expect(line).toMatch(/staff \?/);
   });
 });

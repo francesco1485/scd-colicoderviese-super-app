@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { trasporti, slotsForDay, segmentSlots, type ZoneCell, logoFor, ROOMS, SNAPSHOT_WATERMARK, annateFrom, matchesAnnata, slotHasAnnata, type Annata, type Day, type Week, type ZoneKey } from './snapshot';
+import { trasporti, slotsForDay, segmentSlots, type ZoneCell, logoFor, ROOMS, QUADRO_WATERMARK, annateFrom, matchesAnnata, slotHasAnnata, type Annata, type Day, type Week, type ZoneKey } from './snapshot';
 import { SourceLink, Watermark } from './SourceLink';
 import { useQuadro } from './quadro-context';
 
@@ -35,7 +35,7 @@ export function QuadroAllenamenti() {
   const annataLogo = annata ? logoFor(annata.label) : null;
 
   return <section aria-labelledby="h-quadro">
-    <Watermark text={SNAPSHOT_WATERMARK} />
+    <Watermark text={QUADRO_WATERMARK} />
     <h2 id="h-quadro">Quadro Allenamenti · lun–ven</h2>
     <p className="imp-lead">{quadro.slots.length} fasce, {quadro.rotations.length} rotazioni e {quadro.rooms.length} assegnazioni spogliatoi dal pacchetto pubblico di prova. {quadro.note}</p>
 

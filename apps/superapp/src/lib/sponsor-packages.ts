@@ -1,9 +1,10 @@
 /**
  * Listino partner of the /sponsor page (item C1, Direzione 14/10/2026: "the app must be commercially productive").
  *
- * What each package gives and who sees it. Rules:
- * - no price is published until the Direzione approves it: every entry is `{ kind: "da_approvare" }` and renders as
- *   "Prezzo su richiesta · in approvazione". The `euro` variant exists only so an approved price can be entered later.
+ * What each package gives, where the brand appears and who sees it. Rules:
+ * - no price, amount or discount, ever (Francesco 17/10/2026 09:42: «prezzi non esposti perché li fa al momento il
+ *   Presidente; dobbiamo solo rendere appetibile il singolo sponsor o idea di sponsorizzazione»). There is no price
+ *   field at all: every package renders PROPOSAL_ON_MEASURE. Prices live only in the Presidente's proposal;
  * - audience is described in words; numbers only when documented in the repo, otherwise `audienceNumbers: null`
  *   (rendered "Numeri: da misurare"). Nothing here is measured yet.
  * - this file never says who is a sponsor (that is `sponsors.ts`); tournament facts come from `events.ts` / `tournaments.ts`.
@@ -12,8 +13,8 @@
  *   SEAT_PACKAGE_INTERNAL) and is not part of PARTNER_PACKAGES.
  */
 
-export type PackagePrice =
-  { kind: "da_approvare" } | { kind: "euro"; from: number; to?: number };
+/** Shown wherever a price would be (packages, ideas, FAQ): the Presidente defines the proposal with the company. */
+export const PROPOSAL_ON_MEASURE = "Proposta su misura: la definisce il Presidente con te";
 
 export type PackageIcon =
   "ledwall" | "maglia" | "tornei" | "digitale" | "seggiolino";
@@ -30,7 +31,10 @@ export interface PartnerPackage {
   audience: string;
   /** Documented audience numbers, or null = "da misurare". */
   audienceNumbers: string | null;
-  price: PackagePrice;
+  /** Where the brand appears, as short concrete places (chips on the card). 2 to 4. */
+  placements: readonly string[];
+  /** One plain story line: the scene the sponsor becomes part of. */
+  story: string;
   icon: PackageIcon;
   /** Main package: shown first and larger. Exactly one. */
   featured?: boolean;
@@ -54,7 +58,8 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     audience:
       "Giocatori, famiglie, tifosi e squadre ospiti presenti al campo di Colico.",
     audienceNumbers: null,
-    price: { kind: "da_approvare" },
+    placements: ["LED a bordo campo, Colico", "LED wall dal vivo nella pagina Sponsor dell'app"],
+    story: "Partita in casa a Colico: le famiglie guardano i loro ragazzi e, a bordo campo, gira anche il tuo spot.",
     icon: "ledwall",
   },
   {
@@ -70,7 +75,8 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     audience:
       "Chi segue la squadra in casa e in trasferta, e chi vede le foto della società.",
     audienceNumbers: null,
-    price: { kind: "da_approvare" },
+    placements: ["Maglia da gara o di allenamento", "Foto ufficiale della squadra", "Borse, tute e materiale tecnico"],
+    story: "Il tuo marchio scende in campo con i ragazzi, in casa e in trasferta, e resta nella foto di squadra.",
     icon: "maglia",
   },
   {
@@ -82,12 +88,13 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
       "Title partner di un torneo: il tuo nome accanto al nome del torneo",
       "Premio fair play con il tuo marchio, consegnato in campo",
       "Spazio nel villaggio del torneo per farti conoscere",
-      "Christmas Lario Cup l'8 dicembre 2026, maschile e femminile; Memorial Nasazzi a maggio 2027 (date da confermare)",
+      "Christmas Lario Cup l'8 dicembre 2026, maschile e femminile; Memorial José Nasazzi il 22–23 maggio 2027 a Colico, con la Female Edition a Dervio",
     ],
     audience:
       "Squadre ospiti, accompagnatori e famiglie che vengono a Colico e Dervio per i tornei.",
     audienceNumbers: null,
-    price: { kind: "da_approvare" },
+    placements: ["Christmas Lario Cup, Colico e Dervio", "Premio fair play in campo", "Villaggio del torneo"],
+    story: "A dicembre squadre ospiti e famiglie arrivano sul lago per la Christmas Lario Cup: il tuo nome le accoglie.",
     icon: "tornei",
   },
   {
@@ -103,7 +110,8 @@ export const PARTNER_PACKAGES: readonly PartnerPackage[] = [
     audience:
       "Famiglie dei ragazzi, atleti e tifosi che usano l'app per calendari, risultati e notizie.",
     audienceNumbers: null,
-    price: { kind: "da_approvare" },
+    placements: ["Pagine pubbliche dell'app del club", "Una squadra del settore giovanile", "Notizie del club"],
+    story: "Le famiglie aprono l'app per sapere quando e dove si gioca: lì trovano anche la tua azienda.",
     icon: "digitale",
   },
 ];
@@ -120,25 +128,13 @@ export const SEAT_PACKAGE_INTERNAL: PartnerPackage = {
   ],
   audience: "Chi siede in tribuna alle partite in casa.",
   audienceNumbers: null,
-  price: { kind: "da_approvare" },
+  placements: ["Targhetta sul seggiolino della tribuna"],
+  story: "Ogni partita in casa, qualcuno si siede al posto con il nome della tua azienda.",
   icon: "seggiolino",
   link: { to: "/sostieni", label: "Vedi la tribuna in Sostieni" },
 };
 
 export const AUDIENCE_TO_MEASURE = "da misurare";
-
-export function formatPackagePrice(price: PackagePrice): string {
-  if (price.kind === "da_approvare")
-    return "Prezzo su richiesta · in approvazione";
-  // Fixed grouping (1.500), independent of the runtime ICU data (it-IT does not group 4-digit numbers).
-  const eur = (n: number) =>
-    `€ ${Math.round(n)
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
-  return price.to !== undefined && price.to > price.from
-    ? `${eur(price.from)} – ${eur(price.to)}`
-    : `da ${eur(price.from)}`;
-}
 
 export function formatAudienceNumbers(
   p: Pick<PartnerPackage, "audienceNumbers">,
@@ -193,12 +189,12 @@ export function hypeWordsIn(text: string): string[] {
 /** "Come funziona": no response time is documented, so the second step says only that the club calls back. */
 export const PACKAGE_STEPS: readonly { title: string; text: string }[] = [
   {
-    title: "Scegli il pacchetto",
-    text: "Guarda cosa comprende e premi «Chiedi questo pacchetto».",
+    title: "Scegli il pacchetto o l'idea",
+    text: "Guarda dove compare il tuo marchio e premi «Parliamone».",
   },
   {
-    title: "Ti ricontattiamo",
-    text: "La società ti chiama per capire cosa ti serve e prepara la proposta.",
+    title: "Ne parli con il Presidente",
+    text: "La società ti chiama: il Presidente capisce cosa ti serve e definisce con te la proposta su misura.",
   },
   {
     title: "Contratto e fattura",

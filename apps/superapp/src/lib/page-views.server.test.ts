@@ -19,7 +19,7 @@ const page = {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe("recordPageView (r141, service role only)", () => {
+describe("recordPageView (r143, service role only)", () => {
   it("calls the RPC with the normalised path through the service client", async () => {
     const c = rpcOk();
     const r = await recordPageView(page, {
@@ -81,7 +81,7 @@ describe("recordPageView (r141, service role only)", () => {
     ).toBe(true);
   });
 
-  it("is silent while r141 is missing and logs only the error code once live", async () => {
+  it("is silent while r143 is missing and logs only the error code once live", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const missing = {
       rpc: vi.fn(async () => ({ error: { code: "PGRST202", message: "x" } })),

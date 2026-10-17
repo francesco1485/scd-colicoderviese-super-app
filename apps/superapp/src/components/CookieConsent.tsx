@@ -17,7 +17,7 @@ import {
  * marketingAllowed() è vero (consenso marketing e pagina pubblica, mai aree riservate o minori).
  */
 /**
- * No cookie-based statistics or marketing tool is configured (audit 2026-10-12). Since r141 (UD-167, Francesco
+ * No cookie-based statistics or marketing tool is configured (audit 2026-10-12). Since r143 (UD-169, Francesco
  * 16/10/2026 23:35 chose option A) public pages are counted as anonymous daily totals with no cookie and no device
  * storage, which needs no consent; the banner says so and asks nothing.
  */

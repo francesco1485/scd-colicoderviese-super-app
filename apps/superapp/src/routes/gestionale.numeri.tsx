@@ -26,9 +26,9 @@ import {
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /**
- * Numeri dell'app (UD-167, Francesco 16/10/2026 22:34: «area dove dobbiamo sapere quanti accessi sono stati fatti,
+ * Numeri dell'app (UD-169, Francesco 16/10/2026 22:34: «area dove dobbiamo sapere quanti accessi sono stati fatti,
  * quanti sono arrivati sopra all'app… capiamo come migliorare»). Direzione only. Anonymous daily totals of the public
- * pages (public.scd_app_page_views_daily, r141 STAGED). Until r141 is applied the page says "Funzione in preparazione"
+ * pages (public.scd_app_page_views_daily, r143 STAGED). Until r143 is applied the page says "Funzione in preparazione"
  * and shows no number. Period 7/30/90 days in the URL (?giorni=), so a view can be shared.
  */
 export const NUMERI_PRIVACY_NOTE =
@@ -121,7 +121,7 @@ export function NumeriPage({ data }: { data: AppStatsDesk }) {
             }
           >
             {data.message ??
-              "Il conteggio parte quando la Direzione applica la migrazione r141. Fino ad allora non si conta e non si legge nulla."}
+              "Il conteggio parte quando la Direzione applica la migrazione r143. Fino ad allora non si conta e non si legge nulla."}
           </EmptyState>
         ) : s.total === 0 ? (
           <EmptyState title="Ancora nessuna visita contata in questo periodo">
@@ -156,7 +156,7 @@ export function NumeriPage({ data }: { data: AppStatsDesk }) {
           </ul>
           <SourceLine>
             Fonte: database del club, totali giornalieri per pagina, provenienza
-            e dispositivo (r141).
+            e dispositivo (r143).
           </SourceLine>
         </Card>
       </div>

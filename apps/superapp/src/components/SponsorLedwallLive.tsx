@@ -14,7 +14,7 @@ import { useNow } from "@/lib/use-spot-clock";
  * partner on air shows its poster and plays only on request). Only sponsors of lib/sponsors.ts, spots without
  * "modifiche richieste" (lib/sponsor-spots isShowable).
  */
-export function SponsorLedwallLive() {
+export function SponsorLedwallLive({ className = "mx-auto mt-14 max-w-6xl px-4" }: { className?: string } = {}) {
   const spots = spotsForLedwall();
   const now = useNow(1000, 0);
   const [paused, setPaused] = useState(false);
@@ -78,7 +78,8 @@ export function SponsorLedwallLive() {
   return (
     <section
       ref={box}
-      className="mx-auto mt-14 max-w-6xl px-4"
+      id="ledwall"
+      className={`scroll-mt-20 ${className}`}
       aria-labelledby="ledwall-title"
       data-testid="sponsor-ledwall"
     >

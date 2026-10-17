@@ -36,7 +36,7 @@ const SUB_AREA_COPY: Readonly<Record<string, { label: string; icon: AreaIcon }>>
 
 /** Plain Italian for the role ids used in the registry. */
 const ROLE_LABEL: Readonly<Record<string, string>> = {
-  "responsabile-trasporti": "responsabile trasporti",
+  "responsabile-trasporti": "Responsabile servizio pulmini",
   autista: "autisti",
   direzione: "Direzione",
   dirigenza: "Dirigenza",

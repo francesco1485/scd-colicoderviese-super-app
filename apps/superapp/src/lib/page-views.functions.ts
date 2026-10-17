@@ -1,13 +1,13 @@
 /**
- * "Numeri dell'app" on the server (UD-167, migration r141 STAGED: NOT APPLIED).
+ * "Numeri dell'app" on the server (UD-169, migration r143 STAGED: NOT APPLIED).
  *
  * trackPageView: +1 for a public page, called fire-and-forget by the browser tracker (components/PageViewTracker.tsx).
  * It calls recordPageView (page-views.server.ts), which applies a per-IP rate limit and uses the service-role client
  * (scd_track_page_view is executable by service_role only and validates everything again). It is off without
- * SCD_SUPABASE_SECRET_KEY, on the dev server and in the staging preview, and swallows every error: until r141 is
+ * SCD_SUPABASE_SECRET_KEY, on the dev server and in the staging preview, and swallows every error: until r143 is
  * applied the call simply fails and nothing happens.
  *
- * getAppStats: the Direzione's read (scd_app_stats checks the role in the database). Until r141 answers, the page
+ * getAppStats: the Direzione's read (scd_app_stats checks the role in the database). Until r143 answers, the page
  * says "Funzione in preparazione" and shows no number (unknown is never zero).
  */
 import { createServerFn } from "@tanstack/react-start";
@@ -63,7 +63,7 @@ export {
   type AppStatsDesk,
 } from "./page-views";
 
-/** True only when the Numeri dell'app page has real numbers to show to this session (r141 live, Direzione). */
+/** True only when the Numeri dell'app page has real numbers to show to this session (r143 live, Direzione). */
 export const getNumeriLive = createServerFn({ method: "GET" }).handler(
   async (): Promise<boolean> => numeriLive(),
 );

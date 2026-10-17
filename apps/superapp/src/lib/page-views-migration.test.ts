@@ -5,12 +5,12 @@ import { describe, expect, it } from "vitest";
 import { PUBLIC_PREFIXES } from "./http-policy";
 import { PAGE_DEVICES, PAGE_SOURCES, PUBLIC_PATH_SEGMENTS } from "./page-views";
 
-// r141 is exercised in PGlite by supabase/tests/r141_app_page_views.pglite.mjs (without pg_cron); here its text is
+// r143 is exercised in PGlite by supabase/tests/r143_app_page_views.pglite.mjs (without pg_cron); here its text is
 // checked for the guarantees that must never drift, and the SQL lists are compared with the TypeScript mirror.
 const read = (rel: string) =>
   readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 const sql = read(
-  "../../../../supabase/migrations/20261017_r141_app_page_views.sql",
+  "../../../../supabase/migrations/20261017_r143_app_page_views.sql",
 );
 const body = sql
   .split("\n")
@@ -18,10 +18,10 @@ const body = sql
   .join("\n");
 const quoted = (s: string) => [...s.matchAll(/'([^']+)'/g)].map((m) => m[1]);
 
-describe("r141 app page views (staged, not applied)", () => {
-  it("is staged behind 'applica r141', targets SCD PULSE only, has a rollback", () => {
+describe("r143 app page views (staged, not applied)", () => {
+  it("is staged behind 'applica r143', targets SCD PULSE only, has a rollback", () => {
     expect(sql).toMatch(/STAGED: NOT APPLIED/);
-    expect(sql).toContain('"applica r141"');
+    expect(sql).toContain('"applica r143"');
     expect(sql).toMatch(/Target: SCD PULSE \(ndevtxxijbcnskgysdit\)/);
     expect(sql).toMatch(/Never on dfnwzwutvnwiitiffwvr/);
     expect(sql).toMatch(/-- Rollback/);
@@ -86,7 +86,7 @@ describe("r141 app page views (staged, not applied)", () => {
 
   it("public allowlist, sources and devices match the TypeScript mirror and http-policy", () => {
     const allow = body.match(
-      /not \(v_segments\[1\] = any \(array\[([\s\S]*?)\]\)\)/,
+      /not exists \(select 1 from unnest\(array\[([\s\S]*?)\]\) as a\(p\)/,
     )![1]!;
     expect(quoted(allow)).toEqual([...PUBLIC_PATH_SEGMENTS]);
     // the allowlist is exactly the public prefixes of http-policy.ts, without the registration flow /entra

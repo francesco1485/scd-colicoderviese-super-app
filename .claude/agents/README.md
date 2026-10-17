@@ -1,9 +1,11 @@
 # Agenti SCD
 
-Cinquantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Cinquantasei agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
+| scd-direttore | Direttore del miglioramento: tiene l'elenco unico delle idee (docs/piattaforme/IDEE.md), ogni notte di Cantiere fa costruire una miglioria, la fa controllare due volte e apre la richiesta di pubblicazione |
+| scd-guide | Guide interattive per ruolo (prima volta e sempre in «Guida»), consigli «?» e FAQ, anche FIGC/LND/SGS con fonti |
 | scd-grafica | Disegna e migliora pagine, schermate, grafiche, partendo dalle piattaforme migliori |
 | scd-iride | Responsabile di Iride, la segreteria AI su WhatsApp: conoscenza, regole, qualità (modifiche allo scenario solo con l'ok di Francesco) |
 | scd-tavola-esatta | Riproduce le tavole approvate di Francesco come schermate vere, misurando |
@@ -58,6 +60,10 @@ Cinquantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. 
 | scd-cfo | Budget, flusso di cassa a 13 settimane, costo per atleta, scenari, indicatori |
 | scd-commerciale | SCD GROW: listino diritti, proposte, metodo di vendita, rinnovi, ritorno per gli sponsor |
 | scd-negoziazione | Comuni, federazione, scuole, partner: mappa dei rapporti, schede incontro, trattative |
+
+## Mansionario e ciclo Ufficio
+
+Ogni agente di ruolo lavora come un dipendente (Francesco 17/10/2026 11:57, UD-179): compiti quotidiani, settimanali e stagionali, cosa fa da solo, chi approva, la prova di fine lavoro e i tempi stanno in `docs/organizzazione/MANSIONARIO.md`. Tre volte al giorno `scd-regista` fa girare il ciclo «Ufficio» (skill `scd-ufficio`): legge le richieste aperte, le passa al ruolo giusto, scrive esito, prova e stato, e Iride avvisa chi ha chiesto (UD-178). Quello che si impara va nella memoria del club per stagione, `docs/memoria/` (UD-180).
 
 ## Percorso e squadre
 

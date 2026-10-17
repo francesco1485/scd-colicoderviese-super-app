@@ -11,7 +11,7 @@ import {
 import { trackPageView } from "@/lib/page-views.functions";
 
 /**
- * "Numeri dell'app" (UD-167): +1 for every public page opened, as anonymous daily totals (migration r141, STAGED).
+ * "Numeri dell'app" (UD-169): +1 for every public page opened, as anonymous daily totals (migration r143, STAGED).
  * Rendered only in the public shell of __root.tsx (never in work areas or bare pages). Browser only, fire-and-forget:
  * it never blocks the page, swallows every error, sends nothing with Do Not Track or Global Privacy Control on, and
  * stores nothing on the device (no cookie, no localStorage, no identifier). The source of the visit is computed once

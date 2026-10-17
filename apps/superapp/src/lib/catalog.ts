@@ -85,8 +85,6 @@ export const SETTORI = [
   "Altro",
 ];
 
-export const BUDGET = ["Da definire", "< 1.000 €", "1.000 – 3.000 €", "3.000 – 10.000 €", "> 10.000 €"];
-
 export const INTERESSI_ATLETA = [
   "Scuola calcio (5-10 anni)",
   "Settore giovanile (11-17 anni)",

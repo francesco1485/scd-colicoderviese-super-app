@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
@@ -109,6 +109,7 @@ function Entra() {
             </ol>
           </div>
           <p className="text-xs text-muted-foreground">La richiesta arriva alla segreteria, che ti ricontatta. Ruoli e tesseramenti li assegna solo la società.</p>
+          <p className="text-sm"><Link to="/vetta-legnone" className="font-semibold text-primary underline underline-offset-2">Scopri Vetta Legnone, la piattaforma dei calciatori</Link></p>
         </aside>
       </section>
     </main>

@@ -40,7 +40,7 @@ export interface ClassifiedRequest {
 const AREA_RULES: Array<{ area: RequestArea; re: RegExp; handler: string }> = [
   { area: "club-house", re: /lavander|pulizi|detersiv|sapone|carta igienic|bar\b|cucin|club ?house|bidon|spazzatur|rifiut/i, handler: "Responsabile Club House, pulizie e lavanderia" },
   { area: "magazzino", re: /magazzin|kit|magli|divis|pallon|pettorin|conett|cinesin|materiale sportiv|borsa medic/i, handler: "Responsabile magazzino e materiali" },
-  { area: "pulmini", re: /pulmin|autist|trasport|navett|passagg/i, handler: "Responsabile trasporti" },
+  { area: "pulmini", re: /pulmin|autist|trasport|navett|passagg/i, handler: "Responsabile servizio pulmini" },
   { area: "infermeria", re: /infermer|medic|visit|certificat|ghiaccio|fisioterap|infortun/i, handler: "Infermeria e medico sociale" },
   { area: "tesoreria", re: /quot|pagament|ricevut|rimbors|fattur|bonific|cass[ae]\b/i, handler: "Tesoreria" },
   { area: "eventi", re: /torneo|evento|festa|cena|memorial|christmas/i, handler: "Responsabile eventi" },

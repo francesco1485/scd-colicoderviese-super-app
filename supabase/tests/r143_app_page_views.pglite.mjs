@@ -1,7 +1,7 @@
-// r141 "Numeri dell'app" page-view counters — behaviour test on an in-memory Postgres (PGlite), no remote database
+// r143 "Numeri dell'app" page-view counters — behaviour test on an in-memory Postgres (PGlite), no remote database
 // touched. Run from the repository root (PGlite is not a dependency of the app, so it is installed in a throwaway folder):
 //   npm install --prefix /tmp/scd-pglite @electric-sql/pglite@0.5.10
-//   PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r141_app_page_views.pglite.mjs
+//   PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r143_app_page_views.pglite.mjs
 // Exit code 0 = every assertion passed. PGlite has no pg_cron: section 5 (the daily purge job) is cut here and checked
 // on its text by apps/superapp/src/lib/page-views-migration.test.ts; the purge function itself is exercised below.
 import { readFileSync } from "node:fs";
@@ -18,10 +18,10 @@ async function loadPGlite() {
   return (await import("@electric-sql/pglite")).PGlite;
 }
 const PGlite = await loadPGlite();
-const FULL = readFileSync(fileURLToPath(new URL("../migrations/20261017_r141_app_page_views.sql", import.meta.url)), "utf8");
+const FULL = readFileSync(fileURLToPath(new URL("../migrations/20261017_r143_app_page_views.sql", import.meta.url)), "utf8");
 const CUT = "-- ---------------------------------------------------------------- 5.";
 assert.ok(FULL.includes(CUT), "section 5 marker present");
-const R141 = `${FULL.slice(0, FULL.indexOf(CUT))}\ncommit;\n`;
+const R143 = `${FULL.slice(0, FULL.indexOf(CUT))}\ncommit;\n`;
 
 const ORG = "00000000-0000-0000-0000-000000000001";
 const DIR = "10000000-0000-0000-0000-000000000001"; // Direzione role
@@ -60,7 +60,7 @@ insert into public.scd_memberships (organization_id, user_id, role, scope, activ
 {
   const bare = new PGlite();
   await bare.exec(`create role anon; create role authenticated; create role service_role;`);
-  await assert.rejects(() => bare.exec(R141), /r141 prerequisites missing/);
+  await assert.rejects(() => bare.exec(R143), /r143 prerequisites missing/);
   await bare.exec("rollback");
   const left = await bare.query(`select to_regclass('public.scd_app_page_views_daily') t`);
   assert.equal(left.rows[0].t, null);
@@ -68,8 +68,8 @@ insert into public.scd_memberships (organization_id, user_id, role, scope, activ
 
 const db = new PGlite();
 await db.exec(setup);
-await db.exec(R141);
-await db.exec(R141); // idempotent
+await db.exec(R143);
+await db.exec(R143); // idempotent
 
 const sub = async (uid) => db.exec(`select set_config('request.jwt.claim.sub', '${uid ?? ""}', false)`);
 const asRole = async (role, uid, q, params = []) => {
@@ -195,4 +195,4 @@ assert.equal(await can("anon", "public.scd_app_page_views_purge()"), false);
 assert.equal(await can("authenticated", "public.scd_app_page_views_purge()"), false);
 assert.equal(await can("service_role", "public.scd_app_page_views_purge()"), true);
 
-console.log("r141 app page views: all assertions passed");
+console.log("r143 app page views: all assertions passed");

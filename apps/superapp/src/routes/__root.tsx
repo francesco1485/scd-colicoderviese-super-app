@@ -19,6 +19,7 @@ import { PwaManager } from "../components/PwaManager";
 import { SponsorBand } from "../components/SponsorBand";
 import { CookieConsent } from "../components/CookieConsent";
 import { PageViewTracker } from "../components/PageViewTracker";
+import { GuideTourHost } from "../components/guide/GuideTour";
 import { NextUpBar } from "../components/scd/NextUpBar";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -128,6 +129,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <GuideTourHost />
         <Scripts />
       </body>
     </html>
@@ -210,7 +212,7 @@ function RootComponent() {
       <MenuDrawer />
       <SkyChat />
       <PwaManager />
-      {/* Numeri dell'app (UD-167, r141 STAGED): anonymous daily totals of the public pages only, nothing on the device. */}
+      {/* Numeri dell'app (UD-169, r143 STAGED): anonymous daily totals of the public pages only, nothing on the device. */}
       <PageViewTracker />
     </QueryClientProvider>
   );

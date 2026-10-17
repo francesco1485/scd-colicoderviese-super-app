@@ -43,7 +43,8 @@ export type WorkAreaId =
   | "planning"
   | "struttura"
   | "intake"
-  | "numeri";
+  | "numeri"
+  | "rubrica";
 
 export interface DriveMaster {
   key: string;
@@ -123,7 +124,7 @@ const uniq = (xs: readonly string[]) => [...new Set(xs)];
 export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
   pulmini: {
     id: "pulmini", label: "Pulmini", path: pathOf("pulmini"), railId: "pulmini",
-    description: "Trasferte del weekend dal calendario ufficiale e flotta dal Master Flotta e Trasporti. Sola lettura.",
+    description: "Trasferte del weekend dal calendario ufficiale, richieste delle famiglie, corse con pulmino e autista volontario, flotta dal Master Flotta e Trasporti. Decide il Responsabile servizio pulmini.",
     sources: ["pulmini", "calendario", "inserimenti"],
     insertRoles: uniq([...registryRoles("pulmini"), "Segreteria"]),
   },
@@ -300,6 +301,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Quante pagine dell'app vengono aperte, da dove arrivano le persone (social, Google, QR) e con quale dispositivo. Solo numeri totali, nessun dato delle persone. Solo Direzione.",
     sources: ["supabase", "inserimenti"],
     insertRoles: ["Direzione"],
+  },
+  rubrica: {
+    id: "rubrica", label: "Rubrica staff", path: pathOf("rubrica"), railId: "gestionale",
+    description: "Chi fa cosa nello staff: nome, ruolo e squadra dall'organigramma. Il numero si vede solo se la persona lo ha condiviso. Ognuno vede le persone del proprio ruolo.",
+    sources: ["supabase", "elencoRuoli", "inserimenti"],
+    insertRoles: ["Direzione", "Segreteria"],
   },
   quadro: {
     id: "quadro", label: "Quadro settimanale", path: pathOf("quadro"), railId: "quadro",

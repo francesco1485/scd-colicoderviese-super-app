@@ -1,6 +1,6 @@
--- r141: "Numeri dell'app" — daily page-view COUNTERS of the public pages of the Super App (2026-10-16, chat PC range
+-- r143: "Numeri dell'app" — daily page-view COUNTERS of the public pages of the Super App (2026-10-16, chat PC range
 -- r130-r149, next after r140).
--- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r141". Never apply from an agent.
+-- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r143". Never apply from an agent.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires: r33 (scd_organizations), r35 (scd_has_org_role), r74 (scd_has_position) live; pg_cron available (r140
 -- installed it on SCD PULSE, applied 16/10/2026 20:03). A guard below stops the migration when one is missing.
@@ -12,7 +12,7 @@
 -- consent (nothing read or stored on the device, aggregated counts only). The cookie banner and /privacy were updated
 -- in the same branch (commit 11c8739; legal basis: legitimate interest in measuring the use of the public pages in
 -- aggregated form). Cookie-based statistics would still need consent (manifest rule unchanged). The counter is inert
--- until r141 exists.
+-- until r143 exists.
 --
 -- What it adds (and nothing else):
 --   1. public.scd_app_page_views_daily (day, path, source, device, views): aggregated counters only. No IP, no user
@@ -72,7 +72,7 @@ begin
   if to_regclass('public.scd_organizations') is null
      or to_regprocedure('public.scd_has_org_role(uuid, public.scd_role[])') is null
      or to_regprocedure('public.scd_has_position(uuid, text[])') is null then
-    raise exception 'r141 prerequisites missing (r33, r35, r74)';
+    raise exception 'r143 prerequisites missing (r33, r35, r74)';
   end if;
 end;
 $$;
@@ -116,13 +116,13 @@ begin
     from unnest(string_to_array(v_path, '/')) with ordinality as u(s, n)
    where s <> '';
   if cardinality(v_segments) > 8 then return; end if;
-  -- only the public pages are counted: home or an allowlisted first segment (mirror: lib/page-views.ts PUBLIC_PATH_SEGMENTS)
-  if cardinality(v_segments) > 0 and not (v_segments[1] = any (array[
-    'calendario','card','community','comunicazioni','contatti','elimina-account','eventi','fantacalcio','fornitori',
-    'guida','impianti','installa','kit','partner','privacy','rassegna-stampa','safeguarding','societa','sponsor',
-    'top11','tornei'
-  ])) then return; end if;
   v_path := '/' || array_to_string(v_segments, '/');
+  -- only the public pages are counted: home or a path equal to / below an allowlisted prefix (mirror: lib/page-views.ts PUBLIC_PATH_SEGMENTS)
+  if cardinality(v_segments) > 0 and not exists (select 1 from unnest(array[
+    'calendario','card','classifiche','community','comunicazioni','contatti','elimina-account','eventi','fantacalcio',
+    'fornitori','guida','impianti','installa','kit','partner','privacy','rassegna-stampa','safeguarding','societa',
+    'sponsor','squadre/prima','squadre/u16','squadre/u19','top11','tornei','vetta-legnone'
+  ]) as a(p) where v_path = '/' || a.p or v_path like '/' || a.p || '/%') then return; end if;
   if char_length(v_path) > 120 then return; end if;
   -- abuse cap: at most 5000 distinct rows per day
   if not exists (select 1 from public.scd_app_page_views_daily d
@@ -185,7 +185,7 @@ grant execute on function public.scd_app_page_views_purge() to service_role;
 do $$
 begin
   if not exists (select 1 from pg_available_extensions where name = 'pg_cron') then
-    raise exception 'r141: pg_cron not available on this server';
+    raise exception 'r143: pg_cron not available on this server';
   end if;
 end;
 $$;
@@ -201,10 +201,10 @@ begin
   end loop;
   perform cron.schedule('scd_app_page_views_purge', '27 1 * * *', 'select public.scd_app_page_views_purge();');
   if not has_function_privilege(current_user, 'public.scd_app_page_views_purge()', 'execute') then
-    raise exception 'r141: % cannot execute public.scd_app_page_views_purge()', current_user;
+    raise exception 'r143: % cannot execute public.scd_app_page_views_purge()', current_user;
   end if;
   if (select count(*) from cron.job where jobname = 'scd_app_page_views_purge') <> 1 then
-    raise exception 'r141: job scd_app_page_views_purge not scheduled exactly once';
+    raise exception 'r143: job scd_app_page_views_purge not scheduled exactly once';
   end if;
 end;
 $$;

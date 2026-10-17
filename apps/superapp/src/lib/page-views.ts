@@ -1,7 +1,7 @@
 /**
- * "Numeri dell'app" (UD-167, Francesco 16/10/2026 22:34: «area dove dobbiamo sapere quanti accessi sono stati fatti,
+ * "Numeri dell'app" (UD-169, Francesco 16/10/2026 22:34: «area dove dobbiamo sapere quanti accessi sono stati fatti,
  * quanti sono arrivati sopra all'app… capiamo come migliorare»). Pure rules, shared by the browser tracker, the server
- * functions and the page. Mirror of migration r141 (STAGED): the lists below are kept equal to the SQL by
+ * functions and the page. Mirror of migration r143 (STAGED): the lists below are kept equal to the SQL by
  * page-views-migration.test.ts.
  *
  * What is counted: one +1 per public page opened, as a daily total per (page, source, device). Nothing is stored on
@@ -52,14 +52,15 @@ export const DEVICE_LABEL: Readonly<Record<PageDevice, string>> = {
 };
 
 /**
- * ALLOWLIST: the only first path segments counted, besides the home "/". They are the public prefixes of
+ * ALLOWLIST: the only path prefixes counted (one or two segments), besides the home "/". They are the public prefixes of
  * http-policy.ts PUBLIC_PREFIXES without "/entra" (registration flow); everything else (work areas, reserved areas,
- * /grow, unknown paths) is never counted. Same list as r141 scd_track_page_view, kept equal by
+ * /grow, unknown paths) is never counted. Same list as r143 scd_track_page_view, kept equal by
  * page-views-migration.test.ts.
  */
 export const PUBLIC_PATH_SEGMENTS: readonly string[] = [
   "calendario",
   "card",
+  "classifiche",
   "community",
   "comunicazioni",
   "contatti",
@@ -77,12 +78,16 @@ export const PUBLIC_PATH_SEGMENTS: readonly string[] = [
   "safeguarding",
   "societa",
   "sponsor",
+  "squadre/prima",
+  "squadre/u16",
+  "squadre/u19",
   "top11",
   "tornei",
+  "vetta-legnone",
 ];
 
 export const PATH_MAX = 120;
-/** Raw input longer than this is refused before any parsing (same guard as r141). */
+/** Raw input longer than this is refused before any parsing (same guard as r143). */
 export const INPUT_MAX = 2048;
 export const PATH_MAX_SEGMENTS = 8;
 
@@ -91,9 +96,9 @@ const NUMERIC = /^[0-9]+$/;
 const PLAIN = /^[a-z0-9][a-z0-9._-]{0,59}$/;
 
 /**
- * The path as the database stores it, or null when it is not counted. Same steps as r141: query string and hash cut,
+ * The path as the database stores it, or null when it is not counted. Same steps as r143: query string and hash cut,
  * must start with "/", at most 120 characters, lower case, empty segments dropped, uuid / numeric / unusual segments
- * -> ":id", at most 8 segments, first segment in the public allowlist (or the home).
+ * -> ":id", at most 8 segments, path equal to or below a public allowlist prefix (or the home).
  */
 export function normalisePagePath(
   raw: string | null | undefined,
@@ -109,9 +114,12 @@ export function normalisePagePath(
       UUID.test(s) || NUMERIC.test(s) || !PLAIN.test(s) ? ":id" : s,
     );
   if (segments.length > PATH_MAX_SEGMENTS) return null;
-  if (segments.length > 0 && !PUBLIC_PATH_SEGMENTS.includes(segments[0]!))
-    return null;
   const path = `/${segments.join("/")}`;
+  if (
+    segments.length > 0 &&
+    !PUBLIC_PATH_SEGMENTS.some((p) => path === `/${p}` || path.startsWith(`/${p}/`))
+  )
+    return null;
   return path.length > PATH_MAX ? null : path;
 }
 
@@ -322,7 +330,7 @@ export function pageLabel(path: string): string {
 /* ------------------------------------------------------------------ page data */
 
 export const NUMERI_OFF =
-  "Funzione in preparazione: il conteggio parte quando la Direzione applica la migrazione r141.";
+  "Funzione in preparazione: il conteggio parte quando la Direzione applica la migrazione r143.";
 export const NUMERI_NO_SESSION =
   "Entra con il tuo account del club per vedere i numeri dell'app.";
 export const NUMERI_DENIED = "I numeri dell'app li vede solo la Direzione.";
@@ -333,7 +341,7 @@ export interface AppStatsDesk {
   period: StatsPeriod;
   /** Supabase configured and a signed-in session. */
   connected: boolean;
-  /** r141 answered: the numbers below are real. */
+  /** r143 answered: the numbers below are real. */
   ready: boolean;
   /** null = not read (never a list of zeros pretending to be data). */
   summary: AppStatsSummary | null;

@@ -130,7 +130,7 @@ export const SATELLITES: readonly Satellite[] = [
     slug: "pulmini",
     areaId: "pulmini",
     name: "Pulmini",
-    who: "Responsabile trasporti e autisti",
+    who: "Responsabile servizio pulmini e autisti volontari",
     promise: "Mezzi, autisti, corse e posti a sedere.",
     inside: ["Corse della settimana", "Assegnazione autisti e mezzi", "Posti e passeggeri (solo chi serve)", "Richieste e cambi"],
     source: "Master Pulmini",
