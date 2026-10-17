@@ -61,6 +61,7 @@ describe("public facility map copy (B11)", () => {
       const text = visibleTextAfterOpeningEverySpace(site.id, "public");
       const hit = text.match(INTERNAL);
       expect(hit?.[0] ?? null).toBeNull();
+      expect(text).not.toMatch(/posizione indicativo/);
     });
   }
 

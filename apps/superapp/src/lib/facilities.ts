@@ -414,14 +414,14 @@ export function slotTimes(slots: readonly TrainingSlot[], quadroDay: string): { 
 
 /* ───────────────────────── Public projection ───────────────────────── */
 
+/** Plan note for public pages (B11): the master note names design boards and technical reports, families read this. */
+export const PUBLIC_PLAN_NOTE = "Schema non in scala: serve a orientarsi, non è un rilievo.";
+
 /**
  * What the public page may show: every space with its hours and public-safe
  * fields, only entrances and routes for the public, no training-board link
  * (no team or changing-room assignments) and no responsible roles.
  */
-/** Plan note for public pages (B11): the master note names design boards and technical reports, families read this. */
-export const PUBLIC_PLAN_NOTE = "Schema non in scala: serve a orientarsi, non è un rilievo.";
-
 export function publicSite(site: Site): Site {
   return {
     ...site,

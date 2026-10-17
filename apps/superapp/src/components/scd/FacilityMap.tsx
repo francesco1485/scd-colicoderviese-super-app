@@ -4,7 +4,8 @@
  * One responsive SVG plan per site with layer toggles, a details panel (side panel on desktop,
  * bottom sheet on phones), open/closed status from the contract hours in Europe/Rome and, in the
  * staff view, the pitches and changing rooms in use from the weekly training board snapshot.
- * Data: config/scd-facilities.v1.json through src/lib/facilities.ts. Unknown renders "da inserire".
+ * Data: config/scd-facilities.v1.json through src/lib/facilities.ts. Unknown renders "da inserire" for staff and
+ * "in aggiornamento" on public pages (B11).
  */
 import { Link } from "@tanstack/react-router";
 import { Check, ClipboardCopy, Clock3, DoorOpen, ExternalLink, MapPin, Route as RouteIcon, ShieldCheck, Users, X } from "lucide-react";
@@ -520,7 +521,7 @@ function spaceAria(s: Space, use: UseEntry[], moment: ViewMoment | null, staff: 
   const status = !raw ? "stato in caricamento" : staff ? raw.label : (publicStatus(raw)?.label ?? PUBLIC_HOURS_PENDING.toLowerCase());
   const parts = [s.name, TYPE_LABEL[s.type], status];
   if (staff && s.quadro_key) parts.push(use.length ? `in uso: ${use.map((u) => u.group).join(" e ")}` : "libero in questa fascia");
-  if (s.provenance.source === "board") parts.push(staff ? "da board, da verificare" : `posizione ${PUBLIC_INDICATIVE}`);
+  if (s.provenance.source === "board") parts.push(staff ? "da board, da verificare" : "posizione indicativa");
   return parts.join(", ");
 }
 
@@ -795,7 +796,7 @@ function SpaceIndex({
                   const meta = [
                     moment ? (status?.label ?? null) : "—",
                     !s.layout ? (staff ? "posizione da inserire" : `posizione ${PUBLIC_PENDING}`) : null,
-                    s.provenance.source === "board" ? (staff ? "da verificare" : `posizione ${PUBLIC_INDICATIVE}`) : null,
+                    s.provenance.source === "board" ? (staff ? "da verificare" : s.layout ? "posizione indicativa" : null) : null,
                   ].filter((x): x is string => x !== null);
                   return (
                     <li key={s.id}>

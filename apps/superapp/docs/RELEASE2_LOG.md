@@ -1000,3 +1000,15 @@ Backlog cloud B10. Motori: PERSONE (una famiglia che apre la mappa non legge pi�
 - Calendario da correggere nel master (non modificato qui): coppa U19 del 05/09 (LND 16:00, app 19:00) e U16 del 26/09 (LND 16:00, app 17:45).
 - Motore PERSONE; misura: visite settimanali di /classifiche e del blocco Classifica delle squadre; freschezza ≤ 6 ore (≤ 1 ora nel weekend) dopo l'attivazione dello script.
 - **r116 APPLICATA** (17/10/2026 ~13:35-13:45, SCD PULSE): parti 1-2 con apply_migration; RLS, grant, 4 policy e `scd_public_lnd_results` con execute_sql. Verificato dopo: RLS attiva sulle 4 tabelle, 1 policy ciascuna, anon non inserisce, provvedimenti disciplinari non leggibili da anon, search_path della funzione con pg_temp. Lo script di lettura resta da programmare.
+
+## B11 — Testi pubblici senza codici interni: mappa impianti, /impianti, /societa · 2026-10-17
+
+Backlog cloud B11. Motore: PERSONE (una famiglia che apre /impianti legge «in aggiornamento» e «indicativo», non i «da inserire», i nomi delle board o i percorsi del repository). Misura: 0 termini interni nella mappa pubblica dopo aver aperto ogni spazio di Colico e Dervio (test di render).
+
+- Prima (VERIFIED, build locale 17/10): su /impianti, aprendo uno spazio, comparivano «posizione da inserire», «ingresso da inserire», «regole da inserire», «Da board, da verificare», «Dal master impianti», fonti delle regole come `config/superapp-areas.v1.json (biglietteria, blocker)` e `PRODUCT.md (Infermeria)`, la nota «posizioni dai board Rotazione-campi e Mappa-centro» e, in fondo, il codice del master Drive «16 - SEDI E IMPIANTI (master Drive)». /societa: «Misure dal master impianti».
+- `lib/facilities.ts`: `PUBLIC_PENDING`, `PUBLIC_INDICATIVE`, `PUBLIC_PLAN_NOTE`, `publicRuleSource()` («la società» / «la società, da confermare»); `publicSite()` sostituisce la nota della planimetria con una frase semplice.
+- `FacilityMap` in modalità pubblica: indirizzo, posizione, ingresso, chi entra, regole, legenda, chip ed etichette per lettori di schermo con le diciture pubbliche. Modalità staff invariata (serve per correggere il master).
+- /impianti: nota in fondo senza il codice del master; /societa: «dati degli impianti della società». Nessun cambio di layout.
+- Sweep di tutte le pagine pubbliche (29 indirizzi, build locale, testo visibile): nessun altro codice interno, tranne /vetta-legnone (fonti «Cervellone cartella 04», «Master Tornei e Iniziative») lasciato com'è perché la pagina è stata approvata da Francesco (#183): decide lui.
+- Test: `components/scd/FacilityMap.public-copy.test.tsx` (jsdom, apre ogni spazio dei due siti, controlla anche la modalità staff e «posizione indicativa»).
+- Revisione round 1: scd-sicurezza PASS; scd-revisore BLOCK («posizione indicativo», concordanza) → corretto, con nit (commento in testa, JSDoc, doppia dicitura posizione).
