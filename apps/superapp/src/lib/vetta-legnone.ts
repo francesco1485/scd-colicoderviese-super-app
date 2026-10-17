@@ -9,7 +9,7 @@
  *
  * Content rules (study docs/piattaforme/ricerche/vetta-legnone-studio.md, AGENTS.md principles 1-2):
  * - no individual names, no phone numbers or e-mail addresses, no market values, no votes on people;
- * - the 2011 date is where the club's digital archive starts, never the founding year (which stays uncertain);
+ * - 2011/12 is the first season documented by the club's digital archive, never the founding year (which stays uncertain);
  * - every history fact carries its source; outcomes not verified are written «da verificare»;
  * - nobody's profile is public today: scd_person_consents has 0 rows (SCD PULSE SELECT, 17/10/2026).
  * The only proper nouns allowed are club, competition, event and place names, plus Ottavio. Lario (the DS, UD-174)
@@ -120,92 +120,125 @@ export const VETTA_AUDIENCES: readonly Audience[] = vettaAudiences();
 
 export const VETTA_AUDIENCES_INTRO = "Cinque modi per salire con noi. Quello che non c'è ancora è segnato «Presto».";
 
+/** One verified highlight of an epoch: when, which team or area, what happened, and where it comes from. */
+export type Highlight = {
+  when: string;
+  category: string;
+  result: string;
+  source: string;
+  tag: Label;
+};
+
 export type Epoch = {
   id: string;
   years: string;
   title: string;
-  facts: readonly string[];
-  /** Where the facts come from (Drive Cervellone, folder 04 · STORIA SCD). */
-  source: string;
+  /** 1-2 lines of story, built only on the highlights below (no adjective that is not a fact). */
+  story: string;
+  /** 1-3 verified highlights, each with its own source. */
+  highlights: readonly Highlight[];
 };
 
 const ALBUM_V1 = "Album «STORIA SCD · stagione per stagione (v1)», Cervellone cartella 04";
 const ALBUM_2526 = "«STORIA · 2025/26 · integrazione 2026-10-13», Cervellone cartella 04";
+const EVENTS_CAL = "Calendario eventi del club (Master Tornei e Iniziative)";
 
 /**
- * Six epochs, VERIFIED from the club's history album (study §2.1). The 2011 date is where the digital archive
- * begins: the founding year is uncertain and is never stated here.
+ * Six epochs, VERIFIED from the club's history album (study §2.1), approved by Francesco (DG) on 17/10/2026 09:42
+ * («la approvo ma voglio che si migliora»). The 2011/12 season is the first one documented by the digital archive:
+ * the founding year is uncertain and is never stated here. Outcomes not verified stay «esito da verificare».
+ * No individual is named: only teams, categories, seasons, events and places.
  */
 export const VETTA_EPOCHS: readonly Epoch[] = [
   {
     id: "scuola-calcio",
     years: "2011–2015",
-    title: "Gli anni della scuola calcio",
-    facts: ["L'archivio digitale del club parte il 13/07/2011", "Liste del Settore Giovanile e Scolastico", "Fair Play 2014", "Piccoli Amici 2015"],
-    source: ALBUM_V1,
+    title: "Si parte dal campo dei più piccoli",
+    story: "La prima stagione documentata è il 2011/12. Dei primi anni l'archivio conserva le liste del Settore Giovanile e Scolastico.",
+    highlights: [
+      { when: "2011/12", category: "Società", result: "Prima stagione documentata: l'archivio digitale parte il 13/07/2011", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "2014", category: "Settore Giovanile e Scolastico", result: "Iniziativa Fair Play nell'archivio del club", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "2015", category: "Piccoli Amici", result: "Attività dei Piccoli Amici documentata", source: ALBUM_V1, tag: "VERIFIED" },
+    ],
   },
   {
     id: "tornei",
     years: "2015–2019",
-    title: "I tornei",
-    facts: ["Olginatese Cup e Vis Nova Cup", "Tornei per annata", "Torneo di Primavera ColicoDerviese"],
-    source: ALBUM_V1,
+    title: "Le annate crescono in torneo",
+    story: "Le squadre per annata giocano i loro tornei, e la ColicoDerviese ne organizza uno suo in primavera.",
+    highlights: [
+      { when: "2015–2019", category: "Settore giovanile", result: "Olginatese Cup e Vis Nova Cup", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "2015–2019", category: "Settore giovanile", result: "Torneo di Primavera ColicoDerviese", source: ALBUM_V1, tag: "VERIFIED" },
+    ],
   },
   {
     id: "elite-ripartenza",
     years: "2019–2022",
-    title: "Élite e ripartenza",
-    facts: [
-      "Richieste di Scuola Calcio Élite",
-      "Le stagioni del Covid, giocate con i protocolli",
-      "Finale di Coppa Italia di Promozione, 14/05/2022 a Meda (esito da verificare)",
-      "1° Memorial José Nasazzi, 2022",
-      "Amichevole con la Sampdoria approvata dalla FIGC (31/05/2022)",
+    title: "Élite, Covid e una finale",
+    story: "Il club chiede la Scuola Calcio Élite, le stagioni del Covid si giocano con i protocolli. Poi arriva una finale di coppa.",
+    highlights: [
+      { when: "14/05/2022", category: "Promozione", result: "Finale di Coppa Italia di Promozione a Meda (esito da verificare)", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "2022", category: "Torneo", result: "1° Memorial José Nasazzi", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "31/05/2022", category: "Amichevole", result: "Con la Sampdoria, approvata dalla FIGC", source: ALBUM_V1, tag: "VERIFIED" },
     ],
-    source: ALBUM_V1,
   },
   {
     id: "crescita",
     years: "2022–2025",
-    title: "Crescita",
-    facts: [
-      "I Torneo Città di Colico",
-      "V Memorial José Nasazzi con club professionistici",
-      "Atalanta Football Camp a Colico (2024)",
-      "Ripescaggi nei campionati regionali giovanili",
+    title: "Un torneo con i professionisti",
+    story: "Il Memorial José Nasazzi accoglie club professionistici, e alcune squadre giovanili vengono ripescate nei campionati regionali.",
+    highlights: [
+      { when: "2022–2025", category: "Torneo", result: "V Memorial José Nasazzi con club professionistici", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "2024", category: "Settore giovanile", result: "Atalanta Football Camp a Colico", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "2022–2025", category: "Campionati regionali giovanili", result: "Ripescaggi nei campionati regionali", source: ALBUM_V1, tag: "VERIFIED" },
     ],
-    source: ALBUM_V1,
   },
   {
     id: "nuovo-campo",
     years: "2025/26",
-    title: "Il nuovo campo",
-    facts: [
-      "Inaugurato il sintetico di via Lido (30/11/2025)",
-      "Prima Squadra ai play-off di Promozione, girone B",
-      "Play-off regionali per Under 17 e Under 15",
-      "1° Memorial Sandro Guattini e 6° Memorial José Nasazzi",
+    title: "Il nuovo campo e i play-off",
+    story: "Nell'anno del sintetico di via Lido, la Prima Squadra e due squadre giovanili arrivano ai play-off.",
+    highlights: [
+      { when: "30/11/2025", category: "Impianti", result: "Inaugurato il sintetico di via Lido", source: ALBUM_2526, tag: "VERIFIED" },
+      { when: "2025/26", category: "Prima Squadra · Promozione girone B", result: "Play-off di Promozione", source: ALBUM_2526, tag: "VERIFIED" },
+      { when: "2025/26", category: "Under 17 e Under 15", result: "Play-off regionali", source: ALBUM_2526, tag: "VERIFIED" },
     ],
-    source: ALBUM_2526,
   },
   {
     id: "oggi",
     years: "2026/27",
-    title: "Oggi",
-    facts: [
-      "Affiliazione con l'AC Monza",
-      "Prima Squadra in Promozione",
-      "Christmas Lario Cup, 8 dicembre 2026",
-      "7° Memorial José Nasazzi, 22–23 maggio 2027",
+    title: "La stagione da scrivere",
+    story: "Con l'affiliazione all'AC Monza e la Prima Squadra in Promozione, la stagione è appena cominciata.",
+    highlights: [
+      { when: "2026/27", category: "Società", result: "Affiliazione con l'AC Monza", source: ALBUM_2526, tag: "VERIFIED" },
+      { when: "08/12/2026", category: "Torneo", result: "Christmas Lario Cup", source: EVENTS_CAL, tag: "VERIFIED" },
+      { when: "22–23/05/2027", category: "Torneo", result: "7° Memorial José Nasazzi", source: EVENTS_CAL, tag: "VERIFIED" },
     ],
-    source: `${ALBUM_2526}; calendario eventi del club`,
   },
 ];
 
-export const VETTA_HISTORY_STATUS = "Storia in ricostruzione · da confermare dalla Direzione";
+export type Milestone = { id: string; when: string; title: string; detail: string; source: string; tag: Label };
+
+/** «Le nostre tappe»: the verified milestones of the club, in order. */
+export const VETTA_MILESTONES: readonly Milestone[] = [
+  { id: "coppa-2022", when: "14/05/2022", title: "Finale di Coppa Italia di Promozione", detail: "A Meda · esito da verificare", source: ALBUM_V1, tag: "VERIFIED" },
+  { id: "nasazzi", when: "Dal 2022", title: "Memorial José Nasazzi", detail: "1° nel 2022, 6° nel 2025/26, il 7° il 22–23/05/2027", source: `Album «STORIA SCD» v1 e integrazione 2025/26, Cervellone cartella 04; ${EVENTS_CAL}`, tag: "VERIFIED" },
+  { id: "playoff-2526", when: "2025/26", title: "Play-off di Promozione", detail: "Prima Squadra, girone B", source: ALBUM_2526, tag: "VERIFIED" },
+  { id: "guattini", when: "2025/26", title: "1° Memorial Sandro Guattini", detail: "Torneo giovanile", source: ALBUM_2526, tag: "VERIFIED" },
+];
+
+/** Approval recorded in docs/piattaforme/17-ricerca-calciatori-e-iscriviti-come-calc.md (Francesco, 17/10/2026 09:42). */
+export const VETTA_HISTORY_STATUS = "Storia approvata dalla Direzione · 17/10/2026";
 
 export const VETTA_HISTORY_NOTE =
-  "Sedici stagioni documentate, dal 2011/12 a oggi: è da lì che parte l'archivio digitale. La data di fondazione resta da ricostruire e la cerchiamo insieme a chi c'era.";
+  "Sedici stagioni documentate: la prima è il 2011/12, da quando parte l'archivio digitale del club. La data di fondazione resta da ricostruire e la cerchiamo insieme a chi c'era.";
+
+/** Closing line of the history: the next step is the visitor's, with the same CTA logic as the player audience. */
+export function vettaHistoryCta(formsLive: boolean = PUBLIC_FORMS_LIVE): { line: string; label: string; to: VettaRoute; hint: string } {
+  return formsLive
+    ? { line: "La prossima tappa la scrivi tu.", label: "Chiedi una prova", to: "/entra", hint: "Per i minori la richiesta la fa sempre il genitore" }
+    : { line: "La prossima tappa la scrivi tu.", label: "Scrivi alla società", to: "/contatti", hint: "Dai canali ufficiali del club. Per i minori scrive sempre il genitore" };
+}
 
 export type Need = { team: string; status: string; state: "da-indicare" | "da-confermare" | "aperto" };
 
@@ -300,9 +333,11 @@ export function vettaAllText(): string[] {
     ...VETTA_COUNTERS.flatMap((c) => [c.value, c.label, c.source]),
     ...[...vettaAudiences(false), ...vettaAudiences(true)].flatMap((a) => [a.who, a.invite, a.gets, a.cta.label, a.cta.hint, a.soon]),
     VETTA_AUDIENCES_INTRO,
-    ...VETTA_EPOCHS.flatMap((e) => [e.years, e.title, e.source, ...e.facts]),
+    ...VETTA_EPOCHS.flatMap((e) => [e.years, e.title, e.story, ...e.highlights.flatMap((h) => [h.when, h.category, h.result, h.source])]),
+    ...VETTA_MILESTONES.flatMap((m) => [m.when, m.title, m.detail, m.source]),
     VETTA_HISTORY_STATUS,
     VETTA_HISTORY_NOTE,
+    ...[vettaHistoryCta(false), vettaHistoryCta(true)].flatMap((c) => [c.line, c.label, c.hint]),
     ...VETTA_NEEDS.flatMap((n) => [n.team, n.status]),
     ...Object.values(VETTA_NEEDS_STATE_LABEL),
     ...VETTA_LEVELS.flatMap((l) => [l.name, l.meaning, l.how]),
@@ -324,5 +359,6 @@ export function vettaAllText(): string[] {
 /** All CTA destinations of the page. */
 export function vettaRoutes(): VettaRoute[] {
   const all = [...vettaAudiences(false), ...vettaAudiences(true)].map((a) => a.cta.to);
-  return [...new Set<VettaRoute>([...all, "/privacy"])];
+  const history = [vettaHistoryCta(false).to, vettaHistoryCta(true).to];
+  return [...new Set<VettaRoute>([...all, ...history, "/privacy"])];
 }
