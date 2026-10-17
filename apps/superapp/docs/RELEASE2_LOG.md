@@ -948,3 +948,10 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - «Già con noi»: toccando un logo si apre una scheda (`components/SponsorWall.tsx`, `lib/sponsor-profiles.ts`) con nome ufficiale (solo se verificato), settore e paese «da confermare», sito ufficiale documentato e «Grazie a … per …» solo per spot LED in rotazione o fornitura kit documentata.
 - Motore SOLDI; misura: proposte da /sponsor#proposta per pacchetto/idea (`interessi`, oggetto della mail ufficiale finché i moduli sono in pausa) e aperture della scheda partner.
 - Test: `components/sponsor-public-no-price.test.tsx` (render SSR: nessun simbolo di valuta né cifre seguite da €), `sponsor-ideas.test.ts`, `sponsor-profiles.test.ts`, aggiornati `sponsor-packages.test.ts`, `sponsor-process.test.ts`, `enea-guide.test.ts`.
+
+## 2026-10-17 — chat cloud — Tornei: Memorial José Nasazzi 2027 confermato, con Female Edition (Francesco 11:15 «nasazzi già è confermato e si lavora»; 11:16 «lascia così le locandine, fa niente»)
+
+- Supersedes the 2026-10-17 «date da confermare» status above for the Nasazzi: 7ª edizione 22–23/05/2027, Colico (Centro Sportivo Comunale – Campo TGM Montecchi), annate 2016 dilettanti e 2017 professionisti, 6 squadre confermate, co-organizzatore Sport Pro Experience; Female Edition a Dervio (Pulcini 7v7, nate 2016–2017, ammesse 2018 con 8 anni compiuti), stesse iscrizioni (`lib/tournaments.ts`, `registersWith`).
+- Locandine ufficiali pubblicate così come approvate dalla Direzione 17/10/2026 (la grafica riporta «S.D.C.»; i testi dell'app usano sempre «S.C.D. ColicoDerviese»). Le immagini mostrano il recapito pubblico dell'organizzatore.
+- «Iscrivi la squadra» apre il sito dell'organizzatore (https, nuova scheda, `rel="noopener noreferrer"`). Nessun numero di telefono nei testi.
+- Revisioni scd-revisore + scd-sicurezza: PASS × 2.

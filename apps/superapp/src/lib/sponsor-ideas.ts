@@ -79,7 +79,7 @@ function nasazziIdea(): SponsorIdea | null {
     title: t.name,
     scene: "torneo",
     where: "Al torneo storico della società",
-    community: "La 7ª edizione del torneo internazionale giovanile della società, a Colico con la Female Edition a Dervio: vivai professionistici e club del territorio.",
+    community: "La 7ª edizione del torneo internazionale giovanile della società, a Colico con la Female Edition a Dervio: squadre professionistiche e dilettantistiche.",
     gets: [
       "Il tuo nome legato all'edizione 2027 del torneo",
       "Premi e materiali del torneo con il tuo marchio, da definire insieme",
