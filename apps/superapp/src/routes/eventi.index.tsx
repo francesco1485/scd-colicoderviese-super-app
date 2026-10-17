@@ -10,6 +10,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, CalendarDays, ChevronRight, Handshake, MessageCircle, Trophy, Users } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { EneaGuide } from "@/components/scd/EneaGuide";
 import { METAL_CARD, METAL_CTA, METAL_GHOST, METAL_LABEL, METAL_WRAP, MetalHeading, MetalPageHeader } from "@/components/scd/MetalPageHeader";
 import { getPublicFeed } from "@/lib/club.functions";
 import { CHRISTMAS_LARIO_CUP as CLC } from "@/lib/events";
@@ -58,6 +59,9 @@ function Eventi() {
       <div className={`${METAL_WRAP} grid grid-cols-[minmax(0,1fr)] gap-5 pt-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 lg:pt-6`}>
         <div className="grid min-w-0 content-start gap-6 lg:gap-8">
           <KindPills />
+
+          {/* UD-149: Enea, master guide of tournaments, events and partners: one reason + one action, rotating. */}
+          <EneaGuide ctx="eventi" day={today} />
 
           <section id="tornei" aria-labelledby="eventi-tornei-t" className="scroll-mt-20" data-testid="eventi-tornei">
             <MetalHeading

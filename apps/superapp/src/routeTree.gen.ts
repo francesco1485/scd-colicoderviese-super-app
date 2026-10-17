@@ -115,6 +115,12 @@ import { Route as CrmPartnerPartnerIdRouteImport } from './routes/crm_.partner.$
 import { Route as CrmPartnerNuovoRouteImport } from './routes/crm_.partner.nuovo'
 import { Route as DirezioneAccessiPersonIdRouteImport } from './routes/direzione_.accessi_.$personId'
 import { Route as DirezionePostaCollegaRouteImport } from './routes/direzione_.posta.collega'
+import { Route as GestionalePiattaformeIndexRouteImport } from './routes/gestionale.piattaforme.index'
+import { Route as GestionalePiattaformeBandiERicercaRouteImport } from './routes/gestionale.piattaforme.bandi-e-ricerca'
+import { Route as GestionalePiattaformeConvenzioniRouteImport } from './routes/gestionale.piattaforme.convenzioni'
+import { Route as GestionalePiattaformeMagazzinoAttrezzatureRouteImport } from './routes/gestionale.piattaforme.magazzino-attrezzature'
+import { Route as GestionalePiattaformeMetaAnalisiRouteImport } from './routes/gestionale.piattaforme.meta-analisi'
+import { Route as GestionalePiattaformePalestraRouteImport } from './routes/gestionale.piattaforme.palestra'
 import { Route as GestionaleImpiantiIndexRouteImport } from './routes/gestionale_.impianti.index'
 import { Route as GestionaleImpiantiApprovazioniRouteImport } from './routes/gestionale_.impianti.approvazioni'
 import { Route as GestionaleImpiantiColicoRouteImport } from './routes/gestionale_.impianti.colico'
@@ -659,6 +665,42 @@ const DirezionePostaCollegaRoute = DirezionePostaCollegaRouteImport.update({
   path: '/direzione/posta/collega',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionalePiattaformeIndexRoute =
+  GestionalePiattaformeIndexRouteImport.update({
+    id: '/gestionale/piattaforme/',
+    path: '/gestionale/piattaforme/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeBandiERicercaRoute =
+  GestionalePiattaformeBandiERicercaRouteImport.update({
+    id: '/gestionale/piattaforme/bandi-e-ricerca',
+    path: '/gestionale/piattaforme/bandi-e-ricerca',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeConvenzioniRoute =
+  GestionalePiattaformeConvenzioniRouteImport.update({
+    id: '/gestionale/piattaforme/convenzioni',
+    path: '/gestionale/piattaforme/convenzioni',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeMagazzinoAttrezzatureRoute =
+  GestionalePiattaformeMagazzinoAttrezzatureRouteImport.update({
+    id: '/gestionale/piattaforme/magazzino-attrezzature',
+    path: '/gestionale/piattaforme/magazzino-attrezzature',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeMetaAnalisiRoute =
+  GestionalePiattaformeMetaAnalisiRouteImport.update({
+    id: '/gestionale/piattaforme/meta-analisi',
+    path: '/gestionale/piattaforme/meta-analisi',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformePalestraRoute =
+  GestionalePiattaformePalestraRouteImport.update({
+    id: '/gestionale/piattaforme/palestra',
+    path: '/gestionale/piattaforme/palestra',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GestionaleImpiantiIndexRoute = GestionaleImpiantiIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -813,11 +855,17 @@ export interface FileRoutesByFullPath {
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
+  '/gestionale/piattaforme/bandi-e-ricerca': typeof GestionalePiattaformeBandiERicercaRoute
+  '/gestionale/piattaforme/convenzioni': typeof GestionalePiattaformeConvenzioniRoute
+  '/gestionale/piattaforme/magazzino-attrezzature': typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  '/gestionale/piattaforme/meta-analisi': typeof GestionalePiattaformeMetaAnalisiRoute
+  '/gestionale/piattaforme/palestra': typeof GestionalePiattaformePalestraRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
   '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/piattaforme/': typeof GestionalePiattaformeIndexRoute
   '/gestionale/impianti/': typeof GestionaleImpiantiIndexRoute
   '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
   '/segreteria/richieste/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
@@ -928,11 +976,17 @@ export interface FileRoutesByTo {
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
+  '/gestionale/piattaforme/bandi-e-ricerca': typeof GestionalePiattaformeBandiERicercaRoute
+  '/gestionale/piattaforme/convenzioni': typeof GestionalePiattaformeConvenzioniRoute
+  '/gestionale/piattaforme/magazzino-attrezzature': typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  '/gestionale/piattaforme/meta-analisi': typeof GestionalePiattaformeMetaAnalisiRoute
+  '/gestionale/piattaforme/palestra': typeof GestionalePiattaformePalestraRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
   '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/piattaforme': typeof GestionalePiattaformeIndexRoute
   '/gestionale/impianti': typeof GestionaleImpiantiIndexRoute
   '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
   '/segreteria/richieste/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
@@ -1045,11 +1099,17 @@ export interface FileRoutesById {
   '/crm_/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione_/accessi_/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione_/posta/collega': typeof DirezionePostaCollegaRoute
+  '/gestionale/piattaforme/bandi-e-ricerca': typeof GestionalePiattaformeBandiERicercaRoute
+  '/gestionale/piattaforme/convenzioni': typeof GestionalePiattaformeConvenzioniRoute
+  '/gestionale/piattaforme/magazzino-attrezzature': typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  '/gestionale/piattaforme/meta-analisi': typeof GestionalePiattaformeMetaAnalisiRoute
+  '/gestionale/piattaforme/palestra': typeof GestionalePiattaformePalestraRoute
   '/gestionale_/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale_/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale_/impianti/dervio': typeof GestionaleImpiantiDervioRoute
   '/gestionale_/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale_/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/piattaforme/': typeof GestionalePiattaformeIndexRoute
   '/gestionale_/impianti/': typeof GestionaleImpiantiIndexRoute
   '/gestionale_/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
   '/segreteria_/richieste_/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
@@ -1163,11 +1223,17 @@ export interface FileRouteTypes {
     | '/crm/partner/nuovo'
     | '/direzione/accessi/$personId'
     | '/direzione/posta/collega'
+    | '/gestionale/piattaforme/bandi-e-ricerca'
+    | '/gestionale/piattaforme/convenzioni'
+    | '/gestionale/piattaforme/magazzino-attrezzature'
+    | '/gestionale/piattaforme/meta-analisi'
+    | '/gestionale/piattaforme/palestra'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
     | '/gestionale/impianti/dervio'
     | '/gestionale/impianti/nuova'
     | '/gestionale/impianti/simulazione'
+    | '/gestionale/piattaforme/'
     | '/gestionale/impianti/'
     | '/gestionale/distinta/$eventId/spettatori'
     | '/segreteria/richieste/$id/modulo'
@@ -1278,11 +1344,17 @@ export interface FileRouteTypes {
     | '/crm/partner/nuovo'
     | '/direzione/accessi/$personId'
     | '/direzione/posta/collega'
+    | '/gestionale/piattaforme/bandi-e-ricerca'
+    | '/gestionale/piattaforme/convenzioni'
+    | '/gestionale/piattaforme/magazzino-attrezzature'
+    | '/gestionale/piattaforme/meta-analisi'
+    | '/gestionale/piattaforme/palestra'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
     | '/gestionale/impianti/dervio'
     | '/gestionale/impianti/nuova'
     | '/gestionale/impianti/simulazione'
+    | '/gestionale/piattaforme'
     | '/gestionale/impianti'
     | '/gestionale/distinta/$eventId/spettatori'
     | '/segreteria/richieste/$id/modulo'
@@ -1394,11 +1466,17 @@ export interface FileRouteTypes {
     | '/crm_/partner/nuovo'
     | '/direzione_/accessi_/$personId'
     | '/direzione_/posta/collega'
+    | '/gestionale/piattaforme/bandi-e-ricerca'
+    | '/gestionale/piattaforme/convenzioni'
+    | '/gestionale/piattaforme/magazzino-attrezzature'
+    | '/gestionale/piattaforme/meta-analisi'
+    | '/gestionale/piattaforme/palestra'
     | '/gestionale_/impianti/approvazioni'
     | '/gestionale_/impianti/colico'
     | '/gestionale_/impianti/dervio'
     | '/gestionale_/impianti/nuova'
     | '/gestionale_/impianti/simulazione'
+    | '/gestionale/piattaforme/'
     | '/gestionale_/impianti/'
     | '/gestionale_/distinta/$eventId/spettatori'
     | '/segreteria_/richieste_/$id/modulo'
@@ -1511,6 +1589,12 @@ export interface RootRouteChildren {
   CrmPartnerNuovoRoute: typeof CrmPartnerNuovoRoute
   DirezioneAccessiPersonIdRoute: typeof DirezioneAccessiPersonIdRoute
   DirezionePostaCollegaRoute: typeof DirezionePostaCollegaRoute
+  GestionalePiattaformeBandiERicercaRoute: typeof GestionalePiattaformeBandiERicercaRoute
+  GestionalePiattaformeConvenzioniRoute: typeof GestionalePiattaformeConvenzioniRoute
+  GestionalePiattaformeMagazzinoAttrezzatureRoute: typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  GestionalePiattaformeMetaAnalisiRoute: typeof GestionalePiattaformeMetaAnalisiRoute
+  GestionalePiattaformePalestraRoute: typeof GestionalePiattaformePalestraRoute
+  GestionalePiattaformeIndexRoute: typeof GestionalePiattaformeIndexRoute
   GestionaleDistintaEventIdSpettatoriRoute: typeof GestionaleDistintaEventIdSpettatoriRoute
   SegreteriaRichiesteIdModuloRoute: typeof SegreteriaRichiesteIdModuloRoute
 }
@@ -2259,6 +2343,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirezionePostaCollegaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/piattaforme/': {
+      id: '/gestionale/piattaforme/'
+      path: '/gestionale/piattaforme'
+      fullPath: '/gestionale/piattaforme/'
+      preLoaderRoute: typeof GestionalePiattaformeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/bandi-e-ricerca': {
+      id: '/gestionale/piattaforme/bandi-e-ricerca'
+      path: '/gestionale/piattaforme/bandi-e-ricerca'
+      fullPath: '/gestionale/piattaforme/bandi-e-ricerca'
+      preLoaderRoute: typeof GestionalePiattaformeBandiERicercaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/convenzioni': {
+      id: '/gestionale/piattaforme/convenzioni'
+      path: '/gestionale/piattaforme/convenzioni'
+      fullPath: '/gestionale/piattaforme/convenzioni'
+      preLoaderRoute: typeof GestionalePiattaformeConvenzioniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/magazzino-attrezzature': {
+      id: '/gestionale/piattaforme/magazzino-attrezzature'
+      path: '/gestionale/piattaforme/magazzino-attrezzature'
+      fullPath: '/gestionale/piattaforme/magazzino-attrezzature'
+      preLoaderRoute: typeof GestionalePiattaformeMagazzinoAttrezzatureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/meta-analisi': {
+      id: '/gestionale/piattaforme/meta-analisi'
+      path: '/gestionale/piattaforme/meta-analisi'
+      fullPath: '/gestionale/piattaforme/meta-analisi'
+      preLoaderRoute: typeof GestionalePiattaformeMetaAnalisiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/palestra': {
+      id: '/gestionale/piattaforme/palestra'
+      path: '/gestionale/piattaforme/palestra'
+      fullPath: '/gestionale/piattaforme/palestra'
+      preLoaderRoute: typeof GestionalePiattaformePalestraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale_/impianti/': {
       id: '/gestionale_/impianti/'
       path: '/'
@@ -2446,6 +2572,14 @@ const rootRouteChildren: RootRouteChildren = {
   CrmPartnerNuovoRoute: CrmPartnerNuovoRoute,
   DirezioneAccessiPersonIdRoute: DirezioneAccessiPersonIdRoute,
   DirezionePostaCollegaRoute: DirezionePostaCollegaRoute,
+  GestionalePiattaformeBandiERicercaRoute:
+    GestionalePiattaformeBandiERicercaRoute,
+  GestionalePiattaformeConvenzioniRoute: GestionalePiattaformeConvenzioniRoute,
+  GestionalePiattaformeMagazzinoAttrezzatureRoute:
+    GestionalePiattaformeMagazzinoAttrezzatureRoute,
+  GestionalePiattaformeMetaAnalisiRoute: GestionalePiattaformeMetaAnalisiRoute,
+  GestionalePiattaformePalestraRoute: GestionalePiattaformePalestraRoute,
+  GestionalePiattaformeIndexRoute: GestionalePiattaformeIndexRoute,
   GestionaleDistintaEventIdSpettatoriRoute:
     GestionaleDistintaEventIdSpettatoriRoute,
   SegreteriaRichiesteIdModuloRoute: SegreteriaRichiesteIdModuloRoute,

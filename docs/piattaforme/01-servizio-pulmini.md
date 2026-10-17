@@ -1,6 +1,6 @@
 # 01 · Servizio pulmini
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-pulmini · Stato: Viva · Pagina: `/pulmini` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

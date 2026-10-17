@@ -1,6 +1,6 @@
 # 11 · Rotazione campi (Colico 1, Colico 2, Dervio)
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-impianti · Stato: Viva · Pagina: `/gestionale/impianti` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
