@@ -1,4 +1,4 @@
-# Segreteria AI · prompt Iride v5 (UD-190, UD-191) · PROPOSED — not live
+# Segreteria AI · prompt Iride v5 (UD-190, UD-191) · LIVE since 17/10/2026 18:39 («ok Iride v5»)
 
 Francesco DG 17/10/2026 17:53–18:09: «va meglio indottrinata e va ben capita la sua funzione», «non conosce tutta la
 memoria della colicoderviese vecchia e nuova», «resta stile un servizio di assistenza ma non è quello il suo lavoro»,
@@ -6,7 +6,7 @@ memoria della colicoderviese vecchia e nuova», «resta stile un servizio di ass
 di front office», «un'entità pensante e in continua evoluzione», «mente e braccio di una segreteria organizzata e di
 livello internazionale». Owner: CLOUD chat (17:58, «Questa chat, tutta»).
 
-Status: **PROPOSED**. The live scenario 7979437 runs v4 + the style fix of 17/10 01:03 (copy of the live text:
+Status: **LIVE** on scenario 7979437 since 17/10/2026 18:39 (Francesco «ok Iride v5» 18:33); live blueprint verified identical to the intended one, previous blueprint kept in the CLOUD scratchpad. Was: The live scenario 7979437 runs v4 + the style fix of 17/10 01:03 (copy of the live text:
 `system-prompt.it.md` is out of date on the STILE block; the live text is the reference for v4). v5 goes live only
 after Francesco reads it and writes his OK; the previous live blueprint is kept in the scratchpad before the change.
 
