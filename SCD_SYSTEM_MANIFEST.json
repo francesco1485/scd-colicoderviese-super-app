@@ -5313,6 +5313,15 @@
         "FONDO_SOLIDALE_SLOT (no public page in the super app yet)"
       ]
     },
+    "grow_hub": {
+      "app": "SCD_GROW_IN_CORE_SPONSOR_AREA",
+      "routes": ["/grow"],
+      "access": "SAME_GATE_AS_CRM_WORK_AREA_NOINDEX_NEVER_PUBLIC",
+      "blocks": ["GROW_BAND", "SPOT_LED_COVERAGE", "GROW_TOOLS_WITH_STATUS"],
+      "sources": ["apps/superapp/src/lib/sponsors.ts SPONSORS", "apps/superapp/src/lib/sponsor-spots.ts SPONSOR_SPOTS", "apps/superapp/src/lib/grow-hub.ts GROW_TOOLS"],
+      "rules": ["NO_SECOND_REGISTER", "NO_PROSPECT_DATA", "NO_AMOUNTS", "UNVERIFIED_NAMES_NEUTRAL_LABEL", "COUNTS_LABELLED_CALCULATED"],
+      "date": "2026-10-16"
+    },
     "partner_kit": {
       "directive": "UD-109",
       "app": "SCD_GROW_IN_CORE_SPONSOR_AREA",

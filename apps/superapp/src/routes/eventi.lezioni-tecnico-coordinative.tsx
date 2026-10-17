@@ -6,7 +6,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Phone } from "lucide-react";
 
-import { PageHero, heroOverlapCls } from "@/components/ui-kit";
+import { METAL_WRAP, MetalPageHeader } from "@/components/scd/MetalPageHeader";
 import { dayMonth } from "@/lib/initiatives";
 import { getInitiative } from "@/lib/initiatives.functions";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
@@ -41,14 +41,11 @@ function InitiativePage() {
   const item = Route.useLoaderData();
   return (
     <main data-screen="initiative" data-testid={`initiative-${item.id}`}>
-      <PageHero
-        eyebrow={`Iniziativa · fino al ${dayMonth(item.showUntil)}`}
-        title={item.title}
-      >
+      <MetalPageHeader kicker={`Iniziativa · fino al ${dayMonth(item.showUntil)}`} title={item.title}>
         {item.subtitle}
-      </PageHero>
+      </MetalPageHeader>
       <section
-        className={`${heroOverlapCls} mx-auto grid max-w-6xl gap-5 px-4 pb-10 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:items-start`}
+        className={`${METAL_WRAP} grid gap-5 pb-10 pt-4 lg:pt-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:items-start`}
       >
         <article className="card-premium grid gap-4 p-5 md:p-7">
           <div>

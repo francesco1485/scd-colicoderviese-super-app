@@ -2,6 +2,53 @@
 
 Decisione di Francesco del 16/10/2026: agenti in sequenza dall'inizio alla fine, con i passi obbligatori e quelli che migliorano; squadre in parallelo; un agente orchestrale. Il direttore d'orchestra è `scd-azioni`.
 
+## 0. Comando verticale e le 26 piattaforme (Francesco 16/10/2026 22:58 e 23:00)
+
+Struttura decisa da Francesco: **un solo link** (app.colicoderviese.it) che fa da **vetrina** della società e un **gestionale super interno** con **26 piattaforme**. «Dando verticalità al comando»: ogni ordine scende dall'alto e ogni risultato risale.
+
+| Livello | Chi | Cosa fa |
+| --- | --- | --- |
+| 1. Comando | Francesco (DG) e il Presidente | Decidono; approvano pubblicazioni, migrazioni («applica»), ruoli, soldi |
+| 2. Orchestra | scd-azioni (piano) + scd-regista (giornata) | Traducono l'ordine in lavoro, lanciano le squadre, riportano STATE / PROGRESS / BLOCKERS / NEXT |
+| 3. Direttori di settore | Persone e società: scd-segreteria · Campo: scd-squadre · Struttura e servizi: scd-impianti · Soldi: scd-cfo · Crescita e comunicazione: scd-commerciale (con scd-super-giornalista per news e social) | Coordinano le piattaforme del settore, risolvono i conflitti, fanno rapporto all'orchestra |
+| 4. Responsabili di piattaforma | uno per ciascuna delle 26 (tabella sotto) | Catena a cinque anelli (sezione 3): ingresso, responsabile, supporto, controllo, quadro generale |
+| 5. Specialisti di supporto | legale, diritto sportivo, rendicontazione, grafica, avatar, social, ledwall, google, mail, documenti, figc-lnd, sviluppo | Completano il lavoro quando il responsabile li chiama |
+| 6. Controllo | scd-revisore + scd-sicurezza (sempre), skill scd-occhio-grafico e scd-tono | Nulla va online senza PASS × 2 |
+
+| # | Piattaforma | Settore | Responsabile | Supporto principale |
+| --- | --- | --- | --- | --- |
+| 1 | Servizio pulmini | Struttura e servizi | scd-pulmini | scd-squadre, scd-tesoreria |
+| 2 | Tesoreria | Soldi | scd-tesoreria | scd-cfo, scd-rendicontazione |
+| 3 | Segreteria | Persone e società | scd-segreteria | scd-tesserati, scd-figc-lnd, scd-documenti |
+| 4 | Sponsor | Crescita e comunicazione | scd-sponsor | scd-commerciale, scd-ledwall |
+| 5 | Tornei ed eventi | Campo | scd-tornei | scd-negoziazione, scd-commerciale, scd-impianti |
+| 6 | Infermeria | Struttura e servizi | scd-infermeria | scd-legale |
+| 7 | Club House Colico e Dervio | Struttura e servizi | scd-clubhouse | scd-tesoreria, scd-community, scd-convenzioni |
+| 8 | Palestra | Struttura e servizi | scd-palestra | scd-impianti, scd-infermeria, scd-sociale |
+| 9 | Centro sportivo Colico e Dervio | Struttura e servizi | scd-impianti | scd-negoziazione |
+| 10 | Quadro allenamenti settimanale | Campo | scd-squadre | scd-atleti, scd-impianti |
+| 11 | Rotazione campi (Colico 1, Colico 2, Dervio) | Campo | scd-impianti | scd-squadre, scd-figc-lnd |
+| 12 | Nutrizionista | Struttura e servizi | scd-nutrizione | scd-infermeria, scd-legale |
+| 13 | Social e video | Crescita e comunicazione | scd-social | scd-comunicazione, scd-avatar, scd-crescita |
+| 14 | Avatar | Crescita e comunicazione | scd-avatar | scd-grafica, scd-community |
+| 15 | Fantacalcio | Campo | scd-community | scd-atleti |
+| 16 | Giochi interattivi | Crescita e comunicazione | scd-community | scd-crescita, scd-relazioni |
+| 17 | Ricerca calciatori e «iscriviti come calciatore» | Campo | scd-scouting | scd-tesserati, scd-legale (iscrizioni via Tally: chat PC) |
+| 18 | News e grandi notizie | Crescita e comunicazione | scd-super-giornalista | scd-comunicazione, scd-social |
+| 19 | Convenzioni | Crescita e comunicazione | scd-convenzioni | scd-commerciale, scd-sponsor |
+| 20 | Magazzino abbigliamento | Struttura e servizi | scd-magazzino | scd-tesoreria |
+| 21 | Magazzino attrezzature | Struttura e servizi | scd-magazzino | scd-impianti |
+| 22 | Meta: analisi andamento app e web | Crescita e comunicazione | scd-analisi | scd-crescita, scd-sviluppo |
+| 23 | Bandi e ricerca | Soldi | scd-bandi | scd-rendicontazione, scd-legale |
+| 24 | Fondo Solidale | Soldi | scd-sociale | scd-tesoreria, scd-legale |
+| 25 | Dona e adotta | Soldi | scd-sociale | scd-sponsor, scd-tesoreria |
+| 26 | Analizza e ricerca idee e sviluppo | Persone e società | scd-stratega | scd-skill, scd-crescita (skill scd-ideas-triage) |
+
+Squadre in parallelo: le piattaforme indipendenti si lavorano insieme, una per ramo; dentro una piattaforma la catena è in sequenza. Le cose chieste prima (lavanderia, pulizia, spogliatoi, affitto campi, conti correnti, enti) restano da collocare in una delle 26 su indicazione di Francesco.
+
+### Miglioramento continuo (Francesco 16/10 23:23)
+Ogni piattaforma ha una scheda viva in `docs/piattaforme/NN-*.md`, memoria del suo responsabile. Il ciclo notturno «SCD Cantiere piattaforme» (attività programmata) lavora due piattaforme per notte secondo `docs/piattaforme/ROTAZIONE.md`: stato reale → benchmark delle migliori piattaforme al mondo → nozioni con fonte → visione a 3 mesi → prossimo passo costruito su un ramo con test, foto e PASS × 2 → richieste alle altre piattaforme → riga in `REGISTRO.md`. Nulla va online senza «pubblica» di Francesco.
+
 ## 1. Sequenza (dall'idea al sito vero)
 
 | Passo | Agente | Obbligatorio? | Perché |

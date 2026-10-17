@@ -30,8 +30,8 @@ export const SPONSOR_PACKAGES = [
     id: "digital",
     nome: "Digital Partner",
     tier: "Plus",
-    pitch: "Visibilità misurabile: impression e click in app.",
-    include: ["Banner app", "Card evento", "Ticker sponsor", "Report impression"],
+    pitch: "Banner, card evento e ticker in app; impression e click da misurare.",
+    include: ["Banner app", "Card evento", "Ticker sponsor", "Report impression (quando attivo)"],
   },
   {
     id: "local",

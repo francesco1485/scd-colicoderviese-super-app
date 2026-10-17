@@ -116,11 +116,12 @@ export function configuredSiteUrl(env: Readonly<Record<string, string | undefine
 /**
  * Demo screens (demo data, "Paga ora", old e-mail + PIN wording) are not part of the launch:
  * in production they redirect to the real pages (audit 2026-10-12). Staging keeps them for comparison.
+ * /grow is no longer a demo (16/10/2026): it is the internal GROW hub behind the /crm work-area gate, so it is not
+ * redirected; people without access see the access screen, never sponsor data.
  */
 export function demoRedirect(pathname: string, production: boolean): string | null {
   if (!production) return null;
   if (pathname === "/core" || pathname.startsWith("/core/")) return "/aree";
-  if (pathname === "/grow" || pathname.startsWith("/grow/")) return "/sponsor";
   // Shop not open yet (nothing can be bought): the public link lands on the sponsor page.
   if (pathname === "/shop" || pathname.startsWith("/shop/")) return "/sponsor";
   return null;

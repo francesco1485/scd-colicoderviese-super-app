@@ -112,12 +112,15 @@ function Top11Page() {
       </div>
 
       <div className="mx-auto grid max-w-[720px] gap-3.5 px-3 pt-3.5">
-        <section className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
-          <h2 className="mb-2 mt-0 flex items-center gap-2 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]">
-            <Trophy className="size-4" aria-hidden="true" />
-            SETTIMANA {fmtWeek(data.last.weekStart).toUpperCase()}
-          </h2>
-          {data.last.top.length ? (
+        {data.last.top.length > 0 ? (
+          <section
+            className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]"
+            data-testid="top11-last"
+          >
+            <h2 className="mb-2 mt-0 flex items-center gap-2 text-[13px] font-bold tracking-[0.04em] text-[#0457af]">
+              <Trophy className="size-4" aria-hidden="true" />
+              SETTIMANA {fmtWeek(data.last.weekStart).toUpperCase()}
+            </h2>
             <ol className="m-0 grid list-none gap-1.5 p-0">
               {data.last.top.map((p, i) => (
                 <li
@@ -143,23 +146,20 @@ function Top11Page() {
                 </li>
               ))}
             </ol>
-          ) : (
-            <p className="m-0 text-[15px] text-[#3e5272]">
-              {data.last.voters
-                ? "Risultati in arrivo lunedì."
-                : "Nessun voto la scorsa settimana: la prima Top 11 esce lunedì prossimo."}
-            </p>
-          )}
-        </section>
+          </section>
+        ) : (
+          // No published Top 11 yet: the page leads with how the game works, never with an empty week (16/10/2026).
+          <HowItWorks />
+        )}
 
-        <section className="rounded-[20px] bg-[#0b2a5b] p-4 text-white">
-          <h2 className="mb-2 mt-0 text-[13px] font-bold tracking-[0.04em] text-[var(--uv-gold)]">
-            PREMI DEL MESE
-            {data.month.month
-              ? ` · ${fmtMonth(data.month.month).toUpperCase()}`
-              : ""}
-          </h2>
-          {data.month.awards.length ? (
+        {data.month.awards.length > 0 && (
+          <section className="scd-band rounded-[20px] p-4 text-white" data-testid="top11-month">
+            <h2 className="mb-2 mt-0 text-[13px] font-bold tracking-[0.04em] text-[#ffd84a]">
+              PREMI DEL MESE
+              {data.month.month
+                ? ` · ${fmtMonth(data.month.month).toUpperCase()}`
+                : ""}
+            </h2>
             <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
               {data.month.awards.map((a) => (
                 <li
@@ -183,29 +183,44 @@ function Top11Page() {
                 </li>
               ))}
             </ul>
-          ) : (
-            <p className="m-0 text-[14px] text-[#c8d8ee]">
-              Il giocatore del mese di ogni squadra esce il primo giorno del
-              mese dopo, dalla somma dei voti delle settimane. La premiazione si
-              fa una volta al mese in club house: onore e premi non in denaro.
-            </p>
-          )}
-        </section>
+          </section>
+        )}
 
         {!data.signedIn ? (
-          <section className="rounded-[20px] bg-white p-4 text-center shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
-            <p className="m-0 text-[15px] text-[#3e5272]">
-              Per votare serve un account del club: entra per dare i tuoi 3 voti.
+          <section
+            className="scd-band-sole rounded-[20px] p-4 sm:p-5"
+            aria-labelledby="top11-join-t"
+            data-testid="top11-join"
+          >
+            <p className="m-0 text-[12px] font-extrabold uppercase tracking-[0.12em] text-[#034a96]">
+              Vota anche tu
             </p>
-            <Link
-              to="/accedi"
-              className="scd-focus mt-3 inline-flex h-11 items-center rounded-[12px] bg-[var(--uv-gold)] px-5 font-bold text-[#0b1e3a]"
-            >
-              Entra
-            </Link>
+            <h2 id="top11-join-t" className="m-0 mt-1 font-uv text-[24px] uppercase leading-none">
+              Serve un account del club
+            </h2>
+            <p className="m-0 mt-2 text-[15px] leading-snug text-[#1c2c50]">
+              Lo crei con la tua e-mail: poi dai i tuoi 3 voti ogni settimana e trovi calendario,
+              fantacalcio e community.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2.5">
+              <Link
+                to="/registrati"
+                className="scd-navy-btn scd-focus inline-flex h-12 flex-1 items-center justify-center rounded-[12px] px-5 font-bold sm:flex-none"
+              >
+                Registrati
+              </Link>
+              <Link
+                to="/accedi"
+                search={{ next: "/top11" }}
+                className="scd-focus inline-flex h-12 flex-1 items-center justify-center rounded-[12px] border-2 border-[#13254d] px-5 font-bold text-[#13254d] sm:flex-none"
+              >
+                Entra
+              </Link>
+            </div>
           </section>
         ) : (
           <>
+            {byTeam.length > 0 && (
             <div className="flex items-center justify-between rounded-[14px] bg-[#0b2a5b] px-4 py-3 text-white">
               <span className="text-[15px] font-bold">
                 I tuoi voti di questa settimana
@@ -215,9 +230,10 @@ function Top11Page() {
                 <span className="text-[16px] text-white/70">/3</span>
               </span>
             </div>
+            )}
             {byTeam.length === 0 && (
-              <p className="m-0 rounded-[14px] bg-white p-4 text-[15px] text-[#3e5272]">
-                Nessun giocatore votabile al momento.
+              <p className="m-0 text-[13.5px] text-[#3e5272]">
+                Le liste dei giocatori votabili si aprono con le gare della settimana.
               </p>
             )}
             {byTeam.map(({ team, list }) => (
@@ -274,5 +290,43 @@ function Top11Page() {
       </div>
       <SkyCameo message={sky} onClose={() => setSky(null)} />
     </main>
+  );
+}
+
+/** How the Top 11 works: shown first while no week has been published yet. */
+function HowItWorks() {
+  const steps = [
+    { t: "3 voti a testa", d: "Ogni account del club dà 3 voti ai giocatori delle squadre agonistiche." },
+    { t: "Il lunedì la Top 11", d: "I conteggi della settimana restano chiusi; la classifica esce il lunedì." },
+    { t: "Il giocatore del mese", d: "Il primo giorno del mese, dalla somma delle settimane, per ogni squadra." },
+    { t: "Premiazione in club house", d: "Una volta al mese: onore e premi non in denaro." },
+  ] as const;
+  return (
+    <section
+      className="rounded-[20px] bg-white p-4 shadow-[0_2px_10px_rgb(11_42_91/0.08)] sm:p-5"
+      aria-labelledby="top11-how-t"
+      data-testid="top11-how"
+    >
+      <h2 id="top11-how-t" className="m-0 flex items-center gap-2 text-[13px] font-bold tracking-[0.04em] text-[#0457af]">
+        <Trophy className="size-4" aria-hidden="true" />
+        COME FUNZIONA
+      </h2>
+      <ol className="m-0 mt-3 grid list-none gap-3 p-0 sm:grid-cols-2">
+        {steps.map((s, i) => (
+          <li key={s.t} className="flex items-start gap-3">
+            <span
+              aria-hidden="true"
+              className="scd-band grid size-9 shrink-0 place-items-center rounded-full font-uv text-[18px] text-[#ffd84a]"
+            >
+              {i + 1}
+            </span>
+            <span className="min-w-0">
+              <b className="block text-[15.5px] leading-tight">{s.t}</b>
+              <span className="block text-[13.5px] leading-snug text-[#3e5272]">{s.d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
