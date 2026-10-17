@@ -39,6 +39,8 @@ import {
   type PublicSocial,
 } from "@/lib/social.functions";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
+import { getDocLamp } from "@/lib/my-documents.functions";
+import type { Lamp } from "@/lib/my-documents";
 import { itemState, orderTeams } from "@/lib/universe";
 
 /**
@@ -48,12 +50,13 @@ import { itemState, orderTeams } from "@/lib/universe";
  */
 export const Route = createFileRoute("/la-mia-scd")({
   loader: async () => {
-    const [session, social, calendar, myPosts, birthdays] = await Promise.all([
+    const [session, social, calendar, myPosts, birthdays, docLamp] = await Promise.all([
       getSession(),
       getPublicSocial(),
       getPublicCalendarSnapshot(),
       getMyPosts(),
       getBirthdays(),
+      getDocLamp(),
     ]);
     const serverNow = Date.now();
     const today =
@@ -66,6 +69,7 @@ export const Route = createFileRoute("/la-mia-scd")({
       events: calendar.events,
       myPosts,
       birthdays,
+      docLamp,
       serverNow,
       today,
     };
@@ -99,6 +103,7 @@ function MyPage() {
     events,
     myPosts,
     birthdays,
+    docLamp,
     serverNow,
     today,
   } = Route.useLoaderData();
@@ -122,6 +127,7 @@ function MyPage() {
       events={events}
       myPosts={myPosts}
       birthdays={birthdays}
+      docLamp={docLamp}
       serverNow={serverNow}
       today={today}
     />
@@ -135,6 +141,7 @@ function Inside({
   events,
   myPosts,
   birthdays,
+  docLamp,
   serverNow,
   today,
 }: {
@@ -144,6 +151,7 @@ function Inside({
   events: PublicEvent[];
   myPosts: Post[];
   birthdays: Birthday[];
+  docLamp: Lamp | null;
   serverNow: number;
   today: string;
 }) {
@@ -197,6 +205,7 @@ function Inside({
     bg: string;
     fg?: string;
     dot?: boolean;
+    alert?: string;
   }[] = [
     {
       to: "/calendario",
@@ -213,7 +222,15 @@ function Inside({
       fg: "#0b1e3a",
     },
     { to: "/pulmini", label: "Pulmini", icon: Bus, bg: "#2ba36b" },
-    { to: "/documenti", label: "Documenti", icon: FileText, bg: "#7654b8" },
+    {
+      to: "/documenti",
+      label: "Documenti",
+      icon: FileText,
+      bg: "#7654b8",
+      // «Lampadina» (r142): expired or expiring documents and open requests of the family.
+      dot: (docLamp?.total ?? 0) > 0,
+      ...(docLamp && docLamp.total > 0 ? { alert: `${docLamp.total} documenti da sistemare` } : {}),
+    },
     {
       to: "/crea",
       label: "I miei post",
@@ -280,6 +297,7 @@ function Inside({
                 <t.icon className="size-6" aria-hidden="true" />
               </span>
               <b className="text-[14px] leading-tight">{t.label}</b>
+              {t.alert && <span className="sr-only">{t.alert}</span>}
               {t.dot && (
                 <span
                   aria-hidden="true"

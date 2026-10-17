@@ -260,6 +260,8 @@ export const WORK_AREA_IDS: readonly string[] = [
   "planning",
   // Vetrina richieste (UD-163, Francesco 16/10/2026 15:44): one catalogue of external requests, r139 STAGED.
   "intake",
+  // I miei documenti, office side (Francesco 16/10/2026): verify uploads and ask documents, r142 STAGED.
+  "documenti-soci",
 ];
 
 /**

@@ -102,6 +102,7 @@ const AREA_BADGE: Readonly<Record<string, InternalBadgeId>> = {
   segreteria: "area-segreteria",
   persone: "area-segreteria",
   certificati: "area-segreteria",
+  "documenti-soci": "area-segreteria",
 };
 
 export function areaBadgeFor(areaId: string | null | undefined): InternalBadge | undefined {
