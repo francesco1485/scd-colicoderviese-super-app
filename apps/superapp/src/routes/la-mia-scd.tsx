@@ -16,7 +16,9 @@ import { useEffect, useMemo, useState } from "react";
 
 import { DeleteAccountCard } from "@/components/scd/DeleteAccountCard";
 import { JoinClubScreen } from "@/components/scd/JoinClub";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { RequestsToConfirmCard } from "@/components/scd/RequestsToConfirmCard";
+import { MyNumberCard } from "@/components/scd/StaffDirectory";
 import { FollowButton } from "@/components/universe/Feed";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { getSession, type SessionView } from "@/lib/auth.functions";
@@ -309,6 +311,7 @@ function Inside({
         </div>
 
         <RequestsToConfirmCard />
+        <MyNumberCard />
 
         <section className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
           <h2 className="mb-2.5 mt-0 text-[13px] font-bold tracking-[0.04em] text-[#1e7fd8]">
@@ -456,6 +459,7 @@ function Inside({
         </Link>
         <DeleteAccountCard email={session.user?.email ?? ""} />
       </div>
+      <GuideTourAuto role="calciatori" />
     </main>
   );
 }

@@ -330,6 +330,9 @@ describe("palinsesto", () => {
   it("Memorial Nasazzi peaks from its recorded date only", () => {
     const n = VETRINA_SLOTS.find((s) => s.id === "nasazzi")!;
     expect(n).toBeDefined();
+    // Confirmed by the Direzione 17/10/2026: no «da confermare» left in the slot.
+    expect(n.text).not.toMatch(/da confermare/);
+    expect(n.cta).toBe("Scopri il torneo");
     expect(inPeak(n, "2027-04-20")).toBe(true);
     expect(inPeak(n, "2026-10-20")).toBe(false);
     expect(

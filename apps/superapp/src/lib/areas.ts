@@ -262,6 +262,8 @@ export const WORK_AREA_IDS: readonly string[] = [
   "intake",
   // I miei documenti, office side (Francesco 16/10/2026): verify uploads and ask documents, r142 STAGED.
   "documenti-soci",
+  // Rubrica staff (UD-167, Francesco 17/10/2026 11:11): who does what, numbers only with consent, r141 STAGED.
+  "rubrica",
 ];
 
 /**

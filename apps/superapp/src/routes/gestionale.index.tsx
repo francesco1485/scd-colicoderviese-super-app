@@ -2,6 +2,7 @@ import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { IntakeEntry } from "@/components/intake/IntakeViews";
 import { getIntakeSummary, type IntakeSummary } from "@/lib/intake.functions";
 import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -12,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Grid2x2,
   LayoutGrid,
   MapPinned,
 } from "lucide-react";
@@ -19,6 +21,7 @@ import { useMemo, useState } from "react";
 
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { areaBadgeFor } from "@/lib/internal-badges";
+import { HUB_PATH, statusCounts } from "@/lib/piattaforme";
 import {
   Card,
   Chip,
@@ -180,6 +183,8 @@ function GestionalePage() {
       <div className="flex flex-col gap-[18px]">
         {/* Vetrina richieste (UD-163): first block of the gestionale wall. */}
         <IntakeEntry summary={intake} />
+
+        <PiattaformeEntry />
 
         <SnapshotNotice>
           Calendario ufficiale {season}: copia del{" "}
@@ -466,6 +471,28 @@ function GestionalePage() {
 const colorOrNull = (m: Map<string, string>, id: string | null) =>
   id ? (m.get(id) ?? null) : null;
 
+/** Entry to the hub of the 26 platforms (SCD_COMANDI_PERMANENTI §1): grouped by the 5 sectors. */
+function PiattaformeEntry() {
+  const c = statusCounts();
+  return (
+    <Link
+      to={HUB_PATH}
+      className="scd-focus flex flex-wrap items-center gap-4 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 shadow-[var(--in-card-shadow)] transition-colors duration-150 hover:bg-[var(--in-info-bg)] sm:flex-nowrap sm:px-6"
+    >
+      <span className="flex size-12 flex-none items-center justify-center rounded-xl bg-[var(--in-action)] text-[var(--in-ink)]">
+        <Grid2x2 className="size-6" strokeWidth={1.8} aria-hidden="true" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[18px] font-bold leading-tight">Le 26 piattaforme</span>
+        <span className="mt-1 block text-[14.5px] leading-snug text-[var(--in-sub)]">
+          {c.live} attive · {c.parziale} in parte · {c["in-costruzione"]} in costruzione, divise nei 5 settori
+        </span>
+      </span>
+      <ChevronRight className="size-5 flex-none text-[var(--in-info)]" strokeWidth={2.2} aria-hidden="true" />
+    </Link>
+  );
+}
+
 /** Entry to "Attività in struttura": shifts, openings, evening activities and Club House evenings per site. */
 function StrutturaEntry() {
   return (
@@ -694,6 +721,7 @@ function GestionalePageGate() {
     <WorkAreaGateView id="gestionale" gate={gate}>
       {gate.preview && <StagingBanner />}
       <GestionalePage />
+      {!gate.preview && <GuideTourAuto role="dirigenti" />}
     </WorkAreaGateView>
   );
 }

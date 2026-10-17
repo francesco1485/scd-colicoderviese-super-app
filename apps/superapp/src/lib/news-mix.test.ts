@@ -173,19 +173,28 @@ describe("news mix", () => {
 });
 
 describe("tornei hub", () => {
-  it("lists the Christmas Lario Cup twice (maschile and femminile), Nasazzi and Guattini, without invented details", () => {
+  it("lists the Christmas Lario Cup and the Memorial Nasazzi twice (maschile and femminile) and Guattini, without invented details", () => {
     const ids = TOURNAMENTS.map((t) => t.id);
     expect(ids).toEqual([
       "christmas-lario-cup-maschile",
       "christmas-lario-cup-female",
       "memorial-jose-nasazzi",
+      "memorial-jose-nasazzi-female",
       "memorial-sandro-guattini",
     ]);
     const nas = TOURNAMENTS[2]!;
-    expect(nas.status).toBe("DATE_DA_CONFERMARE");
-    expect(nas.categories).toEqual([]);
-    expect(nas.confirmedTeams).toEqual([]);
-    expect(TOURNAMENTS[3]!.when).toBeNull();
+    // Confirmed by the Direzione 17/10/2026 with the official posters of the 7th edition.
+    expect(nas.status).toBe("ISCRIZIONI_APERTE");
+    expect(nas.when).toBe("22–23 maggio 2027");
+    expect(nas.annate?.map((a) => a.big)).toEqual(["2016", "2017"]);
+    expect(nas.confirmedTeams).toEqual(["Sporting Braga", "Spezia", "Renate", "AlbinoLeffe", "Calcio Lecco", "Folgore Caratese"]);
+    expect(nas.startAt).toBeUndefined();
+    const fem = TOURNAMENTS[3]!;
+    expect(fem.section).toBe("Femminile");
+    expect(fem.place).toBe("Dervio (LC) · Centro Sportivo Comunale");
+    expect(fem.confirmedTeams).toEqual([]);
+    expect(fem.registersWith).toBe(nas.id);
+    expect(TOURNAMENTS[4]!.when).toBeNull();
     for (const to of tournamentRoutes()) expect(routes.has(to), to).toBe(true);
     for (const t of TOURNAMENTS)
       if (t.poster)
@@ -202,6 +211,7 @@ describe("tornei hub", () => {
     expect(after).not.toContain("christmas-lario-cup-maschile");
     expect(after).toEqual([
       "memorial-jose-nasazzi",
+      "memorial-jose-nasazzi-female",
       "memorial-sandro-guattini",
     ]);
   });

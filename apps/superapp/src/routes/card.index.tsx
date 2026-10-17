@@ -1,17 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronRight, Store } from "lucide-react";
 
+import { CardAdditionsCard, ConvenzioniPublicCard } from "@/components/scd/ClubCatalogPublic";
 import { ClubCardFace, ClubCardRules } from "@/components/scd/ClubCards";
+import { catalogWithin } from "@/lib/club-catalog";
+import { getPublicClubCatalog } from "@/lib/club-catalog.functions";
 import { CLUB_CARDS, activationText } from "@/lib/club-cards";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 
 /** /card — the three club cards 2026/27 (Direzione 13/10/2026). Public, no personal data. */
 export const Route = createFileRoute("/card/")({
+  // Convenzioni and card additions entered in the gestionale (r115): published rows only, "da confermare" otherwise.
+  loader: async () => ({ catalog: await catalogWithin(getPublicClubCatalog(), { ready: false, entries: [] }) }),
   head: () => pageHead(PUBLIC_PAGES.card),
   component: CardIndexPage,
 });
 
 function CardIndexPage() {
+  const { catalog } = Route.useLoaderData();
   return (
     <main className="scd-interior min-h-screen bg-[var(--in-ground)] pb-24 lg:pb-12">
       <section className="relative isolate overflow-hidden bg-[var(--scd-navy)] text-white">
@@ -50,6 +56,8 @@ function CardIndexPage() {
           ))}
         </ul>
         <ClubCardRules />
+        <CardAdditionsCard entries={catalog.entries} />
+        <ConvenzioniPublicCard entries={catalog.entries} />
         <p className="m-0 text-[13px] leading-snug text-[var(--in-sub)]">
           Fonte: policy card della Direzione e regole di biglietteria confermate. La data di scadenza della card è da confermare. Nessun dato personale in questa
           pagina.

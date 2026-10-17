@@ -7,6 +7,8 @@ No remote database is touched. PGlite is not a dependency of the app: install it
 ```sh
 npm install --prefix /tmp/scd-pglite @electric-sql/pglite@0.5.10
 PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r138_position_catalog.pglite.mjs
+PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r114_transport_ack.pglite.mjs
+PGLITE_DIR=/tmp/scd-pglite node supabase/tests/r115_club_catalog.pglite.mjs
 for t in supabase/tests/*.pglite.mjs; do PGLITE_DIR=/tmp/scd-pglite node "$t" || echo "FAIL $t"; done
 ```
 

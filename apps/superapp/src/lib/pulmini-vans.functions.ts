@@ -22,7 +22,7 @@ import { buildVanPlan, type RawRider, type RawStop, type SlotInput, type VanPlan
 import { PULMINI_DEMAND } from "./roster-aggregates";
 import { serverSupabase } from "./supabase.server";
 
-export const NAMES_LOCKED_NOTE = "Nomi visibili solo con accesso del responsabile trasporti.";
+export const NAMES_LOCKED_NOTE = "Nomi visibili solo con accesso del Responsabile servizio pulmini o degli autisti.";
 export const NAMES_NOT_COPIED_NOTE = "I nomi dei ragazzi non sono ancora copiati dal Master Pulmini: si vedono quando la copia con i nomi è attiva (aggiornamento r99).";
 
 export function slotInputs(slots: readonly TrainingSlot[]): SlotInput[] {

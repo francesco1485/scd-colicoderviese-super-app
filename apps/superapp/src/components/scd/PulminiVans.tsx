@@ -212,7 +212,7 @@ export function VanDetailPanel({ van, plan }: { van: VanDetail; plan: VanPlan })
           </div>
           <div className="col-span-2 rounded-lg bg-[var(--in-info-bg)] px-2.5 py-1.5">
             <dt className="text-[12px] text-[var(--in-sub)]">Autista</dt>
-            <dd className="m-0 font-bold leading-tight">Autista volontario del club, assegnato dal responsabile trasporti</dd>
+            <dd className="m-0 font-bold leading-tight">Autista volontario del club, assegnato dal Responsabile servizio pulmini</dd>
           </div>
         </dl>
       </div>

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AllenamentiRouteImport } from './routes/allenamenti'
 import { Route as CalendarioRouteImport } from './routes/calendario'
+import { Route as ClassificheRouteImport } from './routes/classifiche'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ComunicazioniRouteImport } from './routes/comunicazioni'
 import { Route as ContattiRouteImport } from './routes/contatti'
@@ -48,6 +49,7 @@ import { Route as SquadreRouteImport } from './routes/squadre'
 import { Route as TesoreriaRouteImport } from './routes/tesoreria'
 import { Route as Top11RouteImport } from './routes/top11'
 import { Route as TorneiRouteImport } from './routes/tornei'
+import { Route as VettaLegnoneRouteImport } from './routes/vetta-legnone'
 import { Route as AccediIndexRouteImport } from './routes/accedi.index'
 import { Route as AccediCompletaRouteImport } from './routes/accedi.completa'
 import { Route as AccediConfermaRouteImport } from './routes/accedi.conferma'
@@ -80,7 +82,9 @@ import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
 import { Route as GestionalePlanningRouteImport } from './routes/gestionale.planning'
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
+import { Route as GestionalePulminiRouteImport } from './routes/gestionale.pulmini'
 import { Route as GestionaleRichiesteRouteImport } from './routes/gestionale.richieste'
+import { Route as GestionaleRubricaRouteImport } from './routes/gestionale.rubrica'
 import { Route as GestionaleStrutturaRouteImport } from './routes/gestionale.struttura'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as LaMiaScdCampioneRouteImport } from './routes/la-mia-scd_.campione'
@@ -115,6 +119,12 @@ import { Route as CrmPartnerPartnerIdRouteImport } from './routes/crm_.partner.$
 import { Route as CrmPartnerNuovoRouteImport } from './routes/crm_.partner.nuovo'
 import { Route as DirezioneAccessiPersonIdRouteImport } from './routes/direzione_.accessi_.$personId'
 import { Route as DirezionePostaCollegaRouteImport } from './routes/direzione_.posta.collega'
+import { Route as GestionalePiattaformeIndexRouteImport } from './routes/gestionale.piattaforme.index'
+import { Route as GestionalePiattaformeBandiERicercaRouteImport } from './routes/gestionale.piattaforme.bandi-e-ricerca'
+import { Route as GestionalePiattaformeConvenzioniRouteImport } from './routes/gestionale.piattaforme.convenzioni'
+import { Route as GestionalePiattaformeMagazzinoAttrezzatureRouteImport } from './routes/gestionale.piattaforme.magazzino-attrezzature'
+import { Route as GestionalePiattaformeMetaAnalisiRouteImport } from './routes/gestionale.piattaforme.meta-analisi'
+import { Route as GestionalePiattaformePalestraRouteImport } from './routes/gestionale.piattaforme.palestra'
 import { Route as GestionaleImpiantiIndexRouteImport } from './routes/gestionale_.impianti.index'
 import { Route as GestionaleImpiantiApprovazioniRouteImport } from './routes/gestionale_.impianti.approvazioni'
 import { Route as GestionaleImpiantiColicoRouteImport } from './routes/gestionale_.impianti.colico'
@@ -137,6 +147,11 @@ const AllenamentiRoute = AllenamentiRouteImport.update({
 const CalendarioRoute = CalendarioRouteImport.update({
   id: '/calendario',
   path: '/calendario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassificheRoute = ClassificheRouteImport.update({
+  id: '/classifiche',
+  path: '/classifiche',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
@@ -319,6 +334,11 @@ const TorneiRoute = TorneiRouteImport.update({
   path: '/tornei',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VettaLegnoneRoute = VettaLegnoneRouteImport.update({
+  id: '/vetta-legnone',
+  path: '/vetta-legnone',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccediIndexRoute = AccediIndexRouteImport.update({
   id: '/accedi/',
   path: '/accedi/',
@@ -482,9 +502,19 @@ const GestionalePostaRoute = GestionalePostaRouteImport.update({
   path: '/gestionale/posta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionalePulminiRoute = GestionalePulminiRouteImport.update({
+  id: '/gestionale/pulmini',
+  path: '/gestionale/pulmini',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleRichiesteRoute = GestionaleRichiesteRouteImport.update({
   id: '/gestionale/richieste',
   path: '/gestionale/richieste',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestionaleRubricaRoute = GestionaleRubricaRouteImport.update({
+  id: '/gestionale/rubrica',
+  path: '/gestionale/rubrica',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestionaleStrutturaRoute = GestionaleStrutturaRouteImport.update({
@@ -659,6 +689,42 @@ const DirezionePostaCollegaRoute = DirezionePostaCollegaRouteImport.update({
   path: '/direzione/posta/collega',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionalePiattaformeIndexRoute =
+  GestionalePiattaformeIndexRouteImport.update({
+    id: '/gestionale/piattaforme/',
+    path: '/gestionale/piattaforme/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeBandiERicercaRoute =
+  GestionalePiattaformeBandiERicercaRouteImport.update({
+    id: '/gestionale/piattaforme/bandi-e-ricerca',
+    path: '/gestionale/piattaforme/bandi-e-ricerca',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeConvenzioniRoute =
+  GestionalePiattaformeConvenzioniRouteImport.update({
+    id: '/gestionale/piattaforme/convenzioni',
+    path: '/gestionale/piattaforme/convenzioni',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeMagazzinoAttrezzatureRoute =
+  GestionalePiattaformeMagazzinoAttrezzatureRouteImport.update({
+    id: '/gestionale/piattaforme/magazzino-attrezzature',
+    path: '/gestionale/piattaforme/magazzino-attrezzature',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformeMetaAnalisiRoute =
+  GestionalePiattaformeMetaAnalisiRouteImport.update({
+    id: '/gestionale/piattaforme/meta-analisi',
+    path: '/gestionale/piattaforme/meta-analisi',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const GestionalePiattaformePalestraRoute =
+  GestionalePiattaformePalestraRouteImport.update({
+    id: '/gestionale/piattaforme/palestra',
+    path: '/gestionale/piattaforme/palestra',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GestionaleImpiantiIndexRoute = GestionaleImpiantiIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -710,6 +776,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
+  '/classifiche': typeof ClassificheRoute
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
@@ -746,6 +813,7 @@ export interface FileRoutesByFullPath {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/vetta-legnone': typeof VettaLegnoneRoute
   '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
@@ -772,7 +840,9 @@ export interface FileRoutesByFullPath {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
@@ -813,11 +883,17 @@ export interface FileRoutesByFullPath {
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
+  '/gestionale/piattaforme/bandi-e-ricerca': typeof GestionalePiattaformeBandiERicercaRoute
+  '/gestionale/piattaforme/convenzioni': typeof GestionalePiattaformeConvenzioniRoute
+  '/gestionale/piattaforme/magazzino-attrezzature': typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  '/gestionale/piattaforme/meta-analisi': typeof GestionalePiattaformeMetaAnalisiRoute
+  '/gestionale/piattaforme/palestra': typeof GestionalePiattaformePalestraRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
   '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/piattaforme/': typeof GestionalePiattaformeIndexRoute
   '/gestionale/impianti/': typeof GestionaleImpiantiIndexRoute
   '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
   '/segreteria/richieste/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
@@ -826,6 +902,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
+  '/classifiche': typeof ClassificheRoute
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
@@ -862,6 +939,7 @@ export interface FileRoutesByTo {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/vetta-legnone': typeof VettaLegnoneRoute
   '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
@@ -888,7 +966,9 @@ export interface FileRoutesByTo {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
@@ -928,11 +1008,17 @@ export interface FileRoutesByTo {
   '/crm/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione/accessi/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione/posta/collega': typeof DirezionePostaCollegaRoute
+  '/gestionale/piattaforme/bandi-e-ricerca': typeof GestionalePiattaformeBandiERicercaRoute
+  '/gestionale/piattaforme/convenzioni': typeof GestionalePiattaformeConvenzioniRoute
+  '/gestionale/piattaforme/magazzino-attrezzature': typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  '/gestionale/piattaforme/meta-analisi': typeof GestionalePiattaformeMetaAnalisiRoute
+  '/gestionale/piattaforme/palestra': typeof GestionalePiattaformePalestraRoute
   '/gestionale/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale/impianti/dervio': typeof GestionaleImpiantiDervioRoute
   '/gestionale/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/piattaforme': typeof GestionalePiattaformeIndexRoute
   '/gestionale/impianti': typeof GestionaleImpiantiIndexRoute
   '/gestionale/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
   '/segreteria/richieste/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
@@ -942,6 +1028,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
+  '/classifiche': typeof ClassificheRoute
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
@@ -978,6 +1065,7 @@ export interface FileRoutesById {
   '/tesoreria': typeof TesoreriaRoute
   '/top11': typeof Top11Route
   '/tornei': typeof TorneiRoute
+  '/vetta-legnone': typeof VettaLegnoneRoute
   '/accedi/completa': typeof AccediCompletaRoute
   '/accedi/conferma': typeof AccediConfermaRoute
   '/accedi/password': typeof AccediPasswordRoute
@@ -1004,7 +1092,9 @@ export interface FileRoutesById {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd_/campione': typeof LaMiaScdCampioneRoute
@@ -1045,11 +1135,17 @@ export interface FileRoutesById {
   '/crm_/partner/nuovo': typeof CrmPartnerNuovoRoute
   '/direzione_/accessi_/$personId': typeof DirezioneAccessiPersonIdRoute
   '/direzione_/posta/collega': typeof DirezionePostaCollegaRoute
+  '/gestionale/piattaforme/bandi-e-ricerca': typeof GestionalePiattaformeBandiERicercaRoute
+  '/gestionale/piattaforme/convenzioni': typeof GestionalePiattaformeConvenzioniRoute
+  '/gestionale/piattaforme/magazzino-attrezzature': typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  '/gestionale/piattaforme/meta-analisi': typeof GestionalePiattaformeMetaAnalisiRoute
+  '/gestionale/piattaforme/palestra': typeof GestionalePiattaformePalestraRoute
   '/gestionale_/impianti/approvazioni': typeof GestionaleImpiantiApprovazioniRoute
   '/gestionale_/impianti/colico': typeof GestionaleImpiantiColicoRoute
   '/gestionale_/impianti/dervio': typeof GestionaleImpiantiDervioRoute
   '/gestionale_/impianti/nuova': typeof GestionaleImpiantiNuovaRoute
   '/gestionale_/impianti/simulazione': typeof GestionaleImpiantiSimulazioneRoute
+  '/gestionale/piattaforme/': typeof GestionalePiattaformeIndexRoute
   '/gestionale_/impianti/': typeof GestionaleImpiantiIndexRoute
   '/gestionale_/distinta/$eventId/spettatori': typeof GestionaleDistintaEventIdSpettatoriRoute
   '/segreteria_/richieste_/$id/modulo': typeof SegreteriaRichiesteIdModuloRoute
@@ -1060,6 +1156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/allenamenti'
     | '/calendario'
+    | '/classifiche'
     | '/community'
     | '/comunicazioni'
     | '/contatti'
@@ -1096,6 +1193,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/vetta-legnone'
     | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
@@ -1122,7 +1220,9 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/gestionale/impianti'
     | '/la-mia-scd/campione'
@@ -1163,11 +1263,17 @@ export interface FileRouteTypes {
     | '/crm/partner/nuovo'
     | '/direzione/accessi/$personId'
     | '/direzione/posta/collega'
+    | '/gestionale/piattaforme/bandi-e-ricerca'
+    | '/gestionale/piattaforme/convenzioni'
+    | '/gestionale/piattaforme/magazzino-attrezzature'
+    | '/gestionale/piattaforme/meta-analisi'
+    | '/gestionale/piattaforme/palestra'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
     | '/gestionale/impianti/dervio'
     | '/gestionale/impianti/nuova'
     | '/gestionale/impianti/simulazione'
+    | '/gestionale/piattaforme/'
     | '/gestionale/impianti/'
     | '/gestionale/distinta/$eventId/spettatori'
     | '/segreteria/richieste/$id/modulo'
@@ -1176,6 +1282,7 @@ export interface FileRouteTypes {
     | '/'
     | '/allenamenti'
     | '/calendario'
+    | '/classifiche'
     | '/community'
     | '/comunicazioni'
     | '/contatti'
@@ -1212,6 +1319,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/vetta-legnone'
     | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
@@ -1238,7 +1346,9 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/la-mia-scd/campione'
     | '/ledwall/player'
@@ -1278,11 +1388,17 @@ export interface FileRouteTypes {
     | '/crm/partner/nuovo'
     | '/direzione/accessi/$personId'
     | '/direzione/posta/collega'
+    | '/gestionale/piattaforme/bandi-e-ricerca'
+    | '/gestionale/piattaforme/convenzioni'
+    | '/gestionale/piattaforme/magazzino-attrezzature'
+    | '/gestionale/piattaforme/meta-analisi'
+    | '/gestionale/piattaforme/palestra'
     | '/gestionale/impianti/approvazioni'
     | '/gestionale/impianti/colico'
     | '/gestionale/impianti/dervio'
     | '/gestionale/impianti/nuova'
     | '/gestionale/impianti/simulazione'
+    | '/gestionale/piattaforme'
     | '/gestionale/impianti'
     | '/gestionale/distinta/$eventId/spettatori'
     | '/segreteria/richieste/$id/modulo'
@@ -1291,6 +1407,7 @@ export interface FileRouteTypes {
     | '/'
     | '/allenamenti'
     | '/calendario'
+    | '/classifiche'
     | '/community'
     | '/comunicazioni'
     | '/contatti'
@@ -1327,6 +1444,7 @@ export interface FileRouteTypes {
     | '/tesoreria'
     | '/top11'
     | '/tornei'
+    | '/vetta-legnone'
     | '/accedi/completa'
     | '/accedi/conferma'
     | '/accedi/password'
@@ -1353,7 +1471,9 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/gestionale_/impianti'
     | '/la-mia-scd_/campione'
@@ -1394,11 +1514,17 @@ export interface FileRouteTypes {
     | '/crm_/partner/nuovo'
     | '/direzione_/accessi_/$personId'
     | '/direzione_/posta/collega'
+    | '/gestionale/piattaforme/bandi-e-ricerca'
+    | '/gestionale/piattaforme/convenzioni'
+    | '/gestionale/piattaforme/magazzino-attrezzature'
+    | '/gestionale/piattaforme/meta-analisi'
+    | '/gestionale/piattaforme/palestra'
     | '/gestionale_/impianti/approvazioni'
     | '/gestionale_/impianti/colico'
     | '/gestionale_/impianti/dervio'
     | '/gestionale_/impianti/nuova'
     | '/gestionale_/impianti/simulazione'
+    | '/gestionale/piattaforme/'
     | '/gestionale_/impianti/'
     | '/gestionale_/distinta/$eventId/spettatori'
     | '/segreteria_/richieste_/$id/modulo'
@@ -1408,6 +1534,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AllenamentiRoute: typeof AllenamentiRoute
   CalendarioRoute: typeof CalendarioRoute
+  ClassificheRoute: typeof ClassificheRoute
   CommunityRoute: typeof CommunityRoute
   ComunicazioniRoute: typeof ComunicazioniRoute
   ContattiRoute: typeof ContattiRoute
@@ -1444,6 +1571,7 @@ export interface RootRouteChildren {
   TesoreriaRoute: typeof TesoreriaRoute
   Top11Route: typeof Top11Route
   TorneiRoute: typeof TorneiRoute
+  VettaLegnoneRoute: typeof VettaLegnoneRoute
   AccediCompletaRoute: typeof AccediCompletaRoute
   AccediConfermaRoute: typeof AccediConfermaRoute
   AccediPasswordRoute: typeof AccediPasswordRoute
@@ -1470,7 +1598,9 @@ export interface RootRouteChildren {
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
   GestionalePlanningRoute: typeof GestionalePlanningRoute
   GestionalePostaRoute: typeof GestionalePostaRoute
+  GestionalePulminiRoute: typeof GestionalePulminiRoute
   GestionaleRichiesteRoute: typeof GestionaleRichiesteRoute
+  GestionaleRubricaRoute: typeof GestionaleRubricaRoute
   GestionaleStrutturaRoute: typeof GestionaleStrutturaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   LaMiaScdCampioneRoute: typeof LaMiaScdCampioneRoute
@@ -1511,6 +1641,12 @@ export interface RootRouteChildren {
   CrmPartnerNuovoRoute: typeof CrmPartnerNuovoRoute
   DirezioneAccessiPersonIdRoute: typeof DirezioneAccessiPersonIdRoute
   DirezionePostaCollegaRoute: typeof DirezionePostaCollegaRoute
+  GestionalePiattaformeBandiERicercaRoute: typeof GestionalePiattaformeBandiERicercaRoute
+  GestionalePiattaformeConvenzioniRoute: typeof GestionalePiattaformeConvenzioniRoute
+  GestionalePiattaformeMagazzinoAttrezzatureRoute: typeof GestionalePiattaformeMagazzinoAttrezzatureRoute
+  GestionalePiattaformeMetaAnalisiRoute: typeof GestionalePiattaformeMetaAnalisiRoute
+  GestionalePiattaformePalestraRoute: typeof GestionalePiattaformePalestraRoute
+  GestionalePiattaformeIndexRoute: typeof GestionalePiattaformeIndexRoute
   GestionaleDistintaEventIdSpettatoriRoute: typeof GestionaleDistintaEventIdSpettatoriRoute
   SegreteriaRichiesteIdModuloRoute: typeof SegreteriaRichiesteIdModuloRoute
 }
@@ -1536,6 +1672,13 @@ declare module '@tanstack/react-router' {
       path: '/calendario'
       fullPath: '/calendario'
       preLoaderRoute: typeof CalendarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/classifiche': {
+      id: '/classifiche'
+      path: '/classifiche'
+      fullPath: '/classifiche'
+      preLoaderRoute: typeof ClassificheRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community': {
@@ -1790,6 +1933,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TorneiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vetta-legnone': {
+      id: '/vetta-legnone'
+      path: '/vetta-legnone'
+      fullPath: '/vetta-legnone'
+      preLoaderRoute: typeof VettaLegnoneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/accedi/': {
       id: '/accedi/'
       path: '/accedi'
@@ -2014,11 +2164,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionalePostaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/pulmini': {
+      id: '/gestionale/pulmini'
+      path: '/gestionale/pulmini'
+      fullPath: '/gestionale/pulmini'
+      preLoaderRoute: typeof GestionalePulminiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/richieste': {
       id: '/gestionale/richieste'
       path: '/gestionale/richieste'
       fullPath: '/gestionale/richieste'
       preLoaderRoute: typeof GestionaleRichiesteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/rubrica': {
+      id: '/gestionale/rubrica'
+      path: '/gestionale/rubrica'
+      fullPath: '/gestionale/rubrica'
+      preLoaderRoute: typeof GestionaleRubricaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestionale/struttura': {
@@ -2259,6 +2423,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DirezionePostaCollegaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/piattaforme/': {
+      id: '/gestionale/piattaforme/'
+      path: '/gestionale/piattaforme'
+      fullPath: '/gestionale/piattaforme/'
+      preLoaderRoute: typeof GestionalePiattaformeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/bandi-e-ricerca': {
+      id: '/gestionale/piattaforme/bandi-e-ricerca'
+      path: '/gestionale/piattaforme/bandi-e-ricerca'
+      fullPath: '/gestionale/piattaforme/bandi-e-ricerca'
+      preLoaderRoute: typeof GestionalePiattaformeBandiERicercaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/convenzioni': {
+      id: '/gestionale/piattaforme/convenzioni'
+      path: '/gestionale/piattaforme/convenzioni'
+      fullPath: '/gestionale/piattaforme/convenzioni'
+      preLoaderRoute: typeof GestionalePiattaformeConvenzioniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/magazzino-attrezzature': {
+      id: '/gestionale/piattaforme/magazzino-attrezzature'
+      path: '/gestionale/piattaforme/magazzino-attrezzature'
+      fullPath: '/gestionale/piattaforme/magazzino-attrezzature'
+      preLoaderRoute: typeof GestionalePiattaformeMagazzinoAttrezzatureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/meta-analisi': {
+      id: '/gestionale/piattaforme/meta-analisi'
+      path: '/gestionale/piattaforme/meta-analisi'
+      fullPath: '/gestionale/piattaforme/meta-analisi'
+      preLoaderRoute: typeof GestionalePiattaformeMetaAnalisiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestionale/piattaforme/palestra': {
+      id: '/gestionale/piattaforme/palestra'
+      path: '/gestionale/piattaforme/palestra'
+      fullPath: '/gestionale/piattaforme/palestra'
+      preLoaderRoute: typeof GestionalePiattaformePalestraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale_/impianti/': {
       id: '/gestionale_/impianti/'
       path: '/'
@@ -2343,6 +2549,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AllenamentiRoute: AllenamentiRoute,
   CalendarioRoute: CalendarioRoute,
+  ClassificheRoute: ClassificheRoute,
   CommunityRoute: CommunityRoute,
   ComunicazioniRoute: ComunicazioniRoute,
   ContattiRoute: ContattiRoute,
@@ -2379,6 +2586,7 @@ const rootRouteChildren: RootRouteChildren = {
   TesoreriaRoute: TesoreriaRoute,
   Top11Route: Top11Route,
   TorneiRoute: TorneiRoute,
+  VettaLegnoneRoute: VettaLegnoneRoute,
   AccediCompletaRoute: AccediCompletaRoute,
   AccediConfermaRoute: AccediConfermaRoute,
   AccediPasswordRoute: AccediPasswordRoute,
@@ -2405,7 +2613,9 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
   GestionalePlanningRoute: GestionalePlanningRoute,
   GestionalePostaRoute: GestionalePostaRoute,
+  GestionalePulminiRoute: GestionalePulminiRoute,
   GestionaleRichiesteRoute: GestionaleRichiesteRoute,
+  GestionaleRubricaRoute: GestionaleRubricaRoute,
   GestionaleStrutturaRoute: GestionaleStrutturaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   LaMiaScdCampioneRoute: LaMiaScdCampioneRoute,
@@ -2446,6 +2656,14 @@ const rootRouteChildren: RootRouteChildren = {
   CrmPartnerNuovoRoute: CrmPartnerNuovoRoute,
   DirezioneAccessiPersonIdRoute: DirezioneAccessiPersonIdRoute,
   DirezionePostaCollegaRoute: DirezionePostaCollegaRoute,
+  GestionalePiattaformeBandiERicercaRoute:
+    GestionalePiattaformeBandiERicercaRoute,
+  GestionalePiattaformeConvenzioniRoute: GestionalePiattaformeConvenzioniRoute,
+  GestionalePiattaformeMagazzinoAttrezzatureRoute:
+    GestionalePiattaformeMagazzinoAttrezzatureRoute,
+  GestionalePiattaformeMetaAnalisiRoute: GestionalePiattaformeMetaAnalisiRoute,
+  GestionalePiattaformePalestraRoute: GestionalePiattaformePalestraRoute,
+  GestionalePiattaformeIndexRoute: GestionalePiattaformeIndexRoute,
   GestionaleDistintaEventIdSpettatoriRoute:
     GestionaleDistintaEventIdSpettatoriRoute,
   SegreteriaRichiesteIdModuloRoute: SegreteriaRichiesteIdModuloRoute,
