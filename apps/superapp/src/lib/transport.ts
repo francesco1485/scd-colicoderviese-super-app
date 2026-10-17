@@ -412,7 +412,7 @@ export function runsForEvent(runs: readonly TransportRun[], eventId: string): Tr
 export function planErrorMessage(code: string | null | undefined): string {
   switch (code) {
     case "forbidden":
-      return "Solo Direzione, Segreteria e responsabile trasporti possono organizzare le corse.";
+      return `Le corse le organizza il ${TRANSPORT_OFFICE} (in sua assenza ${TRANSPORT_OFFICE_BACKUP}).`;
     case "missing":
       return "Servono almeno data, orario di partenza e titolo della corsa.";
     case "vehicle":
@@ -544,4 +544,164 @@ export function expiryTone(due: string | null, today: string): ExpiryTone {
 /** Live trips from today on, in date and departure order. */
 export function upcomingRuns(runs: readonly TransportRun[], today: string): TransportRun[] {
   return runs.filter((r) => r.date >= today && r.status !== "ANNULLATA").sort((a, b) => (a.date + a.departure).localeCompare(b.date + b.departure));
+}
+
+/* ------------------------------------------------------- 2026/27 start-up */
+/*
+ * Start-up of the service for the 2026/27 season (Direzione, 15–17/10/2026: «la piattaforma servizio pulmini deve
+ * partire»). Engine: TEMPO (the transport office stops chasing requests in chats). Measure: share of away matches of
+ * the weekend with a van decided 48 hours before, and share of confirmed seats with the family's «presa visione».
+ */
+
+/** Who owns the transport office: the club's own title for the role (registry position responsabile-trasporti). */
+export const TRANSPORT_OFFICE = "Responsabile servizio pulmini";
+/** Who may stand in for the office when the Responsabile is away (the database allows the same set, r74/r84). */
+export const TRANSPORT_OFFICE_BACKUP = "Direzione o Segreteria";
+
+/**
+ * Fleet facts confirmed by the Direzione on 15–17/10/2026 (VERIFIED): three Fiat Ducato 9 posti of the club and one
+ * of ASD Volley Colico used occasionally; every driver is a volunteer. Counts only: names stay in the organigram
+ * roster and in the Master Flotta, plates and phones never in the code.
+ */
+export const FLEET_2026_27 = {
+  asOf: "2026-10-17",
+  source: "Direzione, 15–17/10/2026",
+  clubVans: 3,
+  partnerVans: 1,
+  partnerOwner: "ASD Volley Colico",
+  model: "Fiat Ducato 9 posti",
+  driversVolunteer: true,
+  /** Responsabile servizio pulmini (also a driver) + three dirigenti autisti. */
+  drivers: 4,
+} as const;
+
+/**
+ * The weekend the transport office works on: on Saturday and Sunday it is the weekend in progress (today's trips must
+ * be visible on the morning of the match), on weekdays the coming one. `from` is the first day still to come.
+ */
+export function serviceWeekend(today: string): { sat: string; sun: string; from: string } {
+  const [y, m, d] = today.split("-").map(Number) as [number, number, number];
+  const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); // 0 Sunday … 6 Saturday
+  const iso = (n: number) => new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+  if (dow === 6) return { sat: today, sun: iso(1), from: today };
+  if (dow === 0) return { sat: iso(-1), sun: today, from: today };
+  return { sat: iso(6 - dow), sun: iso(7 - dow), from: iso(6 - dow) };
+}
+
+/** Away matches of the service weekend (days already gone excluded), in time order. */
+export function serviceWeekendTrips<E extends { date: string; time: string; homeAway: string }>(events: readonly E[], today: string): E[] {
+  const { sun, from } = serviceWeekend(today);
+  return events
+    .filter((e) => e.homeAway === "FUORI" && e.date >= from && e.date <= sun)
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+}
+
+export type SeasonTeamStatus = "active" | "withdrawn" | "unknown";
+
+export interface SeasonTeam {
+  /** Calendar group id of the 2026/27 team ("u15", "2014"…), null when the Master label is not a team of the season. */
+  key: string | null;
+  /** Name of the 2026/27 team as the club writes it, or the Master label when unknown. */
+  label: string;
+  status: SeasonTeamStatus;
+  /** Weekday training service (communication of 5/10): false for U16 Élite and Juniores U19 Élite, null when unknown. */
+  trainingServed: boolean | null;
+}
+
+/** The nine active teams of 2026/27 (Direzione, VERIFIED); U18 withdrawn. Order = the club's order. */
+export const SEASON_TEAMS_2026_27: ReadonlyArray<{ key: string; label: string; trainingServed: boolean | null }> = [
+  { key: "prima", label: "Prima Squadra", trainingServed: false },
+  { key: "u19", label: "Juniores U19 Élite", trainingServed: false },
+  { key: "u16", label: "U16 Élite", trainingServed: false },
+  { key: "u15", label: "U15 2012-2013", trainingServed: true },
+  { key: "2014", label: "Esordienti 2014", trainingServed: true },
+  { key: "2015", label: "Esordienti 2015", trainingServed: true },
+  { key: "pulcini", label: "Pulcini 2016-2017", trainingServed: true },
+  { key: "primicalci", label: "Primi Calci 2018-2019", trainingServed: true },
+  { key: "piccoli", label: "Piccoli Amici 2020-2021", trainingServed: null },
+];
+
+const seasonTeam = (key: string): SeasonTeam => {
+  const t = SEASON_TEAMS_2026_27.find((x) => x.key === key)!;
+  return { key: t.key, label: t.label, status: "active", trainingServed: t.trainingServed };
+};
+
+/**
+ * Master Pulmini group label ("U12 2015", "U18 2009-2010", "JUNIORES 2007-2009") → the 2026/27 team. The Master still
+ * uses the old age-group names; the app shows the season's names and flags the withdrawn U18 instead of hiding it.
+ */
+export function seasonTeamFor(masterGroup: string | null | undefined): SeasonTeam {
+  const raw = (masterGroup ?? "").trim();
+  const g = raw.toUpperCase();
+  if (!g || g === "DA VERIFICARE") return { key: null, label: "Squadra da verificare", status: "unknown", trainingServed: null };
+  if (/\bU18\b|UNDER\s*18/.test(g)) return { key: null, label: "U18 (squadra ritirata)", status: "withdrawn", trainingServed: false };
+  if (/JUNIORES|\bU19\b/.test(g)) return seasonTeam("u19");
+  if (/\bU16\b|UNDER\s*16/.test(g)) return seasonTeam("u16");
+  if (/\bU15\b|GIOVANISSIMI|2012|2013/.test(g)) return seasonTeam("u15");
+  if (/\bU13\b|2014/.test(g)) return seasonTeam("2014");
+  if (/\bU12\b|2015/.test(g)) return seasonTeam("2015");
+  if (/PULCINI|2016|2017/.test(g)) return seasonTeam("pulcini");
+  if (/PRIMI\s*CALCI|2018|2019/.test(g)) return seasonTeam("primicalci");
+  if (/PICCOLI|2020|2021/.test(g)) return seasonTeam("piccoli");
+  if (/PRIMA\s*SQUADRA/.test(g)) return seasonTeam("prima");
+  return { key: null, label: raw, status: "unknown", trainingServed: null };
+}
+
+/** Master counts per group folded into the 2026/27 teams (club order), withdrawn and unknown groups last. */
+export function demandBySeasonTeam(byGroup: Readonly<Record<string, number>>): Array<SeasonTeam & { count: number }> {
+  const acc = new Map<string, SeasonTeam & { count: number }>();
+  for (const [group, n] of Object.entries(byGroup)) {
+    const t = seasonTeamFor(group);
+    const id = t.key ?? `${t.status}:${t.label}`;
+    const prev = acc.get(id);
+    acc.set(id, prev ? { ...prev, count: prev.count + n } : { ...t, count: n });
+  }
+  const order = (t: SeasonTeam) => (t.key ? SEASON_TEAMS_2026_27.findIndex((x) => x.key === t.key) : t.status === "withdrawn" ? 100 : 200);
+  return [...acc.values()].sort((a, b) => order(a) - order(b) || b.count - a.count);
+}
+
+/**
+ * The people of the service from the organigram roster (SCD_STAFF_ROSTER_JSON, the same list behind the "omini" of
+ * /allenamenti and /gestionale/organigramma): no second list of drivers. Office = people with the area "pulmini";
+ * drivers = role "autista" (kind) or an office member whose role also says "autista" (the Responsabile drives too).
+ */
+export function transportCrew<P extends { name: string; role: string; kind: string; areas: readonly string[] }>(people: readonly P[]): { office: P[]; drivers: P[] } {
+  const byName = (a: P, b: P) => a.name.localeCompare(b.name, "it");
+  const office = people.filter((p) => p.areas.includes("pulmini")).sort(byName);
+  const drivers = people.filter((p) => p.kind === "autista" || /autist/i.test(p.role)).sort(byName);
+  return { office, drivers };
+}
+
+const normName = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z ]/g, " ").split(/\s+/).filter(Boolean).sort().join(" ");
+
+/**
+ * Drivers of the organigram roster and drivers of the Master Flotta (05 AUTISTI) side by side: the two must name the
+ * same adults. Returns who is only on one side, so the office fixes the source instead of keeping a second list.
+ * Adults only (volunteer drivers); matching is on the whole name, word order and accents ignored.
+ */
+export function crewMismatch(rosterDrivers: ReadonlyArray<{ name: string }>, masterDrivers: ReadonlyArray<{ name: string; status: string | null }>): { onlyRoster: string[]; onlyMaster: string[] } {
+  const master = masterDrivers.filter((d) => !/NON ATTIVO|CESSAT/i.test(d.status ?? ""));
+  const m = new Set(master.map((d) => normName(d.name)));
+  const r = new Set(rosterDrivers.map((d) => normName(d.name)));
+  return {
+    onlyRoster: rosterDrivers.filter((d) => !m.has(normName(d.name))).map((d) => d.name),
+    onlyMaster: master.filter((d) => !r.has(normName(d.name))).map((d) => d.name),
+  };
+}
+
+/**
+ * Data minimisation for the office list of family requests: "Mario Rossi" → "Mario R." (first name + surname initial,
+ * the same format as the riders under the trainings). A single word stays as it is.
+ */
+export function shortPersonName(full: string): string {
+  const parts = full.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  if (parts.length <= 1) return parts[0] ?? "";
+  const last = parts[parts.length - 1]!;
+  return `${parts[0]} ${last.charAt(0).toLocaleUpperCase("it-IT")}.`;
+}
+
+/** The board as it may reach the browser: phones never leave the server (Direzione 17/10/2026, «mai numeri di telefono»). */
+export function withoutPhones(b: TransportBoard | null): TransportBoard | null {
+  return b ? { ...b, drivers: b.drivers.map((d) => ({ ...d, phone: null })) } : null;
 }

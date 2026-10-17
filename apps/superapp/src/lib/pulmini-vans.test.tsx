@@ -207,7 +207,7 @@ describe("server-rendered HTML", () => {
 
   it("anonymous / preview: no names, lock line shown", () => {
     const out = html(vansFromSources({ gate: PREVIEW, board: null, roster: null, slots: SLOTS })!);
-    expect(out).toContain("Nomi visibili solo con accesso del responsabile trasporti");
+    expect(out).toContain("Nomi visibili solo con accesso del Responsabile servizio pulmini");
     for (const n of [...FAKE_NAMES, "Alfio", "Bruna"]) expect(out).not.toContain(n);
     expect(out).toContain("Pulmino 3 · Valtellina");
     expect(out).toContain("tavola linee 2026/27, da confermare");

@@ -1,6 +1,7 @@
 /**
  * Pulmini on the server (r74). Reads go through scd_transport_board (role and position checked in
- * the database, phones only for managers); trips are saved through scd_transport_plan_run, which
+ * the database); the drivers' phones the database sends to managers are dropped here and never reach the
+ * browser (Direzione 17/10/2026). Trips are saved through scd_transport_plan_run, which
  * refuses double bookings and writes the audit trail. Nothing here trusts the browser for permissions.
  */
 import { createServerFn } from "@tanstack/react-start";
@@ -8,7 +9,7 @@ import { z } from "zod";
 
 import { sessionView } from "./auth.functions";
 import { serverSupabase } from "./supabase.server";
-import { parseBoard, planErrorMessage, type TransportBoard } from "./transport";
+import { parseBoard, planErrorMessage, withoutPhones, type TransportBoard } from "./transport";
 
 export interface TransportData {
   /** False when this server has no database or nobody is signed in. */
@@ -35,7 +36,7 @@ export const getTransportBoard = createServerFn({ method: "GET" }).handler(async
   if (!sb || !org) return { connected: false, board: null, error: null };
   const { data, error } = await sb.rpc("scd_transport_board", { p_organization_id: org.organizationId, p_from: romeDate(-7), p_to: romeDate(60) });
   if (error) return { connected: true, board: null, error: "Lettura dei pulmini non riuscita." };
-  return { connected: true, board: parseBoard(data), error: null };
+  return { connected: true, board: withoutPhones(parseBoard(data)), error: null };
 });
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;

@@ -4,6 +4,12 @@
  * the family circle. The office confirms or answers "non possibile"; a seat is planned on the trip, never here.
  */
 
+/**
+ * «Presa visione» of a confirmed seat lives in migration r113 (STAGED). Switch to true in the same change that
+ * follows «applica r113»: until then the family card does not offer the button and the office shows no ack chip.
+ */
+export const TRANSPORT_ACK_LIVE = false;
+
 export const DIRECTIONS = ["ANDATA_RITORNO", "ANDATA", "RITORNO"] as const;
 export type Direction = (typeof DIRECTIONS)[number];
 export const DIRECTION_LABEL: Readonly<Record<Direction, string>> = {
@@ -36,6 +42,8 @@ export interface MyRequest {
   note: string | null;
   status: RequestState;
   decisionNote: string | null;
+  /** The family took «presa visione» of the confirmed seat (r113); false while r113 is not applied. */
+  acknowledged: boolean;
 }
 
 export interface OfficeRequest {
@@ -51,6 +59,8 @@ export interface OfficeRequest {
   note: string | null;
   status: RequestState;
   decisionNote: string | null;
+  /** The family took «presa visione» of the confirmed seat (r113); false while r113 is not applied. */
+  acknowledged: boolean;
 }
 
 /** An away match a family can ask a seat for (from the calendar copy). */
@@ -77,6 +87,8 @@ function base(r: Raw) {
     note: str(r["note"]),
     status: isState(r["status"]) ? r["status"] : "RICHIESTA",
     decisionNote: str(r["decisionNote"]),
+    // Only a confirmed seat can be acknowledged; anything else from the database is ignored (fail-closed).
+    acknowledged: r["acknowledged"] === true && r["status"] === "CONFERMATA",
   } as const;
 }
 
@@ -155,11 +167,13 @@ const ERRORS: Readonly<Record<string, string>> = {
   past: "La partita è già passata.",
   direction: "Scegli andata, ritorno o entrambi.",
   stop: "Fermata non valida: scegline una dall'elenco.",
-  confirmed: "Il posto è già confermato: per cambiare scrivi al responsabile trasporti.",
+  confirmed: "Il posto è già confermato: per cambiare scrivi al Responsabile servizio pulmini.",
   not_found: "Richiesta non trovata: ricarica la pagina.",
   cancelled: "La famiglia ha annullato la richiesta.",
   note_required: "Scrivi il motivo, così la famiglia capisce.",
   decision: "Scelta non valida.",
+  not_confirmed: "La presa visione si dà solo su un posto confermato.",
+  unavailable: "Presa visione in attivazione: per ora rispondi al Responsabile servizio pulmini nella chat della squadra.",
 };
 export function requestError(code: string | null | undefined): string {
   return (code && ERRORS[code]) || "Operazione non riuscita. Riprova tra poco.";

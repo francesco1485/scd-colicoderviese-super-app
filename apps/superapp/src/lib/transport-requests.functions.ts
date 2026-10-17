@@ -1,13 +1,15 @@
 /**
  * Pulmini · richieste delle famiglie on the server (r84). Families read and write only through the database
  * functions that check the family circle (scd_my_family); the office reads and decides through functions that check
- * Direzione / Segreteria / responsabile trasporti. Nothing here trusts the browser for permissions.
+ * the transport office: the Responsabile servizio pulmini (position responsabile-trasporti), with Direzione and
+ * Segreteria as stand-ins. Names reach the office as first name + surname initial. Nothing here trusts the browser for permissions.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { sessionView } from "./auth.functions";
 import { serverSupabase } from "./supabase.server";
+import { shortPersonName } from "./transport";
 import { DIRECTIONS, parseMyRequests, parseOfficeRequests, parseStops, requestError, type MyRequest, type OfficeRequest, type StopOption } from "./transport-requests";
 
 async function context() {
@@ -55,7 +57,7 @@ export const requestTransport = createServerFn({ method: "POST" })
     if (error) return { ok: false, message: requestError(null) };
     const r = (out ?? {}) as { ok?: boolean; code?: string; id?: string };
     if (!r.ok) return { ok: false, message: requestError(r.code) };
-    return { ok: true, message: "Richiesta inviata al responsabile trasporti: qui vedi la risposta.", ...(r.id ? { id: r.id } : {}) };
+    return { ok: true, message: "Richiesta inviata al Responsabile servizio pulmini: qui vedi la risposta.", ...(r.id ? { id: r.id } : {}) };
   });
 
 export const cancelTransportRequest = createServerFn({ method: "POST" })
@@ -74,8 +76,24 @@ export const getTransportRequests = createServerFn({ method: "GET" }).handler(as
   if (!sb || !org) return null;
   const { data, error } = await sb.rpc("scd_transport_requests_board", { p_organization_id: org.organizationId, p_from: romeDate(-1), p_to: romeDate(45) });
   if (error) return null;
-  return parseOfficeRequests(data);
+  const list = parseOfficeRequests(data);
+  return list ? list.map((r) => ({ ...r, name: shortPersonName(r.name) })) : null;
 });
+
+/** PostgREST / Postgres codes for "function does not exist": r113 not applied yet. */
+const MISSING_FUNCTION = new Set(["PGRST202", "42883"]);
+
+/** Family «presa visione» of a confirmed seat (r113, STAGED until «applica r113»). */
+export const ackTransportRequest = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }): Promise<RequestOutcome> => {
+    const { org, sb } = await context();
+    if (!sb || !org) return { ok: false, message: "Accesso non valido." };
+    const { data: out, error } = await sb.rpc("scd_ack_transport_request", { p_organization_id: org.organizationId, p_request_id: data.id });
+    if (error) return { ok: false, message: requestError(MISSING_FUNCTION.has(error.code ?? "") ? "unavailable" : null) };
+    const r = (out ?? {}) as { ok?: boolean; code?: string };
+    return r.ok ? { ok: true, message: "Presa visione registrata: il Responsabile servizio pulmini la vede." } : { ok: false, message: requestError(r.code) };
+  });
 
 const decideSchema = z.object({
   id: z.string().uuid(),
