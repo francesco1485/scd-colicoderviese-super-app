@@ -18,6 +18,7 @@ async function loadPGlite() {
 const PGlite = await loadPGlite();
 const read = (f) => readFileSync(fileURLToPath(new URL(`../migrations/${f}`, import.meta.url)), "utf8");
 const R121 = read("20261017_r121_people_merge_multi_role.sql");
+const R122 = read("20261017_r122_merge_people_generated_name.sql");
 // The real r64 approval function, taken from its migration file (the one r121 builds on).
 const R64 = read("20261011_r64_access_requests.sql");
 const APPROVE_V1 = R64.slice(R64.indexOf("create or replace function public.scd_approve_access_request("), R64.indexOf("$$;", R64.indexOf("create or replace function public.scd_approve_access_request(")) + 3);
@@ -54,7 +55,7 @@ create table public.scd_memberships (organization_id uuid, user_id uuid, role pu
 create function public.scd_has_org_role(p_organization_id uuid, p_roles public.scd_role[]) returns boolean language sql stable set search_path = public as $$
   select exists (select 1 from public.scd_memberships m where m.organization_id = p_organization_id and m.user_id = auth.uid() and m.active and m.role = any(p_roles)) $$;
 create table public.scd_people (id uuid primary key default gen_random_uuid(), organization_id uuid not null, first_name text, last_name text,
-  birth_date date, email text, phone text, status text, fiscal_code text, display_name text, source_id text, source_record_id text,
+  birth_date date, email text, phone text, status text, fiscal_code text, display_name text generated always as (trim(first_name || ' ' || last_name)) stored, source_id text, source_record_id text,
   updated_at timestamptz default now());
 create table public.scd_teams (id uuid primary key, organization_id uuid);
 create table public.scd_structure_roles (id uuid primary key default gen_random_uuid(), organization_id uuid not null,
@@ -120,6 +121,8 @@ insert into public.scd_access_audit (organization_id, target_person_id, action) 
 await db.exec(APPROVE_V1);
 await db.exec(R121);
 await db.exec(R121); // idempotent
+await db.exec(R122);
+await db.exec(R122); // idempotent
 
 const as = async (uid) => db.exec(`select set_config('request.jwt.claim.sub', '${uid ?? ""}', false)`);
 const one = async (sql) => (await db.query(sql)).rows[0];
