@@ -3,6 +3,7 @@ import { Brain, CalendarDays, ChevronRight, ClipboardList, HandCoins, HeartHands
 import { useMemo } from "react";
 
 import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { ControlRoom } from "@/components/scd/ControlRoom";
 import { Chip, useRomeNow } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
@@ -95,6 +96,7 @@ function DirezioneRoute() {
   return (
     <InteriorShell title="Direzione" path="/direzione" activeAreaId="direzione" roles={new Set(d.roles)} roleLabel={d.badge ?? "Direzione"}>
       <ControlRoom sources={sources} path="/direzione" tools={<DirectionTools email={d.email} pending={d.pending} />} />
+      <GuideTourAuto role="dirigenti" />
     </InteriorShell>
   );
 }
