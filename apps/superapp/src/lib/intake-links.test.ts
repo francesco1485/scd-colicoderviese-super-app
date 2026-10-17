@@ -9,10 +9,15 @@ const config = JSON.parse(readFileSync(fileURLToPath(new URL("../../../../config
 const FORM = "https://tally.so/r/abcd12";
 
 describe("public links of the single Tally form (UD-163)", () => {
-  it("stays closed while the form does not exist (config null)", () => {
-    expect(config.intakeTallyFormUrl).toBeNull();
-    expect(intakeFormUrl()).toBeNull();
-    for (const l of allIntakeLinks()) {
+  it("uses the published form YjDovq (Francesco, 17/10/2026)", () => {
+    expect(config.intakeTallyFormUrl).toBe("https://tally.so/r/YjDovq");
+    expect(intakeFormUrl()).toBe("https://tally.so/r/YjDovq");
+    expect(intakeLink("ISCRIZIONE_TORNEO", { torneo: "memorial-sandro-guattini" }).href).toBe("https://tally.so/r/YjDovq?tipo=torneo&torneo=memorial-sandro-guattini");
+  });
+
+  it("stays closed while the form does not exist (null)", () => {
+    expect(intakeFormUrl(null)).toBeNull();
+    for (const l of allIntakeLinks(null)) {
       expect(l.available).toBe(false);
       expect(l.href).toBeNull();
     }

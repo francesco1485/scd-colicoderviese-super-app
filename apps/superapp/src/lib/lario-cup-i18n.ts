@@ -46,6 +46,8 @@ export type LarioText = {
   progressLabel: string;
   confirmedNote: (n: number) => string;
   writeOrg: string;
+  /** The club's own registration form (Tally, UD-163). */
+  signForm: string;
   liveKicker: string;
   liveTitle: string;
   liveHead: { pre: string; live: string; post: string };
@@ -118,6 +120,7 @@ const IT: LarioText = {
   confirmedNote: (n) =>
     `${n} squadre confermate pubblicamente dalle locandine ufficiali. Il contatore si aggiornerà con il registro iscrizioni dell'organizzazione.`,
   writeOrg: "Scrivi all'organizzazione",
+  signForm: "Modulo d'iscrizione SCD",
   liveKicker: "Ogni gol, in tempo reale",
   liveTitle: "Il torneo live",
   liveHead: { pre: "Si accende l'8 dicembre", live: "In campo ora", post: "Risultati finali" },
@@ -193,6 +196,7 @@ const DE: LarioText = {
   confirmedNote: (n) =>
     `${n} Mannschaften laut den offiziellen Plakaten öffentlich bestätigt. Der Zähler wird mit dem Anmeldeverzeichnis der Organisation aktualisiert.`,
   writeOrg: "Organisation kontaktieren",
+  signForm: "Anmeldeformular des Vereins",
   liveKicker: "Jedes Tor in Echtzeit",
   liveTitle: "Das Turnier live",
   liveHead: { pre: "Start am 8. Dezember", live: "Jetzt auf dem Platz", post: "Endergebnisse" },
@@ -279,6 +283,7 @@ const EN: LarioText = {
   confirmedNote: (n) =>
     `${n} teams publicly confirmed on the official posters. The counter will follow the organisers' registration list.`,
   writeOrg: "Write to the organisers",
+  signForm: "Club registration form",
   liveKicker: "Every goal, in real time",
   liveTitle: "The tournament live",
   liveHead: { pre: "Kick-off on 8 December", live: "On the pitch now", post: "Final results" },

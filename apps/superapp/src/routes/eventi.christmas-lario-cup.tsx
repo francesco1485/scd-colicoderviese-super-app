@@ -17,6 +17,7 @@ import {
   eventCountdown,
   eventPhase,
 } from "@/lib/events";
+import { intakeLink } from "@/lib/intake-links";
 
 export const Route = createFileRoute("/eventi/christmas-lario-cup")({
   validateSearch: (s: Record<string, unknown>): { lang?: "de" | "en" | undefined } =>
@@ -41,6 +42,8 @@ function ChristmasLarioCup() {
   const { serverNow } = Route.useLoaderData();
   const lang: LarioLang = parseLarioLang(Route.useSearch().lang);
   const T = LARIO_TEXT[lang];
+  // One form for both cups: the female edition shares the registrations of the men's tournament (see T.cups[1].note).
+  const signForm = intakeLink("ISCRIZIONE_TORNEO", { torneo: "christmas-lario-cup-maschile" });
   const [now, setNow] = useState(serverNow);
   useEffect(() => {
     setNow(Date.now());
@@ -263,6 +266,11 @@ function ChristmasLarioCup() {
               >
                 {T.writeOrg}
               </a>
+              {signForm.href && (
+                <a href={signForm.href} target="_blank" rel="noopener noreferrer" className={ghost} data-testid="clc-modulo-iscrizione">
+                  {T.signForm}
+                </a>
+              )}
             </div>
           </div>
         </Sec>
