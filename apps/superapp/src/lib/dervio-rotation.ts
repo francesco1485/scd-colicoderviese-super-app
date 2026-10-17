@@ -43,6 +43,8 @@ import {
   isWinterDay,
   minusDays,
   toMinutes,
+  hhmm,
+  type RotationMatch,
 } from "./rotation";
 
 /** Youth groups eligible for Dervio, youngest → oldest (calendar group ids, see `rotation.ts`). */
@@ -328,6 +330,43 @@ export function planDervioRotation(
     });
   }
   return weeks;
+}
+
+/**
+ * Dervio candidates from the home matches of the Master Calendario as read by the
+ * rotation engine (`homeMatches` in rotation.ts: Colico home matches, withdrawn teams
+ * already left out). Hypothetical bookings are never candidates.
+ */
+export function candidatesFromHomeMatches(
+  matches: readonly Pick<RotationMatch, "id" | "group" | "date" | "start" | "end" | "endKnown" | "kind">[],
+): DervioCandidate[] {
+  return matches
+    .filter((m) => m.kind === "match")
+    .map((m) => ({
+      id: m.id,
+      group: m.group,
+      date: m.date,
+      time: hhmm(m.start),
+      end: m.endKnown ? hhmm(m.end) : null,
+      home: true,
+    }));
+}
+
+/**
+ * Weeks of the season plan still to come (week ending today or later), at most `limit`.
+ * The plan always starts on {@link DERVIO_START_DATE} so the rotation order does not
+ * depend on the day the page is opened.
+ */
+export function upcomingDervioWeeks(
+  candidates: readonly DervioCandidate[],
+  today: string,
+  limit = 6,
+  options: RotationOptions = {},
+): DervioWeek[] {
+  assertIsoDay("today", today);
+  return planDervioRotation(candidates, options)
+    .filter((w) => w.weekEnd >= today)
+    .slice(0, Math.max(0, limit));
 }
 
 /** Only the weeks that host a Dervio match. */

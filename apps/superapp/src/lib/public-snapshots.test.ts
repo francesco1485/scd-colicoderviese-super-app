@@ -68,9 +68,12 @@ describe("quadro: ricerca annata solo da Campo 1/Campo 2", () => {
   test("Prima Squadra: mar/gio 19:00–21:00, ven 19:00–20:30", () => {
     expect(fasce("Prima Squadra")).toEqual(["MAR 19:00–21:00", "GIO 19:00–21:00", "VEN 19:00–20:30"]);
   });
-  test("2015: lun/mer 17:20–18:50; nessuna inferenza U13=2014", () => {
+  test("2015: lun/mer 17:20–18:50; 2014 = U13 solo per la tabella verificata (Direzione 17/10/2026)", () => {
     expect(fasce("2015")).toEqual(["LUN 17:20–18:50", "MER 17:20–18:50"]);
-    expect(fasce("2014")).toEqual([]);
+    expect(fasce("2014")).toEqual(fasce("U13"));
+    expect(fasce("2011")).toEqual(fasce("U16"));
+    expect(fasce("2008")).toEqual([]);
+    expect(fasce("2010")).toEqual([]);
   });
 });
 
@@ -135,8 +138,10 @@ describe("calendario -> allenamenti: solo chiavi verificate nel quadro", () => {
   });
   test("Prima Squadra -> 'Prima Squadra'", () => expect(key("prima")).toBe("Prima Squadra"));
   test("U16 -> chiave con sedute reali", () => { const k = key("u16")!; expect(findSessions(slots, k).length).toBe(3); });
-  test("Esordienti 2014: nessun U13 automatico", () => {
+  test("Esordienti 2014 -> 2014 (U13 nel quadro, tabella annate verificata 17/10/2026)", () => {
     const g = groups.find((x) => x.years.includes("2014"));
-    if (g) expect(trainingKeyFor(g, slots)).toBeNull();
+    expect(g).toBeDefined();
+    expect(trainingKeyFor(g!, slots)).toBe("2014");
+    expect(findSessions(slots, "2014")).toEqual(findSessions(slots, "U13"));
   });
 });

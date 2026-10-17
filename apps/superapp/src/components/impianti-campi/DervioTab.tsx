@@ -7,6 +7,14 @@
 import { AlertTriangle, MapPin } from "lucide-react";
 
 import {
+  DERVIO_START_DATE,
+  EXCLUSION_LABEL,
+  candidatesFromHomeMatches,
+  dervioChecklist,
+  upcomingDervioWeeks,
+  type DervioWeek,
+} from "@/lib/dervio-rotation";
+import {
   COMUNE_DERVIO_NOTE,
   GROUP_SHORT,
   RAIN_MOVE_NOTICE_TO,
@@ -14,7 +22,12 @@ import {
   hhmm,
   type DervioMatch,
 } from "@/lib/rotation";
-import { presetLabel, teamColor, type ImpiantiModel } from "./model";
+import {
+  BASE_MATCHES,
+  presetLabel,
+  teamColor,
+  type ImpiantiModel,
+} from "./model";
 import { Card, Chip, SimulationNote, Src, btnPrimary } from "./ui";
 
 interface Zone {
@@ -39,8 +52,9 @@ const ZONES: Zone[] = [
     h: 220,
     fill: "#2f8a4f",
     ink: "#ffffff",
-    name: "Campo a 11 · 96 × 48 m",
-    note: "erba naturale",
+    name: "Campo a 11 · erba naturale",
+    // Verbale LND 97,80 × 50, master «16 - SEDI E IMPIANTI» 96 × 48: until reconciled, no number here.
+    note: "misure da confermare",
     big: true,
   },
   {
@@ -123,7 +137,7 @@ function DervioMap() {
       viewBox="0 0 980 560"
       width="100%"
       role="img"
-      aria-label="Schema del centro sportivo di Dervio con otto zone: AT1 e AT2 atletica, C1 campo a 11 96 per 48 metri in erba naturale, TR tribuna coperta 190 posti, C2 allenamento, BV1 e BV2 beach, SP1 spogliatoi"
+      aria-label="Schema del centro sportivo di Dervio con otto zone: AT1 e AT2 atletica, C1 campo a 11 in erba naturale, misure da confermare, TR tribuna coperta 190 posti, C2 allenamento, BV1 e BV2 beach, SP1 spogliatoi"
       className="block h-auto"
     >
       <rect width="980" height="560" rx="18" fill="#e9f2fb" />
@@ -223,6 +237,103 @@ function noticeChip(d: DervioMatch) {
   );
 }
 
+/** The season rule (DG 16/10/2026) over the real home matches: one youth home match per week at Dervio. */
+function SeasonPlan({ today }: { today: string }) {
+  const weeks: DervioWeek[] = upcomingDervioWeeks(
+    candidatesFromHomeMatches(BASE_MATCHES),
+    today,
+    6,
+  );
+  return (
+    <Card
+      id="h-dervio-plan"
+      title="Piano Dervio: 1 gara giovanile a settimana"
+      subtitle={`Regola della Direzione (16/10): dal ${ddmm(DERVIO_START_DATE)}, dalla squadra più giovane in su, a turno. Proposta calcolata dal Master Calendario: nessuna gara è spostata davvero.`}
+    >
+      {weeks.length === 0 ? (
+        <p className="m-0 px-4 pb-4 text-[14px] text-[var(--in-sub)] sm:px-[18px]">
+          Nessuna settimana da pianificare: nel calendario non ci sono gare in
+          casa dal {ddmm(DERVIO_START_DATE)} in poi.
+        </p>
+      ) : (
+        <ol className="m-0 list-none p-0" aria-label="Prossime settimane">
+          {weeks.map((w) => {
+            const pick = w.pick;
+            const notice = pick
+              ? dervioChecklist({
+                  matchDate: pick.match.date,
+                  today,
+                  group: pick.group,
+                }).find((i) => i.id === "team-notice")
+              : undefined;
+            return (
+              <li
+                key={w.weekStart}
+                className="flex items-start gap-3.5 border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]"
+              >
+                <div className="w-[86px] flex-none text-[13px] text-[var(--in-sub)]">
+                  Settimana
+                  <b className="block font-title text-[17px] font-black text-[var(--in-ink)]">
+                    {ddmm(w.weekStart)}–{ddmm(w.weekEnd)}
+                  </b>
+                </div>
+                {pick ? (
+                  <div className="min-w-0 flex-1">
+                    <span className="inline-flex items-center gap-1.5 text-[15px] font-bold">
+                      <i
+                        className="inline-block size-3 rounded-sm"
+                        style={{ background: teamColor(pick.group) }}
+                      />
+                      {pick.label}
+                    </span>
+                    <div className="text-[13px] text-[var(--in-sub)]">
+                      {ddmm(pick.match.date)} ore{" "}
+                      {pick.match.time ?? "da confermare"} · ora in calendario a
+                      Colico
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {notice && (
+                        <Chip
+                          tone={notice.status === "overdue" ? "warn" : "info"}
+                        >
+                          Avviso alla squadra entro il{" "}
+                          {ddmm(notice.dueDate ?? pick.match.date)}
+                          {notice.status === "overdue"
+                            ? ": già in ritardo"
+                            : ""}
+                        </Chip>
+                      )}
+                      {pick.winterGrass && (
+                        <Chip tone="warn">
+                          Erba in inverno: decide il meteo
+                        </Chip>
+                      )}
+                      {pick.group === "u16" && (
+                        <Chip tone="warn">Anticipare orario U16 (sabato)</Chip>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="min-w-0 flex-1 text-[14px] text-[var(--in-sub)]">
+                    {w.skipReason === "all-excluded"
+                      ? `Nessuna gara idonea: ${[...new Set(w.excluded.map((x) => EXCLUSION_LABEL[x.reason]))].join("; ")}`
+                      : "Nessuna gara giovanile in casa questa settimana: Dervio libero"}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      )}
+      <Src>
+        Squadra che ha giocato l&apos;ultima gara a Dervio prima del{" "}
+        {ddmm(DERVIO_START_DATE)}: non nota, il turno parte dai Piccoli Amici.
+        Prima Squadra sempre a Colico. Nessun avviso è stato inviato.
+      </Src>
+    </Card>
+  );
+}
+
 export function DervioTab({
   model,
   onTryAuto,
@@ -271,6 +382,7 @@ export function DervioTab({
       </Card>
 
       <div className="grid content-start gap-[18px]">
+        <SeasonPlan today={model.today} />
         <Card
           id="h-dervio-list"
           title="Gare proposte a Dervio"
@@ -341,7 +453,8 @@ export function DervioTab({
           )}
           <Src>
             {COMUNE_DERVIO_NOTE} Se piove e la gara torna a Colico: avviso solo
-            a {RAIN_MOVE_NOTICE_TO} (la FIGC avvisa l&apos;arbitro). Nessun avviso è stato inviato.
+            a {RAIN_MOVE_NOTICE_TO} (la FIGC avvisa l&apos;arbitro). Nessun
+            avviso è stato inviato.
           </Src>
         </Card>
         <section
@@ -357,8 +470,8 @@ export function DervioTab({
             <b className="text-[var(--in-ink)]">Erba naturale.</b> Dervio si usa
             anche in inverno; se piove la gara torna a Colico (meteo controllato
             3 giorni prima, decisione il giorno prima). La capienza per formato
-            va verificata sulle misure 96 × 48. Luci disponibili per le gare
-            serali.
+            va verificata sulle misure reali (verbale LND 97,80 × 50, master 96
+            × 48). Luci disponibili per le gare serali.
           </p>
         </section>
         <SimulationNote>

@@ -212,7 +212,7 @@ describe("planDervioRotation", () => {
     expect(weeks[0]?.pick?.match.date).toBe("2026-10-24");
     // Primi Calci (younger) before Pulcini, even if Pulcini kick off earlier.
     expect(weeks[0]?.pick?.group).toBe("primicalci");
-    expect(weeks[0]?.pick?.label).toBe("Primi Calci");
+    expect(weeks[0]?.pick?.label).toBe("Primi Calci 2018-2019");
   });
 
   it("default (lights ok): reproduces the Dervio 1 draft, 21 matches, evening matches included", () => {
