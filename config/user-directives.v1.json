@@ -3927,11 +3927,65 @@
         "quindi uno irrealistico altro carbonato e uno senza foto di bimbo personaggi famosi"
       ],
       "normalizedCommand": {
-        "rule": "'Crea il tuo avatar' always shows the avatar in 3D standing on a club pedestal (SCD palette, club crest only) that rotates slowly; drag or swipe turns it by hand; pause button; with reduced motion it stays still on a front pose. Three styles to choose from: 1) Iperrealistico (photorealistic but synthetic, not resembling any real person), 2) Cartoon (animated-film style, original character, no copyrighted character), 3) third style to confirm with Francesco (INFERRED reading: 'senza foto' = built only from choices, no photo). Never generated from photos of children, never resembling famous people (existing moderation in lib/avatar-studio.ts stays). Same pedestal and rotation for the cast (Vera, Garrison, Enea, Sky, Crovi) and for avatar cards and the LED wall.",
+        "rule": "'Crea il tuo avatar' always shows the avatar in 3D standing on a club pedestal (SCD palette, club crest only) that rotates slowly; drag or swipe turns it by hand; pause button; with reduced motion it stays still on a front pose. Three styles to choose from: 1) Iperrealistico (photorealistic but synthetic, not resembling any real person), 2) Cartoon (animated-film style, original character, no copyrighted character), 3) third style to confirm with Francesco (INFERRED reading: 'senza foto' = built only from choices, no photo). Never resembling famous people; a real photo is used only under UD-145 (consent first, reserved area, never public for minors) (existing moderation in lib/avatar-studio.ts stays). Same pedestal and rotation for the cast (Vera, Garrison, Enea, Sky, Crovi) and for avatar cards and the LED wall.",
         "scope": "SUPER_APP Crea il tuo avatar / Crea il tuo campione (/la-mia-scd/campione), scd-avatar agent, cards and LED wall",
         "supersedes": "none; extends UD-102 and the avatar rules (no photo stored, under 14 parent activates)",
         "implementationStatus": "NOT_IMPLEMENTED",
         "implementation": "backlog docs/piattaforme/IDEE.md I-261017-16 (platform 14 Avatar); 3D with three.js / React Three Fiber, glTF under 2 MB, 60 fps on a mid phone, poster fallback"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "07:44",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-145",
+      "name": "PLAYER_PHOTO_PROMPT_MULTIMEDIA_STICKER_CARDS",
+      "sourceQuoteFragments": [
+        "Per i calciatori tutti anche piccoli appena entrati in app interna deve uscire fin quando non la fanno scattati una foto per diventare una figurina multimediale e poi escono stile card interattive li creano."
+      ],
+      "normalizedCommand": {
+        "rule": "Every registered player, little ones included, sees on entering the internal app a 'Scattati la foto e diventa una figurina' prompt that comes back at every entry until the photo is done (one tap 'più tardi' hides it for that session only). The photo becomes a multimedia sticker and then interactive cards (stats, badges, team) created in the app. Safeguards that never change: under 14 the parent/guardian gives the image consent (scd_person_consents IMMAGINE) and takes or approves the photo from their own account before the prompt appears to the child; 14-17 the athlete with parent informed; the photo and the sticker of a minor are visible only to the athlete, family and team staff in reserved areas, never public, never on social or LED without a separate explicit consent; the photo is stored in private storage, deletable by the family at any time; no face recognition, no AI change of a minor's face; DPIA and the privacy notice updated before launch.",
+        "scope": "SUPER_APP internal area (La mia SCD / Crea il tuo campione), platform 14 Avatar, team cards",
+        "supersedes": "avatar-studio v1 'Foto del volto: always locked' only once consent flow and DPIA are in place",
+        "implementationStatus": "NOT_IMPLEMENTED",
+        "implementation": "backlog docs/piattaforme/IDEE.md I-261017-17; needs consent flow + private storage (migration, 'applica rNNN') and DPIA approval"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "07:45",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-146",
+      "name": "STAFF_TEAM_AREA_SERIE_A_LEVEL",
+      "sourceQuoteFragments": [
+        "Altra cosa importante avere nelle aree interne e dirigenti annate informazioni atleti, statistiche ammonizioni e tutto quello che serve a un mister o dirigente per fare un lavoro da serie A"
+      ],
+      "normalizedCommand": {
+        "rule": "In the internal areas, per age group (annata), mister and dirigenti have a professional team desk: roster with role and availability, certificates expiry (traffic light, no health detail), presences and convocazioni (presa visione / impedimento), minutes, goals, assists, cautions and suspensions with automatic count towards the disciplinary threshold (source: official C.U. / referti, never invented), match reports, training load and plan, opponents, documents and deadlines, contacts of families only through the club channels. Visible only to the staff of that age group and the Direzione; minors with first name + surname initial outside reserved views; export to PDF for the bench.",
+        "scope": "SUPER_APP gestionale (/gestionale/mister, /squadre, platforms 10 Quadro allenamenti, 03 Segreteria), agents scd-squadre, scd-atleti",
+        "supersedes": "none",
+        "implementationStatus": "NOT_IMPLEMENTED",
+        "implementation": "backlog docs/piattaforme/IDEE.md I-261017-18; existing route apps/superapp/src/routes/gestionale.mister.tsx to extend"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "07:46",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-147",
+      "name": "IRIDE_PROACTIVE_MINIBUS_ASK_FOR_AWAY_MATCHES",
+      "sourceQuoteFragments": [
+        "Altra cosa il pulmino fondamentale anche le richieste potremmo anche che iride manda lei un messaggio se sono trasferte al responsabile e mister per chiedere se hanno bisogno."
+      ],
+      "normalizedCommand": {
+        "rule": "Pulmini and their requests are a priority. For every away match in the public calendar copy, Iride writes first (WhatsApp) to the mister and the responsabile of that team a few days before, asking whether they need the minibus, how many seats and from where; the answer becomes a minibus request (platform 01, scd_transport_requests) for the Responsabile pulmini, who confirms. Only adult staff with a verified role in Iride's contacts book are messaged; never families or minors; one message per match, one reminder at most. Proactive WhatsApp messages need a Meta-approved template outside the 24-hour window; until it is approved the same question goes as an internal mail to the club.",
+        "scope": "Iride (Make scenario 7979437 or a new scheduled scenario), platform 01 Servizio pulmini",
+        "supersedes": "none",
+        "implementationStatus": "NOT_IMPLEMENTED",
+        "implementation": "backlog docs/piattaforme/IDEE.md I-261017-19; needs Francesco's ok on the Make change and the WhatsApp template approval"
       }
     },
     {
