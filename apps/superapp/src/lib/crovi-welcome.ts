@@ -123,7 +123,7 @@ export const CROVI_CHIPS = ["Quando si gioca?", "Allenamenti di stasera", "Pulmi
 /** True when the visitor wants to report a score («Segnala un risultato», «ho un risultato»…). */
 export function isResultReport(message: string): boolean {
   const t = message.toLowerCase();
-  return /\b(segnal\w*|comunic\w*|mand\w*|invi\w*|ho)\b[^.?!]{0,30}\brisultat\w*/.test(t) || /^\s*risultato\s*[:\d]/.test(t);
+  return /\b(segnal\w*|comunic\w*|invi\w*)\b[^.?!]{0,30}\brisultat\w*/.test(t) || /\bho (un|il) risultat\w*/.test(t) || /^\s*risultato\s*[:\d]/.test(t);
 }
 
 /**

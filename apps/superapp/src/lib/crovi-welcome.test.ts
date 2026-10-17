@@ -76,7 +76,7 @@ describe("result reports (UD-182 / UD-184)", () => {
   it("recognises «Segnala un risultato» and similar", () => {
     expect(CROVI_CHIPS).toEqual(["Quando si gioca?", "Allenamenti di stasera", "Pulmini", "Segnala un risultato"]);
     for (const m of ["Segnala un risultato", "voglio segnalare il risultato", "ho il risultato della partita", "Risultato: 2-1"]) expect(isResultReport(m), m).toBe(true);
-    for (const m of ["Quando si gioca?", "risultati ufficiali della prima squadra", "Pulmini"]) expect(isResultReport(m), m).toBe(false);
+    for (const m of ["Quando si gioca?", "risultati ufficiali della prima squadra", "Pulmini", "mandami i risultati di sabato", "ho visto i risultati?"]) expect(isResultReport(m), m).toBe(false);
   });
 
   it("never writes a score and sends to the Segreteria and the official LND source", () => {
