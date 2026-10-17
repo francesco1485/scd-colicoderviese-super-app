@@ -8,10 +8,13 @@ import {
   docErrorMessage,
   driveFileName,
   kindLabel,
+  lampAlert,
   lampMessage,
+  orphanLogLine,
   parseDrawer,
   parseLamp,
   personTodo,
+  STATUS_LABEL,
   sniffMime,
 } from "./my-documents";
 
@@ -159,5 +162,47 @@ describe("upload checks", () => {
     expect(docErrorMessage("UPLOAD_OFF")).toContain(
       "Caricamento in preparazione",
     );
+  });
+});
+
+describe("review fixes (r144)", () => {
+  it("never shows an unknown expiry as «In regola»", () => {
+    const d = parseDrawer({
+      importDone: true,
+      people: [
+        {
+          personId: "00000000-0000-4000-8000-000000000001",
+          label: "Bimbo P.",
+          delivered: [
+            { kind: "CERTIFICATO_MEDICO", status: "DA_VERIFICARE" },
+            { kind: "DOC_IDENTITA_ATLETA_FRONTE", status: "DA_VERIFICARE" },
+          ],
+        },
+      ],
+    });
+    const p = d.people[0]!;
+    expect(p.delivered.map((x) => x.status)).toEqual([
+      "DA_VERIFICARE",
+      "DA_VERIFICARE",
+    ]);
+    expect(STATUS_LABEL.DA_VERIFICARE).toBe("Scadenza da verificare");
+    expect(STATUS_LABEL.DA_VERIFICARE).not.toBe(STATUS_LABEL.IN_REGOLA);
+    // the Segreteria fixes the date, the family has nothing to upload
+    expect(personTodo(p)).toBe(0);
+  });
+
+  it("says 1 documento / N documenti", () => {
+    expect(lampAlert(1)).toBe("1 documento da sistemare");
+    expect(lampAlert(3)).toBe("3 documenti da sistemare");
+  });
+
+  it("logs an orphan Drive file with id and code only", () => {
+    expect(orphanLogLine("1AbCdEfGhIjKlMnOp", "PGRST301")).toBe(
+      "[r144] DOC_INDEX_ORPHAN drive_file_id=1AbCdEfGhIjKlMnOp code=PGRST301",
+    );
+    expect(orphanLogLine("../Rossi Mario.pdf", "bad code with spaces")).toBe(
+      "[r144] DOC_INDEX_ORPHAN drive_file_id=invalid-id code=UNKNOWN",
+    );
+    expect(orphanLogLine("1AbCdEfGhIjKlMnOp", null)).toContain("code=UNKNOWN");
   });
 });

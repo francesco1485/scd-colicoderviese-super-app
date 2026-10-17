@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// One-off import of past enrolments into «I miei documenti» (r142): Tally «Modulo Iscrizioni 2026/2027» (VLAJNy),
+// One-off import of past enrolments into «I miei documenti» (r144): Tally «Modulo Iscrizioni 2026/2027» (VLAJNy),
 // staff form (PdeZNV) and the Drive folders `Cognome_Nome_Ruolo` -> scd_documents rows (acceptances with the submission
 // date, delivered files with their Drive id, certificate expiry from the form).
 //
 // DRY RUN by default: prints COUNTS ONLY (no names, no ids, no file names) and writes nothing.
-// Write mode is NOT to be run by an agent: only after «applica r142» and Francesco's explicit go, with
-//   --write --org <uuid> --i-confirm-r142-applied  and env SCD_SUPABASE_URL + SCD_SUPABASE_SECRET_KEY.
+// Write mode is NOT to be run by an agent: only after «applica r144» and Francesco's explicit go, with
+//   --write --org <uuid> --i-confirm-r144-applied  and env SCD_SUPABASE_URL + SCD_SUPABASE_SECRET_KEY.
 //
 // Inputs (JSON files exported by the Segreteria or by Make; keep them OUTSIDE the repository):
 //   --vlajny <file>   Tally API export {questions:[{id,title,type}], submissions:[{id,submittedAt,responses:[{questionId,answer}]}]}
@@ -91,8 +91,8 @@ async function main() {
   if (!write) return;
 
   const org = opt("org");
-  if (!env || !org || !/^[0-9a-f-]{36}$/i.test(org) || !flag("i-confirm-r142-applied")) {
-    throw new Error("Write mode needs --org <uuid>, --i-confirm-r142-applied and SCD_SUPABASE_URL + SCD_SUPABASE_SECRET_KEY.");
+  if (!env || !org || !/^[0-9a-f-]{36}$/i.test(org) || !flag("i-confirm-r144-applied")) {
+    throw new Error("Write mode needs --org <uuid>, --i-confirm-r144-applied and SCD_SUPABASE_URL + SCD_SUPABASE_SECRET_KEY.");
   }
   const rows = [...mv.rows, ...ms.rows, ...md.rows];
   const existing = new Set(

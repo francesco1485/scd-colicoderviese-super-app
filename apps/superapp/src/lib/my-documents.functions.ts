@@ -1,7 +1,8 @@
 /**
- * «I miei documenti» on the server (r142). The database decides who sees what (scd_my_documents, scd_doc_lamp,
+ * «I miei documenti» on the server (r144). The database decides who sees what (scd_my_documents, scd_doc_lamp,
  * scd_doc_office_board); files go to the club Drive through the Make webhook (docs-upload.server.ts) and only the index
- * is written (scd_doc_register_upload). Never logs file contents, names or personal data.
+ * is written (scd_doc_register_upload, service_role only: called here after the Drive upload with the user id verified
+ * by auth.getUser). Never logs file contents, names or personal data.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -13,12 +14,14 @@ import {
   UPLOAD_KINDS,
   docErrorMessage,
   driveFileName,
+  orphanLogLine,
   parseDrawer,
   parseLamp,
   sniffMime,
   type Drawer,
   type Lamp,
 } from "./my-documents";
+import { serviceSupabase } from "./comm/sync.server";
 import { serverSupabase } from "./supabase.server";
 
 async function context() {
@@ -38,7 +41,7 @@ function romeToday(): string {
 
 export interface MyDocumentsData {
   connected: boolean;
-  /** False until r142 answers (migration staged, not applied): the page says so instead of showing empty drawers. */
+  /** False until r144 answers (migration staged, not applied): the page says so instead of showing empty drawers. */
   live: boolean;
   drawer: Drawer | null;
   lamp: Lamp | null;
@@ -64,7 +67,7 @@ export const getMyDocuments = createServerFn({ method: "GET" }).handler(
       sb.rpc("scd_doc_lamp", { p_organization_id: org.organizationId }),
     ]);
     if (d.error) {
-      // PGRST202 / 42883: function not found = r142 not applied yet.
+      // PGRST202 / 42883: function not found = r144 not applied yet.
       const missing = d.error.code === "PGRST202" || d.error.code === "42883";
       return {
         connected: true,
@@ -88,7 +91,7 @@ export const getMyDocuments = createServerFn({ method: "GET" }).handler(
   },
 );
 
-/** Count for the «lampadina» on La mia SCD; null when unknown (signed out, r142 not live). */
+/** Count for the «lampadina» on La mia SCD; null when unknown (signed out, r144 not live). */
 export const getDocLamp = createServerFn({ method: "GET" }).handler(
   async (): Promise<Lamp | null> => {
     const { org, sb } = await context();
@@ -131,8 +134,19 @@ export const uploadMyDocument = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<DocOutcome> => {
     const cfg = uploadConfig();
     if (!cfg) return { ok: false, message: docErrorMessage("UPLOAD_OFF") };
+    // The index is written by the service client: without it the file would reach the Drive and stay unindexed.
+    const service = serviceSupabase();
+    if (!service) return { ok: false, message: docErrorMessage("NO_SERVICE") };
     const { org, sb } = await context();
     if (!sb || !org)
+      return {
+        ok: false,
+        message: "Entra con il tuo account per caricare un documento.",
+      };
+    // Verified by the auth server (not read from the cookie): this id is what the database checks permissions for.
+    const me = await sb.auth.getUser();
+    const userId = me.data.user?.id ?? null;
+    if (me.error || !userId)
       return {
         ok: false,
         message: "Entra con il tuo account per caricare un documento.",
@@ -177,7 +191,8 @@ export const uploadMyDocument = createServerFn({ method: "POST" })
     );
     if (!stored.ok) return { ok: false, message: docErrorMessage(stored.code) };
 
-    const { data: out, error } = await sb.rpc("scd_doc_register_upload", {
+    const { data: out, error } = await service.rpc("scd_doc_register_upload", {
+      p_user_id: userId,
       p_organization_id: org.organizationId,
       p_person_id: data.personId,
       p_kind: data.kind,
@@ -189,8 +204,14 @@ export const uploadMyDocument = createServerFn({ method: "POST" })
       p_sha256: sha256,
     });
     const r = (out ?? {}) as { ok?: boolean; code?: string };
-    if (error || !r.ok)
+    if (error || !r.ok) {
+      // The file is on the Drive but not in the index: log ONLY the Drive file id and the error code so the orphan
+      // can be found and indexed or removed by the Segreteria. No names, person ids, kinds or file names.
+      console.error(
+        orphanLogLine(stored.driveFileId, error?.code ?? r.code ?? null),
+      );
       return { ok: false, message: docErrorMessage(r.code ?? null) };
+    }
     return {
       ok: true,
       message:

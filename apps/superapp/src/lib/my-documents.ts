@@ -1,7 +1,7 @@
 /**
- * «I miei documenti» (r142, Francesco 16/10/2026): the personal document drawer. Pure helpers shared by the server
+ * «I miei documenti» (r144, Francesco 16/10/2026): the personal document drawer. Pure helpers shared by the server
  * functions and the page: the kind catalogue (mirror of scd_doc_kinds() in
- * supabase/migrations/20261017_r142_my_documents.sql, kept equal by my-documents-migration.test.ts), parsing of the
+ * supabase/migrations/20261017_r144_my_documents.sql, kept equal by my-documents-migration.test.ts), parsing of the
  * database answers, status labels, MIME sniffing and safe file names for the Drive.
  *
  * Engines: TEMPO (the Segreteria stops chasing documents) and PERSONE (families see what is in order).
@@ -23,7 +23,7 @@ export interface DocKind {
   clubDocId: string | null;
 }
 
-/** Same order and values as scd_doc_kinds() in r142. */
+/** Same order and values as scd_doc_kinds() in r144. */
 export const DOC_KINDS: readonly DocKind[] = [
   {
     code: "INFORMATIVA_PRIVACY",
@@ -250,6 +250,8 @@ export type DeliveredStatus =
   | "IN_REGOLA"
   | "IN_SCADENZA"
   | "SCADUTO"
+  /** A kind that expires with no known date (or a certificate not yet in the register): never «in regola». */
+  | "DA_VERIFICARE"
   | "IN_VERIFICA"
   | "RIFIUTATO"
   | "MANCANTE"
@@ -262,6 +264,7 @@ export const STATUS_LABEL: Record<DeliveredStatus, string> = {
   IN_REGOLA: "In regola",
   IN_SCADENZA: "In scadenza",
   SCADUTO: "Scaduto",
+  DA_VERIFICARE: "Scadenza da verificare",
   IN_VERIFICA: "In verifica",
   RIFIUTATO: "Da ricaricare",
   MANCANTE: "Mancante",
@@ -271,6 +274,7 @@ export const STATUS_TONE: Record<DeliveredStatus, ChipToneLike> = {
   IN_REGOLA: "ok",
   IN_SCADENZA: "warn",
   SCADUTO: "crit",
+  DA_VERIFICARE: "warn",
   IN_VERIFICA: "info",
   RIFIUTATO: "crit",
   MANCANTE: "warn",
@@ -352,6 +356,7 @@ const DELIVERED: readonly DeliveredStatus[] = [
   "IN_REGOLA",
   "IN_SCADENZA",
   "SCADUTO",
+  "DA_VERIFICARE",
   "IN_VERIFICA",
   "RIFIUTATO",
   "MANCANTE",
@@ -457,6 +462,18 @@ export function personTodo(p: DrawerPerson): number {
   return docs + reqs;
 }
 
+/** One log line for a Drive file that was stored but not indexed: Drive id + error code only, never personal data. */
+export function orphanLogLine(driveFileId: string, code: string | null): string {
+  const id = /^[A-Za-z0-9_-]{10,200}$/.test(driveFileId) ? driveFileId : "invalid-id";
+  const c = code && /^[A-Za-z0-9_]{1,40}$/.test(code) ? code : "UNKNOWN";
+  return `[r144] DOC_INDEX_ORPHAN drive_file_id=${id} code=${c}`;
+}
+
+/** Short alert of the Documenti tile on La mia SCD (singular/plural). */
+export function lampAlert(total: number): string {
+  return total === 1 ? "1 documento da sistemare" : `${total} documenti da sistemare`;
+}
+
 /** One sentence for the «lampadina» banner (null = nothing to say). */
 export function lampMessage(l: Lamp): string | null {
   const parts: string[] = [];
@@ -560,7 +577,7 @@ export function driveFileName(
   return `${base}_${day}.${EXT[mime]}`;
 }
 
-/** Plain Italian for the codes of r142 and of the upload path. */
+/** Plain Italian for the codes of r144 and of the upload path. */
 export function docErrorMessage(code: string | null | undefined): string {
   switch (code) {
     case "NOT_ALLOWED":
@@ -575,6 +592,7 @@ export function docErrorMessage(code: string | null | undefined): string {
       return "Il file deve pesare al massimo 10 MB.";
     case "TOO_MANY":
       return "Hai caricato molti file oggi: riprova domani o scrivi alla Segreteria.";
+    case "NO_SERVICE":
     case "UPLOAD_OFF":
       return "Caricamento in preparazione: per ora consegna il documento alla Segreteria.";
     case "ARCHIVE_FAILED":

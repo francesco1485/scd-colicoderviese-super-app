@@ -1,5 +1,5 @@
--- r142: «I miei documenti» — personal document drawer of every member (2026-10-17, chat PC range r130-r149).
--- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r142". Never apply from an agent.
+-- r144: «I miei documenti» — personal document drawer of every member (2026-10-17, chat PC range r130-r149).
+-- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r144". Never apply from an agent.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires: r33 (scd_documents, scd_people, scd_families, scd_family_members, scd_athletes, scd_audit_events),
 -- r35 (scd_has_org_role), r59 (scd_is_minor, scd_people.display_name/left_at, scd_person_consents),
@@ -41,12 +41,19 @@
 --      scd_my_documents, scd_doc_lamp, scd_doc_upload_target, scd_doc_register_upload, scd_doc_review,
 --      scd_doc_request_create, scd_doc_office_board, scd_team_documents_ok, scd_doc_set_expiry_mail,
 --      scd_doc_expiry_run (service/cron only).
---   Visibility: the caller sees themself and the minors of the families where they are guardian (unknown birth date =
---   minor, as r95); adults only themselves. Health and identity: person/guardians, Segreteria, Direzione. ISEE:
+--   Visibility: the caller sees themself and the minors of the families where they are guardian; another guardian of
+--   the family is never in the circle, and «unknown birth date = minor» (as r95) applies only to children (relationship
+--   FIGLIO/FIGLIA/CHILD/...) or to people with an scd_athletes row; adults only themselves. Health and identity: person/guardians, Segreteria, Direzione. ISEE:
 --   person/guardians, Segreteria, Tesoreria, Direzione. Mister/staff: one boolean «in regola» per athlete
 --   (scd_team_documents_ok), never files or kinds. Families never receive Drive file ids.
 --   Medical certificate: scd_athletes.medical_certificate_expires_at stays the single source of truth (manifest
---   medical_source_of_truth): approving an uploaded certificate calls r66 scd_set_certificate.
+--   medical_source_of_truth): approving an uploaded certificate calls r66 scd_set_certificate, and the drawer reads the
+--   certificate state ONLY from scd_athletes (never from scd_documents.expires_at).
+--   Unknown is never «in regola»: a kind that expires with no known date is DA_VERIFICARE; nothing enters as APPROVATO
+--   without a review (check scd_documents_r144_approved_check: APPROVATO needs verified_at; the enrolment import writes
+--   CARICATO_IN_VERIFICA).
+--   Upload: scd_doc_upload_target (authenticated, BEFORE the file reaches the Drive: permission + daily cap of 30) and
+--   scd_doc_register_upload (service_role ONLY: the server calls it after the Drive upload with the user id it verified).
 --   5. Expiry mail: daily pg_cron job 'scd_doc_expiry_notices' (06:05 UTC) runs scd_doc_expiry_run(). It queues mail
 --      ONLY through the r95 Posta del club tables and only when ALL are true: gmail_connected, sending_enabled
 --      (r95 switches) and scd_document_settings.expiry_mail_enabled (new switch, Direzione, default OFF). Recipients
@@ -58,7 +65,8 @@
 --   drop function public.scd_doc_expiry_run(), public.scd_doc_set_expiry_mail(uuid, boolean),
 --     public.scd_team_documents_ok(uuid), public.scd_doc_office_board(uuid, text),
 --     public.scd_doc_request_create(uuid, uuid, text, text, date), public.scd_doc_review(uuid, uuid, text, date, text, text),
---     public.scd_doc_register_upload(uuid, uuid, text, uuid, text, text, text, integer, text),
+--     public.scd_doc_register_upload(uuid, uuid, uuid, text, uuid, text, text, text, integer, text),
+--     public.scd_doc_user_is_direzione(uuid, uuid),
 --     public.scd_doc_upload_target(uuid, uuid, text, uuid), public.scd_doc_lamp(uuid), public.scd_my_documents(uuid),
 --     public.scd_doc_due(uuid), public.scd_doc_circle(uuid), public.scd_doc_office_can(uuid, text), public.scd_doc_state(date),
 --     public.scd_doc_kinds();
@@ -79,7 +87,7 @@ begin
      or to_regprocedure('public.scd_comm_offices(uuid)') is null
      or to_regprocedure('public.scd_comm_resolve_envelopes(uuid, jsonb)') is null
      or to_regclass('public.scd_comm_settings') is null or to_regclass('public.scd_comm_messages') is null then
-    raise exception 'r142 prerequisites missing (r33, r59, r61, r66, r95)';
+    raise exception 'r144 prerequisites missing (r33, r59, r61, r66, r95)';
   end if;
 end;
 $$;
@@ -102,21 +110,26 @@ alter table public.scd_documents
 
 do $$
 begin
-  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r142_section_check') then
-    alter table public.scd_documents add constraint scd_documents_r142_section_check
+  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r144_section_check') then
+    alter table public.scd_documents add constraint scd_documents_r144_section_check
       check (section is null or section in ('FIRMATO','CONSEGNATO'));
   end if;
-  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r142_status_check') then
-    alter table public.scd_documents add constraint scd_documents_r142_status_check
+  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r144_status_check') then
+    alter table public.scd_documents add constraint scd_documents_r144_status_check
       check (status is null or status in ('ACCETTATO','CARICATO_IN_VERIFICA','APPROVATO','RIFIUTATO','SOSTITUITO'));
   end if;
-  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r142_file_check') then
-    alter table public.scd_documents add constraint scd_documents_r142_file_check
+  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r144_file_check') then
+    alter table public.scd_documents add constraint scd_documents_r144_file_check
       check ((drive_file_id is null or drive_file_id ~ '^[A-Za-z0-9_-]{10,200}$')
          and (file_name is null or length(file_name) <= 160)
          and (size_bytes is null or size_bytes between 1 and 10485760)
          and (sha256 is null or sha256 ~ '^[0-9a-f]{64}$')
          and (review_note is null or length(review_note) <= 300));
+  end if;
+  -- Never approved without a review: imports and uploads enter as CARICATO_IN_VERIFICA.
+  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r144_approved_check') then
+    alter table public.scd_documents add constraint scd_documents_r144_approved_check
+      check (status is distinct from 'APPROVATO' or verified_at is not null);
   end if;
 end;
 $$;
@@ -126,11 +139,9 @@ create unique index if not exists scd_documents_source_record_uidx
   on public.scd_documents (organization_id, source_id, source_record_id) where source_record_id is not null;
 
 -- ------------------------------------------------------------------ 2. read tightening
+-- The policy itself is created after scd_doc_office_can (section 4), with the same per-class r95 offices as the
+-- functions: Direzione and Segreteria (roles or positions) for signatures, health and identity; Tesoreria also ISEE.
 drop policy if exists "scd_documents_select_member" on public.scd_documents;
-do $$ begin
-  create policy "scd_documents_select_office" on public.scd_documents for select to authenticated
-    using (public.scd_has_org_role(organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[]));
-exception when duplicate_object then null; end $$;
 
 -- ------------------------------------------------------------------ 3. requests, settings, notices
 create table if not exists public.scd_document_requests (
@@ -155,8 +166,8 @@ revoke all on table public.scd_document_requests from anon, authenticated;
 
 do $$
 begin
-  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r142_request_fk') then
-    alter table public.scd_documents add constraint scd_documents_r142_request_fk
+  if not exists (select 1 from pg_constraint where conname = 'scd_documents_r144_request_fk') then
+    alter table public.scd_documents add constraint scd_documents_r144_request_fk
       foreign key (request_id) references public.scd_document_requests(id) on delete set null;
   end if;
 end;
@@ -231,6 +242,7 @@ revoke all on function public.scd_doc_kinds() from public, anon;
 grant execute on function public.scd_doc_kinds() to authenticated;
 
 -- In regola / in scadenza (<= 30 days) / scaduto, computed at query time on the Europe/Rome day (never stored).
+-- Only for kinds that expire: an unknown date is DA_VERIFICARE, never «in regola».
 create or replace function public.scd_doc_state(p_expires date)
 returns text
 language sql
@@ -238,7 +250,7 @@ stable
 set search_path to 'public'
 as $$
   select case
-    when p_expires is null then 'IN_REGOLA'
+    when p_expires is null then 'DA_VERIFICARE'
     when p_expires < (now() at time zone 'Europe/Rome')::date then 'SCADUTO'
     when p_expires <= (now() at time zone 'Europe/Rome')::date + 30 then 'IN_SCADENZA'
     else 'IN_REGOLA' end;
@@ -262,7 +274,34 @@ $$;
 revoke all on function public.scd_doc_office_can(uuid, text) from public, anon;
 grant execute on function public.scd_doc_office_can(uuid, text) to authenticated;
 
--- The caller's circle: themself, plus the minors (or unknown age) of the families where the caller is guardian.
+-- Direct table read for the offices only, per document class (unknown kinds: Direzione and Segreteria).
+do $$ begin
+  create policy "scd_documents_select_office" on public.scd_documents for select to authenticated
+    using (public.scd_doc_office_can(organization_id,
+             coalesce((select k.doc_class from public.scd_doc_kinds() k where k.code = document_type), 'IDENTITA')));
+exception when duplicate_object then null; end $$;
+
+-- Does this user (not the caller) still hold a Direzione office? Same test as r95 scd_comm_offices 'DIREZIONE'.
+-- Used by the daily job, which runs without a caller.
+create or replace function public.scd_doc_user_is_direzione(p_organization_id uuid, p_user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path to 'public'
+as $$
+  select p_user_id is not null and exists (
+    select 1 from public.scd_memberships m
+    where m.organization_id = p_organization_id and m.user_id = p_user_id and m.active
+      and (m.role = 'DIRECTION'
+           or (jsonb_typeof(m.scope -> 'positions') = 'array'
+               and exists (select 1 from jsonb_array_elements_text(m.scope -> 'positions') x
+                           where x in ('direzione','presidente','direttore-generale')))));
+$$;
+revoke all on function public.scd_doc_user_is_direzione(uuid, uuid) from public, anon, authenticated;
+
+-- The caller's circle: themself, plus the minors of the families where the caller is guardian. Other guardians are
+-- never in it. An unknown birth date counts as minor only for a child (relationship of child type) or an athlete.
 create or replace function public.scd_doc_circle(p_organization_id uuid)
 returns table (person_id uuid, relationship text)
 language sql
@@ -280,8 +319,13 @@ as $$
     join public.scd_family_members fm on fm.person_id = me.person_id and fm.is_guardian
     join public.scd_families f on f.id = fm.family_id and f.organization_id = p_organization_id
     join public.scd_family_members fm2 on fm2.family_id = fm.family_id and fm2.person_id <> me.person_id
+                                       and not coalesce(fm2.is_guardian, false)
     join public.scd_people p on p.id = fm2.person_id and p.organization_id = p_organization_id
-    where coalesce(public.scd_is_minor(p.birth_date), true)
+    where case
+      when p.birth_date is not null then coalesce(public.scd_is_minor(p.birth_date), false)
+      else upper(coalesce(fm2.relationship, '')) in ('FIGLIO','FIGLIA','FIGLI','CHILD','SON','DAUGHTER','MINORE','ATLETA')
+           or exists (select 1 from public.scd_athletes a where a.person_id = p.id and a.organization_id = p_organization_id)
+    end
   ) x
   join public.scd_people p on p.id = x.person_id and p.organization_id = p_organization_id and p.status <> 'ARCHIVED'
   order by x.person_id, x.rank;
@@ -355,15 +399,22 @@ begin
         from (
           select jsonb_build_object(
             'kind', k.code,
+            -- Certificate: state ONLY from scd_athletes (single source); an approved file without a date there is
+            -- DA_VERIFICARE. Other kinds: an approved file of a kind that expires needs a date to be «in regola».
             'status', case
-              when k.code = 'CERTIFICATO_MEDICO' and a.medical_certificate_expires_at is not null
-                then public.scd_doc_state(a.medical_certificate_expires_at)
+              when k.code = 'CERTIFICATO_MEDICO' then case
+                when a.medical_certificate_expires_at is not null then public.scd_doc_state(a.medical_certificate_expires_at)
+                when last_doc.status = 'CARICATO_IN_VERIFICA' then 'IN_VERIFICA'
+                when last_doc.status = 'RIFIUTATO' then 'RIFIUTATO'
+                when approved.id is not null then 'DA_VERIFICARE'
+                when v_import is null then 'NON_COLLEGATO'
+                else 'MANCANTE' end
               when last_doc.status = 'CARICATO_IN_VERIFICA' and approved.id is null then 'IN_VERIFICA'
-              when approved.id is not null then public.scd_doc_state(approved.expires_at)
+              when approved.id is not null then case when k.has_expiry then public.scd_doc_state(approved.expires_at) else 'IN_REGOLA' end
               when last_doc.status = 'RIFIUTATO' then 'RIFIUTATO'
               when v_import is null then 'NON_COLLEGATO'
               else 'MANCANTE' end,
-            'expiresAt', case when k.code = 'CERTIFICATO_MEDICO' then coalesce(a.medical_certificate_expires_at, approved.expires_at) else approved.expires_at end,
+            'expiresAt', case when k.code = 'CERTIFICATO_MEDICO' then a.medical_certificate_expires_at else approved.expires_at end,
             'uploadedAt', last_doc.created_at,
             'pending', last_doc.status = 'CARICATO_IN_VERIFICA',
             'reviewNote', case when last_doc.status = 'RIFIUTATO' then last_doc.review_note end) as item
@@ -451,6 +502,10 @@ begin
        and r.person_id = p_person_id and r.doc_kind = p_kind and r.status in ('APERTA','RIFIUTATO')) then
     return jsonb_build_object('ok', false, 'code', 'REQUEST_CLOSED');
   end if;
+  -- Daily cap checked here too, so a refused upload never reaches the Drive.
+  if (select count(*) from public.scd_documents d where d.uploaded_by = auth.uid() and d.created_at > now() - interval '1 day') >= 30 then
+    return jsonb_build_object('ok', false, 'code', 'TOO_MANY');
+  end if;
   return jsonb_build_object('ok', true,
     'folderHint', regexp_replace(initcap(coalesce(v_p.last_name, '')) || '_' || initcap(coalesce(v_p.first_name, '')), '[^A-Za-zÀ-ÿ_''-]+', '', 'g'),
     'personRef', v_p.id);
@@ -460,8 +515,11 @@ revoke all on function public.scd_doc_upload_target(uuid, uuid, text, uuid) from
 grant execute on function public.scd_doc_upload_target(uuid, uuid, text, uuid) to authenticated;
 
 -- After the server stored the file on the Drive: index it (status CARICATO_IN_VERIFICA) and move the request.
+-- service_role ONLY: the server passes the user id it verified (auth.getUser) for the session that uploaded. The
+-- function evaluates every permission as that user (transaction-local JWT subject, read by auth.uid(); fails closed
+-- when auth.uid() does not then return that id) and re-checks the target and the daily cap.
 create or replace function public.scd_doc_register_upload(
-  p_organization_id uuid, p_person_id uuid, p_kind text, p_request_id uuid,
+  p_user_id uuid, p_organization_id uuid, p_person_id uuid, p_kind text, p_request_id uuid,
   p_drive_file_id text, p_file_name text, p_mime text, p_size integer, p_sha256 text
 )
 returns jsonb
@@ -470,11 +528,18 @@ security definer
 set search_path to 'public'
 as $$
 declare
-  v_target jsonb := public.scd_doc_upload_target(p_organization_id, p_person_id, p_kind, p_request_id);
+  v_target jsonb;
   v_request uuid := p_request_id;
   v_id uuid;
   v_today_count integer;
 begin
+  if p_user_id is null or not exists (select 1 from auth.users u where u.id = p_user_id) then
+    return jsonb_build_object('ok', false, 'code', 'NOT_ALLOWED');
+  end if;
+  perform set_config('request.jwt.claim.sub', p_user_id::text, true);
+  perform set_config('request.jwt.claims', jsonb_build_object('sub', p_user_id, 'role', 'authenticated')::text, true);
+  if auth.uid() is distinct from p_user_id then return jsonb_build_object('ok', false, 'code', 'NOT_ALLOWED'); end if;
+  v_target := public.scd_doc_upload_target(p_organization_id, p_person_id, p_kind, p_request_id);
   if not coalesce((v_target->>'ok')::boolean, false) then return jsonb_build_object('ok', false, 'code', v_target->>'code'); end if;
   if p_drive_file_id is null or p_drive_file_id !~ '^[A-Za-z0-9_-]{10,200}$' then return jsonb_build_object('ok', false, 'code', 'BAD_FILE'); end if;
   if p_mime not in ('application/pdf','image/jpeg','image/png','image/heic') then return jsonb_build_object('ok', false, 'code', 'BAD_FILE'); end if;
@@ -502,8 +567,8 @@ begin
   return jsonb_build_object('ok', true, 'documentId', v_id);
 end;
 $$;
-revoke all on function public.scd_doc_register_upload(uuid, uuid, text, uuid, text, text, text, integer, text) from public, anon;
-grant execute on function public.scd_doc_register_upload(uuid, uuid, text, uuid, text, text, text, integer, text) to authenticated;
+revoke all on function public.scd_doc_register_upload(uuid, uuid, uuid, text, uuid, text, text, text, integer, text) from public, anon, authenticated;
+grant execute on function public.scd_doc_register_upload(uuid, uuid, uuid, text, uuid, text, text, text, integer, text) to service_role;
 
 -- ------------------------------------------------------------------ 7. Segreteria
 -- Approve or reject an upload. Certificate approval writes the expiry through r66 scd_set_certificate.
@@ -551,7 +616,7 @@ begin
         if not public.scd_has_org_role(p_organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[]) then
           return jsonb_build_object('ok', false, 'code', 'CERT_ROLE');
         end if;
-        perform public.scd_set_certificate(p_organization_id, v_athlete, p_expires_at, p_cert_kind, true, 'r142 upload verified');
+        perform public.scd_set_certificate(p_organization_id, v_athlete, p_expires_at, p_cert_kind, true, 'r144 upload verified');
       end if;
     end if;
     update public.scd_documents set status = 'SOSTITUITO', updated_at = now()
@@ -621,6 +686,8 @@ set search_path to 'public'
 as $$
 declare
   v_q text := nullif(trim(coalesce(p_q, '')), '');
+  -- % and _ typed by the user are literal characters, not wildcards.
+  v_like text := replace(replace(replace(coalesce(v_q, ''), '\', '\\'), '%', '\%'), '_', '\_');
   v_classes text[];
 begin
   select array_agg(c) into v_classes from unnest(array['FIRMA','SANITARIO','IDENTITA','ECONOMICO']) c
@@ -648,7 +715,7 @@ begin
         select jsonb_build_object('id', p.id, 'label', p.display_name,
           'isAthlete', exists (select 1 from public.scd_athletes a where a.person_id = p.id)) as x
         from public.scd_people p
-        where p.organization_id = p_organization_id and p.status in ('ACTIVE','PENDING') and p.display_name ilike '%' || v_q || '%'
+        where p.organization_id = p_organization_id and p.status in ('ACTIVE','PENDING') and p.display_name ilike '%' || v_like || '%' escape '\'
         order by p.display_name limit 15) s), '[]'::jsonb) end
   );
 end;
@@ -675,8 +742,14 @@ as $$
       when exists (select 1 from public.scd_doc_kinds() k
                    where (k.required = 'ATLETA' or (k.required = 'ATLETA_MINORE' and coalesce(public.scd_is_minor(p.birth_date), true)))
                      and not exists (select 1 from public.scd_documents d where d.person_id = a.person_id and d.document_type = k.code
-                                     and d.status = 'APPROVATO')
+                                     and d.status in ('APPROVATO','CARICATO_IN_VERIFICA'))
                      and k.code <> 'CERTIFICATO_MEDICO') then false
+      -- delivered but not yet verified, or approved without the expiry it needs: unknown, not «in regola»
+      when exists (select 1 from public.scd_doc_kinds() k
+                   where (k.required = 'ATLETA' or (k.required = 'ATLETA_MINORE' and coalesce(public.scd_is_minor(p.birth_date), true)))
+                     and not exists (select 1 from public.scd_documents d where d.person_id = a.person_id and d.document_type = k.code
+                                     and d.status = 'APPROVATO' and (not k.has_expiry or d.expires_at is not null))
+                     and k.code <> 'CERTIFICATO_MEDICO') then null
       else true end
   from public.scd_team_memberships tm
   join public.scd_athletes a on a.id = tm.athlete_id
@@ -716,7 +789,8 @@ grant execute on function public.scd_doc_set_expiry_mail(uuid, boolean) to authe
 -- ------------------------------------------------------------------ 8. daily expiry notices (service / cron only)
 -- One generic mail per person per run for documents not yet noticed in the same state. Queued in the r95 outbox only
 -- when gmail_connected AND sending_enabled AND expiry_mail_enabled; the sender of record is the Direzione user who
--- turned the expiry mails on. Recipients from scd_comm_resolve_envelopes (no child under 14, guardians only).
+-- turned the expiry mails on, and only while that user STILL holds a Direzione office (checked at every run).
+-- Recipients from scd_comm_resolve_envelopes (no child under 14, guardians only).
 create or replace function public.scd_doc_expiry_run()
 returns jsonb
 language plpgsql
@@ -738,7 +812,8 @@ declare
 begin
   for v_org in
     select o.id, coalesce(s.expiry_mail_enabled, false) and coalesce(cs.sending_enabled, false) and coalesce(cs.gmail_connected, false)
-             and s.enabled_by is not null as can_send,
+             and public.scd_doc_user_is_direzione(o.id, s.enabled_by) as can_send,
+           s.expiry_mail_enabled is true and not public.scd_doc_user_is_direzione(o.id, s.enabled_by) as enabler_lost,
            s.enabled_by, cs.mailbox
     from public.scd_organizations o
     left join public.scd_document_settings s on s.organization_id = o.id
@@ -750,8 +825,9 @@ begin
     if not v_org.can_send or v_pending = 0 then
       insert into public.scd_audit_events (organization_id, actor_user_id, action, entity_type, entity_id, payload)
       values (v_org.id, null, 'DOC_EXPIRY_RUN', 'scd_document_notices', null,
-              jsonb_build_object('pending', v_pending, 'sending', v_org.can_send, 'queued', 0));
-      v_out := v_out || jsonb_build_object('org', v_org.id, 'pending', v_pending, 'sending', v_org.can_send, 'queued', 0);
+              jsonb_build_object('pending', v_pending, 'sending', v_org.can_send, 'queued', 0, 'enablerLost', v_org.enabler_lost));
+      v_out := v_out || jsonb_build_object('org', v_org.id, 'pending', v_pending, 'sending', v_org.can_send, 'queued', 0,
+                                           'enablerLost', v_org.enabler_lost);
       continue;
     end if;
     v_queued := 0; v_none := 0;
@@ -784,7 +860,7 @@ begin
         audience, delivery, queued_at, queued_by, from_address)
       values (v_org.id, v_thread, 'OUT', v_org.enabled_by, 'SEGRETERIA', 'Documenti da rinnovare',
         'Buongiorno,' || chr(10) || chr(10) || 'nell''area «I miei documenti» dell''app S.C.D. ColicoDerviese ci sono '
-          || v_person.n || ' documenti scaduti o in scadenza' || coalesce(' per ' || nullif(trim(v_name), ''), '') || '.' || chr(10)
+          || case when v_person.n = 1 then '1 documento scaduto o in scadenza' else v_person.n || ' documenti scaduti o in scadenza' end || coalesce(' per ' || nullif(trim(v_name), ''), '') || '.' || chr(10)
           || 'Apri l''app (La mia SCD, Documenti) per vedere quali e caricare quelli nuovi.' || chr(10) || chr(10)
           || 'Segreteria S.C.D. ColicoDerviese',
         v_audience, 'QUEUED', now(), v_org.enabled_by, v_org.mailbox)
@@ -815,11 +891,11 @@ end;
 $$;
 revoke all on function public.scd_doc_expiry_run() from public, anon, authenticated;
 
--- >>> r142 cron (PGlite tests skip this block: PGlite has no pg_cron)
+-- >>> r144 cron (PGlite tests skip this block: PGlite has no pg_cron)
 do $$
 begin
   if not exists (select 1 from pg_available_extensions where name = 'pg_cron') then
-    raise exception 'r142: pg_cron not available on this server';
+    raise exception 'r144: pg_cron not available on this server';
   end if;
 end;
 $$;
@@ -835,14 +911,14 @@ begin
   end loop;
   perform cron.schedule('scd_doc_expiry_notices', '5 6 * * *', 'select public.scd_doc_expiry_run();');
   if (select count(*) from cron.job where jobname = 'scd_doc_expiry_notices') <> 1 then
-    raise exception 'r142: job scd_doc_expiry_notices not scheduled exactly once';
+    raise exception 'r144: job scd_doc_expiry_notices not scheduled exactly once';
   end if;
 end;
 $$;
--- <<< r142 cron
+-- <<< r144 cron
 
-comment on table public.scd_document_requests is 'r142: documents asked by the Segreteria to a person (family). Functions only.';
-comment on table public.scd_document_notices is 'r142: one expiry notice per person/kind/expiry/state; mails only through the r95 outbox.';
-comment on function public.scd_my_documents(uuid) is 'r142: «I miei documenti» of the caller and of the minors they are guardian of.';
+comment on table public.scd_document_requests is 'r144: documents asked by the Segreteria to a person (family). Functions only.';
+comment on table public.scd_document_notices is 'r144: one expiry notice per person/kind/expiry/state; mails only through the r95 outbox.';
+comment on function public.scd_my_documents(uuid) is 'r144: «I miei documenti» of the caller and of the minors they are guardian of.';
 
 commit;

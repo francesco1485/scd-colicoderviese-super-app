@@ -1,6 +1,6 @@
 /**
  * Mapping of past enrolments (Tally «Modulo Iscrizioni 2026/2027» VLAJNy, staff form PdeZNV) and of the Drive folders
- * `Cognome_Nome_Ruolo` (made by the Make scenarios «Atleti»/«Staff») to scd_documents rows (r142). Pure functions used
+ * `Cognome_Nome_Ruolo` (made by the Make scenarios «Atleti»/«Staff») to scd_documents rows (r144). Pure functions used
  * by scripts/import-enrolment-documents.mjs; self-contained (no imports) so Node can load it with type stripping.
  *
  * PROPOSED: the question-title patterns below follow the documents listed by the Direzione; they must be checked
@@ -94,7 +94,11 @@ export interface ImportRow {
   personId: string;
   kind: ImportKind;
   section: "FIRMATO" | "CONSEGNATO";
-  status: "ACCETTATO" | "APPROVATO";
+  /**
+   * Imported files are NEVER approved: a past enrolment proves a file was delivered, not that it was checked. They
+   * enter the Segreteria queue as CARICATO_IN_VERIFICA (r144 review, which writes the certificate through r66).
+   */
+  status: "ACCETTATO" | "CARICATO_IN_VERIFICA";
   acceptedAt: string | null;
   expiresAt: string | null;
   driveFileId: string | null;
@@ -204,7 +208,7 @@ export function mapSubmissions(
           personId: p.id,
           kind,
           section: "CONSEGNATO",
-          status: "APPROVATO",
+          status: "CARICATO_IN_VERIFICA",
           acceptedAt: null,
           expiresAt: kind === "CERTIFICATO_MEDICO" ? certExpiry : null,
           driveFileId: null,
@@ -262,7 +266,7 @@ export function mapDriveFolders(
         personId: p.id,
         kind,
         section: "CONSEGNATO",
-        status: "APPROVATO",
+        status: "CARICATO_IN_VERIFICA",
         acceptedAt: null,
         expiresAt: null,
         driveFileId: file.id,

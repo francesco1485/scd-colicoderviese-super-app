@@ -26,7 +26,7 @@ const people: PersonRef[] = [
 ];
 
 describe("enrolment import mapping", () => {
-  it("maps only to kinds of the r142 catalogue, in the right section", () => {
+  it("maps only to kinds of the r144 catalogue, in the right section", () => {
     const sec = new Map(DOC_KINDS.map((k) => [k.code, k.section]));
     for (const [, k] of ACCEPTANCE_PATTERNS)
       expect(sec.get(k), k).toBe("FIRMATO");
@@ -96,7 +96,7 @@ describe("enrolment import mapping", () => {
     expect(out.unmatched).toBe(2);
     expect(out.certificateDates).toBe(1);
     expect(out.rows.map((r) => `${r.kind}:${r.status}`).sort()).toEqual([
-      "CERTIFICATO_MEDICO:APPROVATO",
+      "CERTIFICATO_MEDICO:CARICATO_IN_VERIFICA",
       "INFORMATIVA_PRIVACY:ACCETTATO",
       "MOG_SAFEGUARDING:ACCETTATO",
     ]);
@@ -109,6 +109,34 @@ describe("enrolment import mapping", () => {
     expect(new Set(out.rows.map((r) => r.sourceRecordId)).size).toBe(
       out.rows.length,
     );
+  });
+
+  it("never writes an approved document: imported files wait for the Segreteria", () => {
+    const subs = mapSubmissions(
+      [
+        {
+          id: "s9",
+          submittedAt: "2026-08-01T10:00:00Z",
+          firstName: "Bimbo",
+          lastName: "Prova",
+          birthDate: "2016-03-04",
+          fields: [
+            { title: "Certificato medico", type: "FILE_UPLOAD", value: [{ name: "c.pdf" }] },
+            { title: "Fototessera", type: "FILE_UPLOAD", value: [{ name: "f.jpg" }] },
+          ],
+        },
+      ],
+      people,
+      "TALLY_VLAJNY",
+    );
+    const drive = mapDriveFolders(
+      [{ name: "D'Esempio_Anna_Atleta", files: [{ id: "1AbCdEfGhIjKlMn", name: "certificato medico.pdf" }] }],
+      people,
+    );
+    const files = [...subs.rows, ...drive.rows].filter((r) => r.section === "CONSEGNATO");
+    expect(files.length).toBe(3);
+    for (const r of files) expect(r.status).toBe("CARICATO_IN_VERIFICA");
+    expect(JSON.stringify([...subs.rows, ...drive.rows])).not.toContain("APPROVATO");
   });
 
   it("uses Drive folders only when Cognome_Nome is unique, and summarises with counts only", () => {

@@ -42,7 +42,7 @@ import {
 } from "@/lib/social.functions";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 import { getDocLamp } from "@/lib/my-documents.functions";
-import type { Lamp } from "@/lib/my-documents";
+import { lampAlert, type Lamp } from "@/lib/my-documents";
 import { itemState, orderTeams } from "@/lib/universe";
 
 /**
@@ -229,9 +229,9 @@ function Inside({
       label: "Documenti",
       icon: FileText,
       bg: "#7654b8",
-      // «Lampadina» (r142): expired or expiring documents and open requests of the family.
+      // «Lampadina» (r144): expired or expiring documents and open requests of the family.
       dot: (docLamp?.total ?? 0) > 0,
-      ...(docLamp && docLamp.total > 0 ? { alert: `${docLamp.total} documenti da sistemare` } : {}),
+      ...(docLamp && docLamp.total > 0 ? { alert: lampAlert(docLamp.total) } : {}),
     },
     {
       to: "/crea",

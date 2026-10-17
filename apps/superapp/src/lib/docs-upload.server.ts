@@ -1,5 +1,5 @@
 /**
- * Upload path of «I miei documenti» (r142), server only.
+ * Upload path of «I miei documenti» (r144), server only.
  *
  * Chosen path: Make webhook. The server has no Google credential with a Drive scope (VERIFIED 17/10/2026: the only
  * Google OAuth credential is the Posta del club one, scopes gmail.send + gmail.readonly, lib/comm/gmail.server.ts;

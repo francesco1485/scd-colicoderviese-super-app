@@ -1,5 +1,5 @@
 /**
- * «I miei documenti» (r142): drawer of the signed-in member. Sections A «Firmati all'iscrizione», B «Consegnati»,
+ * «I miei documenti» (r144): drawer of the signed-in member. Sections A «Firmati all'iscrizione», B «Consegnati»,
  * C «Richiesti dalla Segreteria», one tab per person for guardians of several children, the «lampadina» banner and the
  * «Carica» dialog (file goes to the club Drive through the server; nothing is kept in the browser).
  */
@@ -117,7 +117,7 @@ export function MyDrawer({ data }: { data: MyDocumentsData }) {
       {people.length > 1 && (
         <div
           className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1"
-          role="tablist"
+          role="group"
           aria-label="Di chi sono i documenti"
         >
           {people.map((p) => {
@@ -126,8 +126,7 @@ export function MyDrawer({ data }: { data: MyDocumentsData }) {
               <button
                 key={p.personId}
                 type="button"
-                role="tab"
-                aria-selected={person?.personId === p.personId}
+                aria-pressed={person?.personId === p.personId}
                 onClick={() => setSel(p.personId)}
                 className={`scd-focus inline-flex h-11 flex-none items-center gap-2 rounded-full border px-4 text-[15px] font-semibold ${person?.personId === p.personId ? "border-[#1e90e0] bg-[#1e90e0] text-white" : "border-[var(--in-line)] bg-white"}`}
               >

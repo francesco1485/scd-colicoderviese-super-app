@@ -25,7 +25,7 @@ import {
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
 /**
- * Documenti dei tesserati (r142, office side of «I miei documenti»): verify what families uploaded, ask a document,
+ * Documenti dei tesserati (r144, office side of «I miei documenti»): verify what families uploaded, ask a document,
  * switch the expiry mails (Direzione). The database filters every row by class (Tesoreria: ISEE only).
  */
 export const Route = createFileRoute("/segreteria_/documenti")({
@@ -87,10 +87,14 @@ function DocumentiSociPage({
     >
       {data.error ? (
         <EmptyState title="Dati non disponibili">{data.error}</EmptyState>
-      ) : !data.live || !b ? (
+      ) : !data.live ? (
         <EmptyState title="In preparazione">
-          La migrazione r142 non è ancora attiva: la Direzione la approva con
-          «applica r142». Poi qui arrivano i documenti caricati dalle famiglie.
+          La migrazione r144 non è ancora attiva: la Direzione la approva con
+          «applica r144». Poi qui arrivano i documenti caricati dalle famiglie.
+        </EmptyState>
+      ) : !b ? (
+        <EmptyState title="Niente da gestire">
+          Non hai documenti da gestire con il tuo accesso.
         </EmptyState>
       ) : (
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
@@ -235,14 +239,17 @@ function ExpiryMailCard({ data }: { data: OfficeData }) {
   const router = useRouter();
   const save = useServerFn(setExpiryMail);
   const em = data.board?.expiryMail ?? null;
-  const [msg, setMsg] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
   async function toggle(on: boolean) {
     setBusy(true);
+    setMsg(null);
     try {
       const out = await save({ data: { enabled: on } });
-      setMsg(out.message);
+      setMsg({ ok: out.ok, text: out.message });
       if (out.ok) void router.invalidate();
+    } catch {
+      setMsg({ ok: false, text: "Operazione non riuscita. Riprova tra poco." });
     } finally {
       setBusy(false);
     }
@@ -274,12 +281,17 @@ function ExpiryMailCard({ data }: { data: OfficeData }) {
         ) : (
           <span className="text-[var(--in-sub)]">Li accende la Direzione.</span>
         )}
+        {em?.enabled && (
+          <span className="text-[13px] text-[var(--in-sub)]">
+            Si fermano da soli se chi li ha accesi non è più in Direzione.
+          </span>
+        )}
         {msg && (
           <p
-            role="status"
-            className="m-0 rounded-[10px] bg-[var(--in-info-bg)] px-3 py-2"
+            role={msg.ok ? "status" : "alert"}
+            className={`m-0 rounded-[10px] px-3 py-2 ${msg.ok ? "bg-[var(--in-info-bg)]" : "bg-[#fdecea]"}`}
           >
-            {msg}
+            {msg.text}
           </p>
         )}
       </div>
@@ -436,11 +448,27 @@ function RequestDialog({
   const [due, setDue] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [findMsg, setFindMsg] = useState<string | null>(null);
 
   async function find() {
-    if (q.trim().length < 2) return;
-    const out = await search({ data: { q: q.trim() } });
-    setPeople(out.board?.people ?? []);
+    if (q.trim().length < 2) {
+      setFindMsg("Scrivi almeno 2 lettere.");
+      return;
+    }
+    setFindMsg(null);
+    try {
+      const out = await search({ data: { q: q.trim() } });
+      if (out.error || !out.board) {
+        setPeople([]);
+        setFindMsg(out.error ?? "Ricerca non disponibile con il tuo accesso.");
+        return;
+      }
+      setPeople(out.board.people);
+      if (out.board.people.length === 0) setFindMsg("Nessuna persona trovata.");
+    } catch {
+      setPeople([]);
+      setFindMsg("Ricerca non riuscita. Riprova tra poco.");
+    }
   }
   async function run() {
     if (!person || !kind) return;
@@ -508,6 +536,14 @@ function RequestDialog({
                 Cerca
               </button>
             </form>
+            {findMsg && (
+              <p
+                role="alert"
+                className="m-0 rounded-[10px] bg-[#fdecea] px-3 py-2 text-[14px]"
+              >
+                {findMsg}
+              </p>
+            )}
             <ul className="m-0 flex list-none flex-col gap-1 p-0">
               {people.map((p) => (
                 <li key={p.id}>

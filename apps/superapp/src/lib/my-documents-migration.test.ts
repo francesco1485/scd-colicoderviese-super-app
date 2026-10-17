@@ -4,11 +4,11 @@ import { describe, expect, it } from "vitest";
 
 import { DOC_KINDS } from "./my-documents";
 
-// r142 is checked on its text here; its behaviour runs on PGlite in supabase/tests/r142_my_documents.pglite.mjs
+// r144 is checked on its text here; its behaviour runs on PGlite in supabase/tests/r144_my_documents.pglite.mjs
 // (PGlite has no pg_cron, so the cron block is checked only here).
 const path = (rel: string) => fileURLToPath(new URL(rel, import.meta.url));
 const sql = readFileSync(
-  path("../../../../supabase/migrations/20261017_r142_my_documents.sql"),
+  path("../../../../supabase/migrations/20261017_r144_my_documents.sql"),
   "utf8",
 );
 const body = sql
@@ -25,7 +25,6 @@ const PUBLIC_FNS = [
   "scd_my_documents",
   "scd_doc_lamp",
   "scd_doc_upload_target",
-  "scd_doc_register_upload",
   "scd_doc_review",
   "scd_doc_request_create",
   "scd_doc_office_board",
@@ -33,18 +32,25 @@ const PUBLIC_FNS = [
   "scd_doc_set_expiry_mail",
   "scd_doc_office_can",
 ];
-const INTERNAL_FNS = ["scd_doc_circle", "scd_doc_due", "scd_doc_expiry_run"];
+const INTERNAL_FNS = [
+  "scd_doc_circle",
+  "scd_doc_due",
+  "scd_doc_expiry_run",
+  "scd_doc_user_is_direzione",
+];
+/** Called only by the server with the service key, after the Drive upload, with the verified user id. */
+const SERVICE_FNS = ["scd_doc_register_upload"];
 const NEW_TABLES = [
   "scd_document_requests",
   "scd_document_settings",
   "scd_document_notices",
 ];
 
-describe("r142 my documents (STAGED, not applied)", () => {
-  it("is staged behind 'applica r142', targets SCD PULSE only, says why, engines, measure and rollback", () => {
-    expect(sql).toMatch(/^-- r142:/);
+describe("r144 my documents (STAGED, not applied)", () => {
+  it("is staged behind 'applica r144', targets SCD PULSE only, says why, engines, measure and rollback", () => {
+    expect(sql).toMatch(/^-- r144:/);
     expect(sql).toMatch(
-      /STAGED: NOT APPLIED\. Apply only after Francesco writes "applica r142"/,
+      /STAGED: NOT APPLIED\. Apply only after Francesco writes "applica r144"/,
     );
     expect(sql).toMatch(
       /Target: SCD PULSE \(ndevtxxijbcnskgysdit\)\. Never on dfnwzwutvnwiitiffwvr/,
@@ -59,7 +65,7 @@ describe("r142 my documents (STAGED, not applied)", () => {
     expect(body.trimEnd()).toMatch(/commit;$/);
     expect(
       existsSync(
-        path("../../../../supabase/tests/r142_my_documents.pglite.mjs"),
+        path("../../../../supabase/tests/r144_my_documents.pglite.mjs"),
       ),
     ).toBe(true);
     const manifest = readFileSync(
@@ -67,7 +73,7 @@ describe("r142 my documents (STAGED, not applied)", () => {
       "utf8",
     );
     expect(manifest).toMatch(
-      /"my_documents": "r142 \(2026-10-17, STAGED NOT APPLIED, applied only after Francesco writes «applica r142»/,
+      /"my_documents": "r144 \(2026-10-17, STAGED NOT APPLIED, applied only after Francesco writes «applica r144»/,
     );
   });
 
@@ -89,7 +95,7 @@ describe("r142 my documents (STAGED, not applied)", () => {
       "scd_comm_resolve_envelopes(uuid, jsonb)",
     ])
       expect(guard).toContain(`to_regprocedure('public.${f}') is null`);
-    expect(guard).toMatch(/raise exception 'r142 prerequisites missing/);
+    expect(guard).toMatch(/raise exception 'r144 prerequisites missing/);
   });
 
   it("is additive except the documented read tightening", () => {
@@ -159,9 +165,30 @@ describe("r142 my documents (STAGED, not applied)", () => {
         new RegExp(`grant execute on function public\\.${name}\\(`),
       );
     }
+    for (const name of SERVICE_FNS) {
+      expect(fn(name), name).toMatch(/security definer/);
+      expect(body, name).toMatch(
+        new RegExp(
+          `revoke all on function public\\.${name}\\([^)]*\\) from public, anon, authenticated;`,
+        ),
+      );
+      expect(body, name).toMatch(
+        new RegExp(
+          `grant execute on function public\\.${name}\\([^)]*\\) to service_role;`,
+        ),
+      );
+      expect(body, name).not.toMatch(
+        new RegExp(
+          `grant execute on function public\\.${name}\\([^)]*\\) to authenticated`,
+        ),
+      );
+    }
+    expect(fn("scd_doc_register_upload")).toMatch(/p_user_id uuid, p_organization_id uuid/);
+    expect(fn("scd_doc_register_upload")).toContain(
+      "if auth.uid() is distinct from p_user_id then return",
+    );
     for (const name of [
       "scd_my_documents",
-      "scd_doc_register_upload",
       "scd_doc_review",
       "scd_doc_request_create",
       "scd_doc_office_board",
@@ -204,9 +231,22 @@ describe("r142 my documents (STAGED, not applied)", () => {
     expect(fn("scd_team_documents_ok")).toMatch(
       /returns table \(team_id uuid, person_id uuid, in_regola boolean\)/,
     );
-    expect(fn("scd_doc_circle")).toMatch(
+    // other guardians never in the circle; unknown birth date = minor only for children or athletes
+    expect(fn("scd_doc_circle")).toContain("and not coalesce(fm2.is_guardian, false)");
+    expect(fn("scd_doc_circle")).not.toMatch(
       /coalesce\(public\.scd_is_minor\(p\.birth_date\), true\)/,
     );
+    // certificate state only from scd_athletes; unknown expiry is never «in regola»
+    expect(fn("scd_doc_state")).toContain("when p_expires is null then 'DA_VERIFICARE'");
+    expect(fn("scd_my_documents")).toContain(
+      "'expiresAt', case when k.code = 'CERTIFICATO_MEDICO' then a.medical_certificate_expires_at else",
+    );
+    expect(fn("scd_my_documents")).not.toMatch(/coalesce\(a\.medical_certificate_expires_at, approved/);
+    expect(body).toContain("check (status is distinct from 'APPROVATO' or verified_at is not null)");
+    // the daily cap answers before the file reaches the Drive
+    expect(fn("scd_doc_upload_target")).toMatch(/>= 30 then\s+return jsonb_build_object\('ok', false, 'code', 'TOO_MANY'\)/);
+    // literal % and _ in the people search
+    expect(fn("scd_doc_office_board")).toContain("ilike '%' || v_like || '%' escape");
   });
 
   it("sends expiry notices only through the r95 outbox, three switches on, minors rule of r95", () => {
@@ -220,6 +260,8 @@ describe("r142 my documents (STAGED, not applied)", () => {
     expect(run).toContain("insert into public.scd_comm_recipients");
     expect(run).not.toMatch(/certificat|sanitari|isee/i);
     expect(body).not.toMatch(/net\.http|pg_net|http_post/i);
+    expect(run).toContain("public.scd_doc_user_is_direzione(o.id, s.enabled_by) as can_send");
+    expect(run).toContain("when v_person.n = 1 then '1 documento scaduto o in scadenza'");
     expect(fn("scd_doc_set_expiry_mail")).toMatch(
       /'DIREZIONE' = any\(public\.scd_comm_offices\(p_organization_id\)\)/,
     );
@@ -233,7 +275,7 @@ describe("r142 my documents (STAGED, not applied)", () => {
       )?.[0] ?? "";
     expect(block).not.toBe("");
     expect(sql).toMatch(
-      /-- >>> r142 cron[\s\S]*cron\.schedule[\s\S]*-- <<< r142 cron/,
+      /-- >>> r144 cron[\s\S]*cron\.schedule[\s\S]*-- <<< r144 cron/,
     );
     const schedules = [
       ...body.matchAll(/cron\.schedule\('([^']*)', '([^']*)', '([^']*)'\)/g),
