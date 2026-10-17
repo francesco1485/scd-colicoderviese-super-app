@@ -17,13 +17,14 @@ staging/superapp produces the approved copy.
 
 The master stays an .xlsx on Drive and automation never writes it. Iride (Make scenario 7979437, route CONFERME, v5)
 records the confirm / cancel / move decisions of the Responsabile attività di base in the Make data store
-«SCD · Iride · Esiti gare (registro)» (id `<ESITI_DATASTORE_ID>`, filled in when the store is created). Every hour this
+«SCD · Iride · Esiti gare (registro)» (id `222316`, created empty on 17/10/2026 in team 2129271). Every hour this
 task lists that store and applies it to the downloaded copy of the master with `tools/sync/apply_iride_outcomes.py`
 (overlay: conferma = TIME/VENUE_STATUS CONFIRMED, annulla = MATCH_STATUS CANCELLED, sposta = MATCH_STATUS RESCHEDULED
 with the new date / time / pitch), then converts the patched copy as before. The master always wins: an outcome whose
 game was changed in the master since Iride showed it is skipped. Unit tests: `tools/sync/test_apply_iride_outcomes.py`
-(CI: `.github/workflows/sync-tools.yml`). Until `<ESITI_DATASTORE_ID>` is a real id the task skips steps 1b and 5b
-(outcomes = empty list, fingerprint of `[]`).
+(CI: `.github/workflows/sync-tools.yml`). The scheduled task receives this prompt with the real id only at «accendi v5»;
+until then (placeholder still in the configured prompt) it skips steps 1b and 5b (outcomes = empty list, fingerprint
+of `[]`). An empty register leaves the public copy unchanged.
 
 ## Prompt (as configured in the scheduled task)
 
@@ -43,7 +44,7 @@ PRINCIPLES
 
 PROCEDURE
 1. Google Drive get_file_metadata on 1eXS-kY5PCHFg4CXiAErNAKtIVEMIKgWs (excludeContentSnippets true) → modifiedTime.
-1b. Make data-store-records_list on data store <ESITI_DATASTORE_ID> (limit 100). Write the returned JSON array, exactly as
+1b. Make data-store-records_list on data store 222316 (limit 100). Write the returned JSON array, exactly as
    returned and without printing it, to outcomes.json in its own new empty directory (if the tool saved the result to a
    file, copy that file). The keys contain WhatsApp message ids: never print them, never put them in the report. If the
    call fails → BLOCKER "registro esiti Iride non leggibile", nothing pushed (the current copy keeps the outcomes it

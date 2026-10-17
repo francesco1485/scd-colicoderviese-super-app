@@ -90,7 +90,7 @@
     "conditions": [
      [
       {
-       "a": "{{if(replace(4.date; \"-\"; \"\") >= formatDate(now; \"YYYYMMDD\"; \"Europe/Rome\") & replace(4.date; \"-\"; \"\") <= formatDate(addDays(now; 8); \"YYYYMMDD\"; \"Europe/Rome\") & (4.group = \"primicalci\" | 4.group = \"piccoli\" | 4.group = \"pulcini\" | 4.group = \"2014\" | 4.group = \"2015\" | 4.group = \"esordienti\") & (4.verification.time_confirmed != true | 4.verification.venue_confirmed != true | 4.match_status = \"CLUB_EVENT\"); true; false)}}",
+       "a": "{{if((replace(4.date; \"-\"; \"\") > formatDate(now; \"YYYYMMDD\"; \"Europe/Rome\") | (replace(4.date; \"-\"; \"\") = formatDate(now; \"YYYYMMDD\"; \"Europe/Rome\") & replace(ifempty(4.time; \"23:59\"); \":\"; \"\") > formatDate(now; \"HHmm\"; \"Europe/Rome\"))) & replace(4.date; \"-\"; \"\") <= formatDate(addDays(now; 8); \"YYYYMMDD\"; \"Europe/Rome\") & (4.group = \"primicalci\" | 4.group = \"piccoli\" | 4.group = \"pulcini\" | 4.group = \"2014\" | 4.group = \"2015\" | 4.group = \"esordienti\") & (4.verification.time_confirmed != true | 4.verification.venue_confirmed != true | 4.match_status = \"CLUB_EVENT\"); true; false)}}",
        "b": "true",
        "o": "boolean:equal"
       }
@@ -132,7 +132,7 @@
        "module": "datastore:SearchRecord",
        "version": 1,
        "parameters": {
-        "datastore": 900001,
+        "datastore": 222315,
         "limit": 50,
         "continueWhenNoRes": false
        },
@@ -171,7 +171,7 @@
        "module": "datastore:UpdateRecord",
        "version": 1,
        "parameters": {
-        "datastore": 900001
+        "datastore": 222315
        },
        "mapper": {
         "key": "{{8.key}}",
@@ -192,7 +192,12 @@
        "id": 10,
        "module": "builtin:BasicFeeder",
        "version": 1,
-       "parameters": {
+       "parameters": {},
+       "mapper": {
+        "array": "{{5.array}}"
+       },
+       "metadata": {},
+       "filter": {
         "name": "Poi salva e manda la nuova lista",
         "conditions": [
          [
@@ -203,18 +208,14 @@
           }
          ]
         ]
-       },
-       "mapper": {
-        "array": "{{5.array}}"
-       },
-       "metadata": {}
+       }
       },
       {
        "id": 11,
        "module": "datastore:UpdateRecord",
        "version": 1,
        "parameters": {
-        "datastore": 900001
+        "datastore": 222315
        },
        "mapper": {
         "key": "{{1.key + \"-\" + toString(10.__IMTINDEX__)}}",
