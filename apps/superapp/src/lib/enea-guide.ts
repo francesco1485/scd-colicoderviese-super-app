@@ -90,7 +90,7 @@ function sponsorLines(today: string, list?: readonly TournamentEdition[]): EneaL
     },
     {
       id: "sponsor-led",
-      reason: `Sul LED wall a bordo campo a Colico ogni partner ha il suo spot di ${LED_MASTER.seconds} secondi, in rotazione con gli altri: lo prepara il club e lo approvi tu.`,
+      reason: `Con il pacchetto LED wall il tuo spot di ${LED_MASTER.seconds} secondi va in rotazione a bordo campo a Colico: lo prepara il club e lo approvi tu.`,
       action: { label: "Guarda il LED wall", to: "/sponsor", hash: "ledwall" },
     },
   ];

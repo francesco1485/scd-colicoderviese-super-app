@@ -4020,8 +4020,8 @@
         "rule": "Enea (cast id mentore-tornei, UD-122) becomes the master character of the cast: besides tournaments he actively pushes sponsorship, tournaments and events. In the app and in the showcase (UD-148) he proposes with reasoning, not slogans: why partnering with S.C.D. ColicoDerviese pays (audience, LED wall, events, territory), the partner packages and the 'Diventa partner' form, the next tournament or event with its call to action (sign up a team, volunteer, sponsor a prize). He is trained with a dedicated knowledge pack kept by scd-commerciale, scd-sponsor and scd-tornei: confirmed sponsors only (lib/sponsors.ts, nameVerified), real tournament calendar, offer and prices only when published; he never promises prices, discounts, visibility numbers or registrations, he collects interest and hands it to the Direzione. Quality bar: every line has a concrete reason and one action; varied wording; reviewed by scd-revisore before publish.",
         "scope": "SUPER_APP cast (apps/superapp/src/lib/cast-personas.ts mentore-tornei, assistant-cast.ts), showcase UD-148, platforms 04 Sponsor and 05 Tornei ed eventi, agents scd-commerciale, scd-sponsor, scd-tornei, scd-avatar",
         "supersedes": "extends UD-122 (Enea = tournaments mentor)",
-        "implementationStatus": "NOT_IMPLEMENTED",
-        "implementation": "backlog docs/piattaforme/IDEE.md I-261017-21"
+        "implementationStatus": "PARTIAL",
+        "implementation": "PR #181 (branch feat/cantiere-04-05-sponsor-tornei): Enea guide on /tornei, /eventi and /sponsor — apps/superapp/src/lib/enea-guide.ts (lines from repo data only: sponsors.ts, tournaments.ts, events.ts, sponsor-packages.ts, sponsor-spots.ts), apps/superapp/src/components/scd/EneaGuide.tsx (one reason + one action, rotating, dismissible, reduced motion), tests apps/superapp/src/lib/enea-guide.test.ts; open: dedicated knowledge pack for the chat (cast-personas.ts mentore-tornei), home showcase UD-148, approved Enea portrait; backlog docs/piattaforme/IDEE.md I-261017-21"
       }
     },
     {

@@ -59,7 +59,7 @@ function SponsorHero() {
             Il tuo marchio, dove <span className="text-[#ffd84a]">il Lario</span> si ritrova
           </h1>
           <p className="m-0 max-w-[58ch] text-[15px] leading-snug text-[#dbe5f7] lg:text-[17px]">
-            A bordo campo a Colico, sulle maglie, ai tornei e nell'app del club: la tua azienda davanti a famiglie, ragazzi e tifosi di Colico e Dervio, ogni settimana della stagione.
+            A bordo campo a Colico, sulle maglie, ai tornei e nell'app del club: la tua azienda davanti a famiglie, ragazzi e tifosi di Colico e Dervio.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
