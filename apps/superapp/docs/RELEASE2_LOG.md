@@ -931,3 +931,11 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Causa: sul sito live /sw.js arrivava troncato (23436 su 23956 byte, misurato 17/10 00:05): Nitro (node-server) registra size/etag dei file pubblici prima che vite-plugin-pwa completi sw.js e serve la Content-Length vecchia. Il browser rifiutava il service worker («ServiceWorker script evaluation failed») e non offriva «Installa app».
 - Misura: `scripts/fix-public-asset-meta.mjs` dopo `vite build` (anche `build:node`) riallinea size, etag e mtime in `.output/server/index.mjs` (accetta le dimensioni esponenziali 2e3; avviso se la tabella non è riconosciuta; scrittura atomica). Test: `src/lib/public-asset-meta.test.ts`.
 - Dopo il deploy: verificare che la Content-Length di /sw.js sia uguale alla dimensione reale e che Chrome offra «Installa app».
+
+## 2026-10-17 — chat cloud — Cantiere 04 Sponsor + 05 Tornei ed eventi (PR #181; Francesco 08:22 «migliorala… renderla attrattiva»)
+
+- /tornei: testata con il prossimo torneo e conto alla rovescia, «Iscrivi la squadra» (sezione iscrizioni esistente), una scheda per torneo pubblicato (annate in fila, 6 icone di servizio con «da confermare», squadre confermate, locandina una volta e ingrandibile), righe «In arrivo», fascia «Vivi il Lago» con fonti (`lib/tournament-hub.ts`).
+- Enea guida (UD-149, PARTIAL) su /tornei, /eventi, /sponsor: un motivo e un'azione, a rotazione, chiudibile, movimento ridotto rispettato (`lib/enea-guide.ts`, `components/scd/EneaGuide.tsx`).
+- /sponsor: nuova testata, «Perché conviene» con soli numeri documentati (`lib/sponsor-reach.ts`), parete dei loghi originali, LED wall, pacchetti con i 3 passi, FAQ, modulo invariato. /partner: vantaggi e area di esempio («Esempio · dati non reali») prima della schermata di accesso invariata (`lib/partner-preview.ts`).
+- Motori SOLDI e PERSONE; misura: pressioni su «Iscrivi la squadra»/«Condividi» per torneo e proposte da /sponsor#proposta per mese.
+- Test: `tournament-hub.test.ts`, `enea-guide.test.ts`. Revisioni scd-revisore + scd-sicurezza: PASS × 2, con 3 correzioni del revisore applicate.
