@@ -111,6 +111,12 @@ export const askStaffAssistant = createServerFn({ method: "POST" })
       castFacts: loadCastFacts,
       loadPublicContext,
       session: async () => ({ user: view.user, roles: view.roles }),
+      // UD-167: the caller's own staff directory (r141, caller's session). undefined while r141 is not applied.
+      staffDirectory: async () => {
+        const { loadMyDirectory } = await import("./staff-directory.server");
+        const v = await loadMyDirectory();
+        return v.status === "live" ? v.directory : undefined;
+      },
       kbSearch: async ({ query, onlyDue, limit }) => {
         // The caller's own session (publishable key + cookies): scd_kb_search enforces INTERNO / RISERVATO.
         // Never a service key here.

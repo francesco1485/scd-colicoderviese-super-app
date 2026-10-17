@@ -159,3 +159,23 @@ describe.skipIf(!built)("client bundle keeps the showcase RPCs on the server (UD
     expect(hits).toEqual([]);
   });
 });
+
+describe.skipIf(!built)("client bundle keeps the staff directory and its numbers on the server (UD-167, r141)", () => {
+  // The directory (names, roles, consented numbers) is read only inside server-function handlers
+  // (staff-directory.functions.ts, assistant.functions.ts) with the caller's session; the office phone read too.
+  const list = ["scd_staff_directory", "scd_set_my_phone_share", "scd_person_phone"];
+
+  it("finds the RPC names in the server build (control)", () => {
+    const server = files(SERVER_DIR).map((f) => readFileSync(f, "utf8")).join("\n");
+    expect(list.every((p) => server.includes(p))).toBe(true);
+  });
+
+  it("finds no staff directory RPC in .output/public", () => {
+    const hits: string[] = [];
+    for (const f of files(PUBLIC_DIR)) {
+      const src = readFileSync(f, "utf8");
+      for (const p of list) if (src.includes(p)) hits.push(`${f.slice(PUBLIC_DIR.length)}: ${p}`);
+    }
+    expect(hits).toEqual([]);
+  });
+});
