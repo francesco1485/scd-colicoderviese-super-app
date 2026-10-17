@@ -116,6 +116,8 @@ export function ClubCatalogEditor(props: ClubCatalogEditorProps) {
   const { platform, state, entries, onSave, onDone, children } = props;
   const cardId = props.id ?? `catalogo-${platform.toLowerCase().replace("_", "-")}`;
   const [editing, setEditing] = useState<{ id: string | null; draft: CatalogDraft } | null>(null);
+  // Bumped on every "Aggiungi": the new-entry form remounts empty even when one is already open.
+  const [formKey, setFormKey] = useState(0);
   const [flash, setFlash] = useState<string | null>(null);
   const counts = entries ? catalogCounts(entries) : null;
   const kinds = PLATFORM_KINDS[platform];
@@ -177,6 +179,7 @@ export function ClubCatalogEditor(props: ClubCatalogEditorProps) {
                     className={btnGhost}
                     onClick={() => {
                       setFlash(null);
+                      setFormKey((n) => n + 1);
                       setEditing({ id: null, draft: emptyCatalogDraft(kind) });
                     }}
                   >
@@ -188,7 +191,7 @@ export function ClubCatalogEditor(props: ClubCatalogEditorProps) {
               {editing && editing.draft.kind === kind && (
                 <div className="mt-3 rounded-xl border border-[#b9d5ef] bg-[#f7fbff] p-3">
                   <CatalogForm
-                    key={editing.id ?? "new"}
+                    key={`${editing.id ?? "new"}-${formKey}`}
                     platform={platform}
                     editing={editing}
                     onSave={onSave}

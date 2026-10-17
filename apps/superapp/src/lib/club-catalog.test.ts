@@ -4,6 +4,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   CATALOG_WRITERS,
+  CATEGORY_LABEL,
+  LISTINO_CATEGORIES,
+  LISTINO_TAB_LABELS,
+  PUBLIC_CATALOG_TIMEOUT_MS,
+  catalogWithin,
   PLATFORM_KINDS,
   cardAdditions,
   catalogCounts,
@@ -67,9 +72,9 @@ describe("writers (mirror of scd_club_catalog_writer)", () => {
       for (const k of kinds) expect(SQL).toMatch(new RegExp(`platform = '${p}' and kind (=|in \\()[^)]*'${k}'`));
   });
 
-  it("the migration is staged, additive and never touches the forbidden project", () => {
-    expect(SQL).toContain("STAGED: NOT APPLIED");
-    expect(SQL).toContain('"applica r115"');
+  it("the migration records its applied state, is additive and never touches the forbidden project", () => {
+    expect(SQL).toContain("APPLIED on SCD PULSE 17/10/2026");
+    expect(SQL).toContain("«applica r115 r116»");
     expect(SQL).not.toMatch(/\bdrop table\b(?![^\n]*if exists)/i);
     expect(SQL).not.toContain("dfnwzwutvnwiitiffwvr");
     expect(SQL).toContain("revoke all on table public.scd_club_catalog from anon, authenticated");
@@ -104,6 +109,33 @@ describe("validateCatalogDraft (mirror of scd_club_catalog_clean)", () => {
     expect(validateCatalogDraft("CONVENZIONI", { ...c, validFrom: "2026-05-01", validUntil: "2026-04-01" })).toEqual({ ok: false, code: "date" });
     expect(validateCatalogDraft("CONVENZIONI", { ...c, validFrom: "2026-02-31" })).toEqual({ ok: false, code: "date" });
     expect(validateCatalogDraft("CONVENZIONI", { ...c, body: "" })).toEqual({ ok: false, code: "body" });
+  });
+
+  it("a delimited date is not a phone number; phone numbers with dashes stay refused", () => {
+    const c = { ...emptyCatalogDraft("CONVENZIONE"), title: "Negozio di prova", body: "Sconto 10%" };
+    expect(validateCatalogDraft("CONVENZIONI", { ...c, body: "Valida fino al 2026-10-31" })).toMatchObject({ ok: true });
+    expect(validateCatalogDraft("CONVENZIONI", { ...c, body: "Dal 2026-10-01 al 2026-10-31" })).toMatchObject({ ok: true });
+    expect(validateCatalogDraft("CONVENZIONI", { ...c, body: "Chiama 0341-94-01-23" })).toEqual({ ok: false, code: "contact" });
+    expect(validateCatalogDraft("CONVENZIONI", { ...c, body: "Chiama 3331-23-45-67" })).toEqual({ ok: false, code: "contact" });
+    expect(validateCatalogDraft("CONVENZIONI", { ...c, body: "Chiama 12026-10-311" })).toEqual({ ok: false, code: "contact" });
+  });
+
+  it("a slow or failed public read falls back to 'da confermare' (not ready) within the timeout", async () => {
+    expect(PUBLIC_CATALOG_TIMEOUT_MS).toBe(2000);
+    const fallback = { ready: false, entries: [] };
+    const never = new Promise<typeof fallback>(() => {});
+    expect(await catalogWithin(never, fallback, 10)).toBe(fallback);
+    expect(await catalogWithin(Promise.reject(new Error("x")), fallback, 10)).toBe(fallback);
+    const ok = { ready: true, entries: [] };
+    expect(await catalogWithin(Promise.resolve(ok), fallback, 10)).toBe(ok);
+  });
+
+  it("the till categories include photo services", () => {
+    expect(LISTINO_CATEGORIES).toEqual(["BAR", "CUCINA", "MERCHANDISING", "SERVIZI_FOTO"]);
+    expect(CATEGORY_LABEL["SERVIZI_FOTO"]).toBe("Servizi foto");
+    expect(LISTINO_TAB_LABELS).toEqual(["Bar", "Cucina", "Merchandising", "Servizi foto"]);
+    const d = { ...emptyCatalogDraft("LISTINO"), title: "Foto squadra", category: "SERVIZI_FOTO" };
+    expect(validateCatalogDraft("CLUB_HOUSE", d)).toMatchObject({ ok: true, value: { category: "SERVIZI_FOTO" } });
   });
 
   it("a card benefit needs at least one card; cards are deduplicated and sorted", () => {

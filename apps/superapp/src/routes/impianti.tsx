@@ -5,6 +5,7 @@ import { CastPresence } from "@/components/scd/CastPresence";
 import { ClubHousePublicCard } from "@/components/scd/ClubCatalogPublic";
 import { FacilityMap } from "@/components/scd/FacilityMap";
 import { TicketRules } from "@/components/scd/TicketRules";
+import { catalogWithin } from "@/lib/club-catalog";
 import { getPublicClubCatalog } from "@/lib/club-catalog.functions";
 import { FACILITIES, siteById, spaceById } from "@/lib/facilities";
 import { siteMapsUrl } from "@/lib/maps-link";
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/impianti")({
     const [{ loadCalendar }, { nextHomeMatchText }] = await Promise.all([import("@/lib/public-snapshots"), import("@/lib/cast-live")]);
     const cal = loadCalendar();
     // Club House hours, price list and group menus entered in the gestionale (r115); "da confermare" otherwise.
-    const catalog = await getPublicClubCatalog().catch(() => ({ ready: false, entries: [] }));
+    const catalog = await catalogWithin(getPublicClubCatalog(), { ready: false, entries: [] });
     return { today, nextHome: nextHomeMatchText(cal.groups, cal.events, today), catalog };
   },
   head: () => pageHead(PUBLIC_PAGES.impianti),

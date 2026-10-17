@@ -3,6 +3,7 @@ import { ChevronLeft, Store } from "lucide-react";
 
 import { CardAdditionsCard, ConvenzioniPublicCard } from "@/components/scd/ClubCatalogPublic";
 import { ClubCardDetails, ClubCardFace, ClubCardLinks, ClubCardRules } from "@/components/scd/ClubCards";
+import { catalogWithin } from "@/lib/club-catalog";
 import { getPublicClubCatalog } from "@/lib/club-catalog.functions";
 import { CLUB_CARDS, clubCard, isClubCardId } from "@/lib/club-cards";
 import { CREST_SHARE_IMAGE, PUBLIC_PAGES, pageHead } from "@/lib/share";
@@ -14,7 +15,7 @@ import { CREST_SHARE_IMAGE, PUBLIC_PAGES, pageHead } from "@/lib/share";
 export const Route = createFileRoute("/card/$tipo")({
   loader: async ({ params }) => {
     if (!isClubCardId(params.tipo)) throw notFound();
-    const catalog = await getPublicClubCatalog().catch(() => ({ ready: false, entries: [] }));
+    const catalog = await catalogWithin(getPublicClubCatalog(), { ready: false, entries: [] });
     return { id: params.tipo, catalog };
   },
   head: ({ loaderData }) => {

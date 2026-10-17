@@ -4,7 +4,7 @@ Responsabile: scd-convenzioni · Stato: In costruzione · Pagina: `/gestionale/p
 
 ## Stato reale
 
-- 17/10/2026 (Francesco 12:22): la pagina `/gestionale/piattaforme/convenzioni` ha due schede di inserimento: «Convenzioni» (partner, offerta, validità, come usarla, categoria, card che danno accesso, link https) e «Tessere e card» (vantaggi delle tre card, regole, altri tipi di tessera). Registro unico `scd_club_catalog` (migrazione r115, STAGED). Convenzioni: solo Direzione; Tessere: Direzione e Segreteria. Le tre card e i loro importi restano la policy della Direzione (`config/scd-club-cards.v1.json`), mai copiate.
+- 17/10/2026 (Francesco 12:22): la pagina `/gestionale/piattaforme/convenzioni` ha due schede di inserimento: «Convenzioni» (partner, offerta, validità, come usarla, categoria, card che danno accesso, link https) e «Tessere e card» (vantaggi delle tre card, regole, altri tipi di tessera). Registro unico `scd_club_catalog` (migrazione r115, APPLICATA su SCD PULSE il 17/10/2026 dopo «applica r115 r116»: parte 1 `r115_club_catalog_part1_tables` (~12:55), parte 2 `r115_club_catalog_part2_clean_save` (~13:20); parte 3 (filtro date più stretto e categoria «Servizi foto» in `scd_club_catalog_clean`) da applicare dalla sessione principale). Convenzioni: solo Direzione; Tessere: Direzione e Segreteria. Le tre card e i loro importi restano la policy della Direzione (`config/scd-club-cards.v1.json`), mai copiate.
 - In pubblico: `/card` (tutte) e `/card/<tipo>` (solo quelle di quella card); senza dati «Convenzioni da confermare».
 - Non toccato: la fascia promo della home (`lib/home-promos.ts` CONVENZIONI) resta vuota finché Francesco annuncia le convenzioni con partner sponsor.
 
@@ -24,7 +24,7 @@ Responsabile: scd-convenzioni · Stato: In costruzione · Pagina: `/gestionale/p
 
 ## Prossimo passo costruibile
 
-- Dopo «applica r115»: la Direzione inserisce le convenzioni già dette sì dai partner; la Segreteria la scadenza delle card e gli altri vantaggi.
+- Ora che r115 è applicata: la Direzione inserisce le convenzioni già dette sì dai partner; la Segreteria la scadenza delle card e gli altri vantaggi.
 - Poi: la fascia promo della home legge le convenzioni pubblicate con partner tra gli sponsor confermati (invece della lista fissa).
 
 ## Storico dei cicli

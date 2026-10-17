@@ -3,6 +3,7 @@ import { ChevronRight, Store } from "lucide-react";
 
 import { CardAdditionsCard, ConvenzioniPublicCard } from "@/components/scd/ClubCatalogPublic";
 import { ClubCardFace, ClubCardRules } from "@/components/scd/ClubCards";
+import { catalogWithin } from "@/lib/club-catalog";
 import { getPublicClubCatalog } from "@/lib/club-catalog.functions";
 import { CLUB_CARDS, activationText } from "@/lib/club-cards";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
@@ -10,7 +11,7 @@ import { PUBLIC_PAGES, pageHead } from "@/lib/share";
 /** /card — the three club cards 2026/27 (Direzione 13/10/2026). Public, no personal data. */
 export const Route = createFileRoute("/card/")({
   // Convenzioni and card additions entered in the gestionale (r115): published rows only, "da confermare" otherwise.
-  loader: async () => ({ catalog: await getPublicClubCatalog().catch(() => ({ ready: false, entries: [] })) }),
+  loader: async () => ({ catalog: await catalogWithin(getPublicClubCatalog(), { ready: false, entries: [] }) }),
   head: () => pageHead(PUBLIC_PAGES.card),
   component: CardIndexPage,
 });

@@ -93,6 +93,17 @@ assert.deepEqual(await save(CH, null, { platform: "CLUB_HOUSE", kind: "LISTINO",
 assert.deepEqual(await save(CH, null, { platform: "CLUB_HOUSE", kind: "LISTINO", category: "BAR", title: "Panino", priceCents: -1 }), { ok: false, code: "price" });
 assert.deepEqual(await save(CH, null, { platform: "CLUB_HOUSE", kind: "MENU_GRUPPI", title: "Chiama 333 123 4567", body: "x" }), { ok: false, code: "contact" });
 assert.deepEqual(await save(CH, null, { platform: "CLUB_HOUSE", kind: "MENU_GRUPPI", title: "Menu", body: "scrivi a chef@example.com" }), { ok: false, code: "contact" });
+// a delimited date is not a phone number; phone numbers with dashes stay refused (mirror of ISO_DATE in TS)
+for (const body of ["Valido fino al 2026-10-31", "Dal 2026-10-01 al 2026-10-31"]) {
+  assert.equal(await one(CH, `select public.scd_club_catalog_clean('CLUB_HOUSE', $1::jsonb) ? 'code'`, [JSON.stringify({ kind: "MENU_GRUPPI", title: "Menu", body })]), false, body);
+}
+for (const body of ["Chiama 0341-94-01-23", "Chiama 3331-23-45-67", "Chiama 12026-10-311"]) {
+  assert.deepEqual(await save(CH, null, { platform: "CLUB_HOUSE", kind: "MENU_GRUPPI", title: "Menu", body }), { ok: false, code: "contact" }, body);
+}
+// till category "Servizi foto"
+const photo = await one(CH, `select public.scd_club_catalog_clean('CLUB_HOUSE', $1::jsonb)`, [JSON.stringify({ kind: "LISTINO", category: "SERVIZI_FOTO", title: "Foto squadra" })]);
+assert.equal(photo.category, "SERVIZI_FOTO");
+assert.equal(photo.priceCents, null);
 assert.deepEqual(await save(CH, null, { platform: "CLUB_HOUSE", kind: "CONVENZIONE", title: "x", body: "y" }), { ok: false, code: "kind" });
 // the responsible cannot touch the other platforms
 await denied(save(CH, null, { platform: "CONVENZIONI", kind: "CONVENZIONE", category: "NEGOZI", title: "Negozio", body: "10%" }));

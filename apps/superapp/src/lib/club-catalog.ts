@@ -6,7 +6,8 @@
  *   - 19 Convenzioni: partner, offer, validity, how to use it, category, cards that give access, link.
  *   - Tessere (club cards): other card or membership types, benefits and rules ADDED to the three cards of
  *     config/scd-club-cards.v1.json (lib/club-cards.ts), which stay the Direzione's policy and are never duplicated.
- * Storage: Supabase SCD PULSE table scd_club_catalog (migration r115, STAGED until "applica r115"). This file is pure:
+ * Storage: Supabase SCD PULSE table scd_club_catalog (migration r115, APPLIED 17/10/2026 after «applica r115»:
+ * part1 tables, part2 clean+save; part3 = tightened date strip, pending). This file is pure:
  * types, the writer rule mirror, the input check (mirror of scd_club_catalog_clean), parsing and the public views.
  * Nothing is invented: a missing price is "prezzo da confermare", an empty list is "da confermare", never zero.
  */
@@ -44,19 +45,23 @@ export const CATALOG_SITES = ["COLICO", "DERVIO"] as const;
 export type CatalogSite = (typeof CATALOG_SITES)[number];
 export const SITE_LABEL: Readonly<Record<CatalogSite, string>> = { COLICO: "Colico", DERVIO: "Dervio" };
 
-/** Same tabs as the till preview of /tesoreria/club-house. */
-export const LISTINO_CATEGORIES = ["BAR", "CUCINA", "MERCHANDISING"] as const;
+/** Same categories as the Club House cash register; the till preview tabs come from here (LISTINO_TAB_LABELS). */
+export const LISTINO_CATEGORIES = ["BAR", "CUCINA", "MERCHANDISING", "SERVIZI_FOTO"] as const;
 export const CONVENZIONE_CATEGORIES = ["RISTORAZIONE", "SPORT_SALUTE", "NEGOZI", "SERVIZI", "ALTRO"] as const;
 export const CATEGORY_LABEL: Readonly<Record<string, string>> = {
   BAR: "Bar",
   CUCINA: "Cucina",
   MERCHANDISING: "Merchandising",
+  SERVIZI_FOTO: "Servizi foto",
   RISTORAZIONE: "Ristorazione",
   SPORT_SALUTE: "Sport e salute",
   NEGOZI: "Negozi",
   SERVIZI: "Servizi",
   ALTRO: "Altro",
 };
+/** Tabs of the till preview of /tesoreria and /tesoreria/club-house: the same categories as the Club House cash register
+ *  (VERIFIED from a photo of the till, 17/10/2026: bar, cucina, merchandising, servizi fotografici). */
+export const LISTINO_TAB_LABELS: readonly string[] = LISTINO_CATEGORIES.map((c) => CATEGORY_LABEL[c] ?? c);
 
 export const CATALOG_STATUSES = ["BOZZA", "PUBBLICATA", "ARCHIVIATA"] as const;
 export type CatalogStatus = (typeof CATALOG_STATUSES)[number];
@@ -219,6 +224,9 @@ export function isCatalogWriteCode(v: unknown): v is CatalogWriteCode {
 
 const MAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 const PHONE = /(\+|00)?[0-9]([ ./-]?[0-9]){8,}/;
+/** A plausible delimited YYYY-MM-DD date (19xx/20xx, month 01-12, day 01-31): dropped before the phone check, so
+ *  "2026-10-31" passes while "0341-94-01-23" or "3331-23-45-67" stay phone numbers. Mirror of scd_club_catalog_clean. */
+const ISO_DATE = /(?<!\d)(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(?!\d)/g;
 const TIME = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -262,7 +270,7 @@ export function validateCatalogDraft(
   if (howTo.length > 300) return fail("how_to");
   if (days.length > 60) return fail("days");
   const text = [title, body, howTo, days].join(" ");
-  if (MAIL.test(text) || PHONE.test(text.replace(/\d{4}-\d{2}-\d{2}/g, " "))) return fail("contact");
+  if (MAIL.test(text) || PHONE.test(text.replace(ISO_DATE, " "))) return fail("contact");
   if (link && (link.length > 300 || !/^https:\/\/\S+$/.test(link))) return fail("link");
   const price = parseEuroInput(d.price);
   if (price === "invalid") return fail("price");
@@ -400,6 +408,18 @@ export function validityText(e: Pick<CatalogEntry, "validFrom" | "validUntil">):
   if (e.validUntil) return `fino al ${it(e.validUntil)}`;
   if (e.validFrom) return `dal ${it(e.validFrom)}, scadenza da confermare`;
   return `validità ${TO_CONFIRM}`;
+}
+
+/** Longest wait of a public page (SSR loader) for the register: after it the page renders with "da confermare". */
+export const PUBLIC_CATALOG_TIMEOUT_MS = 2000;
+
+/** Resolves with the read, or with `fallback` when it fails or takes longer than `ms`. Never rejects. */
+export function catalogWithin<T>(read: Promise<T>, fallback: T, ms: number = PUBLIC_CATALOG_TIMEOUT_MS): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<T>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), ms);
+  });
+  return Promise.race([read.catch(() => fallback), late]).finally(() => clearTimeout(timer));
 }
 
 /* ------------------------------------------------------------------------------------------------ public views */

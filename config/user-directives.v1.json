@@ -4301,8 +4301,8 @@
         "rule": "Club House (platform 07: opening hours of Colico and Dervio, price list, group menus; evening events in Attività in struttura r135/r137), Convenzioni (platform 19: partner, offer, validity, how to use it, category, cards, link) and club cards (benefits, rules, other card types added to the Direzione policy config/scd-club-cards.v1.json) get a data-entry path inside the existing gestionale pages, one register for the three (scd_club_catalog). Writers: Direzione everywhere, Responsabile Club House for Club House, Segreteria for Tessere; nobody's permissions are changed. Public pages show only published rows inside their validity; missing = «da confermare», never an invented price, partner or hour.",
         "scope": "SUPER_APP /tesoreria/club-house, /gestionale/piattaforme/convenzioni, /impianti, /card, /card/$tipo",
         "supersedes": "none",
-        "implementationStatus": "IMPLEMENTED_STAGED",
-        "implementation": "migration r115 (STAGED until «applica r115»), apps/superapp/src/lib/club-catalog.ts, club-catalog.functions.ts, features/club-catalog/ClubCatalogEditor.tsx, components/scd/ClubCatalogPublic.tsx",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "migration r115 (APPLIED on SCD PULSE 17/10/2026 after «applica r115 r116»: part1 r115_club_catalog_part1_tables ~12:55, part2 r115_club_catalog_part2_clean_save ~13:20; part3 = strict date strip and LISTINO SERVIZI_FOTO in scd_club_catalog_clean, pending main session), apps/superapp/src/lib/club-catalog.ts, club-catalog.functions.ts, features/club-catalog/ClubCatalogEditor.tsx, components/scd/ClubCatalogPublic.tsx",
         "engines": [
           "SOLDI",
           "TEMPO"

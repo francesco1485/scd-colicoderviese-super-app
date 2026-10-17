@@ -9,7 +9,7 @@ import { EmptyState, SourcesBox, WorkAreaGateView, WorkAreaShell, workAreaHead }
 import { Card } from "@/components/scd/interior-ui";
 import { ClubCatalogEditor } from "@/features/club-catalog/ClubCatalogEditor";
 import { getClubHouseBoard } from "@/lib/area-requests.functions";
-import { catalogCounts } from "@/lib/club-catalog";
+import { LISTINO_TAB_LABELS, catalogCounts } from "@/lib/club-catalog";
 import { getClubCatalogDesk, saveClubCatalogEntry } from "@/lib/club-catalog.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 
@@ -50,14 +50,14 @@ function ClubHouseRoute() {
             ? { value: listino.published, label: `prodotti pubblicati nel listino (${listino.total} inseriti)` }
             : { value: null, label: "prodotti: listino da caricare" },
         ]}
-        note="Sottoarea di Tesoreria. Nessun importo mostrato."
+        note="Sottoarea di Tesoreria. Nessun incasso mostrato: la cassa resta il registratore fiscale."
       >
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_420px]">
           <div className="flex min-w-0 flex-col gap-[18px]">
             <TillPreview
               title="Cassa del bar"
               path="/tesoreria/club-house"
-              tabs={["Bar", "Cucina", "Merchandising"]}
+              tabs={LISTINO_TAB_LABELS}
               emptyTitle="Listino non ancora caricato"
               emptyText="Prodotti e prezzi del Club House: i tasti della cassa si creeranno dal listino."
               loadLabel="Carica listino"

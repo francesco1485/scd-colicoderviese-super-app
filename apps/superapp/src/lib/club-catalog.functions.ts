@@ -1,5 +1,6 @@
 /**
- * Club House, Convenzioni and Tessere register on the server (migration r115, STAGED until "applica r115").
+ * Club House, Convenzioni and Tessere register on the server (migration r115, APPLIED 17/10/2026 after
+ * «applica r115 r116»: part1 tables, part2 clean+save; part3 = tightened date strip in clean, pending).
  *
  * Every read and write goes through the caller's own Supabase session (publishable key + request cookies): the
  * SECURITY DEFINER functions of r115 check roles and positions themselves, nothing here trusts the browser. Fail closed:

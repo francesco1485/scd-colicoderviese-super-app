@@ -1,7 +1,10 @@
 -- r115: data entry of Club House (platform 07), Convenzioni (platform 19) and club cards ("tessere"), 2026-10-17,
 -- chat CLOUD range r110-r129 (r110, r113, r114 in use; r111/r112/r113 reported applied on SCD PULSE; r115 is the next
 -- free number in the repository and in every remote branch on 17/10/2026).
--- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r115". Never apply from an agent.
+-- APPLIED on SCD PULSE 17/10/2026 after Francesco wrote «applica r115 r116», in parts: part1
+-- r115_club_catalog_part1_tables (~12:55), part2 r115_club_catalog_part2_clean_save (~13:20, ISO-date strip included).
+-- PENDING part3 (main session): re-apply scd_club_catalog_clean with the strict date strip (phone numbers such as
+-- "0341-94-01-23" no longer treated as dates) and LISTINO category SERVIZI_FOTO. Never apply from an agent.
 -- Requires: r35 (scd_has_org_role), r74 (scd_has_position), scd_organizations with slug. A guard stops the migration
 -- if they are missing.
 --
@@ -197,6 +200,7 @@ declare
   c_phone constant text := '(\+|00)?[0-9]([ ./-]?[0-9]){8,}';
   c_time constant text := '^([01][0-9]|2[0-3]):[0-5][0-9]$';
   c_day constant text := '^\d{4}-\d{2}-\d{2}$';
+  c_iso_date constant text := '(?<![0-9])(19|20)[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(?![0-9])';
 begin
   if p is null or jsonb_typeof(p) <> 'object' then return jsonb_build_object('code', 'input'); end if;
   if not ((p_platform = 'CLUB_HOUSE' and v_kind in ('ORARIO','LISTINO','MENU_GRUPPI'))
@@ -209,9 +213,10 @@ begin
   if v_body is not null and char_length(v_body) > 600 then return jsonb_build_object('code', 'body'); end if;
   if v_how is not null and char_length(v_how) > 300 then return jsonb_build_object('code', 'how_to'); end if;
   if v_days is not null and char_length(v_days) > 60 then return jsonb_build_object('code', 'days'); end if;
-  -- dates (YYYY-MM-DD) are not phone numbers: drop them before the phone check
+  -- plausible delimited dates (YYYY-MM-DD, 19xx/20xx, month 01-12, day 01-31) are not phone numbers: drop them before
+  -- the phone check. "0341-94-01-23" or "3331-23-45-67" are not dates and stay refused. Mirror of ISO_DATE in TS.
   if concat_ws(' ', v_title, v_body, v_how, v_days) ~ c_mail
-     or regexp_replace(concat_ws(' ', v_title, v_body, v_how, v_days), '[0-9]{4}-[0-9]{2}-[0-9]{2}', ' ', 'g') ~ c_phone then
+     or regexp_replace(concat_ws(' ', v_title, v_body, v_how, v_days), c_iso_date, ' ', 'g') ~ c_phone then
     return jsonb_build_object('code', 'contact');
   end if;
   if v_site is not null and v_site not in ('COLICO','DERVIO') then return jsonb_build_object('code', 'site'); end if;
@@ -257,7 +262,7 @@ begin
     if v_opens is null or v_closes is null or v_opens = v_closes then return jsonb_build_object('code', 'time'); end if;
     v_cat := null; v_price := null; v_cards := '{}'::text[];
   elsif v_kind = 'LISTINO' then
-    if coalesce(v_cat, '') not in ('BAR','CUCINA','MERCHANDISING') then return jsonb_build_object('code', 'category'); end if;
+    if coalesce(v_cat, '') not in ('BAR','CUCINA','MERCHANDISING','SERVIZI_FOTO') then return jsonb_build_object('code', 'category'); end if;
     v_opens := null; v_closes := null; v_days := null;
   elsif v_kind = 'MENU_GRUPPI' then
     if v_body is null then return jsonb_build_object('code', 'body'); end if;
