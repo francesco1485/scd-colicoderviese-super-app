@@ -568,12 +568,15 @@ export function HomeLobby({
   training = null,
   nowMs: serverNow,
   today,
+  lead = null,
 }: {
   calendar: PublicCalendar;
   vetrina?: Readonly<Record<VetrinaWorld, readonly VetrinaSlot[]>> | undefined;
   training?: PublicTrainingDay | null;
   nowMs: number;
   today: string;
+  /** UD-187: what opens the page right under the live + weather band (the Super Giornalista's front page). */
+  lead?: ReactNode;
 }) {
   const nowMs = useMinuteClock(serverNow);
   const week = useMemo(() => weekBoardEvents(calendar.events, today), [calendar.events, today]);
@@ -593,6 +596,7 @@ export function HomeLobby({
   return (
     <div data-testid="home-lobby">
       <WeekStrip events={week} groups={calendar.groups} nowMs={nowMs} />
+      {lead}
       <ClubAffiliation />
       <div className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-5 pt-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 lg:pt-6`}>
         <div className="grid min-w-0 gap-5 lg:gap-7">

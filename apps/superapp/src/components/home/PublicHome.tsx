@@ -21,7 +21,9 @@ import { urgentNotices } from "@/lib/home-today";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 import type { PublicTrainingDay } from "@/lib/public-training";
 
+import { FrontPage } from "@/components/home/FrontPage";
 import { HomeLobby } from "@/components/home/HomeLobby";
+import { EMPTY_FRONT_PAGE, type FrontPage as FrontPageData } from "@/lib/front-page";
 import {
   ClubNoticeCard,
   UrgentNotices,
@@ -39,6 +41,7 @@ export function PublicHome({
   feed = null,
   notice = null,
   training = null,
+  front = EMPTY_FRONT_PAGE,
   nowMs,
   today,
 }: {
@@ -51,6 +54,8 @@ export function PublicHome({
   notice?: ClubNotice | null;
   /** Public training evening (UD-140): timetable only, from getPublicTrainings. */
   training?: PublicTrainingDay | null;
+  /** UD-187: the Super Giornalista's front page of the day (r145, VERIFIED items only); hidden when empty. */
+  front?: FrontPageData;
   nowMs: number;
   today: string;
 }) {
@@ -71,8 +76,19 @@ export function PublicHome({
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
       </h1>
       <UrgentNotices items={alerts} />
-      <ClubNoticeCard notice={notice} />
-      <HomeLobby calendar={calendar} vetrina={vetrina} training={training} nowMs={nowMs} today={today} />
+      <HomeLobby
+        calendar={calendar}
+        vetrina={vetrina}
+        training={training}
+        nowMs={nowMs}
+        today={today}
+        lead={
+          <>
+            <FrontPage page={front} today={today} />
+            <ClubNoticeCard notice={notice} />
+          </>
+        }
+      />
       <WeekendResults rows={results} />
     </main>
   );

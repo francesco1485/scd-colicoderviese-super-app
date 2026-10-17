@@ -92,7 +92,7 @@ describe("public home v5", () => {
     const home = code("src/components/home/PublicHome.tsx");
     // Direzione 13/10 09:03 "calendario settimana deve essere sempre" + 15/10 22:04 Eurobet rebuild: the week of every
     // team as event cards, right after the chips and the one static match banner.
-    expect(home).toMatch(/<HomeLobby calendar=\{calendar\}/);
+    expect(home).toMatch(/<HomeLobby\s+calendar=\{calendar\}/);
     const lobby = code("src/components/home/HomeLobby.tsx");
     expect(lobby).toMatch(/weekBoardEvents\(calendar\.events, today\)/);
     expect(lobby).toContain('data-testid="home-lobby"');
@@ -131,13 +131,13 @@ describe("public home v5", () => {
     expect(chrome).toContain('"https://www.acmonza.com/en/insieme-monza-dettaglio/mission/"');
   });
 
-  it("home order (15/10 07:04, UD-134 09:18, new idea 21:35): notices, communication, lobby, results; no stories, no partner band", () => {
+  it("home order (15/10 07:04, UD-134 09:18, new idea 21:35; UD-187 17/10): notices, lobby (live band, then front page and communication), results; no stories, no partner band", () => {
     const home = code("src/components/home/PublicHome.tsx");
     const body = home.slice(home.indexOf("export function PublicHome"));
     const order = [
       "<UrgentNotices",
-      "<ClubNoticeCard",
       "<HomeLobby",
+      "<ClubNoticeCard",
       "<WeekendResults",
     ];
     const at = order.map((t) => body.indexOf(t));
@@ -269,12 +269,15 @@ describe("public home v5", () => {
     // UD-186 (Francesco DG 17/10/2026 16:23): on the public home Crovi is only the floating chatbot; the top opens on
     // live games and Colico weather; the Crovi card moves inside, on the member home (tesserati, convocati).
     expect(home).not.toMatch(/<CroviWelcome/);
-    const order = ["<UrgentNotices", "<ClubNoticeCard", "<HomeLobby"].map((t) => home.indexOf(t));
+    // UD-187: the Super Giornalista's front page and the club communication open the page right under the live band.
+    const order = ["<UrgentNotices", "<HomeLobby", "<FrontPage", "<ClubNoticeCard"].map((t) => home.indexOf(t));
     expect(order.every((i) => i >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     const lobby = code("src/components/home/HomeLobby.tsx");
     expect(lobby).toMatch(/data-testid="home-weather"/);
     expect(lobby).toMatch(/<ColicoNowChip \/>/);
+    expect(lobby.indexOf("<WeekStrip")).toBeLessThan(lobby.indexOf("{lead}"));
+    expect(lobby.indexOf("{lead}")).toBeLessThan(lobby.indexOf("<ClubAffiliation"));
     expect(lobby).not.toMatch(/hidden lg:flex"\} min-h-11 w-full items-center gap-2 border-b/);
     const member = code("src/components/home/MemberHome.tsx");
     const mOrder = ["<UrgentNotices", "<CroviWelcome", "<ClubNoticeCard", "<MyWeek"].map((t) => member.indexOf(t));

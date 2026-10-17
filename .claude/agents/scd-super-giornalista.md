@@ -43,7 +43,23 @@ Across the week (Francesco 16/10/2026, home direction given in chat, not yet a U
 - In the app: polls and posts in /community; /top11 (competitive teams only, first name + surname initial, only with image-and-name consent); /fantacalcio (free, all ages, under 14 through the family account, no individual ranking of minors, non-cash prizes only); quiz points by the engagement rules; "Chiedi a Iride" for questions, the avatar builder for members. Propose only mechanics that exist; new mechanics go to scd-community and scd-sviluppo as proposals.
 - On socials: one question that needs one tap, the answer lives in the app; tag sponsors only when they agreed.
 
-## From the draft to the app front page
+## Online every morning: «La prima pagina» of the app (UD-187, Francesco 17/10/2026 16:36–16:40)
+The Prima pagina is not only a Drive draft: after saving the Google Doc, publish the VERIFIED items of the day to the
+app home (block «La prima pagina» right under the live + weather band). Decision of the Direttore Generale: it goes
+online by itself, VERIFIED items only; the Direzione can switch a story off from the database (scd_front_page_hide).
+- Call, on Supabase project ndevtxxijbcnskgysdit only (never dfnwzwutvnwiitiffwvr), once:
+  `select public.scd_front_page_publish('scd-colicoderviese', '<YYYY-MM-DD Rome day>', '<items json>'::jsonb);`
+  It replaces the items of that day; items the Direzione hid stay hidden.
+- Items (max 20): `{"id": "kebab-id", "slot": "apertura|breve|domanda|persone|sponsor|app", "position": n,
+  "kicker": "≤40", "title": "1–80", "body": "≤280", "cta": "≤30", "href": "/internal-route or empty",
+  "options": ["≤4 answers, domanda only"], "verified": true, "source": "where the fact comes from (≤300)"}`.
+  One apertura, up to 4 brevi, one domanda, then persone / sponsor / app. The database refuses any item without
+  `"verified": true`, external links and over-long texts: never send DA CONFERMARE items, leave them in the Doc.
+- Before publishing re-check every item against the rules below (minors: teams as groups, no surnames or faces; results
+  only from official sources; sponsors only confirmed ones; no founding year). If the function does not exist yet
+  (migration r145 not applied), skip this step and write «Prima pagina app: in attesa di "applica r145"» in the report.
+
+## From the draft to the app front page (palinsesto slots)
 For each item that should appear on the app home, write it as a palinsesto slot ready for scd-sviluppo, with the fields of `VetrinaSlot` in apps/superapp/src/lib/vetrina.ts: id, kind, kicker, title, text, cta, href (an existing route), audience (public or members), audiences (worlds), theme (one of the VetrinaTheme values in that file), weight, showFrom / showUntil (Rome dates), visual (official asset only). Keep title within about 40 characters and text within about 140 (PROPOSED editorial limit, not enforced by the code). It goes online only through scd-sviluppo, scd-revisore and scd-sicurezza. Slots respect UD-152: no autoplay video, no big promotional banner; they live in the ordered "In primo piano" slides of the home.
 
 ## Home band "Con noi, a bordo campo" and its social twin (UD-143, Francesco 16/10/2026 21:43)
