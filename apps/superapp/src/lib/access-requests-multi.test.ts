@@ -50,3 +50,24 @@ describe("one person, many hats (UD-189, r121)", () => {
     expect(multiOutcome({ code: "XX000", message: "boom" }).ok).toBe(false);
   });
 });
+
+describe("merge messages (review 17/10)", () => {
+  it("names the reason a merge was refused", () => {
+    expect(multiOutcome({ code: "22023", message: "card is not the requester" }).message).toMatch(/forse è il figlio/);
+    expect(multiOutcome({ code: "22023", message: "merge: cards of two different accounts" }).message).toMatch(/due persone/);
+    expect(multiOutcome({ code: "22023", message: "merge: a minor card with an account" }).message).toMatch(/minorenne/);
+    expect(multiOutcome({ code: "42501", message: "merge: own card" }).message).toMatch(/tua stessa scheda/);
+    expect(multiOutcome({ code: "42501", message: "merge: sections only the Direzione moves" }).message).toMatch(/Direzione/);
+    expect(multiOutcome({ code: "42501", message: "only Presidente or Direttore Generale give these roles" }).message).toMatch(/Presidente e Direttore generale/);
+    expect(multiOutcome({ code: "22023", message: "merge: duplicate data in scd_x" }).message).toMatch(/dati doppi/);
+  });
+});
+
+describe("duplicate cards by name", () => {
+  it("pairs same names, never two different known birth years or people who left", async () => {
+    const { duplicateNamePairs } = await import("./access-requests");
+    const p = (id: string, displayName: string, birthYear: number | null, status = "ACTIVE") => ({ id, displayName, birthYear, status });
+    const pairs = duplicateNamePairs([p("a", "Ernesto Maglia", 1969), p("b", "ernesto  maglia", null), p("c", "Luca Neri", 1980), p("d", "Luca Neri", 2012), p("e", "Ernesto Maglia", null, "LEFT")]);
+    expect(pairs.map(([x, y]) => `${x.id}${y.id}`)).toEqual(["ab"]);
+  });
+});

@@ -2,7 +2,7 @@
 -- STAGED: NOT APPLIED. Apply only after Francesco writes "applica r121". Never apply from an agent.
 -- Target: SCD PULSE (ndevtxxijbcnskgysdit). Never on dfnwzwutvnwiitiffwvr.
 -- Requires: r64 (scd_access_requests, scd_approve_access_request), r65 (scd_access_audit), r111 (scd_is_role_creator,
--- scd_is_creator_label, scd_is_creator_position), r138 (scd_position_catalog). A guard below stops the migration when
+-- scd_is_creator_label), r112 (scd_is_creator_position, applied 17/10), r138 (scd_position_catalog). A guard below stops the migration when
 -- one of them is missing.
 --
 -- Why (Francesco, Direttore Generale, 17/10/2026 17:51 on the access-request dialog): «uno può essere più cose come
@@ -18,13 +18,17 @@
 --      fields (email, phone, birth date, fiscal code, display name) from drop, writes one MERGE_PEOPLE audit row and
 --      deletes drop. Fail closed: different organisations, different birth dates, two athlete records, two active
 --      grants on the same section, two active consents of the same type, the same tesseramento or transport request
---      on both -> exception, nothing changes (one transaction). Who: Direzione or Segreteria; when either card holds a
---      Presidente / Direttore Generale position, only a role creator (r111: Presidente or DG).
+--      on both, cards of two different accounts, a minor's card with an account, a card linked to the caller,
+--      section grants moved by anyone but the Direzione -> exception, nothing changes (one transaction). Who: a
+--      signed-in Direzione or Segreteria person only (no session = refused: agents never merge); when either card holds
+--      a Presidente / Direttore Generale position, only a role creator (r111: Presidente or DG).
 --   2. scd_approve_access_request_multi(request, person, merge_ids[], role, positions jsonb, child_ids[], note) -> uuid:
 --      the same approval as r64 (account, base role that only goes up, verified identity link) after merging the
 --      chosen duplicate cards into `person`, then every child as guardian link and every position from the catalogue
 --      as an active organigram row (position_code, label and kind from scd_position_catalog; an optional team). Roles
---      already held are kept, never duplicated. Office roles (Direzione, Segreteria) stay out, as in r64.
+--      already held are kept, never duplicated. Office roles (Direzione, Segreteria) stay out, as in r64. Every chosen
+--      card must be the requester (same birth date when known; never a minor's or a dateless athlete's card for an
+--      adult's request: the child whose parent used the same e-mail). Presidente / DG seats only by role creators.
 --
 -- Engine: PERSONE (one card per human, every hat they wear) and TEMPO (no third card to clean up later).
 -- Measure: duplicate cards with the same e-mail or name + birth date; requests approved with more than one role.
@@ -45,7 +49,7 @@ begin
      or to_regprocedure('public.scd_is_role_creator(uuid)') is null
      or to_regprocedure('public.scd_is_creator_label(text)') is null
      or to_regprocedure('public.scd_is_creator_position(text)') is null then
-    raise exception 'r121 prerequisites missing (r64, r65, r111, r138)';
+    raise exception 'r121 prerequisites missing (r64, r65, r111, r112, r138)';
   end if;
 end
 $$;
@@ -82,19 +86,47 @@ begin
   if k.id is null or d.id is null then raise exception 'merge: card not found' using errcode = 'P0002'; end if;
   if k.organization_id <> d.organization_id then raise exception 'merge: not allowed' using errcode = '42501'; end if;
 
-  -- Who: an agent or anonymous caller never merges; the office does; Presidente/DG cards only the role creators.
-  if auth.uid() is not null then
-    if not public.scd_has_org_role(k.organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[]) then
-      raise exception 'merge: not allowed' using errcode = '42501';
-    end if;
-    select exists (
-      select 1 from public.scd_structure_roles r
-      where r.person_id in (p_keep, p_drop) and r.active
-        and (public.scd_is_creator_label(r.role_label) or public.scd_is_creator_position(r.position_code))
-    ) into v_creator_card;
-    if v_creator_card and not public.scd_is_role_creator(k.organization_id) then
-      raise exception 'merge: only Presidente or Direttore Generale merge these cards' using errcode = '42501';
-    end if;
+  -- Who: only a signed-in person of the office. No session (service role, an agent through a connector) = no merge.
+  if auth.uid() is null
+     or not public.scd_has_org_role(k.organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[]) then
+    raise exception 'merge: not allowed' using errcode = '42501';
+  end if;
+  select exists (
+    select 1 from public.scd_structure_roles r
+    where r.person_id in (p_keep, p_drop) and r.active
+      and (public.scd_is_creator_label(r.role_label) or public.scd_is_creator_position(r.position_code))
+  ) into v_creator_card;
+  if v_creator_card and not public.scd_is_role_creator(k.organization_id) then
+    raise exception 'merge: only Presidente or Direttore Generale merge these cards' using errcode = '42501';
+  end if;
+  -- Nobody merges a card linked to their own account (no self-service on one's own identity).
+  if exists (select 1 from public.scd_identity_links l where l.person_id in (p_keep, p_drop) and l.user_id = auth.uid()) then
+    raise exception 'merge: own card' using errcode = '42501';
+  end if;
+  -- Two accounts are two people: cards linked to different accounts are never merged.
+  if exists (select 1 from public.scd_identity_links a join public.scd_identity_links b
+               on b.person_id = p_drop and b.user_id <> a.user_id
+              and b.link_state in ('AUTO_VERIFIED', 'VERIFIED_BY_STAFF')
+             where a.person_id = p_keep and a.link_state in ('AUTO_VERIFIED', 'VERIFIED_BY_STAFF')) then
+    raise exception 'merge: cards of two different accounts' using errcode = '22023';
+  end if;
+  -- A minor's card (under 18, or an athlete with no birth date) never joins a card that has an account.
+  if ((d.birth_date is not null and d.birth_date > current_date - interval '18 years')
+        or (d.birth_date is null and exists (select 1 from public.scd_athletes a where a.person_id = p_drop))
+        or (k.birth_date is not null and k.birth_date > current_date - interval '18 years')
+        or (k.birth_date is null and exists (select 1 from public.scd_athletes a where a.person_id = p_keep)))
+     and exists (select 1 from public.scd_identity_links l where l.person_id in (p_keep, p_drop)) then
+    raise exception 'merge: a minor card with an account' using errcode = '22023';
+  end if;
+  -- Section grants are the Direzione's (r100): only the Direzione moves them.
+  if exists (select 1 from public.scd_person_grants g where g.person_id = p_drop and g.revoked_at is null)
+     and not public.scd_has_org_role(k.organization_id, array['DIRECTION']::public.scd_role[]) then
+    raise exception 'merge: sections only the Direzione moves' using errcode = '42501';
+  end if;
+  -- A reference this function does not know how to move (multi-column foreign key) stops the merge.
+  if exists (select 1 from pg_constraint c where c.contype = 'f' and c.confrelid = 'public.scd_people'::regclass
+               and cardinality(c.conkey) > 1) then
+    raise exception 'merge: unknown reference to people, update r121' using errcode = '22023';
   end if;
 
   if k.birth_date is not null and d.birth_date is not null and k.birth_date <> d.birth_date then
@@ -160,8 +192,12 @@ begin
       and c.conrelid not in ('public.scd_family_members'::regclass, 'public.scd_identity_links'::regclass)
       and cardinality(c.conkey) = 1
   loop
-    execute format('update %s set %I = $1 where %I = $2', fk.tbl, fk.col, fk.col) using p_keep, p_drop;
-    get diagnostics v_n = row_count;
+    begin
+      execute format('update %s set %I = $1 where %I = $2', fk.tbl, fk.col, fk.col) using p_keep, p_drop;
+      get diagnostics v_n = row_count;
+    exception when unique_violation then
+      raise exception 'merge: duplicate data in %', fk.tbl using errcode = '22023';
+    end;
     if v_n > 0 then v_moved := v_moved || jsonb_build_object(fk.tbl::text || '.' || fk.col, v_n); end if;
   end loop;
 
@@ -209,8 +245,9 @@ declare
   c public.scd_position_catalog%rowtype;
   v_added int := 0;
 begin
-  select * into r from public.scd_access_requests where id = p_request_id;
-  if r.id is null or not public.scd_has_org_role(r.organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[]) then
+  select * into r from public.scd_access_requests where id = p_request_id for update;
+  if r.id is null or auth.uid() is null
+     or not public.scd_has_org_role(r.organization_id, array['DIRECTION','SECRETARIAT']::public.scd_role[]) then
     raise exception 'not allowed' using errcode = '42501';
   end if;
   if r.status <> 'PENDING' then raise exception 'request already reviewed' using errcode = '22023'; end if;
@@ -225,9 +262,39 @@ begin
     raise exception 'a minor holds no organigram position' using errcode = '22023';
   end if;
 
+  -- Every chosen card must be the requester: same club, never another birth date, never a minor's card for an adult's
+  -- request, never an athlete card without a birth date (it may be the child whose parent used the same e-mail).
+  if coalesce(cardinality(p_merge_ids), 0) > 0 and v_person is null then
+    raise exception 'merge needs the card to keep' using errcode = '22023';
+  end if;
+  if exists (
+    select 1 from public.scd_people p
+    where p.id = any (array_append(coalesce(p_merge_ids, '{}'::uuid[]), v_person))
+      and (p.organization_id <> r.organization_id
+           or (p.birth_date is not null and p.birth_date <> r.birth_date)
+           or (not r.is_minor and p.birth_date is not null and p.birth_date > current_date - interval '18 years')
+           or (p.birth_date is null and exists (select 1 from public.scd_athletes a where a.person_id = p.id) and not r.is_minor))
+  ) then
+    raise exception 'card is not the requester' using errcode = '22023';
+  end if;
+  if v_person is not null and not exists (select 1 from public.scd_people where id = v_person and organization_id = r.organization_id) then
+    raise exception 'person not found' using errcode = 'P0002';
+  end if;
+  if exists (select 1 from unnest(coalesce(p_merge_ids, '{}'::uuid[])) m(id)
+             where not exists (select 1 from public.scd_people where id = m.id and organization_id = r.organization_id)) then
+    raise exception 'person not found' using errcode = 'P0002';
+  end if;
+
+  -- Presidente / Direttore Generale seats are given only by those two (r111/r112), checked here, not only in the UI.
+  if exists (select 1 from jsonb_array_elements(coalesce(p_positions, '[]'::jsonb)) e(x)
+             join public.scd_position_catalog pc on pc.organization_id = r.organization_id and pc.code = e.x->>'code'
+             where public.scd_is_creator_position(pc.code) or public.scd_is_creator_label(pc.label))
+     and not public.scd_is_role_creator(r.organization_id) then
+    raise exception 'only Presidente or Direttore Generale give these roles' using errcode = '42501';
+  end if;
+
   -- Duplicate cards of the same human first, so the approval lands on one card.
   if coalesce(cardinality(p_merge_ids), 0) > 0 then
-    if v_person is null then raise exception 'merge needs the card to keep' using errcode = '22023'; end if;
     foreach v_drop in array p_merge_ids loop
       if v_drop is not null and v_drop <> v_person then
         perform public.scd_merge_people(v_person, v_drop, coalesce(p_note, '') || ' [richiesta di accesso]');
@@ -242,7 +309,7 @@ begin
   if coalesce(cardinality(p_child_ids), 0) > 1 then
     for i in 2 .. cardinality(p_child_ids) loop
       v_child := p_child_ids[i];
-      continue when v_child is null or v_child = p_child_ids[1];
+      continue when v_child is null or v_child = p_child_ids[1] or v_child = v_person;
       if not exists (select 1 from public.scd_people where id = v_child and organization_id = r.organization_id) then
         raise exception 'child not found' using errcode = 'P0002';
       end if;

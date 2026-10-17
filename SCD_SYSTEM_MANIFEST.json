@@ -703,6 +703,19 @@
       "activation": "Apply r100 only after explicit Direzione approval. Until then the app keeps today's role-derived guards unchanged; no guard reads scd_can. Switching each existing guard to scd_can is a separate, explicit step.",
       "pending_requests_policy": "Pending access requests stay pending until this system is active: nobody is activated."
     },
+    "one_person_many_roles": {
+      "directive": "UD-189",
+      "decided_at": "2026-10-17",
+      "authority": "FRANCESCO_SCD",
+      "state": "STAGED_R121_NOT_APPLIED",
+      "migration": "supabase/migrations/20261017_r121_people_merge_multi_role.sql",
+      "rule": "One human = one scd_people card holding every role: parent of one or more children, athlete, any number of organigram positions (scd_structure_roles.position_code from scd_position_catalog). Duplicate cards are merged, never left split; a new card only for a different person. The account base role is the highest among the hats; sections still come one by one from r100.",
+      "functions": ["scd_merge_people", "scd_approve_access_request_multi"],
+      "merge_guards": ["SIGNED_IN_OFFICE_ONLY_NO_SESSION_REFUSED", "PRESIDENTE_DG_CARDS_AND_SEATS_ONLY_ROLE_CREATORS", "NO_OWN_CARD", "NO_TWO_ACCOUNTS", "NO_MINOR_CARD_WITH_ACCOUNT", "SECTION_GRANTS_MOVED_ONLY_BY_DIREZIONE", "DIFFERENT_BIRTH_DATES_REFUSED", "CARD_MUST_BE_THE_REQUESTER", "FAIL_CLOSED_ONE_TRANSACTION"],
+      "audit": "scd_access_audit (MERGE_PEOPLE, APPROVE_REQUEST with positions/children/merged counts)",
+      "ui": ["components/scd/AccessRequestsCard.tsx", "components/scd/MergeCardsCard.tsx (/segreteria/persone «Schede doppie»)"],
+      "before_apply": "Simple requests (one card, at most one child, no position) still go through r64 scd_approve_access_request; everything else says «serve applica r121»."
+    },
     "single_account": true,
     "registration_fields": [
       "first_name",

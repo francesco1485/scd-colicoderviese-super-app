@@ -191,6 +191,12 @@ export function multiOutcome(error: { code?: string | null; message?: string | n
   const m = error.message ?? "";
   if (error.code === "PGRST202" || error.code === "42883") return { ok: false, message: "Più ruoli e unione schede non ancora attivi: serve «applica r121»." };
   if (/only Presidente or Direttore Generale/.test(m)) return { ok: false, message: "Le schede o i ruoli di Presidente e Direttore generale li gestiscono solo loro due." };
+  if (/card is not the requester/.test(m)) return { ok: false, message: "Una scheda scelta è di un'altra persona (data di nascita diversa o atleta): forse è il figlio. Toglila e collegala come figlio." };
+  if (/two different accounts/.test(m)) return { ok: false, message: "Le schede sono collegate a due account diversi: sono due persone, non si uniscono." };
+  if (/minor card with an account/.test(m)) return { ok: false, message: "Una scheda è di un minorenne: non si unisce alla scheda di un adulto con account." };
+  if (/own card/.test(m)) return { ok: false, message: "Non puoi unire la tua stessa scheda: chiedi a un'altra persona della Direzione." };
+  if (/only the Direzione moves/.test(m)) return { ok: false, message: "La scheda da unire ha sezioni dell'app aperte: l'unione la fa la Direzione." };
+  if (/duplicate data/.test(m)) return { ok: false, message: "Le due schede hanno dati doppi: unione fermata, nulla è cambiato." };
   if (error.code === "42501") return { ok: false, message: "Solo Direzione e Segreteria possono autorizzare." };
   if (/already reviewed/.test(m)) return { ok: false, message: "Richiesta già gestita." };
   if (/different birth dates/.test(m)) return { ok: false, message: "Le schede da unire hanno date di nascita diverse: non sono la stessa persona, controlla." };
@@ -240,5 +246,22 @@ export const approveAccessRequestMulti = createServerFn({ method: "POST" })
       });
       return multiOutcome(v1.error);
     }
+    return multiOutcome(error);
+  });
+
+/* ------------------------------------------- merge two cards of the same human outside a request (UD-189) */
+
+export const mergePeopleCards = createServerFn({ method: "POST" })
+  .inputValidator((d: { keepId: string; dropId: string; note: string }) =>
+    z.object({ keepId: z.string().uuid(), dropId: z.string().uuid(), note: z.string().max(300) }).parse(d),
+  )
+  .handler(async ({ data }): Promise<{ ok: boolean; message: string }> => {
+    const c = await office();
+    if (!c) return { ok: false, message: "Accesso non valido." };
+    if (data.keepId === data.dropId) return { ok: false, message: "Scegli due schede diverse." };
+    const { error } = await c.sb.rpc("scd_merge_people", { p_keep: data.keepId, p_drop: data.dropId, p_note: data.note.trim() || null });
+    if (!error) return { ok: true, message: "Schede unite: ruoli, figli e documenti ora sono su una sola scheda." };
+    if (/different birth dates/.test(error.message ?? "")) return { ok: false, message: "Date di nascita diverse: non sono la stessa persona." };
+    if (/both cards are athletes/.test(error.message ?? "")) return { ok: false, message: "Tutte e due le schede sono atleti: unirle va fatto con i tesseramenti davanti." };
     return multiOutcome(error);
   });

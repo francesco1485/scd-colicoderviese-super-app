@@ -210,4 +210,72 @@ await fails(`select public.scd_approve_access_request_multi('50000000-0000-0000-
 await as(null);
 await fails(`select public.scd_approve_access_request_multi('50000000-0000-0000-0000-000000000002', null, null, 'ATHLETE', null, null, 'x')`, /not allowed/);
 
+// ---- Review fixes (scd-sicurezza + scd-revisore 17/10): every path that could hand data or power to the wrong person.
+const P_KID = "20000000-0000-0000-0000-000000000011"; // child card, same e-mail as the parent (typical registration)
+const P_PARENT2 = "20000000-0000-0000-0000-000000000012"; // parent card without birth date, linked to an account
+const P_X = "20000000-0000-0000-0000-000000000013";
+const P_Y = "20000000-0000-0000-0000-000000000014";
+const P_DATELESS_ATHLETE = "20000000-0000-0000-0000-000000000015";
+const U_PARENT2 = "10000000-0000-0000-0000-000000000012";
+const U_X = "10000000-0000-0000-0000-000000000013";
+const U_Y = "10000000-0000-0000-0000-000000000014";
+await db.exec(`
+insert into public.scd_people (id, organization_id, first_name, last_name, birth_date, email) values
+  ('${P_KID}', '${ORG}', 'Kid', 'Neri', '2013-04-04', 'neri@example.org'),
+  ('${P_PARENT2}', '${ORG}', 'Paola', 'Neri', null, 'neri@example.org'),
+  ('${P_X}', '${ORG}', 'Ugo', 'Gialli', '1975-01-01', null),
+  ('${P_Y}', '${ORG}', 'Ugo', 'Gialli', null, null),
+  ('${P_DATELESS_ATHLETE}', '${ORG}', 'Ugo', 'Gialli', null, null);
+insert into public.scd_athletes (organization_id, person_id) values ('${ORG}', '${P_KID}'), ('${ORG}', '${P_DATELESS_ATHLETE}');
+insert into public.scd_identity_links (organization_id, user_id, person_id, link_state) values
+  ('${ORG}', '${U_PARENT2}', '${P_PARENT2}', 'VERIFIED_BY_STAFF'),
+  ('${ORG}', '${U_X}', '${P_X}', 'VERIFIED_BY_STAFF'),
+  ('${ORG}', '${U_Y}', '${P_Y}', 'VERIFIED_BY_STAFF');
+insert into public.scd_access_requests (id, organization_id, first_name, last_name, birth_date, email, phone) values
+  ('50000000-0000-0000-0000-000000000003', '${ORG}', 'Paola', 'Neri', '1980-06-06', 'neri@example.org', '333 1111111'),
+  ('50000000-0000-0000-0000-000000000004', '${ORG}', 'Ugo', 'Gialli', '1975-01-01', 'ugo@example.org', '333 2222222');
+`);
+
+// No session = no merge (an agent through a connector never merges).
+await as(null);
+await fails(`select public.scd_merge_people('${P_X}', '${P_Y}', 'x')`, /merge: not allowed/);
+// Nobody merges their own card.
+await as(DG);
+await fails(`select public.scd_merge_people('${P_DG}', '${P_X}', 'x')`, /own card/);
+// Two accounts are two people.
+await fails(`select public.scd_merge_people('${P_X}', '${P_Y}', 'x')`, /two different accounts/);
+// A minor's card never joins a card that has an account (parent + child with the same e-mail).
+await fails(`select public.scd_merge_people('${P_PARENT2}', '${P_KID}', 'x')`, /minor card with an account/);
+await fails(`select public.scd_merge_people('${P_KID}', '${P_PARENT2}', 'x')`, /minor card with an account/);
+// Section grants move only with the Direzione.
+await db.exec(`insert into public.scd_people (id, organization_id, first_name, last_name) values
+  ('20000000-0000-0000-0000-000000000016', '${ORG}', 'Gino', 'Viola'), ('20000000-0000-0000-0000-000000000017', '${ORG}', 'Gino', 'Viola');
+  insert into public.scd_person_grants (organization_id, person_id, section_code) values ('${ORG}', '20000000-0000-0000-0000-000000000017', 'quadro');`);
+await as(SEG);
+await fails(`select public.scd_merge_people('20000000-0000-0000-0000-000000000016', '20000000-0000-0000-0000-000000000017', 'x')`, /only the Direzione moves/);
+await as(DG);
+await db.query(`select public.scd_merge_people('20000000-0000-0000-0000-000000000016', '20000000-0000-0000-0000-000000000017', 'x')`);
+assert.equal((await one(`select count(*)::int n from public.scd_person_grants where person_id = '20000000-0000-0000-0000-000000000016'`)).n, 1);
+
+// Multi approval: the chosen card must be the requester.
+await fails(`select public.scd_approve_access_request_multi('50000000-0000-0000-0000-000000000003', '${P_KID}', null, 'FAMILY', null, array['${P_KID}']::uuid[], 'x')`,
+  /card is not the requester/);
+await fails(`select public.scd_approve_access_request_multi('50000000-0000-0000-0000-000000000003', '${P_PARENT2}', array['${P_KID}']::uuid[], 'FAMILY', null, null, 'x')`,
+  /card is not the requester/);
+await fails(`select public.scd_approve_access_request_multi('50000000-0000-0000-0000-000000000004', '${P_DATELESS_ATHLETE}', null, 'STAFF', null, null, 'x')`,
+  /card is not the requester/);
+await fails(`select public.scd_approve_access_request_multi('50000000-0000-0000-0000-000000000004', '${P_X}', array['${P_OTHER_ORG}']::uuid[], 'STAFF', null, null, 'x')`,
+  /card is not the requester/);
+assert.equal((await one(`select status from public.scd_access_requests where id = '50000000-0000-0000-0000-000000000003'`)).status, "PENDING");
+// Presidente seat by the Segreteria, with no merge involved: refused in the database.
+await as(SEG);
+await fails(`select public.scd_approve_access_request_multi('50000000-0000-0000-0000-000000000004', null, null, 'MANAGER', '[{"code":"presidente"}]', null, 'x')`,
+  /only Presidente or Direttore Generale give these roles/);
+// The parent approved correctly: own card kept, child linked, child's card untouched.
+await db.query(`select public.scd_approve_access_request_multi('50000000-0000-0000-0000-000000000003', '${P_PARENT2}', null, 'FAMILY', null,
+  array['${P_KID}', '${P_PARENT2}']::uuid[], 'genitore')`);
+assert.equal((await one(`select count(*)::int n from public.scd_people where id = '${P_KID}'`)).n, 1, "child card kept");
+assert.equal((await one(`select count(*)::int n from public.scd_athletes where person_id = '${P_KID}'`)).n, 1, "athlete record stays with the child");
+assert.equal((await one(`select count(*)::int n from public.scd_family_members where person_id = '${P_PARENT2}' and is_guardian`)).n, 1, "parent is guardian once, never of self");
+
 console.log("r121 people merge + multi-role approval: all assertions passed");

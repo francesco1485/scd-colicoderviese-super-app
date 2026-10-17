@@ -124,6 +124,30 @@ export function isSeatPosition(code: string): boolean {
   return !code.startsWith("rasd-tessera-") && !code.startsWith("ls-");
 }
 
+/** Pairs of active cards with the same name (accents and case folded), to check as possible duplicates. */
+export function duplicateNamePairs<P extends { id: string; displayName: string; status: string; birthYear: number | null }>(people: readonly P[]): Array<[P, P]> {
+  const key = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+  const groups = new Map<string, P[]>();
+  for (const p of people) {
+    if (p.status === "LEFT") continue;
+    const k = key(p.displayName);
+    if (!k) continue;
+    groups.set(k, [...(groups.get(k) ?? []), p]);
+  }
+  const out: Array<[P, P]> = [];
+  for (const g of groups.values()) {
+    for (let i = 0; i < g.length; i++)
+      for (let j = i + 1; j < g.length; j++) {
+        const x = g[i]!;
+        const y = g[j]!;
+        // Two different known birth years are two people (often parent and child with the same name).
+        if (x.birthYear !== null && y.birthYear !== null && x.birthYear !== y.birthYear) continue;
+        out.push([x, y]);
+      }
+  }
+  return out;
+}
+
 export const MATCH_LABEL: Readonly<Record<string, string>> = {
   EMAIL: "stessa e-mail",
   NAME_BIRTH: "stesso nome e data di nascita",

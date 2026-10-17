@@ -33,6 +33,7 @@ import {
 import { assignTeam, getPeople, getPerson, insertPerson, markPersonLeft, type PeopleData, type WriteOutcome } from "@/lib/people.functions";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { AccessRequestsCard } from "@/components/scd/AccessRequestsCard";
+import { MergeCardsCard } from "@/components/scd/MergeCardsCard";
 
 /** Pre-selected filters from the desk links: ?squadra=nessuna, ?stato=pending. */
 function validateSearch(raw: Record<string, unknown>): { squadra?: string; stato?: "pending" } {
@@ -103,6 +104,7 @@ function PersonePage({ initial, preview, initialFilter }: { initial: PeopleData;
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
           {data.connected && <AccessRequestsCard people={data.people} today={data.today} canWrite={data.canWrite} onChanged={refresh} />}
+          {data.connected && <MergeCardsCard people={data.people} canWrite={data.canWrite} onChanged={refresh} />}
           <Card
             id="persone-elenco"
             title="Elenco"

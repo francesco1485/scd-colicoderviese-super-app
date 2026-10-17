@@ -146,6 +146,7 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
   const [positions, setPositions] = useState<PickedPosition[]>([]);
   const [posQuery, setPosQuery] = useState("");
   const [note, setNote] = useState("");
+  const [mergeOk, setMergeOk] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const age = ageOn(request.birthDate, today);
@@ -155,10 +156,8 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
     void candidatesFn({ data: { id: request.id } })
       .then((c) => {
         setCandidates(c);
-        // Strong matches (same e-mail, same name + birth date) are proposed as the same person; a name alone is not.
-        const strong = c.filter((x) => x.match !== "NAME").map((x) => x.personId);
-        setSame(strong);
-        if (c.some((x) => x.match !== "NAME" && x.kind === "atleta")) setAthlete(true);
+        // Nothing is ticked by itself: a parent's request often matches the child's card by e-mail (review 17/10).
+        setSame([]);
       })
       .catch(() => setCandidates([]));
     void catalogFn()
@@ -196,7 +195,11 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
   }, [posQuery, catalog, positions]);
 
   const missingChild = parent && children.length === 0;
-  const canApprove = canWrite && !busy && base !== null && !missingChild;
+  const requestYear = Number(request.birthDate.slice(0, 4)) || null;
+  /** A card that cannot be the requester: another birth year, or an athlete card with no year for an adult's request. */
+  const notRequester = (c: AccessCandidate) =>
+    (c.birthYear !== null && requestYear !== null && c.birthYear !== requestYear) || (c.birthYear === null && c.kind === "atleta" && !request.minor);
+  const canApprove = canWrite && !busy && base !== null && !missingChild && (mergeIds.length === 0 || mergeOk);
 
   async function doApprove() {
     if (!base) return;
@@ -264,13 +267,19 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
               {candidates.map((c) => {
                 const on = same.includes(c.personId);
                 const roles = byId.get(c.personId)?.roles ?? [];
+                const other = notRequester(c);
                 return (
-                  <label key={c.personId} className={`flex min-h-11 cursor-pointer items-center gap-3 ${box} text-[14.5px] ${on ? "border-[var(--scd-blue)] bg-[#f3f8ff]" : ""}`}>
-                    <input type="checkbox" checked={on} onChange={() => setSame((s) => (on ? s.filter((x) => x !== c.personId) : [...s, c.personId]))} className="size-5 accent-[var(--scd-blue)]" />
+                  <label key={c.personId} className={`flex min-h-11 items-center gap-3 ${box} text-[14.5px] ${other ? "cursor-not-allowed opacity-60" : "cursor-pointer"} ${on ? "border-[var(--scd-blue)] bg-[#f3f8ff]" : ""}`}>
+                    <input type="checkbox" checked={on} disabled={other} onChange={() => { setMergeOk(false); setSame((s) => (on ? s.filter((x) => x !== c.personId) : [...s, c.personId])); }} className="size-5 accent-[var(--scd-blue)]" />
                     <span className="min-w-0 flex-1">
                       <b className="block truncate">{c.displayName}{c.birthYear ? ` · ${c.birthYear}` : ""}</b>
                       <small className="block text-[13px] text-[var(--in-sub)]">{c.kind}{c.teamCodes.length ? ` · ${c.teamCodes.join(", ")}` : ""} · {MATCH_LABEL[c.match] ?? c.match}</small>
                       {roles.length > 0 && <small className="block text-[13px] text-[#0b2a5b]">Ha già: {roles.map((r) => r.label + (r.teamName ? ` (${r.teamName})` : "")).join(", ")}</small>}
+                      {other ? (
+                        <small className="block text-[13px] font-semibold text-[#9a1d14]">Non è questa persona: {c.birthYear !== null ? "anno di nascita diverso" : "atleta senza anno"} (forse un figlio: collegalo sotto, come genitore).</small>
+                      ) : (
+                        c.match !== "NAME" && !on && <small className="block text-[13px] font-semibold text-[#7a5200]">Probabile stessa persona: controlla e spunta.</small>
+                      )}
                     </span>
                   </label>
                 );
@@ -281,6 +290,12 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
                   <select value={keep.personId} onChange={(e) => setKeepId(e.target.value)} className="h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-2 text-[15px] font-normal">
                     {ticked.map((c) => <option key={c.personId} value={c.personId}>{c.displayName}{c.birthYear ? ` · ${c.birthYear}` : ""} · {c.kind}</option>)}
                   </select>
+                </label>
+              )}
+              {mergeIds.length > 0 && (
+                <label className="mt-1 flex cursor-pointer items-start gap-3 rounded-xl bg-[#fff3c4] px-3 py-2 text-[14px] leading-snug text-[#7a5200]">
+                  <input type="checkbox" checked={mergeOk} onChange={() => setMergeOk((v) => !v)} className="mt-0.5 size-5 shrink-0 accent-[var(--scd-blue)]" />
+                  <span>Ho verificato che {ticked.length} schede sono la stessa persona. L'unione non si può annullare: ruoli, figli e documenti passano sulla scheda che resta.</span>
                 </label>
               )}
               {ticked.length === 0 && <p className="m-0 text-[13.5px] text-[var(--in-sub)]">Nessuna spuntata: creo una scheda nuova (solo se è davvero un'altra persona, per esempio un omonimo).</p>}
@@ -386,7 +401,7 @@ function ReviewDialog({ request, people, today, canWrite, onClose, onDone }: { r
 
         <label className="mt-4 flex flex-col gap-1 text-[15px] font-semibold">
           Nota della verifica
-          <input value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} placeholder="Es. verificato al telefono" className="h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[15px] font-normal" />
+          <input value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} placeholder="Es. verificato al telefono (niente dati sanitari)" className="h-11 rounded-[10px] border border-[var(--in-line)] bg-white px-3 text-[15px] font-normal" />
         </label>
 
         {!canWrite && <p className="mt-3 text-[14px] text-[var(--in-sub)]">Solo Direzione e Segreteria possono autorizzare.</p>}
