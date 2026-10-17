@@ -38,6 +38,7 @@
 --   begin;
 --   drop policy if exists scd_private_team_files_insert on storage.objects;
 --   drop policy if exists scd_private_team_files_select on storage.objects;
+--   drop function if exists public.scd_team_docs_retention_candidates();
 --   drop function if exists public.scd_storage_team_file_allowed(text);
 --   drop function if exists public.scd_report_callup_impediment(uuid, uuid, text, text);
 --   drop function if exists public.scd_staff_match_status(uuid, text[]);
@@ -500,12 +501,34 @@ begin
     return false;
   end;
   if v_kind = 'match' then
+    -- A removed document (removed_at set) is closed for everyone, staff included: the row stays as history only.
+    if exists (select 1 from public.scd_match_documents d where d.storage_path = p_name and d.removed_at is not null) then
+      return false;
+    end if;
     return public.scd_team_area_scope(v_org, v_ref);
   end if;
   return exists (select 1 from public.scd_teams t where t.id = v_ref and t.organization_id = v_org
                  and t.id in (select public.scd_my_team_ids(v_org)));
 end;
 $$;
+
+-- Retention placeholder (NOT scheduled, nothing deletes anything): removed match documents older than 30 days,
+-- candidates for the storage clean-up. The retention term is «da confermare con Francesco»; until then the files stay.
+create or replace function public.scd_team_docs_retention_candidates()
+returns table (document_id uuid, organization_id uuid, match_id uuid, storage_path text, removed_at timestamptz)
+language sql
+stable
+security definer
+set search_path to 'public'
+as $$
+  select d.id, d.organization_id, d.match_id, d.storage_path, d.removed_at
+  from public.scd_match_documents d
+  where d.removed_at is not null and d.removed_at < now() - interval '30 days'
+  order by d.removed_at;
+$$;
+revoke all on function public.scd_team_docs_retention_candidates() from public, anon, authenticated;
+grant execute on function public.scd_team_docs_retention_candidates() to service_role;
+comment on function public.scd_team_docs_retention_candidates() is 'r117: retention placeholder, not scheduled. Term 30 days da confermare con Francesco. service_role only.';
 
 do $$
 begin

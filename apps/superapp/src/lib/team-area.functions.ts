@@ -55,6 +55,7 @@ const CODE_TEXT: Readonly<Record<string, string>> = {
   started: "È già iniziato: non si può più modificare.",
   future: "Le presenze si segnano dal giorno dell'allenamento.",
   not_in_team: "Uno dei ragazzi non è nella rosa di questa squadra.",
+  closed: "Questa richiesta è già stata chiusa o risposta: solo la Segreteria può modificarla.",
 };
 function codeMessage(out: unknown, fallback = "Non riuscito, riprova."): Outcome {
   const o = (out ?? {}) as { ok?: boolean; code?: string };

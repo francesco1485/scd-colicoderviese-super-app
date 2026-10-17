@@ -15,8 +15,10 @@
 --      by the app; no recording of minors), live_note, status (PLANNED | DONE | CANCELLED), updated_by.
 --      coach_notes stays private to the team staff;
 --   2. scd_training_attendance: status (PRESENTE | ASSENTE | GIUSTIFICATO) recorded by the team staff, plus the
---      family's advance notice (notice_code, notice_note, noticed_at, noticed_by). The r53 'present' column is kept
---      equal to status = PRESENTE. No health data: the reasons are categories, notes are short and stripped of
+--      family's advance notice (notice_code, notice_note, noticed_at, noticed_by). status is AUTHORITATIVE: the r53
+--      'present' column is NOT NULL DEFAULT true (r53, not changed here) and is only a legacy mirror, written equal to
+--      status = PRESENTE when the staff records; a notice-only row (status null) does not write it (no absence is
+--      pre-recorded from the family side) and every r118 read uses status, never present. No health data: the reasons are categories, notes are short and stripped of
 --      contacts. rpe stays unused;
 --   3. scd_training_drills: «dinamiche di gioco» library (title, description, optional image in scd-private
 --      <org>/drill/<team_id>/...), audience STAFF_SQUADRA | STAFF_CLUB | SQUADRA (shared with the team's athletes
@@ -103,6 +105,7 @@ alter table public.scd_training_attendance
   add column if not exists notice_note text check (notice_note is null or char_length(notice_note) <= 140),
   add column if not exists noticed_at timestamptz,
   add column if not exists noticed_by uuid;
+comment on column public.scd_training_attendance.present is 'r53 legacy mirror. r118: status is authoritative; present is meaningful only when status is not null (= status PRESENTE). Notice-only rows keep the r53 default.';
 
 -- ---------------------------------------------------------------- 2. new tables
 create table if not exists public.scd_training_drills (
@@ -575,8 +578,8 @@ begin
     where training_session_id = p_session_id and athlete_id = v_athlete;
   else
     insert into public.scd_training_attendance as t
-      (organization_id, training_session_id, athlete_id, present, notice_code, notice_note, noticed_at, noticed_by)
-    values (p_organization_id, p_session_id, v_athlete, false, p_code, public.scd_team_text_clean(p_note, 140), now(), (select auth.uid()))
+      (organization_id, training_session_id, athlete_id, notice_code, notice_note, noticed_at, noticed_by)
+    values (p_organization_id, p_session_id, v_athlete, p_code, public.scd_team_text_clean(p_note, 140), now(), (select auth.uid()))
     on conflict (training_session_id, athlete_id) do update set
       notice_code = excluded.notice_code, notice_note = excluded.notice_note, noticed_at = now(),
       noticed_by = excluded.noticed_by, updated_at = now();
@@ -751,9 +754,13 @@ begin
      or (p_status = 'CLOSED' and not v_office) then
     return jsonb_build_object('ok', false, 'code', 'forbidden');
   end if;
+  -- Team staff answers an OPEN request only; the Segreteria / Direzione may still change any status.
   update public.scd_team_gap_requests set status = p_status, answer_note = public.scd_team_text_clean(p_note, 300),
     answered_by = (select auth.uid()), answered_at = now()
-  where id = p_request_id;
+  where id = p_request_id and (v_office or status = 'OPEN');
+  if not found then
+    return jsonb_build_object('ok', false, 'code', 'closed');
+  end if;
   insert into public.scd_audit_events (organization_id, actor_user_id, action, entity_type, entity_id, payload)
   values (p_organization_id, (select auth.uid()), 'GAP_REQUEST_ANSWERED', 'scd_team_gap_requests', p_request_id,
           jsonb_build_object('status', p_status));

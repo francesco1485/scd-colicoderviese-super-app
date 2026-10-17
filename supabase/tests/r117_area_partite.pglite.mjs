@@ -39,8 +39,12 @@ create role anon; create role authenticated; create role service_role;
 create schema auth;
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
 create schema storage;
-create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text);
+create table storage.buckets (id text primary key, name text not null, public boolean not null default false);
+insert into storage.buckets (id, name, public) values ('scd-private', 'scd-private', false);
+create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text references storage.buckets(id), name text);
 alter table storage.objects enable row level security;
+grant usage on schema storage to authenticated;
+grant select, insert on storage.objects to authenticated;
 create type public.scd_role as enum ('USER_BASE','FAMILY','ATHLETE','MISTER','STAFF','MANAGER','SECRETARIAT','REGISTRATION','TOURNAMENTS','DIRECTION');
 create table public.scd_organizations (id uuid primary key, name text);
 create table public.scd_memberships (organization_id uuid, user_id uuid, role public.scd_role, scope jsonb default '{}'::jsonb, active boolean default true);
@@ -277,6 +281,32 @@ assert.equal(await allowed(MIS15, `${ORG}/drill/${T15}/a.png`), true);
 assert.equal(await allowed(MIS15, `${ORG}/drill/${T16}/a.png`), false);
 const pol = (await db.query(`select policyname from pg_policies where schemaname = 'storage' and tablename = 'objects' order by 1`)).rows.map((r) => r.policyname);
 assert.deepEqual(pol, ["scd_private_team_files_insert", "scd_private_team_files_select"]);
+// a removed document is closed for everyone, staff and office included; the live one stays readable
+const path2 = `${ORG}/match/${M1}/1700000001-referto.pdf`;
+assert.equal(await allowed(MIS15, path1), false, "removed referto: mister denied");
+assert.equal(await allowed(SEG, path1), false, "removed referto: Segreteria denied");
+assert.equal(await allowed(MIS15, path2), true);
+// the policy itself, evaluated as the authenticated role with RLS on
+await db.query(`insert into storage.objects (bucket_id, name) values ('scd-private', $1), ('scd-private', $2)`, [path1, path2]);
+const objs = async (uid) => {
+  await db.query(`select set_config('request.jwt.claim.sub', $1, false)`, [uid ?? ""]);
+  await db.query(`set role authenticated`);
+  try { return (await db.query(`select name from storage.objects order by name`)).rows.map((r) => r.name); }
+  finally { await db.query(`reset role`); }
+};
+assert.deepEqual(await objs(MIS15), [path2], "storage policy hides the removed file");
+assert.deepEqual(await objs(MIS16), []);
+assert.deepEqual(await objs(FAM), []);
+// retention placeholder: service only, lists removed documents older than 30 days, deletes nothing
+const ret = async () => (await db.query(`select document_id, storage_path from public.scd_team_docs_retention_candidates()`)).rows;
+assert.deepEqual(await ret(), [], "removed today: not yet a candidate");
+await db.query(`update public.scd_match_documents set removed_at = now() - interval '31 days' where id = $1`, [r1.id]);
+assert.deepEqual(await ret(), [{ document_id: r1.id, storage_path: path1 }]);
+assert.equal((await db.query(`select count(*)::int as n from public.scd_match_documents`)).rows[0].n, 2, "nothing deleted");
+const rg = (await db.query(`select has_function_privilege('authenticated', 'public.scd_team_docs_retention_candidates()', 'execute') as auth,
+  has_function_privilege('anon', 'public.scd_team_docs_retention_candidates()', 'execute') as anon,
+  has_function_privilege('service_role', 'public.scd_team_docs_retention_candidates()', 'execute') as svc`)).rows[0];
+assert.deepEqual(rg, { auth: false, anon: false, svc: true });
 
 // ================================================================ r118
 const save = (uid, p) => one(uid, `select public.scd_staff_training_save($1, $2::jsonb)`, [ORG, JSON.stringify(p)]);
@@ -343,6 +373,9 @@ assert.deepEqual(await notice(FAM, sPast.id, KID1, "SCUOLA"), { ok: false, code:
 assert.deepEqual(await notice(FAM, sSoon.id, KID1, "INFORTUNIO"), { ok: false, code: "invalid" });
 assert.deepEqual(await notice(MIS15, sSoon.id, KID1, "SCUOLA"), { ok: false, code: "forbidden" });
 assert.deepEqual(await notice(FAM, sSoon.id, KID1, "FAMIGLIA", "matrimonio"), { ok: true });
+// the notice does not pre-record an absence: status stays null (authoritative), legacy present is not written
+const nr = (await db.query(`select status, notice_code from public.scd_training_attendance where training_session_id = $1`, [sSoon.id])).rows;
+assert.deepEqual(nr, [{ status: null, notice_code: "FAMIGLIA" }]);
 assert.equal((await mine(FAM))[0].sessions.find((s) => s.id === sSoon.id).my_notice, "FAMIGLIA");
 assert.equal((await list(MIS15, "u15")).sessions.find((s) => s.id === sSoon.id).notices, 1);
 assert.deepEqual(await notice(FAM, sSoon.id, KID1, null), { ok: true });
@@ -402,7 +435,9 @@ assert.deepEqual(await ans(MIS16, g15[0].id, "INTEGRATED", null), { ok: false, c
 assert.deepEqual(await ans(FAM, g15[0].id, "INTEGRATED", null), { ok: false, code: "forbidden" });
 assert.deepEqual(await ans(MIS15, g15[0].id, "CLOSED", null), { ok: false, code: "forbidden" }, "only the office closes");
 assert.deepEqual(await ans(MIS15, g15[0].id, "JUSTIFIED", "Distinta cartacea consegnata all'arbitro"), { ok: true });
+assert.deepEqual(await ans(MIS15, g15[0].id, "INTEGRATED", null), { ok: false, code: "closed" }, "an answered request is not rewritten by staff");
 assert.deepEqual(await ans(SEG, g15[0].id, "CLOSED", null), { ok: true });
+assert.deepEqual(await ans(MIS15, g15[0].id, "JUSTIFIED", "riscrivo dopo la chiusura"), { ok: false, code: "closed" }, "a closed request is not rewritten by staff");
 const og = await one(SEG, `select public.scd_office_gap_requests($1, $2::date)`, [ORG, month]);
 assert.deepEqual(og.map((g) => [g.team_code, g.status]), [["u15", "CLOSED"], ["u16", "OPEN"]]);
 assert.equal(await one(MIS15, `select public.scd_office_gap_requests($1, $2::date)`, [ORG, month]), null);
