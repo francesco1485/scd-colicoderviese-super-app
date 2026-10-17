@@ -4173,6 +4173,24 @@
         "implementationStatus": "IN_PROGRESS",
         "implementation": "scd-sviluppo after the Crovi home work; scd-iride for WhatsApp (Serve ok)"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "08:33",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-176",
+      "name": "LND_PORTAL_2026_27_IS_MASTER_FOR_CURRENT_TESSERATI",
+      "sourceQuoteFragments": [
+        "A comandare è il portale LND 2026/27 perché sono i tesserati attuali"
+      ],
+      "normalizedCommand": {
+        "rule": "For current tesserati of season 2026/27 (who is registered, in which team and category) the LND portal is the master source. SCD PULSE rosters, approved registrations and app lists are copies that must be reconciled to the latest LND portal export; on conflict the LND portal wins and the difference is reported to the Segreteria, never silently overwritten. Counts shown anywhere in the app cite the LND export and its date.",
+        "scope": "SUPER_APP rosters, Vetta Legnone (platform 17), tesserati, Iride knowledge, dashboards",
+        "supersedes": "none",
+        "implementationStatus": "IN_PROGRESS",
+        "implementation": "scd-figc-lnd, scd-tesserati reconciliation; Vetta Legnone counts"
+      }
     }
   ],
   "completionGate": {
