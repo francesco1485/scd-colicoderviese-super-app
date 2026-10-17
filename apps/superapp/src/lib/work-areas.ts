@@ -123,7 +123,7 @@ const uniq = (xs: readonly string[]) => [...new Set(xs)];
 export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
   pulmini: {
     id: "pulmini", label: "Pulmini", path: pathOf("pulmini"), railId: "pulmini",
-    description: "Trasferte del weekend dal calendario ufficiale e flotta dal Master Flotta e Trasporti. Sola lettura.",
+    description: "Trasferte del weekend dal calendario ufficiale, richieste delle famiglie, corse con pulmino e autista volontario, flotta dal Master Flotta e Trasporti. Decide il Responsabile servizio pulmini.",
     sources: ["pulmini", "calendario", "inserimenti"],
     insertRoles: uniq([...registryRoles("pulmini"), "Segreteria"]),
   },

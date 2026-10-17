@@ -11,13 +11,15 @@ import {
   DIRECTION_LABEL,
   REQUEST_LABEL,
   stopLabel,
+  TRANSPORT_ACK_LIVE,
   type AwayMatch,
   type Direction,
   type MyRequest,
   type RequestState,
   type StopOption,
 } from "@/lib/transport-requests";
-import { cancelTransportRequest, requestTransport } from "@/lib/transport-requests.functions";
+import { ackTransportRequest, cancelTransportRequest, requestTransport } from "@/lib/transport-requests.functions";
+import { TRANSPORT_OFFICE } from "@/lib/transport";
 
 const TONE: Readonly<Record<RequestState, ChipTone>> = { RICHIESTA: "warn", CONFERMATA: "ok", NON_POSSIBILE: "crit", ANNULLATA: "mute" };
 const btnMain = "scd-focus inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[#F8D000] px-4 text-[15px] font-bold text-[#062a52] disabled:opacity-50";
@@ -42,7 +44,7 @@ export function TransportRequestCard({ members, matches, requests, stops }: { me
     .sort((a, b) => (a.match.date + a.match.time).localeCompare(b.match.date + b.match.time)), [members, matches, items]);
 
   return (
-    <Card id="fam-pulmino" title="Pulmino per le trasferte" sub="Le prossime partite fuori casa delle squadre dei tuoi ragazzi. Chiedi il posto: il responsabile trasporti conferma qui.">
+    <Card id="fam-pulmino" title="Pulmino per le trasferte" sub={`Le prossime partite fuori casa delle squadre dei tuoi ragazzi. Chiedi il posto: il ${TRANSPORT_OFFICE} conferma qui, tu prendi visione.`}>
       <div className="flex flex-col gap-2 px-4 pb-4 sm:px-[18px]" data-testid="fam-pulmino">
         {rows.length === 0 ? (
           <EmptyState title="Nessuna trasferta nelle prossime tre settimane">
@@ -77,13 +79,18 @@ export function TransportRequestCard({ members, matches, requests, stops }: { me
                       <Bus className="size-4" aria-hidden="true" />{active ? "Modifica la richiesta" : "Chiedi il pulmino"}
                     </button>
                   )}
+                  {TRANSPORT_ACK_LIVE && active && active.status === "CONFERMATA" && (active.acknowledged ? (
+                    <Chip tone="ok">Presa visione data</Chip>
+                  ) : (
+                    <AckButton request={active} onAcked={() => setItems((prev) => prev.map((x) => (x.id === active.id ? { ...x, acknowledged: true } : x)))} />
+                  ))}
                   {active && <CancelButton request={active} onCancelled={() => setItems((prev) => prev.map((x) => (x.id === active.id ? { ...x, status: "ANNULLATA" } : x)))} />}
                 </div>
               )}
             </article>
           );
         })}
-        <p className="m-0 text-[13px] text-[var(--in-sub)]">La richiesta non è ancora il posto: lo conferma il responsabile trasporti in base a pulmini, autisti e posti liberi.</p>
+        <p className="m-0 text-[13px] text-[var(--in-sub)]">La richiesta non è ancora il posto: lo conferma il {TRANSPORT_OFFICE} in base a pulmini, autisti volontari e posti liberi.{TRANSPORT_ACK_LIVE ? " Quando il posto è confermato, premi «Presa visione»." : ""}</p>
       </div>
     </Card>
   );
@@ -112,7 +119,7 @@ function RequestForm({ member, match, current, stops, onClose, onSaved }: {
       if (out.ok && out.id) {
         const stop = stops.find((s) => s.id === stopId);
         onSaved({ id: out.id, eventId: match.eventId, date: match.date, teamCode: match.teamCode, event: null, personId: member.personId,
-          direction, stopId: stopId || null, stop: stop ? stopLabel(stop) : null, note: note.trim() || null, status: "RICHIESTA", decisionNote: null });
+          direction, stopId: stopId || null, stop: stop ? stopLabel(stop) : null, note: note.trim() || null, status: "RICHIESTA", decisionNote: null, acknowledged: false });
       }
     } catch {
       setMsg({ ok: false, text: "Richiesta non inviata, riprova." });
@@ -165,6 +172,25 @@ function CancelButton({ request, onCancelled }: { request: MyRequest; onCancelle
           .catch(() => setMsg("Annullamento non riuscito, riprova."))
           .finally(() => setBusy(false));
       }}>Non serve più</button>
+      {msg && <span role="status" className="self-center text-[13.5px] text-[var(--in-sub)]">{msg}</span>}
+    </>
+  );
+}
+
+/** «Presa visione» of a confirmed seat (r114): the family says it has read day, stop and direction. */
+function AckButton({ request, onAcked }: { request: MyRequest; onAcked: () => void }) {
+  const ack = useServerFn(ackTransportRequest);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <>
+      <button type="button" disabled={busy} className={btnMain} data-testid="ack-seat" onClick={() => {
+        setBusy(true);
+        void ack({ data: { id: request.id } })
+          .then((o) => { setMsg(o.message); if (o.ok) onAcked(); })
+          .catch(() => setMsg("Presa visione non registrata, riprova."))
+          .finally(() => setBusy(false));
+      }}>Presa visione</button>
       {msg && <span role="status" className="self-center text-[13.5px] text-[var(--in-sub)]">{msg}</span>}
     </>
   );

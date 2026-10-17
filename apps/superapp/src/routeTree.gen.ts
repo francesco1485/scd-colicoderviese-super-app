@@ -81,6 +81,7 @@ import { Route as GestionaleMisterRouteImport } from './routes/gestionale.mister
 import { Route as GestionaleOrganigrammaRouteImport } from './routes/gestionale.organigramma'
 import { Route as GestionalePlanningRouteImport } from './routes/gestionale.planning'
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
+import { Route as GestionalePulminiRouteImport } from './routes/gestionale.pulmini'
 import { Route as GestionaleRichiesteRouteImport } from './routes/gestionale.richieste'
 import { Route as GestionaleRubricaRouteImport } from './routes/gestionale.rubrica'
 import { Route as GestionaleStrutturaRouteImport } from './routes/gestionale.struttura'
@@ -494,6 +495,11 @@ const GestionalePostaRoute = GestionalePostaRouteImport.update({
   path: '/gestionale/posta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionalePulminiRoute = GestionalePulminiRouteImport.update({
+  id: '/gestionale/pulmini',
+  path: '/gestionale/pulmini',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleRichiesteRoute = GestionaleRichiesteRouteImport.update({
   id: '/gestionale/richieste',
   path: '/gestionale/richieste',
@@ -821,6 +827,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
   '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
@@ -944,6 +951,7 @@ export interface FileRoutesByTo {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
   '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
@@ -1067,6 +1075,7 @@ export interface FileRoutesById {
   '/gestionale/organigramma': typeof GestionaleOrganigrammaRoute
   '/gestionale/planning': typeof GestionalePlanningRoute
   '/gestionale/posta': typeof GestionalePostaRoute
+  '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
   '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
@@ -1192,6 +1201,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/pulmini'
     | '/gestionale/richieste'
     | '/gestionale/rubrica'
     | '/gestionale/struttura'
@@ -1315,6 +1325,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/pulmini'
     | '/gestionale/richieste'
     | '/gestionale/rubrica'
     | '/gestionale/struttura'
@@ -1437,6 +1448,7 @@ export interface FileRouteTypes {
     | '/gestionale/organigramma'
     | '/gestionale/planning'
     | '/gestionale/posta'
+    | '/gestionale/pulmini'
     | '/gestionale/richieste'
     | '/gestionale/rubrica'
     | '/gestionale/struttura'
@@ -1561,6 +1573,7 @@ export interface RootRouteChildren {
   GestionaleOrganigrammaRoute: typeof GestionaleOrganigrammaRoute
   GestionalePlanningRoute: typeof GestionalePlanningRoute
   GestionalePostaRoute: typeof GestionalePostaRoute
+  GestionalePulminiRoute: typeof GestionalePulminiRoute
   GestionaleRichiesteRoute: typeof GestionaleRichiesteRoute
   GestionaleRubricaRoute: typeof GestionaleRubricaRoute
   GestionaleStrutturaRoute: typeof GestionaleStrutturaRoute
@@ -2118,6 +2131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionalePostaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/pulmini': {
+      id: '/gestionale/pulmini'
+      path: '/gestionale/pulmini'
+      fullPath: '/gestionale/pulmini'
+      preLoaderRoute: typeof GestionalePulminiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/richieste': {
       id: '/gestionale/richieste'
       path: '/gestionale/richieste'
@@ -2552,6 +2572,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionaleOrganigrammaRoute: GestionaleOrganigrammaRoute,
   GestionalePlanningRoute: GestionalePlanningRoute,
   GestionalePostaRoute: GestionalePostaRoute,
+  GestionalePulminiRoute: GestionalePulminiRoute,
   GestionaleRichiesteRoute: GestionaleRichiesteRoute,
   GestionaleRubricaRoute: GestionaleRubricaRoute,
   GestionaleStrutturaRoute: GestionaleStrutturaRoute,

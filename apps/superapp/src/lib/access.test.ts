@@ -67,7 +67,7 @@ describe("access screen content from the registry", () => {
   it("pulmini: board copy, registry roles and sources, Entra to the role landing", () => {
     const s = accessScreen("pulmini");
     expect(s).toMatchObject({ label: "Pulmini", path: "/pulmini", icon: "bus", blurb: "Mezzi, autisti, corse", parent: null });
-    expect(whoEnters(s)).toBe("responsabile trasporti, autisti, Direzione");
+    expect(whoEnters(s)).toBe("Responsabile servizio pulmini, autisti, Direzione");
     expect(s.sources).toEqual(["Master Flotta"]);
     expect(s.enter).toEqual({ href: "/aree/pulmini", via: "landing" });
     expect(s.insideFrom).toBe("landing");

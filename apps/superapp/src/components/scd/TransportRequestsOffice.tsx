@@ -4,8 +4,9 @@ import { useMemo, useState } from "react";
 
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { EmptyState } from "@/components/scd/work-area-ui";
-import { DIRECTION_LABEL, REQUEST_LABEL, groupByEvent, type OfficeRequest, type RequestState } from "@/lib/transport-requests";
+import { DIRECTION_LABEL, REQUEST_LABEL, TRANSPORT_ACK_LIVE, groupByEvent, type OfficeRequest, type RequestState } from "@/lib/transport-requests";
 import { decideTransportRequest } from "@/lib/transport-requests.functions";
+import { TRANSPORT_OFFICE, TRANSPORT_OFFICE_BACKUP } from "@/lib/transport";
 
 const TONE: Readonly<Record<RequestState, ChipTone>> = { RICHIESTA: "warn", CONFERMATA: "ok", NON_POSSIBILE: "crit", ANNULLATA: "mute" };
 
@@ -23,7 +24,7 @@ export function TransportRequestsOffice({ initial }: { initial: OfficeRequest[] 
   const waiting = items.filter((r) => r.status === "RICHIESTA").length;
 
   return (
-    <Card id="pul-richieste" title="Richieste delle famiglie" sub={waiting ? `${waiting} da gestire: conferma o rispondi "non possibile" con il motivo.` : "Le famiglie chiedono il posto dalla loro area per ogni trasferta."}>
+    <Card id="pul-richieste" title="Richieste delle famiglie" sub={waiting ? `${waiting} da gestire: conferma o rispondi "non possibile" con il motivo. Decide il ${TRANSPORT_OFFICE}.` : `Le famiglie chiedono il posto dalla loro area per ogni trasferta; decide il ${TRANSPORT_OFFICE}.`}>
       <div className="flex flex-col gap-3 px-4 pb-4 sm:px-[18px]" data-testid="pul-richieste">
         {groups.length === 0 ? (
           <EmptyState title="Nessuna richiesta">Quando una famiglia chiede il pulmino per una trasferta, la richiesta compare qui.</EmptyState>
@@ -40,7 +41,7 @@ export function TransportRequestsOffice({ initial }: { initial: OfficeRequest[] 
             </ul>
           </section>
         ))}
-        <p className="m-0 text-[13px] text-[var(--in-sub)]">I nomi li vedono solo Direzione, Segreteria e responsabile trasporti. Il posto sul pulmino si assegna nella corsa.</p>
+        <p className="m-0 text-[13px] text-[var(--in-sub)]">Nome e iniziale del cognome, visibili solo al {TRANSPORT_OFFICE} e, in sua assenza, a {TRANSPORT_OFFICE_BACKUP}. Il posto sul pulmino si assegna nella corsa.</p>
       </div>
     </Card>
   );
@@ -71,7 +72,10 @@ function Row({ r, onDecided }: { r: OfficeRequest; onDecided: (s: RequestState, 
           <b className="block text-[15px]">{r.name}</b>
           <span className="block text-[13.5px] text-[var(--in-sub)]">{DIRECTION_LABEL[r.direction]}{r.stop ? ` · ${r.stop}` : " · fermata da chiedere"}{r.note ? ` · "${r.note}"` : ""}</span>
         </span>
-        <Chip tone={TONE[r.status]}>{REQUEST_LABEL[r.status]}</Chip>
+        <span className="flex flex-wrap gap-1.5">
+          <Chip tone={TONE[r.status]}>{REQUEST_LABEL[r.status]}</Chip>
+          {TRANSPORT_ACK_LIVE && r.status === "CONFERMATA" && <Chip tone={r.acknowledged ? "ok" : "mute"}>{r.acknowledged ? "presa visione" : "attesa presa visione"}</Chip>}
+        </span>
       </div>
       {r.status !== "ANNULLATA" && r.status !== "CONFERMATA" && (
         <div className="flex flex-wrap items-center gap-2">
