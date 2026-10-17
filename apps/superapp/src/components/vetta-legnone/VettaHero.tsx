@@ -26,13 +26,14 @@ export function VettaHero() {
             </a>
             <ShareButton page={VETTA_SHARE} />
           </div>
-          <dl className="m-0 mt-5 grid grid-cols-3 gap-2" data-testid="vetta-counters">
+          <dl className="m-0 mt-5 grid max-w-xl grid-cols-2 gap-2" data-testid="vetta-counters">
             {VETTA_COUNTERS.map((c) => (
-              <div key={c.label} className="rounded-[12px] border border-white/15 bg-black/20 px-2.5 py-2" title={`Fonte: ${c.source}`}>
+              <div key={c.label} className="rounded-[12px] border border-white/15 bg-black/20 px-2.5 py-2">
                 <dt className="sr-only">{c.label}</dt>
                 <dd className="m-0">
                   <b className="block font-display text-[24px] font-bold leading-none text-[#ffd84a] lg:text-[30px]">{c.value}</b>
                   <span className="mt-1 block text-[11.5px] leading-tight text-[#dbe5f7] lg:text-[12.5px]">{c.label}</span>
+                  <small className="mt-1.5 block text-[10.5px] leading-tight text-[#b4c3de] lg:text-[11.5px]">{c.source}</small>
                 </dd>
               </div>
             ))}

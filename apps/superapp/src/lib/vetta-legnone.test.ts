@@ -7,12 +7,16 @@ import {
   VETTA_AUDIENCES,
   VETTA_CAST,
   VETTA_COUNTERS,
+  VETTA_HISTORY_STATUS,
+  VETTA_HERO,
+  VETTA_RULES,
   VETTA_EPOCHS,
   VETTA_LEVELS,
   VETTA_NEEDS,
   VETTA_PATH,
   VETTA_SHARE,
   vettaAllText,
+  vettaAudiences,
   vettaRoutes,
 } from "./vetta-legnone";
 
@@ -32,7 +36,7 @@ const ALLOWED_PROPER_WORDS = new Set([
   "Élite", "Coppa", "Italia", "Promozione", "Memorial", "José", "Nasazzi", "Sandro", "Guattini", "Torneo", "Città",
   "Colico", "Lido", "Meda", "Atalanta", "Football", "Camp", "Sampdoria", "FIGC", "Covid", "AC", "Monza", "Prima", "Squadra",
   "Christmas", "Lario", "Juniores", "Under", "DS", "Riva", "Molo", "Largo", "Rifugio", "NOIF", "GDPR", "Segreteria",
-  "Ottavio", "Cervellone", "V", "I", "B", "Direzione", "Leggende", "Leggenda", "SELECT",
+  "Ottavio", "Cervellone", "Super", "App", "V", "I", "B", "Direzione", "Leggende", "Leggenda", "SELECT",
 ]);
 
 /** Capitalised words that do not open a sentence (after «.», «:», «;», «·», «—», ««», «(» or a line start). */
@@ -89,7 +93,7 @@ describe("Vetta Legnone content", () => {
   it("has one CTA per audience, and the parent goes through the parent", () => {
     expect(VETTA_AUDIENCES.map((a) => a.id)).toEqual(["calciatore", "genitore", "leggenda", "mister", "tifoso"]);
     const parent = VETTA_AUDIENCES.find((a) => a.id === "genitore");
-    expect(parent?.invite).toMatch(/la fa lei/);
+    expect(parent?.invite).toMatch(/lo fa lei/);
     expect(parent?.gets).toMatch(/privata/);
   });
 
@@ -108,7 +112,8 @@ describe("Vetta Legnone content", () => {
 
   it("states needs honestly: roles by the mister, annata 2010 to be confirmed by the DS", () => {
     expect(VETTA_NEEDS.filter((n) => n.state === "da-indicare").every((n) => /dal mister/.test(n.status))).toBe(true);
-    expect(VETTA_NEEDS.find((n) => n.team === "Annata 2010")?.status).toMatch(/da confermare dal DS/);
+    expect(VETTA_NEEDS.find((n) => n.team === "Annata 2010")?.status).toBe("Da confermare dal DS");
+    expect(joined).not.toMatch(/senza una squadra propria/);
     expect(joined).not.toMatch(/cerchiamo (un|una|due) (portiere|difensore|centrocampista|attaccante)/i);
   });
 
@@ -119,10 +124,41 @@ describe("Vetta Legnone content", () => {
     expect(joined).not.toMatch(/Breva/);
   });
 
-  it("Lario shows only his initial and Ottavio talks to parents about minors", () => {
-    expect(VETTA_CAST.lario.initials).toBe("L");
-    expect(VETTA_CAST.lario.role).toBe("Direttore sportivo");
+  it("public cast is Ottavio only: the DS does not speak here and Ottavio addresses adults", () => {
+    expect(Object.keys(VETTA_CAST)).toEqual(["ottavio"]);
+    expect(joined.replaceAll("Christmas Lario Cup", "")).not.toMatch(/Lario/);
+    expect(VETTA_CAST.ottavio.lines[0]).toMatch(/^Sei maggiorenne/);
     expect(VETTA_CAST.ottavio.lines.join(" ")).toMatch(/per i minori parliamo con i genitori/i);
+  });
+
+  it("CTAs follow PUBLIC_FORMS_LIVE: with the forms paused nobody is sent to /entra or promised a callback", () => {
+    const paused = vettaAudiences(false);
+    const pausedText = paused.flatMap((a) => [a.invite, a.gets, a.cta.label, a.cta.hint]).join(" ");
+    expect(paused.map((a) => a.cta.to)).not.toContain("/entra");
+    expect(paused.find((a) => a.id === "calciatore")?.cta.to).toBe("/contatti");
+    expect(paused.find((a) => a.id === "genitore")?.cta.to).toBe("/contatti");
+    expect(pausedText).not.toMatch(/due minuti|ricontatt|funziona già oggi/i);
+    expect(joined).not.toMatch(/due minuti|ricontatt|funziona già oggi/i);
+    const live = vettaAudiences(true);
+    expect(live.find((a) => a.id === "calciatore")?.cta.to).toBe("/entra");
+    expect(live.find((a) => a.id === "genitore")?.cta.to).toBe("/entra");
+  });
+
+  it("the default audiences match the real state of the public forms", async () => {
+    const { PUBLIC_FORMS_LIVE } = await import("./public-forms");
+    expect(VETTA_AUDIENCES).toEqual(vettaAudiences(PUBLIC_FORMS_LIVE));
+  });
+
+  it("shows no team or tesserati count (UD-176: those cite the LND export), and no profile in the present tense", () => {
+    expect(joined).not.toMatch(/\bsquadre in campo\b|\btesserati\b/);
+    expect(VETTA_HERO.sub).toMatch(/si scriverà/);
+    for (const c of VETTA_COUNTERS) expect(c.source).toMatch(/^Fonte: .+ al 17\/10\/2026$/);
+  });
+
+  it("history is labelled as being rebuilt, the federal rule has no unsourced article and minors follow /top11", () => {
+    expect(VETTA_HISTORY_STATUS).toBe("Storia in ricostruzione · da confermare dalla Direzione");
+    expect(joined).not.toMatch(/95\s*bis/i);
+    expect(VETTA_RULES.map((r) => r.text).join(" ")).toMatch(/Nome e iniziale solo con il consenso della famiglia, mai volti/);
   });
 
   it("every hero counter has a source and none is an unknown shown as zero", () => {

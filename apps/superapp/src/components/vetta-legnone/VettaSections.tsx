@@ -4,10 +4,13 @@ import type { ReactNode } from "react";
 
 import {
   VETTA_AUDIENCES,
+  VETTA_AUDIENCES_INTRO,
   VETTA_BETTER,
   VETTA_CAST,
+  VETTA_CAST_NOTE,
   VETTA_EPOCHS,
   VETTA_HISTORY_NOTE,
+  VETTA_HISTORY_STATUS,
   VETTA_LEVELS,
   VETTA_LEVELS_NOTE,
   VETTA_NEEDS,
@@ -48,7 +51,7 @@ export function AudienceCtas() {
   return (
     <section aria-labelledby="vl-chi" className="mx-auto max-w-6xl px-4 py-8 lg:py-12" data-testid="vetta-audiences">
       <SectionHead id="vl-chi" kicker="Da dove parti" title="Scegli il tuo sentiero">
-        Cinque modi per salire con noi. Ogni pulsante porta a una pagina che funziona già oggi.
+        {VETTA_AUDIENCES_INTRO}
       </SectionHead>
       <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-5">
         {VETTA_AUDIENCES.map((a) => (
@@ -78,30 +81,27 @@ export function AudienceCtas() {
   );
 }
 
+/** Public cast: Ottavio only (the DS does not speak on public pages, UD-174). */
 export function CastIntro() {
-  const { lario, ottavio } = VETTA_CAST;
+  const { ottavio } = VETTA_CAST;
   return (
     <section aria-labelledby="vl-cast" className="scd-band-azzurro text-white" data-testid="vetta-cast">
-      <div className="mx-auto grid max-w-6xl gap-4 px-4 py-8 lg:grid-cols-2 lg:gap-6 lg:py-10">
+      <div className="mx-auto max-w-6xl px-4 py-7 lg:py-9">
         <h2 id="vl-cast" className="sr-only">Chi ti accompagna</h2>
-        {[
-          { c: lario, tone: "gold" as const },
-          { c: ottavio, tone: "navy" as const },
-        ].map(({ c, tone }) => (
-          <figure key={c.name} className="m-0 flex gap-3 rounded-2xl bg-white/10 p-4 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.25)] lg:p-5">
-            <CastBadge initials={c.initials} tone={tone} />
-            <div className="min-w-0">
-              <figcaption className="font-display text-[17px] font-bold leading-none">
-                {c.name} <span className="font-semibold text-[#dbe5f7]">· {c.role}</span>
-              </figcaption>
-              {c.lines.map((l) => (
-                <blockquote key={l} className="m-0 mt-2 text-[15px] leading-snug">
-                  «{l}»
-                </blockquote>
-              ))}
-            </div>
-          </figure>
-        ))}
+        <figure className="m-0 flex gap-3 rounded-2xl bg-white/10 p-4 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.25)] lg:max-w-3xl lg:p-5">
+          <CastBadge initials={ottavio.initials} tone="navy" />
+          <div className="min-w-0">
+            <figcaption className="font-display text-[17px] font-bold leading-none">
+              {ottavio.name} <span className="font-semibold text-[#dbe5f7]">· {ottavio.role}</span>
+            </figcaption>
+            {ottavio.lines.map((l) => (
+              <blockquote key={l} className="m-0 mt-2 text-[15px] leading-snug">
+                «{l}»
+              </blockquote>
+            ))}
+            <p className="m-0 mt-2 text-[13px] leading-snug text-[#dbe5f7]">{VETTA_CAST_NOTE}</p>
+          </div>
+        </figure>
       </div>
     </section>
   );
@@ -113,6 +113,9 @@ export function HistoryEpochs() {
       <SectionHead id="vl-storia" kicker="La nostra storia" title="La nostra storia in 6 epoche">
         {VETTA_HISTORY_NOTE}
       </SectionHead>
+      <p className="-mt-1 mb-4 inline-flex rounded-full bg-[#fff6cc] px-3 py-1 font-display text-[12.5px] font-bold uppercase tracking-[0.06em] text-[#5c4500]" role="note" data-testid="vetta-history-status">
+        {VETTA_HISTORY_STATUS}
+      </p>
       <ol className="m-0 grid list-none gap-3 p-0 md:grid-cols-2 lg:grid-cols-3">
         {VETTA_EPOCHS.map((e, i) => (
           <li key={e.id} className="relative overflow-hidden rounded-2xl border border-[var(--scd-line)] bg-white p-4 shadow-[var(--scd-card-shadow)]">
@@ -149,7 +152,7 @@ export function WhoWeSeek() {
     <section aria-labelledby="vl-cerchiamo" className="bg-[var(--scd-page)]" data-testid="vetta-needs">
       <div className="mx-auto max-w-6xl px-4 py-8 lg:py-12">
         <SectionHead id="vl-cerchiamo" kicker="Ottavio guarda le rose" title="Chi cerchiamo">
-          Lo stato vero di oggi. I ruoli li indica ogni mister e li conferma il direttore sportivo: finché non lo fanno, qui non inventiamo nulla.
+          Lo stato vero di oggi. I ruoli li indica ogni mister e li conferma il DS: finché non lo fanno, qui non inventiamo nulla.
         </SectionHead>
         <ul className="m-0 grid list-none gap-2.5 p-0 md:grid-cols-2">
           {VETTA_NEEDS.map((n) => (
