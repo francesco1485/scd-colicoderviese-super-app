@@ -929,3 +929,8 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - Base di ogni socio: quadro settimanale (senza menu staff, etichetta «Socio») e servizio pulmini su /allenamenti (orari, ritrovo, posti, numero di ragazzi; nessun nome).
 - Abilitazioni della Direzione: per ora aprono solo Mister e Impianti e campi (pagine che ne leggono già i dati); le altre aree quando le loro funzioni dati leggeranno le abilitazioni.
 - r112 (ruolo ↔ posizione dell'organigramma) e r113 (le mie abilitazioni) applicate su SCD PULSE il 17/10/2026. Nuova direttiva UD-144.
+## 2026-10-17 — PWA installabile: sw.js non più troncato (PR #171)
+
+- Causa: sul sito live /sw.js arrivava troncato (23436 su 23956 byte, misurato 17/10 00:05): Nitro (node-server) registra size/etag dei file pubblici prima che vite-plugin-pwa completi sw.js e serve la Content-Length vecchia. Il browser rifiutava il service worker («ServiceWorker script evaluation failed») e non offriva «Installa app».
+- Misura: `scripts/fix-public-asset-meta.mjs` dopo `vite build` (anche `build:node`) riallinea size, etag e mtime in `.output/server/index.mjs` (accetta le dimensioni esponenziali 2e3; avviso se la tabella non è riconosciuta; scrittura atomica). Test: `src/lib/public-asset-meta.test.ts`.
+- Dopo il deploy: verificare che la Content-Length di /sw.js sia uguale alla dimensione reale e che Chrome offra «Installa app».
