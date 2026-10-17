@@ -1,6 +1,6 @@
 -- r119: retention of removed team documents until the end of the sporting season (UD-185, Francesco DG
--- 17/10/2026 15:06: «Tenere fino al 30 giugno 2027»). Apply on SCD PULSE (ndevtxxijbcnskgysdit) only after Francesco
--- writes «applica r119». Never on dfnwzwutvnwiitiffwvr. Requires r117.
+-- 17/10/2026 15:06: «Tenere fino al 30 giugno 2027»). APPLIED on SCD PULSE 17/10/2026 ~15:25 after Francesco wrote
+-- «Applica r119» (verified: season end 2027-06-30, service_role only). Never on dfnwzwutvnwiitiffwvr. Requires r117.
 --
 -- A removed referto / distinta (scd_match_documents.removed_at set) is already unreadable for everyone (r117
 -- scd_storage_team_file_allowed). Its file stays in scd-private until 30 June of the season in which it was removed

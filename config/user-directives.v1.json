@@ -4384,8 +4384,8 @@
         "rule": "Removed team match documents (referto, distinte) stay unreadable for everyone and their files are kept until 30 June of the season in which they were removed (2026/27: 30/06/2027); only after that date they become clean-up candidates. Nothing is deleted automatically today.",
         "scope": "SCD PULSE scd_match_documents, scd_team_docs_retention_candidates (r119), scd-private bucket",
         "supersedes": "the 30-day PROPOSED term of r117 (never confirmed)",
-        "implementationStatus": "IMPLEMENTED_STAGED",
-        "implementation": "migration r119 (STAGED until «applica r119»): scd_team_docs_season_end + scd_team_docs_retention_candidates by season end; PGlite assertions in supabase/tests/r117_area_partite.pglite.mjs",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "migration r119 (APPLIED on SCD PULSE 17/10/2026 ~15:25 after «Applica r119»): scd_team_docs_season_end + scd_team_docs_retention_candidates by season end; PGlite assertions in supabase/tests/r117_area_partite.pglite.mjs",
         "engines": [
           "PERSONE"
         ],
