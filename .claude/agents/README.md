@@ -1,6 +1,6 @@
 # Agenti SCD
 
-Quarantasette agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Cinquantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
@@ -11,7 +11,7 @@ Quarantasette agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. 
 | scd-bandi | Cerca bandi e contributi (Italia, Lombardia, UE, fondazioni) con scadenze |
 | scd-mail | Smista la posta del club e prepara bozze di risposta |
 | scd-messaggi | Prepara risposte a WhatsApp, Instagram, Facebook |
-| scd-social | Piano editoriale, didascalie, grafiche Canva, script reel |
+| scd-social | Social media manager esperto: pacchetto social del giorno in approvazione, piano editoriale, reel, numeri e idee |
 | scd-tesoreria | Quote, conto, fornitori, compensi, chiusura del mese (398/91) |
 | scd-segreteria | Persone, tesseramenti, certificati, consensi, scadenze FIGC |
 | scd-sponsor | Pipeline sponsor, offerta LED, contratti, CRM |
@@ -21,8 +21,10 @@ Quarantasette agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. 
 | scd-google | Mondo Google di sportclubcolico@gmail.com: posta, calendari, Drive, fogli, documenti; mappa, ordine, proposte |
 | scd-skill | Fabbrica delle skill: trova cosa serve, progetta e prova le skill migliori |
 | scd-crescita | Crescita e viralità: creator, social, TV, giornali, sport, grafica; idee che portano gente al campo |
+| scd-super-giornalista | Il Super Giornalista: ogni mattina la Prima pagina del club (notizie, interazione, social, app), coordina comunicazione, social, crescita e community |
 | scd-stratega | Priorità della settimana, rischi, decisioni da prendere |
 | scd-avatar | Crea e ambienta avatar e personaggi 2D e 3D (sintetici, mai volti reali senza consenso) |
+| scd-voci | Voci dei personaggi (Iride, Vera, Garrison, Enea, Sky, Crovi) e video breakout 3D che escono dallo schermo per LED wall, reel e home; riferisce all'orchestratore |
 | scd-regista | Il regista del gestionale: cosa fare oggi, in che ordine, chi lo fa, cosa prepara subito Claude |
 | scd-maestro | Maestro e ricercatore in tutte le materie, dalla scuola all'università alla filosofia, con fonti |
 | scd-revisore | Rilegge ogni modifica prima che vada online (PASS o BLOCK) |
@@ -36,6 +38,11 @@ Quarantasette agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. 
 | scd-sociale | Sport inclusivo, disabilità, solidarietà, progetti con servizi sociali |
 | scd-relazioni | Relazioni fra iscritti, famiglie, volontari, ex atleti e partner |
 | scd-impianti | Campi di Colico e Dervio, rotazione, richieste, spogliatoi, luci, manutenzioni |
+| scd-clubhouse | Club House di Colico e Dervio: apertura, listino, card SQUBY, serate, incassi verso Tesoreria |
+| scd-palestra | Palestra SCD: turni per squadra, attrezzi donati, sicurezza, prenotazioni dei tesserati |
+| scd-nutrizione | Piattaforma Nutrizionista: rubrica, richieste riservate, linee guida per età |
+| scd-convenzioni | Convenzioni dei partner per soci e famiglie, con date; fascia promo e post gemelli |
+| scd-analisi | Analisi di app e web (Meta): uso, iscrizioni, funnel, solo dati con consenso e aggregati |
 | scd-pulmini | Pulmini: corse, posti a bordo, linee e fermate, scadenze dei mezzi |
 | scd-squadre | Squadre, allenamenti, calendario, partite, staff per squadra |
 | scd-infermeria | Certificati in scadenza, infortuni (solo numeri), defibrillatori, safeguarding |

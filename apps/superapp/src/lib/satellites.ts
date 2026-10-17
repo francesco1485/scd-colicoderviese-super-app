@@ -47,7 +47,7 @@ export interface Satellite {
   /** Visual accent token for the tile. */
   tone: "blue" | "sky" | "yellow" | "navy" | "green" | "orange";
   /** Public preview already available without login. */
-  preview?: { label: string; to: "/calendario" | "/allenamenti" | "/core/atleta" | "/core/famiglia" | "/core/staff" | "/core" | "/grow" | "/community" | "/core/impianti-calendari" };
+  preview?: { label: string; to: "/calendario" | "/allenamenti" | "/core/atleta" | "/core/famiglia" | "/core/staff" | "/core" | "/sponsor" | "/community" | "/core/impianti-calendari" };
 }
 
 export const SATELLITES: readonly Satellite[] = [
@@ -162,7 +162,7 @@ export const SATELLITES: readonly Satellite[] = [
     login: null,
     status: "in-progettazione",
     tone: "yellow",
-    preview: { label: "Diventa partner", to: "/grow" },
+    preview: { label: "Diventa partner", to: "/sponsor" },
   },
 ] as const;
 

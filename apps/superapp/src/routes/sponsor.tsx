@@ -6,6 +6,7 @@ import { CastPresence } from "@/components/scd/CastPresence";
 import { PartnerForm } from "@/components/PartnerForm";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { PartnerPackages } from "@/components/PartnerPackages";
+import { SponsorLedwallLive } from "@/components/SponsorLedwallLive";
 import { SponsorProcess } from "@/components/SponsorProcess";
 import { PageHero, heroOverlapCls } from "@/components/ui-kit";
 import { SPONSOR_ASSETS } from "@/lib/catalog";
@@ -43,14 +44,14 @@ function Sponsor() {
   return (
     <main>
       <PageHero eyebrow="Commercial Hub · Sponsor & Partner" title={<>Il tuo brand, <span className="text-accent">in campo</span> ogni settimana.</>} action={<ShareButton page={SHARE_PAGES.sponsor} />}>
-        Un media sportivo locale: prima squadra, settore giovanile, famiglie e tifosi dell'Alto Lario. Visibilità fisica e digitale, misurabile.
+        Un media sportivo locale: prima squadra, settore giovanile, famiglie e tifosi dell'Alto Lario. Visibilità fisica e digitale.
       </PageHero>
 
       <section className={`${heroOverlapCls} mx-auto grid max-w-6xl grid-cols-3 gap-3 px-4`}>
         {[
           { icon: MonitorSmartphone, t: "App & digitale", d: "Banner, card, ticker, notifiche" },
           { icon: Trees, t: "Campo & territorio", d: "Led, tornei, club house" },
-          { icon: BarChart3, t: "Misurabile", d: "Impression, click e lead" },
+          { icon: BarChart3, t: "Report in arrivo", d: "Impression e click: da misurare" },
         ].map((x) => (
           <div key={x.t} className="card-premium p-4">
             <x.icon className="size-5 text-primary" />
@@ -60,15 +61,16 @@ function Sponsor() {
         ))}
       </section>
 
+      {/* Francesco 16/10/2026 20:56 «mancano i ledwall per sponsor a rotazione sulla web app sponsor» (supersedes the
+          15/10 "no rotating LED preview" for this page): the club LED wall, clock-synced with the physical board. */}
+      <SponsorLedwallLive />
+
       <PartnerPackages onChoose={choose} />
 
       {/* UD-121: the Volto sponsor face lives here (listino, "chiedi un pacchetto", "Chiedi a Vera"). */}
       <section id="volto-sponsor" aria-label="Il Volto sponsor" className="mx-auto mt-10 max-w-3xl scroll-mt-20 px-4" data-testid="sponsor-volto">
         <CastPresence id="volto-sponsor" day={day} />
       </section>
-
-      {/* No vetrine (Francesco 15/10/2026): no rotating LED preview, no "in onda ora", no partner of the month here.
-          The partners scroll only in the fixed SponsorBand at the bottom of every page. */}
 
       <section className="mx-auto mt-14 max-w-6xl px-4">
         <p className="eyebrow">Asset disponibili</p>

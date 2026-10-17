@@ -1,11 +1,19 @@
 /**
  * Dervio: the eight zones of the club navigator (board Rotazione-Dervio) and
  * the matches the CURRENT scenario would play there, with the notice to the
- * Comune. Nothing here is a decision: it is the simulation's output.
+ * team (14 days before). The Comune di Dervio is already informed with the season
+ * programme (DG 2026-10-16). Nothing here is a decision: it is the simulation's output.
  */
 import { AlertTriangle, MapPin } from "lucide-react";
 
-import { GROUP_SHORT, ddmm, hhmm, type DervioMatch } from "@/lib/rotation";
+import {
+  COMUNE_DERVIO_NOTE,
+  GROUP_SHORT,
+  RAIN_MOVE_NOTICE_TO,
+  ddmm,
+  hhmm,
+  type DervioMatch,
+} from "@/lib/rotation";
 import { presetLabel, teamColor, type ImpiantiModel } from "./model";
 import { Card, Chip, SimulationNote, Src, btnPrimary } from "./ui";
 
@@ -202,15 +210,17 @@ function DervioMap() {
 function noticeChip(d: DervioMatch) {
   if (d.late)
     return (
-      <Chip tone="crit">
-        Avviso al Comune entro il {ddmm(d.noticeBy)}: già in ritardo
+      <Chip tone="warn">
+        Avviso alla squadra entro il {ddmm(d.noticeBy)}: già in ritardo
       </Chip>
     );
   if (d.daysToNotice <= 10)
     return (
-      <Chip tone="warn">Avviso al Comune entro il {ddmm(d.noticeBy)}</Chip>
+      <Chip tone="warn">Avviso alla squadra entro il {ddmm(d.noticeBy)}</Chip>
     );
-  return <Chip tone="info">Avviso al Comune entro il {ddmm(d.noticeBy)}</Chip>;
+  return (
+    <Chip tone="info">Avviso alla squadra entro il {ddmm(d.noticeBy)}</Chip>
+  );
 }
 
 export function DervioTab({
@@ -264,7 +274,7 @@ export function DervioTab({
         <Card
           id="h-dervio-list"
           title="Gare proposte a Dervio"
-          subtitle={`Scenario: ${presetLabel(model.preset)}. Restano a Colico finché Direzione, Comune e LND non approvano.`}
+          subtitle={`Scenario: ${presetLabel(model.preset)}. Restano a Colico finché la Direzione non approva e la LND non autorizza la variazione.`}
         >
           {list.length === 0 ? (
             <div className="mx-4 mb-4 rounded-[14px] border-[1.5px] border-dashed border-[#b9d5ef] bg-[#f8fbfe] p-4 sm:mx-[18px]">
@@ -330,8 +340,8 @@ export function DervioTab({
             </p>
           )}
           <Src>
-            Il Comune vuole l'avviso almeno un mese prima. Nessun avviso è stato
-            inviato.
+            {COMUNE_DERVIO_NOTE} Se piove e la gara torna a Colico: avviso solo
+            a {RAIN_MOVE_NOTICE_TO} (la FIGC avvisa l&apos;arbitro). Nessun avviso è stato inviato.
           </Src>
         </Card>
         <section
@@ -344,10 +354,11 @@ export function DervioTab({
             aria-hidden="true"
           />
           <p className="m-0 text-[14px] leading-snug text-[var(--in-sub)]">
-            <b className="text-[var(--in-ink)]">Erba naturale.</b> Niente tornei
-            invernali a Dervio e controllo del meteo e del fondo prima di
-            confermare una gara. La capienza per formato va verificata sulle
-            misure 96 × 48. Luci per le gare serali da verificare.
+            <b className="text-[var(--in-ink)]">Erba naturale.</b> Dervio si usa
+            anche in inverno; se piove la gara torna a Colico (meteo controllato
+            3 giorni prima, decisione il giorno prima). La capienza per formato
+            va verificata sulle misure 96 × 48. Luci disponibili per le gare
+            serali.
           </p>
         </section>
         <SimulationNote>

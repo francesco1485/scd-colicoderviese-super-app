@@ -64,7 +64,7 @@ export function AccessScreen({
 }) {
   const items = inside ?? [
     "Chi usa quale parte del campo, giorno per giorno",
-    "Conflitti sul campo 1 e avvisi al Comune di Dervio",
+    "Conflitti sul campo 1 e avvisi per le gare a Dervio",
     "Simulazioni e nuove prenotazioni con anteprima 2D",
     "Chiedi a Iride: risposte dal calendario reale",
   ];

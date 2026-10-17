@@ -3695,6 +3695,282 @@
         "engines": "PERSONE and TEMPO",
         "status": "PUBLISHED_PER_FRANCESCO_2026-10-16_1152"
       }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "13:32-14:30",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-161",
+      "name": "POSITION_CATALOGUE_FIGC_RASD_CUSTOM_ROLES_AND_NEW_ACCESS_POSITIONS",
+      "sourceQuoteFragments": [
+        "creare le posizioni direttore sportivo agonistica e direttore sportivo generale, con il coordinatore attività sportiva tra chi vede Dervio; il responsabile struttura vede Colico; a Dervio per ora nessun responsabile struttura (13:32, as relayed by the main session)",
+        "io avevo chiesto che entravi nel sito figc e rasd e nella parte orgnigramma o nei siti generali recuperavi tutti quelli presiti indeflt che si posssono ricoprire e renderli gia pronti per inserire il tesserato ad occorrenza e avere sepre la possibilitò di creare un ruolo nuovo cosi da avere eventuali figure aggiuntive per altre cose (13:35)",
+        "Ruolo nuovo: chi lo approva? -> Chi lo crea",
+        "Livello DS -> Sopra il coordinatore",
+        "Responsabile tutela minori e fisioterapista: creo anche il loro accesso? -> Sì, crea gli accessi"
+      ],
+      "context": "Francesco (DG) 16/10/2026, chat PC. 13:32 decides the two direttori sportivi and the Dervio readers; 13:35 asks for the full catalogue of positions from FIGC/LND/SGS/RASD, ready to receive a tesserato, plus new roles on demand; answers D1-D3 the same afternoon. Qualifiche of the Portale Società LND (Organigramma) VERIFIED read-only by the main session at 14:30, no names stored. Implemented as staged migration r138 (feat/pc-r138-catalogo-ruoli).",
+      "normalizedCommand": {
+        "rule": "One position catalogue (scd_position_catalog, mirror config/scd-position-catalog.v1.json): every organigram position from FIGC, LND (portal qualifiche in lnd_label), SGS, RASD, D.Lgs 36/2021 and the club, seeded EMPTY and ready; the holder stays in scd_structure_roles (position_code, coach qualification as attribute). New roles custom-<slug> are created by the Presidente or the Direttore Generale and approved by whoever created them (D1: self-approval allowed, always audited). direttore-sportivo-agonistica and direttore-sportivo-generale confirm U16/U15 and Prima/U19 requests, read Dervio, and rank above the coordinatore attività sportiva and below DG/Presidente (D2). responsabile-safeguarding and fisioterapista get access positions (D3): the safeguarding lead only through the dedicated Safeguarding channel, the physio receives health-topic notices without health data. The four new positions are assigned only by the Direzione and exist for the app only once r138 is verified live.",
+        "scope": "ORGANIGRAMMA_POSITIONS_AND_ACCESS",
+        "engines": "PERSONE (every role ready for a tesserato, new figures without code) and TEMPO (requests reach their direttore sportivo instead of the Direzione fallback)",
+        "measure": "mandatory catalogue positions with at least one holder; custom roles created and approved per season (scd_access_audit CREATE_POSITION / POSITION_STATUS); U16-U19 requests confirmed by a direttore sportivo",
+        "status": "IMPLEMENTED_ON_BRANCH_MIGRATION_STAGED_R138",
+        "constraints": [
+          "migration r138 applied only after Francesco writes 'applica r138'",
+          "until r138 is live the app does not offer, route or use the four new positions (registry-live.server.ts probe, fail closed)",
+          "no person names in code, config, tests or commits; holders shown only as counts"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "11:52-11:54; 15:18",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "sourceQuoteFragments": [
+        "comune lasciamo stare per ora avvisato sul programma, importante solo figc e squadra avversaria in caso di spostamento a colico per mal tempo",
+        "luci Dervio ok",
+        "inverno si ma se piove no",
+        "no va avvisato la figc"
+      ],
+      "id": "UD-162",
+      "name": "DERVIO_NO_PER_MATCH_COMUNE_NOTICE_LIGHTS_OK_WINTER_UNLESS_RAIN",
+      "context": "Francesco (DG) 16/10/2026, chat PC, Dervio rotation decisions (time window as recorded in lib/dervio-rotation.ts). UD-161 is reserved by branch feat/pc-r138-catalogo-ruoli, so this entry takes UD-162. Implemented on branch feat/pc-comune-preavviso: lib/rotation.ts (TEAM_NOTICE_DAYS, RAIN_MOVE_NOTICE_TO, COMUNE_DERVIO_NOTE, DERVIO_LIGHTS_OK), facility-assistant, bookings-register, impianti texts, visual-master boards Rotazione-Dervio and Segreteria. Referee question closed by Francesco at 15:18 («no va avvisato la figc»): lib/dervio-rotation.ts item renamed opponent-notice, no referee notice by the club.",
+      "normalizedCommand": {
+        "rule": "The Comune di Dervio is already informed with the season programme: no per-match notice to the Comune (the old 30-day rule is removed). When bad weather moves a Dervio match back to Colico, notify only FIGC (LND/SGS) and the opponent club; the club does not notify the referee, FIGC does (15:18, answer to \"in caso di pioggia l'arbitro va avvisato anche lui, oppure no?\": \"no va avvisato la figc\"). Dervio lights are available for evening matches. Dervio is used in winter too; if it rains the match moves to Colico (weather check 3 days before, decision the day before).",
+        "scope": "DERVIO_ROTATION_NOTICES_LIGHTS_WINTER",
+        "engines": "TEMPO (no useless 30-day Comune chase for the Segreteria; one clear rule for weather moves)",
+        "measure": "0 app texts asking for the 30-day Comune notice (tests rotation, facility-assistant, bookings-register, impianti-planning); FIGC and opponent notices closed by the weather-decision day (dervio-rotation checklist)",
+        "status": "IMPLEMENTED_ON_BRANCH_NOT_PUBLISHED",
+        "proposed": {
+          "text": "Bookings outside the season programme at Dervio (rentals, tournaments): the Direzione decides whether to inform the Comune. Not said by Francesco; shown in the app as \"Proposta, da confermare\".",
+          "status": "PROPOSED"
+        }
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "15:44; 16:39; 16:55; 17:00; 17:10; ~19:20",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "sourceQuoteFragments": [
+        "Esterni Tally, soci app",
+        "Li crea la Tesoreria",
+        "decide presidente e consiglio direttivo",
+        "Preparo e inoltro",
+        "No, senza pagamento",
+        "Tengo anche Direzione",
+        "Tutte e due gratis",
+        "12 mesi"
+      ],
+      "id": "UD-163",
+      "name": "VETRINA_RICHIESTE_EXTERNALS_TALLY_MEMBERS_APP_PAYMENT_LINKS_BY_TESORERIA",
+      "context": "Francesco (DG) 16/10/2026, chat PC, answers to the questions of the Vetrina richieste design (PROGETTO_VETRINA_RICHIESTE, request of 14:57: Tally links and forms in the gestionali for tournaments, visits, sponsors, companies, field rental, other, all catalogued in one place, managed after acceptance with a traced payment). Question 1 (two doors) answered «Esterni Tally, soci app»; question 3 (SumUp links) answered «Li crea la Tesoreria». Earlier the same day: «DG conferma tutto» (13:31). Implemented as phase F1 on branch feat/pc-vetrina-richieste: migration r139 STAGED (not applied), lib/intake-kinds.ts, lib/intake-links.ts, lib/intake.functions.ts, /gestionale block and /gestionale/richieste.",
+      "normalizedCommand": {
+        "rule": "External parties (società, aziende, scuole, privati adulti) send requests through ONE Tally form «Richieste alla SCD» with a branch per kind and a hidden field tipo; members and families ask from their in-app area, so no minor's name passes through Tally. Every request lives in the single catalogue public.scd_requests. The payment link of an accepted request is created by a Tesoreria person (no automatic SumUp links), recorded on the request and reconciled later; nothing is paid before acceptance. 16:39 «decide presidente e consiglio direttivo» (answer to: who decides AFFITTO CAMPO and VISITA AL CENTRO): field rentals and visits to the centres are decided by the Presidente and the Consiglio Direttivo. ~16:55, to the question «Per l'affitto del campo e le visite al centro decidono il Presidente e il Consiglio Direttivo... Nell'app il Consiglio Direttivo corrisponde a chi ha il ruolo «Direzione». Tu, come DG, su queste due richieste cosa fai?» Francesco answered «Preparo e inoltro»: the Consiglio Direttivo is the role Direzione in the app and the DG prepares and forwards these two kinds. ~17:00, to \"Il tuo account nell'app deve avere solo il ruolo DG, così non decidi tu affitti e visite?\" Francesco answered «Tengo anche Direzione»: the DG keeps the role Direzione and, as a Consiglio member, can also decide rentals and visits (accepted). ~17:00, to \"Le visite al centro (medico, massaggi, nutrizione) si pagano con un link della Tesoreria?\" Francesco answered «No, senza pagamento»: VISITA_CENTRO has no payment. ~17:10, to the clarified question \"nell'app «Visita al centro» vuol dire una scuola o un gruppo che viene a vedere il centro sportivo. Le visite mediche, i massaggi e la nutrizione sono un'altra cosa e arrivano più avanti. Il tuo «senza pagamento» per quale vale?\" Francesco answered «Tutte e due gratis»: visits of schools or groups to the centres are free, and the phase F4 health services (medical visits, massage, nutrition; not built yet) will be without payment too. No threshold under which the DG decides alone has been decided. ~19:20, to the question «Per quanto teniamo i recapiti di chi scrive dall'esterno?» Francesco answered «12 mesi» (VERIFIED): the contacts of external requests (scd_request_contacts) are kept 12 months from receipt, 6 months after RIFIUTATA/ANNULLATA and 12 months after CHIUSA, the periods already coded in r139 (DECIDED, no longer PROPOSED); the daily deletion job is migration r140 (pg_cron job scd_intake_contacts_purge, 03:17 Italian summer time), APPLIED on SCD PULSE 16/10/2026 20:03 after Francesco wrote «applica r140». Separate fact, same evening, to the question «S.C.D. o S.D.C.?»: the official name is «S.D.C. ColicoDerviese A.S.D.» (recorded only; nothing renamed in the app, texts and code keep «S.C.D.» until Francesco asks for the change).",
+        "scope": "VETRINA_RICHIESTE_DOORS_AND_PAYMENTS",
+        "engines": "TEMPO (one catalogue, deciders told in the app at once) and SOLDI (tournament fees and field rentals traced to the bank movements)",
+        "measure": "requests per month and kind (scd_requests.received_at); median hours from RICEVUTA to decision; share of accepted requests with payment RISCONTRATO within 7 days of LINK_INVIATO; 0 minors' names in Tally submissions (form asks for an adult referent only)",
+        "status": "IMPLEMENTED_ON_BRANCH_NOT_PUBLISHED",
+        "pending": [
+          "Tally form «Richieste alla SCD» to be created (not by an agent without approval); config intakeTallyFormUrl stays null until then",
+          "«applica r139» for the migration (r139 applied on SCD PULSE 16/10/2026 17:53)",
+          "Make scenario Tally -> scd_request_ingest (service role) to be created after the form",
+          "placement of the public links on /tornei, /sponsor, /partner, /fornitori, /impianti, /contatti (pages of the CLOUD chat)",
+          "PROPOSED (security review): Tally form: honeypot field + Make filter before ingest",
+          "PROPOSED, to be confirmed by Francesco: phases Ricevuta -> In valutazione -> Accettata | Non accolta -> In gestione -> Chiusa; deciders of ISCRIZIONE_TORNEO, SPONSOR, CONVENZIONE, ALTRO and every preparer/informed/owner list (lib/intake-kinds.ts INTAKE_RULES; AFFITTO_CAMPO and VISITA_CENTRO deciders DECIDED 16:39, DG prepares and forwards DECIDED ~16:55), payment and payment link yes/no for the other kinds (no link for sponsors and convenzioni; VISITA_CENTRO without payment DECIDED ~17:00), ingest cap 60/hour (contact retention periods DECIDED ~19:20 «12 mesi», job r140 applied 20:03)"
+        ]
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "afternoon before 16:30 (exact time not recorded); 16:31; ~16:42; ~17:40; ~18:20",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-164",
+      "name": "IRIDE_V4_FRIENDLIES_CONFIRMED_BY_DG_ON_WHATSAPP",
+      "sourceQuoteFragments": [
+        "meglio che manda un sms a direttore generale e lui conferma",
+        "sì, semplifica",
+        "WhatsApp",
+        "ok Iride v4 (16:31)",
+        "Sì, accendi la copia (~16:42, test copies only)",
+        "Fine stagione (~17:40, answer to «per quanto tempo li teniamo?» about the requester's name and number in the requests data store)",
+        "Sì, accendi v4 (~18:20, answer to «La accendo su Iride vera? Prima faccio un salvataggio... Il promemoria al DG lo creo spento.»)",
+        "Sì, cancella tutto (~18:20, answer to «A fine stagione, le richieste di amichevole a cui non hai mai risposto le cancello anche loro?»)"
+      ],
+      "context": "Francesco (DG) 16/10/2026, chat PC, after finding the friendly procedure of UD-154/UD-155 too difficult («troppo difficile questa procedura»). Design in claude.ai project work (PROPOSTA_CONFERMA_DG, chat PC working folder); prompt and blueprints recorded in automations/make/segreteria-ai/ (system-prompt.it.md v4, blueprint-v4.json, promemoria-dg-v4.json, prompt-diff-v3-v4.txt, test-v4-risultati.md). UD-163 is taken by branch feat/pc-vetrina-richieste, so this entry takes UD-164. Tests T1-T10 all PASS on the inactive copies 8000995 and 8001010 with test data stores and fake TESTIRIDE numbers, no real message or mail sent; both copies switched off afterwards (VERIFIED by the PC chat with scenarios_get). The live scenario 7979437 still runs v3 and was not touched. Review 16/10 evening (fixes on the same copies, run «R», T1-T15 PASS, both copies OFF again, VERIFIED with scenarios_get): «AM» prefix mandatory in free text (a parent's «Sì 2» stays a normal conversation; the bare number only from button ids), requester fields in the DG message limited and neutralised (newlines, AM-n → AM·n), mail subject cleaned, season-end retention in the reminder scenario, CANCELLA also deletes the sender's friendly requests and keeps only the verified role of a role contact. Go-live 16/10/2026 18:35 Italian time (16:35:18Z, scenario lastEdit): after Francesco's «Sì, accendi v4», the live scenario 7979437 was saved first (full blueprint backup, v3, active, scheduling immediately) and then updated with blueprint-v4.json (same name, folder, scheduling, connections, webhook 3910801); scenarios_get afterwards: blueprint identical to the tested file (modules 60, 61, 68, 69, 84-104 present) and isActive=true. The reminder/retention scenario was created INACTIVE as 8003125 'SCD · Iride · Promemoria DG' (every 6 hours when switched on), as Francesco was told «Il promemoria al DG lo creo spento». Retention widened before go-live («Sì, cancella tutto»): at season end every AM- request is deleted, IN_ATTESA_DG included; T13 re-run on the inactive copy 8001010 PASS (copy switched on only for the run, then off, VERIFIED).",
+      "normalizedCommand": {
+        "rule": "A friendly request reaching Iride is confirmed or refused only by the Direttore Generale, on WhatsApp from the club number. Iride collects only team (category), date and opponent (time and pitch are decided by the club and never asked), never confirms a friendly herself, and tells the requester the request went to the Direttore Generale. Make (not the AI) creates the code AM-nnnn and sends it to the DG with SÌ/NO buttons, or by internal [Iride] mail to the club inbox when the DG is outside the WhatsApp 24-hour window. Only a message from the number whose verified role in the Iride rubrica (data store 220276, field ruolo, written only by a person in Make) is DIRETTORE GENERALE can decide; the same SÌ/NO AM-code from any other number is logged IGNORATO with no reply and no change; a plain «sì» from anyone else stays a normal conversation. Iride then tells the requester the outcome (time and pitch from the Segreteria) and logs it in SCD_INTAKE_LOG.",
+        "scope": "SECRETARIAT_FRIENDLIES_DG_CONFIRMATION",
+        "engines": "TEMPO (one tap of the DG instead of a multi-person procedure) and PERSONE (the requester gets the outcome on the same chat)",
+        "measure": "friendly requests with AM code decided by the DG; AM requests still IN_ATTESA_DG after 48 hours (reminder mails); confirmations accepted from numbers without the DIRETTORE GENERALE role = 0",
+        "status": "APPLIED_TO_LIVE_7979437",
+        "constraints": [
+          "v4 reached the live scenario 7979437 only after Francesco's explicit OK («Sì, accendi v4»); the 48-hour reminder scenario (8003125) is created inactive and switched on only with his OK",
+          "the DG number never appears in blueprints, repo, mails or reports: Make reads it from the rubrica (to = +{{67.key}})",
+          "no names of minors: teams are categories; the requester is stored with first name only",
+          "prompt rule 8 rewritten (friendly as a separate rule) and rules 15-16 added; system-prompt.it.md and the Make module stay byte-identical",
+          "the reminder/retention scenario never deletes the CONTATORE record and never writes test data to the real data store 221453"
+        ],
+        "proposed": [
+          {
+            "text": "Reminder threshold of 48 hours (one reminder mail per request still IN_ATTESA_DG after 48 hours): chosen in the design, not a Francesco quote.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "Sector shown to the DG for information (Responsabile attività di base / DS settore agonistico / DS generale / Segreteria) computed by Make from the team; mapping of U14, U17, Allievi and 'Giovanissimi = U15' not confirmed by Francesco.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "Meta WhatsApp utility templates scd_conferma_amichevole and scd_esito_richiesta (v4.1) to reach the DG and the requester outside the 24-hour window; price for Italy UNKNOWN until read on the official Meta rate card.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "INTAKE_LOG field 'AI:' aligned with the fixed Make text when the request goes to the DG (v4.1).",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "CANCELLA from a contact whose rubrica record has a verified ruolo (e.g. DIRETTORE GENERALE): the record keeps only ruolo and ultimo_contatto (needed for the 24-hour WhatsApp window), every other personal field is deleted and the reply says the role is managed by the Segreteria. Simplest safe option chosen in the review, not said by Francesco.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "IMPLEMENTED (wording PROPOSED, not Francesco's): when the DIRETTORE GENERALE writes a short yes/no without AM code and without quoting a message, Make answers with a fixed text, no AI: up to 5 requests IN_ATTESA_DG («• AM-… · squadra · data · contro avversario», sanitised like module 69) and «Rispondi SÌ AM-… oppure NO AM-… con il codice della richiesta, oppure tocca il pulsante nel messaggio di Iride.», or «Non ci sono richieste di amichevole in attesa.». Fixes test T8c (the AI had said «nessuna richiesta in attesa» while one was open). Modules 100-104, route DG_SENZA_CODICE.",
+            "status": "PROPOSED"
+          },
+          {
+            "text": "v4.1: keep the friendly team in Make, not only in the AI summary (test T2: the AI asked again for the team).",
+            "status": "PROPOSED"
+          }
+        ],
+        "implementation": {
+          "make_scenario": "7979437 'SCD · Segreteria AI · WhatsApp' (LIVE v4 since 16/10/2026 18:35); reminder/retention 8003125 'SCD · Iride · Promemoria DG' (created OFF); test copies 8000995 and 8001010 (both OFF)",
+          "prompt_source": "automations/make/segreteria-ai/system-prompt.it.md",
+          "blueprints": [
+            "automations/make/segreteria-ai/blueprint-v4.json",
+            "automations/make/segreteria-ai/promemoria-dg-v4.json"
+          ],
+          "test_report": "automations/make/segreteria-ai/test-v4-risultati.md",
+          "register": "SCD_INTAKE_LOG"
+        },
+        "retention": {
+          "text": "Friendly requests are kept until the end of the season they were created in: every request with code AM- (any stato, IN_ATTESA_DG included), with the requester's first name and WhatsApp number, is deleted from 30 June (e.g. created 16/10/2026 → deleted from 30/06/2027). Implemented in the reminder scenario (route 2: SearchRecord codice starts with AM- and creato_il before the last 30 June → DeleteRecord, never the CONTATORE); the only value to change is the constant fine_stagione = 06-30 (module 4). On CANCELLA the sender's records in the requests data store are deleted too. T13 re-run 16/10/2026 on the inactive copy 8001010: a CONFERMATA and an IN_ATTESA_DG request created 01/10/2025 deleted, CONTATORE and this season's requests intact (execution e4990482df4744bbb69034be8ae5e02d).",
+          "status": "VERIFIED",
+          "source": "Francesco 16/10/2026 ~17:40, «per quanto tempo li teniamo?» → «Fine stagione»; ~18:20, «A fine stagione, le richieste di amichevole a cui non hai mai risposto le cancello anche loro?» → «Sì, cancella tutto»"
+        },
+        "appliedToLive": {
+          "at": "2026-10-16T16:35:18Z (18:35 Europe/Rome)",
+          "scenario": "7979437 'SCD · Segreteria AI · WhatsApp'",
+          "approval": "Francesco «Sì, accendi v4» (~18:20) to «La accendo su Iride vera? Prima faccio un salvataggio... Il promemoria al DG lo creo spento.»",
+          "backup": "scenarios_get full blueprint saved before the update (backup-7979437-20261016T163214Z-pre-v4.json, chat working folder, not in the repo)",
+          "isActive_after": true,
+          "reminder_scenario": {
+            "id": "8003125",
+            "name": "SCD · Iride · Promemoria DG",
+            "isActive": true,
+            "note": "created inactive; switched on 16/10/2026 ~18:45 after Francesco's answer «Sì, accendilo» to «Accendo anche il promemoria? Se non rispondi a una richiesta di amichevole entro 48 ore, ti arriva un solo promemoria per mail. Lo stesso scenario fa anche la pulizia di fine stagione al 30 giugno.»"
+          },
+          "status": "VERIFIED"
+        }
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "20:56",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-142",
+      "name": "SPONSOR_PAGE_LEDWALL_ROTATION",
+      "sourceQuoteFragments": [
+        "Mancano i ledwal per sponsor a rotazione sul wab app sponsor"
+      ],
+      "normalizedCommand": {
+        "rule": "The /sponsor page of the Super App shows the club LED wall spots of the confirmed sponsors in rotation, clock-synced with the physical board (/ledwall/player). Exception to UD-152 limited to /sponsor: muted video, pause button, no autoplay with reduced motion, only showable spots of confirmed sponsors.",
+        "scope": "SUPER_APP /sponsor",
+        "supersedes": "UD-152 for the /sponsor page only",
+        "implementationStatus": "IMPLEMENTED_PUBLISHED_2026-10-16",
+        "implementation": "apps/superapp/src/components/SponsorLedwallLive.tsx"
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "21:43",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-143",
+      "name": "HOME_BOTTOM_PROMO_ROTATION_SKY_CONVENZIONI_SOCIAL",
+      "sourceQuoteFragments": [
+        "Nella home a rotazione in basso devi fare passare una promo questi sono i nostri sponsor che a bordo campo ci sostengono vuoi farlo anche tu scrivi e ti ricontattiamo",
+        "Puoi decidere tu la grafica e il messaggio e cambiarlo quantabvikre vuoi",
+        "Poi ogni due giorni fai comparire Sky con la divise e lo spinsor e fai lo stesso e poi anche altri idee se vuoi sostenere i nostri colori",
+        "Poi a rotazione le convenzioni annunciate che ti comunico e così anche programmare che quando lo fai lì lo fai anche sui social così siamo virali taggando lo sponsor"
+      ],
+      "normalizedCommand": {
+        "rule": "At the bottom of the public home a rotating promo band: every day the call to sponsors (confirmed sponsors with a sponsor of the day, CTA to the /sponsor proposal form 'Scrivici e ti ricontattiamo'); every second day Sky in the official match kit with the sponsors on the shirt; 'Sostieni i nostri colori'; the convenzioni Francesco announces (none invented). Copy and graphics may change at will. Pause button, stops on hover/focus/hidden tab, never moves with reduced motion. The daily Super Giornalista prepares the matching social post tagging the sponsor of the day (draft; publishing only through a social account Francesco connects).",
+        "scope": "SUPER_APP public home + scd-super-giornalista",
+        "supersedes": "UD-152 for this home band only; UD-151 'Sky never in the app' for this band only (official artwork sky-atv-cut.webp)",
+        "implementationStatus": "IMPLEMENTED_PENDING_PUBLISH",
+        "implementation": "apps/superapp/src/lib/home-promos.ts, apps/superapp/src/components/home/HomeBordoCampo.tsx"
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "22:40",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-165",
+      "name": "CHARACTERS_IN_APP_SURPRISE_MOMENTS",
+      "sourceQuoteFragments": [
+        "ma io lo devo fare succedere nella web app e nella piattaforma per ingolosire gli sponsor e ogni tanto far divertire chi ce sopra a lavorare o a giocare",
+        "devono comparire tutti Iride è dentro il gestionale a supporto , Sky esce ogni tanto quando si fanno eventi o su goal o festa o altro capendo se ce un bambino o un adulto",
+        "crovi deve far sorridere e creare atmosfere gioiose anche parlando in modo goffo e con molta dialettica del nod e del posto lui è milanese di nascita e molto stile meneghino"
+      ],
+      "normalizedCommand": {
+        "rule": "All characters appear in the web app and the gestionale as occasional surprise moments (breakout/talking), to attract sponsors and to make staff and players smile.",
+        "cast": {
+          "Iride": "inside the gestionale as support assistant (UD-155 rules: says she is an AI).",
+          "Sky": "comes out occasionally on events, goals, parties and celebrations; tone adapts to child or adult audience; adult playful voice.",
+          "Crovi": "brings joy and smiles; clumsy, funny speech with northern and local expressions; born in Milan, Milanese (meneghino) style; never vulgar or offensive."
+        },
+        "audienceDetection": "PROPOSED: from the signed-in profile type (minor athlete / parent / adult staff); unknown visitor = family-friendly tone. Never camera, face or voice analysis.",
+        "guards": [
+          "rare and skippable with one tap",
+          "sound only after a user tap",
+          "respect prefers-reduced-motion",
+          "sponsor moments only with active contracts",
+          "no data collected from minors"
+        ]
+      },
+      "supersedes": "UD-151 'Sky never in the app' — now Sky is allowed in the app for surprise moments only; pages stay without Sky otherwise.",
+      "status": "RECORDED"
+    },
+    {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "22:47",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-166",
+      "name": "LEDWALL_SKY_SPONSOR_INTRO_AND_GOAL_CELEBRATION",
+      "sourceQuoteFragments": [
+        "sky a rotazione dal ledwole esce e presenta lo sponsor e poi parte lo spondor sul ledwlae , poi puo fare srtiel goale e esulta per far vedere la divisa con un possible sponsor sopra"
+      ],
+      "normalizedCommand": {
+        "rule": "LED wall playlist (10 m x 1 m): in rotation Sky breaks out of the LED, introduces the sponsor, then the sponsor spot plays; Sky can also kick at goal and celebrate, showing the kit with a sponsor on it.",
+        "sequence": [
+          "Sky breakout intro (2-3 s)",
+          "Sky presents sponsor name/logo",
+          "sponsor spot (official sponsor asset)",
+          "optional: Sky shot on goal + celebration showing the kit with a sponsor slot"
+        ],
+        "guards": [
+          "only sponsors with an active contract; unsold kit slot shown as 'spazio disponibile' in sales demos only, never as a fake sponsor",
+          "official logos and kit only",
+          "no audio on LED unless the venue system and Francesco approve"
+        ]
+      },
+      "status": "RECORDED"
     }
   ],
   "completionGate": {

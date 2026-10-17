@@ -8,7 +8,8 @@
  * people are resolved elsewhere from the gestionale registry (positions and person grants), never from addresses
  * found in a mail (UD-141 limits). Only adult positions with a club role can be returned: never families, athletes
  * (minors), partners or external people. Positions Francesco named that the registry does not have yet
- * (e.g. fisioterapista, direttori sportivi) are reported as missing and never used as recipients (fail closed).
+ * (none since r138, UD-161) and r138 positions before r138 is live are reported as missing and never used as
+ * recipients (fail closed).
  *
  * Users: Iride staff alerts (UD-155), the Google Calendar agent (UD-141) and the request machine (UD-154).
  * Who holds a responsibility is decided in the gestionale by the Direttore Generale and the Presidente (UD-159),
@@ -22,7 +23,7 @@ import { z } from "zod";
 
 import { POSITION_LABEL } from "./access-admin";
 import { REQUEST_TEAMS, REQUEST_WATCHERS, confirmerFor, positionExists, teamLabel } from "./request-machine";
-import { KNOWN_POSITIONS } from "./session";
+import { KNOWN_POSITIONS, R138_POSITIONS, positionLive } from "./session";
 
 /* ------------------------------------------------------------------ vocabulary */
 
@@ -72,11 +73,23 @@ export type RoutingStatus = "CONFERMATA" | "DA_CONFERMARE" | "IMMEDIATO";
 /** Registry positions that are never recipients: families and athletes (minors) come only from the coarse role, partners are external. */
 export const NEVER_RECIPIENTS: readonly string[] = ["famiglia", "atleta", "partner"];
 
-/** Adult club positions that can be routed (registry KNOWN_POSITIONS minus NEVER_RECIPIENTS). */
-export const ROUTABLE_POSITIONS: readonly string[] = KNOWN_POSITIONS.filter((p) => !NEVER_RECIPIENTS.includes(p));
+/**
+ * Francesco 16/10/2026 (D3, UD-161): the safeguarding lead has an access of its own, but tutela reports travel ONLY in
+ * the dedicated Safeguarding channel (AGENTS.md: safeguarding never in ordinary flows). This table never routes it.
+ */
+export const SAFEGUARDING_CHANNEL_ONLY: readonly string[] = ["responsabile-safeguarding"];
 
-export function isRoutablePosition(p: string): boolean {
-  return ROUTABLE_POSITIONS.includes(p);
+/** Adult club positions that can be routed (registry KNOWN_POSITIONS minus NEVER_RECIPIENTS and the safeguarding lead). */
+export const ROUTABLE_POSITIONS: readonly string[] = KNOWN_POSITIONS.filter(
+  (p) => !NEVER_RECIPIENTS.includes(p) && !SAFEGUARDING_CHANNEL_ONLY.includes(p),
+);
+
+/**
+ * Routable now. r138 positions (session.ts R138_POSITIONS) only when r138Live is true, a value verified on the server
+ * (registry-live.server.ts); default false = fail closed.
+ */
+export function isRoutablePosition(p: string, r138Live = false): boolean {
+  return ROUTABLE_POSITIONS.includes(p) && positionLive(p, r138Live);
 }
 
 /**
@@ -87,7 +100,11 @@ export function isRoutablePosition(p: string): boolean {
 export const POSITION_RANK: Readonly<Record<string, number>> = {
   presidente: 0,
   direzione: 0,
-  "direttore-generale": 1,
+  // Francesco 16/10/2026 13:31 «DG conferma tutto»: the Direttore Generale confirms on its own on every topic.
+  "direttore-generale": 0,
+  // Francesco 16/10/2026 (D2) "Sopra il coordinatore": below DG/Presidente/direzione, above coordinatore and RAB.
+  "direttore-sportivo-agonistica": 1.5,
+  "direttore-sportivo-generale": 1.5,
   "coordinatore-attivita-sportiva": 2,
   "responsabile-attivita-base": 2,
   dirigenza: 3,
@@ -99,6 +116,7 @@ export const POSITION_RANK: Readonly<Record<string, number>> = {
   "responsabile-struttura-colico": 3,
   "responsabile-struttura-dervio": 3,
   "responsabile-infermeria": 3,
+  fisioterapista: 3,
   nutrizionista: 3,
   "responsabile-tornei": 3,
   "responsabile-magazzino": 3,
@@ -139,21 +157,25 @@ export { REQUEST_WATCHERS };
 /**
  * UD-156 (Francesco 16/10/2026 06:57 "Dervio decido io e responsabile attività di base e coordinatore attività
  * sportiva e presidente e segreteria sempre informata"): always told of anything that touches Dervio.
- * Same positions as the Dervio readers of r135 (feat/pc-attivita-struttura) plus the Segreteria.
+ * Same positions as the Dervio readers of r135, extended by r138 with the two direttori sportivi, plus the Segreteria.
  */
 export const DERVIO_ALWAYS: readonly string[] = [
   "presidente",
   "direttore-generale",
   "coordinatore-attivita-sportiva",
   "responsabile-attivita-base",
+  // Francesco (DG) 16/10/2026 13:32: the two direttori sportivi see Dervio too (r138 adds them to the r135 readers).
+  "direttore-sportivo-agonistica",
+  "direttore-sportivo-generale",
   "segreteria",
 ];
 
-/** Positions Francesco named that do not exist in the registry yet: reported, never routed (fail closed). */
-export const NAMED_MISSING_POSITIONS: Readonly<Record<string, string>> = {
-  fisioterapista: "Fisioterapista",
-  "responsabile-safeguarding": "Responsabile safeguarding",
-};
+/**
+ * Positions Francesco named that do not exist in the registry yet: reported, never routed (fail closed). Empty since
+ * r138 (UD-161 D3: fisioterapista and responsabile-safeguarding get their own access); until r138 is live the r138
+ * positions are still reported as "ruolo non ancora attivo" by routeChiFaCosa.
+ */
+export const NAMED_MISSING_POSITIONS: Readonly<Record<string, string>> = {};
 
 /* ------------------------------------------------------------------ topic table */
 
@@ -192,10 +214,12 @@ const BASE_LIMITS: readonly string[] = [NO_NAMES_OF_MINORS, NO_COPY];
  * salute and impianti (Colico and Dervio) the deciders are the Presidente AND the Consiglio Direttivo. The registry
  * has no separate "consiglio-direttivo" position: the board is the role DIRECTION, whose position is 'direzione'
  * (session.ts ROLE_POSITIONS.DIRECTION; 'dirigenza' is the purchasing seat of the same role). So the Consiglio
- * Direttivo is routed as 'direzione'.
+ * Direttivo is routed as 'direzione'. Francesco 16/10/2026 13:31 «DG conferma tutto»: the Direttore Generale
+ * decides with them.
  */
 export const BOARD_POSITION = "direzione";
 const BOARD_DECIDERS: readonly Entry[] = [
+  { position: "direttore-generale", duty: "DECIDE", reason: "conferma tutto (Francesco 16/10/2026 13:31)" },
   { position: "presidente", duty: "DECIDE", reason: "decide con il Consiglio Direttivo (Francesco 16/10/2026)" },
   { position: BOARD_POSITION, duty: "DECIDE", reason: "Consiglio Direttivo: decide con il Presidente (Francesco 16/10/2026)" },
 ];
@@ -271,11 +295,13 @@ export const CHI_FA_COSA_TABLE: Readonly<Record<ChiFaCosaTopic, TopicRule>> = {
     entries: [
       ...BOARD_DECIDERS,
       { position: "responsabile-infermeria", duty: "INFORM", reason: "appuntamenti e infermeria (UD-155)" },
+      // UD-161 D3: the physio is told that a contact is needed, never health data (NO_HEALTH below).
+      { position: "fisioterapista", duty: "INFORM", reason: "serve un contatto del fisioterapista (nessun dato di salute)" },
     ],
     teamStaff: false,
     teamConfirmerDecides: false,
     siteStructure: false,
-    missing: ["fisioterapista"],
+    missing: [],
     contentLimits: [...BASE_LIMITS, NO_HEALTH],
     immediate: false,
   },
@@ -288,7 +314,7 @@ export const CHI_FA_COSA_TABLE: Readonly<Record<ChiFaCosaTopic, TopicRule>> = {
     teamStaff: false,
     teamConfirmerDecides: false,
     siteStructure: false,
-    missing: ["responsabile-safeguarding"],
+    missing: [],
     contentLimits: [
       ...BASE_LIMITS,
       NO_HEALTH,
@@ -387,13 +413,6 @@ export const DERVIO_EMERGENCY_STRUCTURE: readonly string[] = [
   "responsabile-struttura",
 ];
 
-/**
- * VERIFIED (Francesco 16/10/2026 11:58 «ok DG conferma come direzione»): when the Direzione fallback decides a
- * group whose confirmer position does not exist yet, the Direttore Generale confirms as Direzione. Applied only when
- * 'direzione' is the sole decider (UD-154 fallback); where the Presidente decides too, the Presidente's rank counts.
- */
-const FALLBACK_CONFIRM_RANK = 1;
-
 /** UD-154: until a group confirmer position exists, only the Direzione confirms that group. */
 export const CONFIRMER_FALLBACK = "direzione";
 
@@ -456,7 +475,12 @@ const DUTY_ORDER: Readonly<Record<Duty, number>> = { DECIDE: 0, PREPARE: 1, INFO
  * Route a topic to positions. Pure and deterministic: same input, same output, ordered by duty then rank then id.
  * Throws a ZodError on an invalid topic/site (callers validate first with chiFaCosaInputSchema.safeParse).
  */
-export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
+/**
+ * r138Live: whether migration r138 is live (direttori sportivi, fisioterapista exist). It is NOT part of the input
+ * schema: callers pass only the value verified on the server by registry-live.server.ts r138Live(), never anything
+ * from the browser, a mail or a form. Default false (fail closed).
+ */
+export function routeChiFaCosa(raw: ChiFaCosaInput, r138Live = false): ChiFaCosaRoute {
   const input = chiFaCosaInputSchema.parse(raw);
   const rule = CHI_FA_COSA_TABLE[input.topic];
   const warnings: string[] = [];
@@ -464,9 +488,15 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
   const byPos = new Map<string, { duty: Duty; reasons: string[]; teamKey: string | null }>();
 
   const add = (position: string, duty: Duty, reason: string, teamKey: string | null = null) => {
-    if (!isRoutablePosition(position)) {
+    if (!isRoutablePosition(position, r138Live)) {
       if (!missing.has(position))
-        missing.set(position, { position, label: labelOf(position), reason: "posizione non presente nel registro" });
+        missing.set(position, {
+          position,
+          label: labelOf(position),
+          reason: R138_POSITIONS.includes(position)
+            ? "ruolo non ancora attivo (r138 da applicare): nessun avviso"
+            : "posizione non presente nel registro",
+        });
       return;
     }
     const cur = byPos.get(position);
@@ -497,7 +527,7 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
     if (conf && (rule.teamConfirmerDecides || rule.teamStaff)) {
       const duty: Duty = rule.teamConfirmerDecides ? "DECIDE" : "INFORM";
       const why = rule.teamConfirmerDecides ? `conferma per ${teamLabel(teamKey)} (UD-154)` : `responsabile del gruppo ${teamLabel(teamKey)}`;
-      if (positionExists(conf.position)) {
+      if (positionExists(conf.position, r138Live)) {
         add(conf.position, duty, why);
       } else {
         missing.set(conf.position, {
@@ -552,11 +582,7 @@ export function routeChiFaCosa(raw: ChiFaCosaInput): ChiFaCosaRoute {
   // Hierarchy (UD-141).
   const approvers = [...byPos.entries()].filter(([, v]) => v.duty === "DECIDE").map(([p]) => p);
   const approverRank = approvers.length
-    ? Math.min(
-        ...approvers.map((p) =>
-          p === CONFIRMER_FALLBACK ? FALLBACK_CONFIRM_RANK : (POSITION_RANK[p] ?? Number.POSITIVE_INFINITY),
-        ),
-      )
+    ? Math.min(...approvers.map((p) => POSITION_RANK[p] ?? Number.POSITIVE_INFINITY))
     : POSITION_RANK["direttore-generale"]!;
   const rank = requesterRank(input.requesterPositions);
   let status: RoutingStatus;

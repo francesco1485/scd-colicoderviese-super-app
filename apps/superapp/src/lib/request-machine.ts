@@ -18,7 +18,7 @@ import { z } from "zod";
 
 import { CLUB_PROFILE } from "./club-profile";
 import { romeParts, romeToIso } from "./home-week";
-import { KNOWN_POSITIONS } from "./session";
+import { positionLive } from "./session";
 
 /* ------------------------------------------------------------------ vocabulary */
 
@@ -138,8 +138,12 @@ export const REQUEST_WATCHERS: readonly string[] = ["direttore-generale", "coord
 /** Positions that always see everything and may confirm on behalf (Direzione). */
 export const REQUEST_DIRECTION: readonly string[] = ["direzione", "presidente"];
 
-export function positionExists(position: string): boolean {
-  return KNOWN_POSITIONS.includes(position);
+/**
+ * True when the position exists on the database. r138 positions (direttori sportivi, ...) only when the caller passes
+ * r138Live = true, verified on the server (registry-live.server.ts); default false keeps the UD-154 fallback.
+ */
+export function positionExists(position: string, r138Live = false): boolean {
+  return positionLive(position, r138Live);
 }
 
 export function confirmerFor(teamKey: string | null | undefined): ConfirmerRule | null {
@@ -148,32 +152,32 @@ export function confirmerFor(teamKey: string | null | undefined): ConfirmerRule 
 }
 
 /** Positions the database accepts as confirmers of a group (only registry positions), null for unknown groups. */
-export function dbConfirmerPositions(teamKey: string): string[] | null {
+export function dbConfirmerPositions(teamKey: string, r138Live = false): string[] | null {
   const rule = confirmerFor(teamKey);
   if (!rule) return null;
-  return positionExists(rule.position) ? [rule.position] : [];
+  return positionExists(rule.position, r138Live) ? [rule.position] : [];
 }
 
-/** Confirmer positions that do not exist yet (to be created by Francesco). */
-export function missingConfirmerPositions(): ConfirmerRule[] {
-  return REQUEST_CONFIRMERS.filter((r) => !positionExists(r.position));
+/** Confirmer positions that do not exist yet (to be created by Francesco / r138 not live). */
+export function missingConfirmerPositions(r138Live = false): ConfirmerRule[] {
+  return REQUEST_CONFIRMERS.filter((r) => !positionExists(r.position, r138Live));
 }
 
 /** Plain line "Conferma: …" for a group, honest when the position does not exist yet. */
-export function confirmerLine(teamKey: string | null | undefined): string {
+export function confirmerLine(teamKey: string | null | undefined, r138Live = false): string {
   const rule = confirmerFor(teamKey);
   if (!rule) return "Conferma: squadra da indicare";
-  return positionExists(rule.position)
+  return positionExists(rule.position, r138Live)
     ? `Conferma: ${rule.label} (o la Direzione)`
-    : `Conferma: Direzione (ruolo ${rule.label} non ancora creato)`;
+    : "Conferma: Direzione (ruolo non ancora attivo)";
 }
 
 /** UI hint only (the database decides): may this session confirm requests of this group? */
-export function mayConfirm(roles: ReadonlySet<string>, teamKey: string | null | undefined): boolean {
+export function mayConfirm(roles: ReadonlySet<string>, teamKey: string | null | undefined, r138Live = false): boolean {
   const rule = confirmerFor(teamKey);
   if (!rule) return false;
   if (REQUEST_DIRECTION.some((p) => roles.has(p))) return true;
-  return positionExists(rule.position) && roles.has(rule.position);
+  return positionExists(rule.position, r138Live) && roles.has(rule.position);
 }
 
 /** UI hint only: sees the whole board (Segreteria, Direzione, Direttore Generale, Coordinatore). */
@@ -182,8 +186,8 @@ export function seesEverything(roles: ReadonlySet<string>): boolean {
 }
 
 /** UI hint only: has a part in the machine (board or confirmation of at least one group). */
-export function hasRequestRole(roles: ReadonlySet<string>): boolean {
-  return seesEverything(roles) || REQUEST_CONFIRMERS.some((r) => positionExists(r.position) && roles.has(r.position));
+export function hasRequestRole(roles: ReadonlySet<string>, r138Live = false): boolean {
+  return seesEverything(roles) || REQUEST_CONFIRMERS.some((r) => positionExists(r.position, r138Live) && roles.has(r.position));
 }
 
 /* ------------------------------------------------------------------ status rules (mirror of r133) */

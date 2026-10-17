@@ -267,34 +267,33 @@ function HeaderSearch() {
 }
 
 /**
- * Desktop centre tabs in the style of a Facebook page (Francesco 16/10/2026 06:21: «una barra in alto stile pagina
- * interna Facebook»): big icons, the active one underlined; labels as tooltip and accessible name.
+ * Desktop top bar with every main section as a written label (Francesco 16/10/2026 14:46 «la home, partite e tutto
+ * vanno nella barra in alto»; type sized for desktop, 15 px): the active one in yellow with a yellow underline.
  */
-const TOP_TABS: readonly { to: string; label: string; icon: LucideIcon; match: (p: string) => boolean }[] = [
-  { to: "/", label: "Home", icon: House, match: (p) => p === "/" },
-  { to: "/calendario", label: "Partite", icon: CalendarDays, match: (p) => p.startsWith("/calendario") },
-  { to: "/eventi", label: "Eventi e tornei", icon: Trophy, match: (p) => p.startsWith("/eventi") || p.startsWith("/tornei") },
-  { to: "/community", label: "Comunità", icon: MessagesSquare, match: (p) => p.startsWith("/community") },
-  { to: "/sponsor", label: "Sponsor", icon: Handshake, match: (p) => p.startsWith("/sponsor") },
+const TOP_TABS: readonly { to: string; label: string; match: (p: string) => boolean }[] = [
+  { to: "/", label: "Home", match: (p) => p === "/" },
+  { to: "/calendario", label: "Partite", match: (p) => p.startsWith("/calendario") },
+  { to: "/eventi", label: "Eventi e tornei", match: (p) => p.startsWith("/eventi") || p.startsWith("/tornei") },
+  { to: "/shop", label: "Shop", match: (p) => p.startsWith("/shop") || p.startsWith("/kit") },
+  { to: "/community", label: "Comunità", match: (p) => p.startsWith("/community") },
+  { to: "/sponsor", label: "Sponsor", match: (p) => p.startsWith("/sponsor") },
 ];
 
 function TopTabs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <nav aria-label="Sezioni principali" className="hidden h-full flex-1 items-stretch justify-center gap-1 lg:flex" data-testid="top-tabs">
+    <nav aria-label="Sezioni principali" className="hidden h-full flex-1 items-stretch justify-center gap-0.5 lg:flex" data-testid="top-tabs">
       {TOP_TABS.map((t) => {
         const on = t.match(pathname);
         return (
           <Link
             key={t.to}
             to={t.to as never}
-            title={t.label}
-            aria-label={t.label}
             aria-current={on ? "page" : undefined}
-            className={`scd-focus relative grid w-[84px] place-items-center rounded-[10px] transition-colors duration-150 xl:w-[104px] ${on ? "text-[#ffd600]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+            className={`scd-focus relative flex items-center whitespace-nowrap rounded-[8px] px-2.5 font-display text-[15px] font-semibold transition-colors duration-150 xl:px-3.5 ${on ? "text-[#ffd23f]" : "text-[#dbe5f7] hover:bg-white/10 hover:text-white"}`}
           >
-            <t.icon className="size-[26px]" strokeWidth={on ? 2.4 : 1.9} aria-hidden="true" />
-            {on && <span aria-hidden="true" className="absolute inset-x-2 bottom-0 h-[3px] rounded-t-full bg-[#ffd600]" />}
+            {t.label}
+            {on && <span aria-hidden="true" className="absolute inset-x-2 bottom-0 h-[3px] rounded-t-full bg-[#ffd23f]" />}
           </Link>
         );
       })}
@@ -304,8 +303,9 @@ function TopTabs() {
 
 /**
  * The three official marks in the top bar (Francesco 16/10/2026 07:07 «mettili in alto sulla barra, scontornati e
- * piccoli, solo il Monza un po' più grande»): cut-out files on a small white plate, CR Lombardia and AC Monza linked
- * to their official sites. Monza is larger: affiliation with a Serie A club.
+ * piccoli, solo il Monza un po' più grande»): transparent cut-outs straight on the blue bar with a light halo, never on a
+ * white plate (Francesco 16/10/2026 14:58-15:05: «non utilizzare più con sfondo bianco», «utilizzali sempre»). CR Lombardia
+ * and AC Monza linked to their official sites. Monza is larger: affiliation with a Serie A club.
  */
 const CREDENTIAL_LINK: Partial<Record<CredentialId, string>> = {
   lnd: "https://www.crlombardia.it/",
@@ -320,12 +320,12 @@ const CREDENTIAL_H: Record<CredentialId, string> = {
 function HeaderCredentials() {
   return (
     <ul
-      className="m-0 flex shrink-0 list-none items-center gap-1.5 rounded-[10px] bg-white px-1.5 py-1 shadow-[0_2px_8px_-3px_rgb(0_0_0/0.35)] lg:gap-3 lg:px-3 lg:py-1.5"
+      className="m-0 flex shrink-0 list-none items-center gap-2 px-0.5 py-1 lg:gap-4 lg:px-1"
       aria-label="Riconoscimenti e affiliazioni della società"
       data-testid="header-credentials"
     >
       {CLUB_CREDENTIALS.map((c) => {
-        const img = <img src={c.art.src} alt={c.alt} decoding="async" className={`${CREDENTIAL_H[c.id]} w-auto object-contain`} />;
+        const img = <img src={c.art.src} alt={c.alt} decoding="async" className={`${CREDENTIAL_H[c.id]} w-auto object-contain [filter:drop-shadow(0_0_1px_rgb(255_255_255/0.95))_drop-shadow(0_0_5px_rgb(255_255_255/0.55))]`} />;
         const href = CREDENTIAL_LINK[c.id];
         return (
           <li key={c.id} className="flex">
@@ -348,7 +348,7 @@ export function SiteHeader() {
   const board = isBoardRoute(pathname);
   return (
     <header
-      className={`scd-pub sticky top-0 z-40 h-[var(--pub-header-h)] bg-[linear-gradient(100deg,#1d5fd0_0%,#1149a8_45%,#0b3a8c_100%)] font-text text-white shadow-[0_4px_14px_-6px_rgb(11_42_91/0.45)] ${board ? "hidden lg:block" : ""}`}
+      className={`scd-pub sticky top-0 z-40 h-[var(--pub-header-h)] scd-metal-line scd-band font-text text-white shadow-[0_4px_14px_-6px_rgb(11_42_91/0.45)] ${board ? "hidden lg:block" : ""}`}
       data-site-header
     >
       <div className="flex h-full items-center gap-2 pl-3 pr-3 lg:gap-6 lg:pl-0 lg:pr-6">
@@ -401,12 +401,12 @@ export function SideNav() {
   const row = (active: boolean) =>
     `scd-focus group relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-[15px] transition-colors duration-150 ${
       active
-        ? "bg-[#ffd82a] font-bold text-[#0b2f6b]"
+        ? "scd-gold font-bold"
         : "font-semibold text-[#dbe7f7] hover:bg-white/10 hover:text-white"
     }`;
   return (
     <aside
-      className="sticky top-[var(--pub-header-h)] hidden h-[calc(100dvh-var(--pub-header-h)-46px)] self-start overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#0f45a6_0%,#0b3a8c_55%,#082f74_100%)] px-3 pb-6 pt-4 text-white [scrollbar-color:rgb(255_255_255/0.25)_transparent] [scrollbar-width:thin] lg:block"
+      className="sticky top-[var(--pub-header-h)] hidden h-[calc(100dvh-var(--pub-header-h)-46px)] self-start overflow-y-auto overscroll-contain scd-band-v px-3 pb-6 pt-4 text-white [scrollbar-color:rgb(255_255_255/0.25)_transparent] [scrollbar-width:thin] lg:block"
       data-testid="side-nav"
     >
       <nav aria-label="Sezioni del club">
@@ -436,7 +436,7 @@ export function SideNav() {
       </nav>
       {areas.length > 0 && (
         <nav aria-label="Le tue aree di lavoro" className="mt-4 border-t border-white/12 pt-3" data-testid="side-work-areas">
-          <p className="m-0 px-3 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#ffd82a]">Le tue aree</p>
+          <p className="m-0 px-3 pb-1.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#ffd84a]">Le tue aree</p>
           <ul className="m-0 grid list-none gap-0.5 p-0">
             {areas.map(({ entry, link }) => {
               const Icon = AREA_ICON[entry.icon];
@@ -462,7 +462,7 @@ export function SideNav() {
           <Link
             to="/accedi"
             search={loginSearch(pathname) as never}
-            className="scd-focus flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#ffd82a] px-4 text-[15px] font-bold text-[#0b2f6b] transition-[filter] duration-150 hover:brightness-95"
+            className="scd-focus flex min-h-11 items-center justify-center gap-2 scd-gold rounded-full px-4 text-[15px] font-bold transition-[filter] duration-150"
           >
             <LogIn className="size-[18px]" strokeWidth={2.2} aria-hidden="true" />
             Entra o registrati
@@ -887,7 +887,7 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center gap-2">
             <Link
               to="/installa"
-              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 rounded-[10px] bg-[#ffd600] px-4 font-extrabold text-[#061a3d] transition-[filter] duration-150 hover:brightness-95"
+              className="scd-focus inline-flex min-h-11 min-w-11 items-center text-[14px] gap-1.5 scd-gold rounded-[10px] px-4 font-extrabold transition-[filter] duration-150"
               data-testid="footer-install"
             >
               <Download className="size-4" aria-hidden="true" />

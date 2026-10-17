@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 import snapshot from "@/data/calendario-snapshot-20261010.json";
 import { spaceById } from "./facilities";
 import {
+  COMUNE_DERVIO_NOTE,
   DEFAULT_OPTIONS,
+  RAIN_MOVE_NOTICE_TO,
+  TEAM_NOTICE_DAYS,
   analyse,
   bookingToItem,
   checkSlot,
@@ -352,24 +355,32 @@ describe("analysis outputs", () => {
       aOpts(),
     );
 
-  it("gives the council notice date 30 days before and flags it late against today", () => {
+  it("gives the team notice date 14 days before (no Comune notice) and flags it late against today", () => {
+    expect(TEAM_NOTICE_DAYS).toBe(14);
     const r = moveU16("2026-11-15", "10:30");
-    expect(r.dervio[0]!.noticeBy).toBe("2026-10-16");
+    expect(r.dervio[0]!.noticeBy).toBe("2026-11-01");
     expect(r.dervio[0]!.late).toBe(false);
-    expect(r.dervio[0]!.daysToNotice).toBe(5);
-    expect(r.firstNotice).toBe("2026-10-16");
-    expect(minusDays("2026-11-15", 30)).toBe("2026-10-16");
+    expect(r.dervio[0]!.daysToNotice).toBe(21);
+    expect(r.firstNotice).toBe("2026-11-01");
+    expect(minusDays("2026-11-15", 14)).toBe("2026-11-01");
     const late = analyse(
       simulate(
-        homeMatches([ev("u16", "2026-11-05", "10:30")]),
-        opts({ startDate: "2026-11-01", modes: U16_DERVIO }),
+        homeMatches([ev("u16", "2026-10-18", "10:30")]),
+        opts({ startDate: "2026-10-12", modes: U16_DERVIO }),
       ),
-      aOpts({ startDate: "2026-11-01" }),
+      aOpts({ startDate: "2026-10-12" }),
     );
     expect(late.lateNotices).toBe(1);
-    expect(late.days[0]!.issues.some((i) => i.code === "dv-notice-late")).toBe(
-      true,
-    );
+    const issue = late.days[0]!.issues.find((i) => i.code === "dv-notice-late");
+    expect(issue).toMatchObject({ severity: "warn" });
+    expect(issue!.text).toMatch(/avviso alla squadra/);
+    expect(late.days.flatMap((d) => d.issues).map((i) => i.text).join(" ")).not.toMatch(/Comune/);
+  });
+
+  it("states the DG 2026-10-16 notice rules: Comune informed by the season programme, rain move to FIGC and opponent", () => {
+    expect(COMUNE_DERVIO_NOTE).toMatch(/programma stagionale/);
+    expect(COMUNE_DERVIO_NOTE).toMatch(/nessun avviso gara per gara/);
+    expect(RAIN_MOVE_NOTICE_TO).toBe("FIGC (LND/SGS) e squadra avversaria");
   });
 
   it("flags evening matches at Dervio unless lights are verified", () => {

@@ -1,7 +1,8 @@
 /**
- * LED spots of the confirmed sponsors (UD-119, Francesco 14/10/2026 18:14): they rotate only on the physical LED wall
- * player (/ledwall/player); in the app they are listed in /crm ("Spot LED") and play only on demand (no showcases,
- * Francesco 15/10/2026); never sent by e-mail. Presidente or commerciale proposes the spot, the sponsor approves or asks for
+ * LED spots of the confirmed sponsors (UD-119, Francesco 14/10/2026 18:14): they rotate on the physical LED wall player
+ * (/ledwall/player) and, clock-synced with it, on the public sponsor page (/sponsor, SponsorLedwallLive, UD-142 —
+ * Francesco 16/10/2026 20:56, the only exception to UD-152); in the gestionale they are listed in /crm ("Spot LED") and
+ * play on demand; never sent by e-mail. Presidente or commerciale proposes the spot, the sponsor approves or asks for
  * changes, then it goes on air: "tutto è gestito dal vivo attraverso l'app".
  *
  * Source: Drive "02_V4_SPONSOR_VALIDATI" (one folder per sponsor): master LED 20 s 1920x164 and field preview

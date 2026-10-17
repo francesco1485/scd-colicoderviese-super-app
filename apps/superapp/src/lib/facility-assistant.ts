@@ -8,9 +8,12 @@
  */
 import {
   BOOKING_DEFAULTS,
+  COMUNE_DERVIO_NOTE,
+  DERVIO_OFF_PROGRAMME_PROPOSAL,
   LIGHTS_AFTER_MIN,
-  NOTICE_DAYS,
   PITCHES,
+  RAIN_MOVE_NOTICE_TO,
+  TEAM_NOTICE_DAYS,
   checkSlot,
   ddmm,
   freeWindows,
@@ -250,7 +253,7 @@ const HELP_EXAMPLES = [
   "Posso affittare il campo 2 domenica alle 18?",
   "Dove metto un torneo il 13 dicembre?",
   "Quali giorni hanno conflitti?",
-  "Quando devo avvisare il Comune per le gare a Dervio?",
+  "Chi devo avvisare per le gare a Dervio?",
   "Come gestisco un affitto a terzi?",
 ];
 
@@ -295,7 +298,7 @@ function answerAvailability(
       details.push("A Dervio dopo le 17:00 le luci sono da verificare.");
     if (pitch === "DV")
       details.push(
-        `A Dervio serve l'avviso al Comune entro il ${ddmm(minusDays(q.date, NOTICE_DAYS))}.`,
+        `Dervio, avviso al Comune per un affitto: ${DERVIO_OFF_PROGRAMME_PROPOSAL}.`,
       );
     if (note) details.push(note);
     details.push(
@@ -366,7 +369,7 @@ function answerPlaceEvent(
       extra.push("96 × 48: per l'11 contro 11 misure da verificare");
     if (p === "DV") {
       extra.push(
-        `avviso al Comune entro il ${ddmm(minusDays(q.date, NOTICE_DAYS))}${minusDays(q.date, NOTICE_DAYS) < ctx.today ? " (già in ritardo)" : ""}`,
+        `avviso al Comune: ${DERVIO_OFF_PROGRAMME_PROPOSAL}`,
       );
       if (isWinterDay(q.date))
         extra.push("erba in inverno: controllo del fondo");
@@ -452,6 +455,12 @@ function answerConflicts(ctx: AssistantContext): AssistantAnswer {
   };
 }
 
+/** Who is notified for a Dervio match (DG decision 2026-10-16). */
+const NOTICE_RULES: readonly string[] = [
+  `Avviso alla squadra che gioca ${TEAM_NOTICE_DAYS} giorni prima, a tutti 3 giorni prima.`,
+  `Se piove e la gara torna a Colico: avviso solo a ${RAIN_MOVE_NOTICE_TO} (la FIGC avvisa l'arbitro).`,
+];
+
 function answerNotice(ctx: AssistantContext): AssistantAnswer {
   const list = ctx.analysis.dervio
     .filter((d) => d.match.kind === "match")
@@ -459,8 +468,9 @@ function answerNotice(ctx: AssistantContext): AssistantAnswer {
   if (!list.length) {
     return {
       intent: "notice",
-      text: `Nello scenario scelto nessuna gara è a Dervio, quindi nessun avviso. La regola: il Comune vuole l'avviso almeno ${NOTICE_DAYS} giorni prima di ogni gara.`,
+      text: `Nello scenario scelto nessuna gara è a Dervio, quindi nessun avviso. ${COMUNE_DERVIO_NOTE}`,
       details: [
+        ...NOTICE_RULES,
         'Prova lo scenario "Solo i conflitti a Dervio" nella simulazione.',
       ],
       actions: [
@@ -476,14 +486,14 @@ function answerNotice(ctx: AssistantContext): AssistantAnswer {
       : d.daysToNotice === 0
         ? "oggi"
         : `fra ${d.daysToNotice} ${d.daysToNotice === 1 ? "giorno" : "giorni"}`;
-    return `${d.match.label} ${ddmm(d.match.date)} ${hhmm(d.match.start)} → avviso entro il ${ddmm(d.noticeBy)} (${when})`;
+    return `${d.match.label} ${ddmm(d.match.date)} ${hhmm(d.match.start)} → avviso alla squadra entro il ${ddmm(d.noticeBy)} (${when})`;
   });
   return {
     intent: "notice",
-    text: `Primo avviso al Comune entro il ${ddmm(list[0]!.noticeBy)}${late ? `; ${late} ${late === 1 ? "avviso è" : "avvisi sono"} già oltre il mese` : ""}. Sono date della simulazione: nessuna gara è spostata davvero.`,
-    details,
+    text: `${COMUNE_DERVIO_NOTE} Primo avviso alla squadra entro il ${ddmm(list[0]!.noticeBy)}${late ? `; ${late} ${late === 1 ? "avviso è" : "avvisi sono"} già oltre i ${TEAM_NOTICE_DAYS} giorni` : ""}. Sono date della simulazione: nessuna gara è spostata davvero.`,
+    details: [...details, ...NOTICE_RULES],
     actions: [{ type: "open-tab", tab: "dervio", label: "Apri Dervio" }],
-    tone: late ? "crit" : "warn",
+    tone: "warn",
   };
 }
 
@@ -495,7 +505,7 @@ function answerRentalProcedure(): AssistantAnswer {
       "1. Verifica la disponibilità qui (campo, giorno, orario, cambio campo) e salva l'ipotesi.",
       "2. Prepara la proposta: ente richiedente, campo, orari, spogliatoi e uso delle luci.",
       "3. Approvazione della Direzione (Presidente o Direttore generale).",
-      "4. Comunicazione all'ente e, per Dervio, avviso al Comune almeno 30 giorni prima.",
+      `4. Comunicazione all'ente. Per Dervio, avviso al Comune: ${DERVIO_OFF_PROGRAMME_PROPOSAL}.`,
       "Servono un accordo scritto e la verifica dell'assicurazione dell'ente: chiedi alla segreteria. Questa non è una consulenza legale.",
     ],
     actions: [

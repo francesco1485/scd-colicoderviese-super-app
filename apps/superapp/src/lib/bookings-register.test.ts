@@ -65,7 +65,7 @@ describe("master row", () => {
     });
   });
 
-  it("adds the council notice at Dervio and leaves the amount out of non-rentals", () => {
+  it("marks Dervio bookings as outside the season programme (no Comune deadline) and leaves the amount out of non-rentals", () => {
     const dv = bookingToRegistryRow({
       ...base,
       kind: "gara",
@@ -79,7 +79,9 @@ describe("master row", () => {
     expect(dv[5]).toBe("SPA-DER-C1");
     expect(dv[6]).toBe("Metà campo");
     expect(dv[15]).toBe("");
-    expect(dv[17]).toBe("Entro il 13/11/2026");
+    expect(dv[17]).toBe(
+      "Proposta, da confermare: fuori dal programma stagionale, decide la Direzione",
+    );
   });
 
   it("validates entrance and amount", () => {
@@ -122,7 +124,7 @@ describe("scheda per la Direzione", () => {
     expect(t).toMatch(/Richiesto da: Presidente/);
   });
 
-  it("reports a pitch conflict with the real calendar and a late council notice", () => {
+  it("reports a pitch conflict with the real calendar and the Dervio notice rules", () => {
     const clash: Booking = {
       ...base,
       kind: "gara",
@@ -137,7 +139,14 @@ describe("scheda per la Direzione", () => {
       /Conflitti sul campo: SÌ.*Juniores U19 15:00/,
     );
     const dv: Booking = { ...clash, pitch: "DV", date: "2026-10-25" };
-    expect(directionBrief(dv, ctx)).toMatch(/GIÀ IN RITARDO/);
+    const brief = directionBrief(dv, ctx);
+    expect(brief).toMatch(/già informato con il programma stagionale/);
+    expect(brief).toMatch(/avviso solo a FIGC \(LND\/SGS\) e squadra avversaria/);
+    expect(brief).not.toMatch(/arbitr/i);
+    expect(brief).toMatch(
+      /Proposta, da confermare: fuori dal programma stagionale, decide la Direzione/,
+    );
+    expect(brief).not.toMatch(/GIÀ IN RITARDO|entro il/);
     expect(
       directionBrief(
         { ...base, entrance: "", rooms: [] },

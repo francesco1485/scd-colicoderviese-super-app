@@ -303,7 +303,7 @@ export function lightsAdvice(d: Omit<Booking, "id">): LightsAdvice {
       ? "Impianto luci omologato (registro impianti, campo 1)."
       : d.pitch === "C2"
         ? "Luci del campo 2: omologazione da verificare nel registro impianti."
-        : "Luci di Dervio da verificare con il Comune.";
+        : "Luci di Dervio disponibili per le gare serali (Direzione, 16/10/2026).";
   return {
     requested,
     recommended,
