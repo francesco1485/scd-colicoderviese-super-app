@@ -15,6 +15,7 @@ import type { ReactNode } from "react";
 import { TONES, type Tone } from "@/components/home/tones";
 import { METAL_CARD, METAL_LABEL, METAL_WRAP, MetalHeading, MetalPageHeader } from "@/components/scd/MetalPageHeader";
 import { PUBLIC_PAGES, pageHead } from "@/lib/share";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 
 /**
  * Comunità (Tifosi SCD) in the SCD METAL "via di mezzo" style of the home (16/10/2026): compact navy band, then the
@@ -120,6 +121,7 @@ const TONE_ROW: Readonly<Record<Tone, { bar: string; tile: string; ink: string }
 function Tifosi() {
   return (
     <main data-screen="tifosi" className="pb-28 text-[#0b1e3a] lg:pb-12">
+      <GuideTourAuto role="tifosi" />
       <MetalPageHeader kicker="Tifosi ColicoDerviese" title="Comunità" testId="community-header">
         Il posto di chi tifa ColicoDerviese: segui, pubblica, vota e gioca. Tutto gratis.
       </MetalPageHeader>

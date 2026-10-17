@@ -2,6 +2,7 @@ import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { IntakeEntry } from "@/components/intake/IntakeViews";
 import { getIntakeSummary, type IntakeSummary } from "@/lib/intake.functions";
 import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
+import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
 import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -694,6 +695,7 @@ function GestionalePageGate() {
     <WorkAreaGateView id="gestionale" gate={gate}>
       {gate.preview && <StagingBanner />}
       <GestionalePage />
+      {!gate.preview && <GuideTourAuto role="dirigenti" />}
     </WorkAreaGateView>
   );
 }
