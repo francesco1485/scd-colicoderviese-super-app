@@ -4435,6 +4435,27 @@
         "implementationStatus": "IMPLEMENTED",
         "implementation": "branch feat/front-page-agent (PR to staging/superapp); tests lib/front-page.test.ts; no migration"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "17:20",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-188",
+      "name": "FRONT_PAGE_SWITCH_FOR_THE_DIREZIONE",
+      "sourceQuoteFragments": [
+        "Spegni notizia",
+        "Costruisci il pulsante"
+      ],
+      "normalizedCommand": {
+        "rule": "The Direzione (role DIRECTION) sees today's Prima pagina in Direzione → Contenuti and switches one story, or the whole page, off and on again; the public home applies it within about a minute. The switch lives in SCD PULSE (r120), written only through scd_front_page_set_hidden after a DIRECTION check, never by an agent. If the switch cannot be read the whole front page is hidden; before r120 is applied nothing is switched off.",
+        "scope": "SUPER_APP routes/direzione_.contenuti.tsx, components/scd/FrontPageDesk.tsx, lib/front-page.ts (applyHidden), lib/front-page.functions.ts (publicFrontPage, getFrontPageDesk, setFrontPageHidden); SCD PULSE migration r120 (scd_front_page_switch, scd_front_page_set_hidden, scd_public_front_page_hidden)",
+        "supersedes": "the chat-only switch-off of UD-187 («spegni la prima pagina» rewriting the file stays as fallback)",
+        "engine": "PERSONE",
+        "measure": "switch-offs per week; minutes from switch-off to the story gone from the home",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "branch feat/front-page-switch (PR to staging/superapp); r120 APPLIED 17/10/2026 after «applica r120»; tests lib/front-page.test.ts, supabase/tests/r120_front_page_switch.pglite.mjs"
+      }
     }
   ],
   "completionGate": {

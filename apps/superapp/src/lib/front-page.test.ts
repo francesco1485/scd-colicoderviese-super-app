@@ -129,3 +129,31 @@ describe("front page links for the router", () => {
     expect(parseFrontItem(item({ slot: "domanda", options: ["Sì", "Sì", "No"] }))?.options).toEqual(["Sì", "No"]);
   });
 });
+
+describe("front page switch (UD-188, r120)", () => {
+  it("drops switched-off items and the whole page with *", async () => {
+    const { applyHidden, parseFrontItems, parseHidden, frontItems } = await import("./front-page");
+    const page = parseFrontItems([item({ id: "a1", slot: "apertura" }), item({ id: "b1" }), item({ id: "b2" }), item({ id: "d1", slot: "domanda" })]);
+    expect(frontItems(page).map((i) => i.id)).toEqual(["a1", "b1", "b2", "d1"]);
+    expect(frontItems(applyHidden(page, ["b1", "a1"])).map((i) => i.id)).toEqual(["b2", "d1"]);
+    expect(applyHidden(page, ["*"])).toEqual(EMPTY_FRONT_PAGE);
+    expect(applyHidden(page, [])).toBe(page);
+    expect(parseHidden(["*", "b1", "Bad Id", 3])).toEqual(["*", "b1"]);
+    expect(parseHidden(null)).toBeNull();
+  });
+
+  it("reads the switch: missing function = nothing off, other errors = unknown (page hidden)", async () => {
+    const { readHidden, publicFrontPage } = await import("./front-page.functions");
+    const rpc = (data: unknown, error: { code?: string; message?: string } | null) => ({ rpc: () => Promise.resolve({ data, error }) });
+    expect(await readHidden(DAY, rpc(["b1"], null))).toEqual(["b1"]);
+    expect(await readHidden(DAY, rpc(null, { code: "PGRST202" }))).toEqual([]);
+    expect(await readHidden(DAY, rpc(null, { code: "42883" }))).toEqual([]);
+    expect(await readHidden(DAY, rpc(null, { code: "500", message: "boom" }))).toBeNull();
+    expect(await readHidden(DAY, null)).toEqual([]);
+    resetFrontPageCache();
+    const f = respond(file({ items: [item({ id: "a1", slot: "apertura" }), item({ id: "b1" })] }));
+    expect((await publicFrontPage(DAY, 0, rpc(["a1"], null), f)).apertura).toBeNull();
+    resetFrontPageCache();
+    expect(await publicFrontPage(DAY, 0, rpc(null, { code: "500" }), f)).toEqual(EMPTY_FRONT_PAGE);
+  });
+});

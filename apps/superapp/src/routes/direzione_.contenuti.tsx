@@ -7,6 +7,8 @@ import { AccessScreenPage, accessHead } from "@/components/scd/AccessScreen";
 import { Card, Chip, type ChipTone } from "@/components/scd/interior-ui";
 import { InteriorShell } from "@/components/scd/InteriorShell";
 import { EmptyState } from "@/components/scd/work-area-ui";
+import { FrontPageDesk } from "@/components/scd/FrontPageDesk";
+import { getFrontPageDesk, type FrontPageDesk as Desk } from "@/lib/front-page.functions";
 import { getSession } from "@/lib/auth.functions";
 import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { CLUB_EVENTS } from "@/lib/club-events";
@@ -31,12 +33,14 @@ import { orderTeams } from "@/lib/universe";
  */
 export const Route = createFileRoute("/direzione_/contenuti")({
   loader: async () => {
-    const [session, queue, calendar] = await Promise.all([
+    const [session, queue, calendar, desk] = await Promise.all([
       getSession(),
       getPostsQueue(),
       getPublicCalendarSnapshot(),
+      // UD-188: today's Prima pagina with the switch (the buttons work only for the Direzione, checked in the database).
+      getFrontPageDesk().catch((): Desk | null => null),
     ]);
-    return { session, queue, groups: calendar.groups, serverNow: Date.now() };
+    return { session, queue, groups: calendar.groups, desk, serverNow: Date.now() };
   },
   head: () => accessHead("direzione"),
   component: ContenutiRoute,
@@ -50,7 +54,7 @@ const TONE: Readonly<Record<PostStatus, ChipTone>> = {
 };
 
 function ContenutiRoute() {
-  const { session, queue, groups, serverNow } = Route.useLoaderData();
+  const { session, queue, groups, desk, serverNow } = Route.useLoaderData();
   if (!session.user || queue === null)
     return <AccessScreenPage id="direzione" />;
   return (
@@ -59,6 +63,7 @@ function ContenutiRoute() {
       badge={session.badge}
       initial={queue}
       groups={groups}
+      desk={desk}
       serverNow={serverNow}
     />
   );
@@ -69,12 +74,14 @@ function Queue({
   badge,
   initial,
   groups,
+  desk,
   serverNow,
 }: {
   roles: string[];
   badge: string | null;
   initial: Post[];
   groups: PublicGroup[];
+  desk: Desk | null;
   serverNow: number;
 }) {
   const [posts, setPosts] = useState(initial);
@@ -151,6 +158,7 @@ function Queue({
             {msg}
           </p>
         )}
+        {desk && roles.includes("direzione") && <FrontPageDesk desk={desk} />}
         <Card
           id="coda"
           title="Da approvare"
