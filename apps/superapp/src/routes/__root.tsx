@@ -18,6 +18,7 @@ import { DESKTOP_CONTENT_CLEARANCE, PHONE_CONTENT_CLEARANCE, SkyChat } from "../
 import { PwaManager } from "../components/PwaManager";
 import { SponsorBand } from "../components/SponsorBand";
 import { CookieConsent } from "../components/CookieConsent";
+import { GuideTourHost } from "../components/guide/GuideTour";
 import { NextUpBar } from "../components/scd/NextUpBar";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -127,6 +128,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <GuideTourHost />
         <Scripts />
       </body>
     </html>
