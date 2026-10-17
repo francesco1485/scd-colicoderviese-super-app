@@ -7,10 +7,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { VettaHero } from "@/components/vetta-legnone/VettaHero";
+import { HistoryEpochs } from "@/components/vetta-legnone/VettaHistory";
 import {
   AudienceCtas,
   CastIntro,
-  HistoryEpochs,
   HowItWorks,
   LevelLadder,
   RulesBand,

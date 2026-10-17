@@ -8,9 +8,6 @@ import {
   VETTA_BETTER,
   VETTA_CAST,
   VETTA_CAST_NOTE,
-  VETTA_EPOCHS,
-  VETTA_HISTORY_NOTE,
-  VETTA_HISTORY_STATUS,
   VETTA_LEVELS,
   VETTA_LEVELS_NOTE,
   VETTA_NEEDS,
@@ -103,40 +100,6 @@ export function CastIntro() {
           </div>
         </figure>
       </div>
-    </section>
-  );
-}
-
-export function HistoryEpochs() {
-  return (
-    <section aria-labelledby="vl-storia" className="mx-auto max-w-6xl px-4 py-8 lg:py-12" data-testid="vetta-epochs">
-      <SectionHead id="vl-storia" kicker="La nostra storia" title="La nostra storia in 6 epoche">
-        {VETTA_HISTORY_NOTE}
-      </SectionHead>
-      <p className="-mt-1 mb-4 inline-flex rounded-full bg-[#fff6cc] px-3 py-1 font-display text-[12.5px] font-bold uppercase tracking-[0.06em] text-[#5c4500]" role="note" data-testid="vetta-history-status">
-        {VETTA_HISTORY_STATUS}
-      </p>
-      <ol className="m-0 grid list-none gap-3 p-0 md:grid-cols-2 lg:grid-cols-3">
-        {VETTA_EPOCHS.map((e, i) => (
-          <li key={e.id} className="relative overflow-hidden rounded-2xl border border-[var(--scd-line)] bg-white p-4 shadow-[var(--scd-card-shadow)]">
-            <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#0457af,#1b95d3,#ffd84a)]" />
-            <p className="m-0 flex items-baseline gap-2">
-              <span className="font-display text-[13px] font-bold text-[var(--scd-sub)]">{i + 1}/6</span>
-              <span className="font-display text-[22px] font-bold leading-none text-[var(--scd-blue)]">{e.years}</span>
-            </p>
-            <h3 className="m-0 mt-1 font-display text-[19px] font-bold text-[var(--scd-navy)]">{e.title}</h3>
-            <ul className="m-0 mt-2 grid list-none gap-1 p-0 text-[14px] leading-snug text-[var(--scd-ink)]">
-              {e.facts.map((f) => (
-                <li key={f} className="flex gap-2">
-                  <span aria-hidden="true" className="mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--scd-yellow)] shadow-[0_0_0_1px_#b38f00]" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <p className="m-0 mt-3 text-[12px] leading-snug text-[var(--scd-sub)]">Fonte: {e.source}</p>
-          </li>
-        ))}
-      </ol>
     </section>
   );
 }
