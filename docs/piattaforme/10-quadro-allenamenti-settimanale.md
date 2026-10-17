@@ -1,6 +1,6 @@
 # 10 · Quadro allenamenti settimanale
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-squadre · Stato: Viva · Pagina: `/quadro` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 

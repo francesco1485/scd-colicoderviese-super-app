@@ -1,6 +1,6 @@
 # 24 · Fondo Solidale
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-sociale · Stato: Viva · Pagina: `/tesoreria/fondo-solidale` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
