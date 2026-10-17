@@ -51,6 +51,12 @@ export const PUBLIC_PREFIXES: readonly string[] = [
  */
 export const MEMBERS_ONLY_PREFIXES: readonly string[] = ["/allenamenti", "/la-mia-scd", "/la-mia-scd/campione", "/squadre"];
 
+/**
+ * Public pages kept out of robots.txt Allow and the sitemap (they also send <meta name="robots" content="noindex">):
+ * /squadre/u16, whose roster is all minors (security review 17/10/2026). Still public and cacheable.
+ */
+export const NOINDEX_PREFIXES: readonly string[] = ["/squadre/u16"];
+
 export function isPublicPath(pathname: string): boolean {
   if (pathname === "/" || pathname === "") return true;
   return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -102,14 +108,14 @@ export function isProductionEnv(env: Readonly<Record<string, string | undefined>
 /** robots.txt: staging is never indexed; production exposes only the public pages. */
 export function robotsTxt(production: boolean, siteUrl: string | null): string {
   if (!production) return "User-agent: *\nDisallow: /\n";
-  const lines = ["User-agent: *", "Allow: /$", ...PUBLIC_PREFIXES.map((p) => `Allow: ${p}`), "Disallow: /"];
+  const lines = ["User-agent: *", "Allow: /$", ...PUBLIC_PREFIXES.filter((p) => !NOINDEX_PREFIXES.includes(p)).map((p) => `Allow: ${p}`), "Disallow: /"];
   if (siteUrl) lines.push("", `Sitemap: ${siteUrl.replace(/\/$/, "")}/sitemap.xml`);
   return `${lines.join("\n")}\n`;
 }
 
 export function sitemapXml(siteUrl: string): string {
   const base = siteUrl.replace(/\/$/, "");
-  const urls = ["/", ...PUBLIC_PREFIXES.filter((p) => p !== "/privacy")].map((p) => `  <url><loc>${base}${p === "/" ? "/" : p}</loc></url>`);
+  const urls = ["/", ...PUBLIC_PREFIXES.filter((p) => p !== "/privacy" && !NOINDEX_PREFIXES.includes(p))].map((p) => `  <url><loc>${base}${p === "/" ? "/" : p}</loc></url>`);
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`;
 }
 

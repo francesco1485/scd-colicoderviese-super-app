@@ -8,9 +8,12 @@ import { resolve } from "node:path";
 
 import { describe, expect, it, vi } from "vitest";
 
-import { MEMBERS_ONLY_PREFIXES, PUBLIC_PREFIXES, isPublicPath } from "./http-policy";
+import { MEMBERS_ONLY_PREFIXES, PUBLIC_PREFIXES, isPublicPath, robotsTxt, sitemapXml } from "./http-policy";
 import {
+  SHOWCASE_NOINDEX,
   SHOWCASE_TEAMS,
+  viewerNeutralPosts,
+  viewerNeutralSocial,
   isShowcaseTeam,
   parseShowcase,
   showcaseRole,
@@ -158,6 +161,30 @@ describe("routes and policy", () => {
     expect(isPublicPath("/squadre")).toBe(false);
     expect(isPublicPath("/squadre/u15")).toBe(false);
     expect(MEMBERS_ONLY_PREFIXES).toContain("/squadre");
+  });
+
+  it("keeps /squadre/u16 public but out of robots Allow and the sitemap, with a noindex head", () => {
+    const robots = robotsTxt(true, "https://app.example.it").split("\n");
+    const sitemap = sitemapXml("https://app.example.it");
+    expect(isPublicPath("/squadre/u16")).toBe(true);
+    expect(robots).not.toContain("Allow: /squadre/u16");
+    expect(sitemap).not.toContain("/squadre/u16");
+    for (const p of ["/squadre/prima", "/squadre/u19"]) {
+      expect(robots).toContain(`Allow: ${p}`);
+      expect(sitemap).toContain(`<loc>https://app.example.it${p}</loc>`);
+    }
+    expect([...SHOWCASE_NOINDEX]).toEqual(["u16"]);
+    expect(read("src/routes/squadre_.$team.tsx")).toMatch(/SHOWCASE_NOINDEX\.has\(id\)[\s\S]{0,120}content: "noindex"/);
+  });
+
+  it("ships no viewer state in the loader data of the showcase pages", () => {
+    const social = { posts: [{ id: "1", mine: true }], counts: { a: 3 }, follows: ["team:prima"], signedIn: true, canPost: true, office: true };
+    expect(viewerNeutralSocial(social)).toEqual({ posts: [{ id: "1", mine: false }], counts: { a: 3 }, follows: [], signedIn: false, canPost: false, office: false });
+    expect(viewerNeutralPosts([{ id: "1", mine: true }])).toEqual([{ id: "1", mine: false }]);
+    const route = read("src/routes/squadre_.$team.tsx");
+    expect(route).toMatch(/social: showcase \? viewerNeutralSocial\(social\) : social/);
+    expect(route).toMatch(/posts: showcase \? viewerNeutralPosts\(posts\) : posts/);
+    expect(route).toMatch(/member: showcase \? false : !!session\.user/);
   });
 
   it("the team route uses the public showcase for the three teams and the route exists", () => {

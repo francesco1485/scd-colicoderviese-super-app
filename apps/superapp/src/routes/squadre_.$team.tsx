@@ -35,7 +35,13 @@ import {
   type RosterPlayer,
 } from "@/lib/public-roster";
 import { getPublicRoster } from "@/lib/public-roster.functions";
-import { isShowcaseTeam, SHOWCASE_SHARE } from "@/lib/team-showcase";
+import {
+  isShowcaseTeam,
+  SHOWCASE_NOINDEX,
+  SHOWCASE_SHARE,
+  viewerNeutralPosts,
+  viewerNeutralSocial,
+} from "@/lib/team-showcase";
 import { pageHead } from "@/lib/share";
 import { getTeamShowcase } from "@/lib/team-showcase.functions";
 import { TeamShowcaseSection } from "@/components/scd/TeamShowcase";
@@ -57,7 +63,12 @@ import { itemState, orderTeams } from "@/lib/universe";
 
 /** Public head of a showcase team (UD-168): link preview without player names. */
 function showcaseHead(id: string) {
-  return isShowcaseTeam(id) ? pageHead(SHOWCASE_SHARE[id]) : membersOnlyHead("Squadra");
+  if (!isShowcaseTeam(id)) return membersOnlyHead("Squadra");
+  const head = pageHead(SHOWCASE_SHARE[id]);
+  // Allievi U16 Élite: public but not indexed (all minors), also left out of robots.txt and the sitemap.
+  return SHOWCASE_NOINDEX.has(id)
+    ? { ...head, meta: [...head.meta, { name: "robots", content: "noindex" }] }
+    : head;
 }
 
 /**
@@ -92,13 +103,14 @@ async function loadTeam(team: string) {
     new Date(serverNow).toISOString().slice(0, 10);
   return {
     signedIn: true as const,
-    member: !!session.user,
+    // Showcase pages: the same loader data for every visitor (no viewer state); the client reads it after load.
+    member: showcase ? false : !!session.user,
     id,
     group,
     groups: calendar.groups,
     events: calendar.events.filter((e) => e.group === id),
-    social,
-    posts,
+    social: showcase ? viewerNeutralSocial(social) : social,
+    posts: showcase ? viewerNeutralPosts(posts) : posts,
     roster,
     vetrina,
     serverNow,
@@ -167,6 +179,28 @@ function TeamPage({ data }: { data: TeamData }) {
   const [nowMs, setNowMs] = useState(serverNow);
   const [follows, setFollows] = useState(social.follows);
   const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [viewer, setViewer] = useState({ signedIn: social.signedIn, member });
+  const readSocial = useServerFn(getPublicSocial);
+  const readFeed = useServerFn(getChannelFeed);
+  // Showcase pages ship no viewer state: follows, «Forza» and sign-in are read here, after load.
+  useEffect(() => {
+    if (!vetrina) return;
+    let live = true;
+    void Promise.all([
+      readSocial(),
+      readFeed({ data: { channel: teamChannel(id) } }),
+    ])
+      .then(([s, p]) => {
+        if (!live) return;
+        setFollows(s.follows);
+        setViewer({ signedIn: s.signedIn, member: s.signedIn });
+        setPosts(p);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [vetrina, id, readSocial, readFeed]);
   const [sky, setSky] = useState<{ title: string; text: string } | null>(null);
   const doFollow = useServerFn(setFollow);
   const doForza = useServerFn(toggleForza);
@@ -209,7 +243,7 @@ function TeamPage({ data }: { data: TeamData }) {
   const results = resultLinkFor(id);
 
   const toggle = async () => {
-    if (!social.signedIn) {
+    if (!viewer.signedIn) {
       setSky({
         title: "Iscriviti",
         text: 'Con un account segui la squadra e la trovi in "Per te".',
@@ -229,7 +263,7 @@ function TeamPage({ data }: { data: TeamData }) {
     }
   };
   const forza = async (post: Post) => {
-    if (!social.signedIn) {
+    if (!viewer.signedIn) {
       setSky({ title: "Forza SCD!", text: "Iscriviti per fare il tifo." });
       return;
     }
@@ -274,8 +308,8 @@ function TeamPage({ data }: { data: TeamData }) {
           className="absolute inset-0 bg-[linear-gradient(180deg,rgb(7_29_66/0.25),rgb(11_42_91/0.95))]"
         />
         <Link
-          to={member ? "/squadre" : "/"}
-          aria-label={member ? "Tutte le squadre" : "Torna alla home"}
+          to={viewer.member ? "/squadre" : "/"}
+          aria-label={viewer.member ? "Tutte le squadre" : "Torna alla home"}
           className="scd-focus absolute left-3 top-3.5 grid size-11 place-items-center rounded-[12px] bg-white/14 text-white"
         >
           <ChevronLeft className="size-6" aria-hidden="true" />
@@ -346,7 +380,7 @@ function TeamPage({ data }: { data: TeamData }) {
             base={base}
             count={roster.count}
             players={roster.players}
-            signedIn={social.signedIn}
+            signedIn={viewer.signedIn}
           />
         ) : null}
         <section className="rounded-[20px] bg-white p-3.5 shadow-[0_2px_10px_rgb(11_42_91/0.08)]">
@@ -433,7 +467,7 @@ function TeamPage({ data }: { data: TeamData }) {
             />
           ))
         ) : (
-          <EmptyFeed mode="tutti" signedIn={social.signedIn} />
+          <EmptyFeed mode="tutti" signedIn={viewer.signedIn} />
         )}
 
         <p className="m-0 flex items-start gap-2 rounded-[14px] bg-[#eef5ff] px-3 py-3 text-[13px] leading-[1.4] text-[#22385c]">

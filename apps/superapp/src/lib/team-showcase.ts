@@ -192,3 +192,22 @@ export function statsSourceLine(s: Pick<TeamShowcase, "matchesRecorded" | "seaso
     return `Statistiche${season}: ${UNKNOWN}, nessuna gara ancora registrata nel tabellino ufficiale della società.`;
   return `Statistiche${season} dai tabellini registrati: ${s.matchesRecorded} ${s.matchesRecorded === 1 ? "gara" : "gare"}. Dove manca il dato: ${UNKNOWN}.`;
 }
+
+/**
+ * The three showcase pages are public and may be kept by the offline worker: their loader data must be the same for
+ * every visitor. The viewer's own social state (follows, «Forza» given, may post, office) is dropped here and read
+ * on the client after load (review 17/10/2026). Public counters and approved posts stay.
+ */
+export function viewerNeutralSocial<
+  S extends { posts: readonly P[]; counts: Record<string, number>; follows: readonly string[]; signedIn: boolean; canPost: boolean; office: boolean },
+  P extends { mine: boolean },
+>(social: S): S {
+  return { ...social, posts: social.posts.map((p) => ({ ...p, mine: false })), follows: [], signedIn: false, canPost: false, office: false };
+}
+
+export function viewerNeutralPosts<P extends { mine: boolean }>(posts: readonly P[]): P[] {
+  return posts.map((p) => ({ ...p, mine: false }));
+}
+
+/** Showcase pages kept out of search engines: the Allievi U16 Élite roster is all minors (security review 17/10/2026). */
+export const SHOWCASE_NOINDEX: ReadonlySet<ShowcaseTeam> = new Set<ShowcaseTeam>(["u16"]);

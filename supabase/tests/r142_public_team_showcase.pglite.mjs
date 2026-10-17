@@ -245,9 +245,20 @@ for (const team of ["prima", "u19", "u16", "u15"]) {
     public.scd_showcase_full_name(null, null) c`)).rows[0];
   assert.deepEqual(r, { a: true, b: false, c: false });
   // an event whose metadata team_id is not a uuid must not break the public read
-  await db.exec(`insert into public.scd_events (organization_id, starts_at, metadata) values ('${ORG}', now(), '{"team_id":"not-a-uuid"}'), ('${ORG}', now(), '{"team_id":""}')`);
-  await db.exec(`insert into public.scd_matches (organization_id, event_id) select '${ORG}', id from public.scd_events where metadata->>'team_id' in ('not-a-uuid', '')`);
-  assert.equal((await showcase("prima")).available, true);
+  const bad = ["not-a-uuid", "", "0123456789abcdef0123456789abcdef0123", "2000000-00000-0000-0000-0000000000001", "20000000-0000-0000-0000-00000000000g"];
+  for (const v of bad) await db.exec(`insert into public.scd_events (organization_id, starts_at, metadata) values ('${ORG}', now(), '{"team_id":"${v}"}')`);
+  // upper-case uuid of the Prima is accepted (lower())
+  await db.exec(`insert into public.scd_events (id, organization_id, starts_at, metadata) values ('60000000-0000-0000-0000-000000000009', '${ORG}', now() - interval '1 day', '{"team_id":"${T.prima.toUpperCase()}"}')`);
+  await db.exec(`insert into public.scd_matches (organization_id, event_id) select '${ORG}', id from public.scd_events e where not exists (select 1 from public.scd_matches m where m.event_id = e.id)`);
+  // match sheets with a non-array players value, non-object elements and odd shirts must not break the read
+  const m9 = (await db.query(`select m.id from public.scd_matches m where m.event_id = '60000000-0000-0000-0000-000000000009'`)).rows[0].id;
+  await db.exec(`insert into public.scd_match_sheets (organization_id, match_id, players) values ('${ORG}', '${m9}', '[1, "x", null, {"athlete_id":"${A(2)}","shirt":"7a"}, {"athlete_id":"${A(2)}","shirt":123}, {"athlete_id":"${A(2)}","shirt":"11"}]')`);
+  const odd = (await db.query(`select m.id from public.scd_matches m join public.scd_events e on e.id = m.event_id where e.metadata->>'team_id' = 'not-a-uuid'`)).rows[0].id;
+  await db.exec(`insert into public.scd_match_sheets (organization_id, match_id, players) values ('${ORG}', '${odd}', '{"not":"an array"}')`);
+  const after = await showcase("prima");
+  assert.equal(after.available, true);
+  assert.equal(after.players.find((p) => p.name === "Bruno Bianchetti").shirt, 11, "valid shirt from the upper-case team id match");
+  assert.equal(after.players.find((p) => p.name === "Andrea Adultissimo").shirt, 9);
 }
 
 // ---------------------------------------------------------------- staff flagged needs_review (r141 column) is left out
@@ -257,6 +268,13 @@ await db.exec(`update public.scd_structure_roles set needs_review = true where p
 assert.deepEqual((await showcase("prima")).staff, [{ name: "Mario Misterone", role: "Allenatore" }]);
 await db.exec(`update public.scd_structure_roles set needs_review = false where person_id = '${P(16)}'`);
 await db.exec(R142); // re-applies after r141 too
+
+// ---------------------------------------------------------------- staff role not started yet (valid_from in the future) is left out
+await db.exec(`alter table public.scd_structure_roles add column if not exists valid_from date`);
+await db.exec(`update public.scd_structure_roles set valid_from = current_date + 5 where person_id = '${P(16)}'`);
+assert.deepEqual((await showcase("prima")).staff, [{ name: "Mario Misterone", role: "Allenatore" }]);
+await db.exec(`update public.scd_structure_roles set valid_from = current_date where person_id = '${P(16)}'`);
+assert.equal((await showcase("prima")).staff.length, 2, "valid_from today counts");
 
 // ---------------------------------------------------------------- mister desk: read and write roles
 await assert.rejects(as(null, `select public.scd_staff_team_roles($1, $2)`, [ORG, T.prima]), /not allowed/);

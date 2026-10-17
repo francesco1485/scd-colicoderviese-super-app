@@ -267,8 +267,8 @@ function PublicTeamsScreen({ teams }: { teams: readonly PublicTeam[] }) {
       title="Le nostre squadre"
       intro={
         teams.length > 0
-          ? `${teams.length} squadre tra Colico e Dervio, dalla Prima Squadra ai più piccoli. Le gare sono nel calendario pubblico; le rose di Prima Squadra, Juniores U19 Élite e Allievi U16 Élite sono aperte a tutti. Convocazioni e notizie di ogni squadra sono nell'area soci.`
-          : "Dalla Prima Squadra ai più piccoli, tra Colico e Dervio. Convocazioni e notizie di ogni squadra sono nell'area soci."
+          ? `${teams.length} squadre tra Colico e Dervio, dalla Prima Squadra ai più piccoli. Le gare sono nel calendario pubblico; le rose di Prima Squadra, Juniores U19 Élite e Allievi U16 Élite sono aperte a tutti. Le convocazioni sono nell'area soci.`
+          : "Dalla Prima Squadra ai più piccoli, tra Colico e Dervio. Le convocazioni sono nell'area soci."
       }
       next="/squadre"
       lead={

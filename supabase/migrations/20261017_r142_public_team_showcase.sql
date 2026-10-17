@@ -22,7 +22,7 @@
 --     recorded row gets stats null (the page writes «da confermare», never 0: UNKNOWN != ZERO);
 --   * role = scd_athletes.fanta_role (P/D/C/A, r92) or null («ruolo da confermare»);
 --   * staff of the team (scd_structure_roles, the organigram registry r59, seeded by r141): adults only, active roles
---     only, name and role label, never phone or e-mail. Labels that look like a phone number or an e-mail are not
+--     only (active, valid_from <= today or null, valid_to >= today or null), name and role label, never phone or e-mail. Labels that look like a phone number or an e-mail are not
 --     returned. Roles flagged needs_review (column added by r141) are left out; the flag is read through
 --     to_jsonb(row) so r142 applies before or after r141 (no reference to a column that may not exist yet).
 --
@@ -125,8 +125,9 @@ as $$
   team_matches as (
     select m.id as match_id, e.starts_at
     from team
-    join public.scd_events e on (case when (e.metadata->>'team_id') ~ '^[0-9a-f-]{36}$'
-                                      then (e.metadata->>'team_id')::uuid end) = team.id
+    join public.scd_events e on (case when (e.metadata->>'team_id')
+                                             ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                                      then lower(e.metadata->>'team_id')::uuid end) = team.id
       and e.starts_at >= team.starts_on and e.starts_at < team.ends_on + 1
     join public.scd_matches m on m.event_id = e.id
   ),
@@ -170,11 +171,13 @@ as $$
     group by mp.athlete_id
   ),
   shirts as (
-    select distinct on ((pl->>'athlete_id')) (pl->>'athlete_id') as athlete_id, (pl->>'shirt')::integer as shirt
+    select distinct on ((pl->>'athlete_id')) (pl->>'athlete_id') as athlete_id,
+      case when (pl->>'shirt') ~ '^[0-9]{1,2}$' then (pl->>'shirt')::integer end as shirt
     from team_matches tm
     join public.scd_match_sheets ms on ms.match_id = tm.match_id
-    cross join lateral jsonb_array_elements(ms.players) pl
-    where (pl->>'shirt') ~ '^[0-9]{1,2}$' and (pl->>'shirt')::integer between 1 and 99
+    cross join lateral jsonb_array_elements(case when jsonb_typeof(ms.players) = 'array' then ms.players else '[]'::jsonb end) pl
+    where jsonb_typeof(pl) = 'object'
+      and case when (pl->>'shirt') ~ '^[0-9]{1,2}$' then (pl->>'shirt')::integer between 1 and 99 else false end
     order by (pl->>'athlete_id'), tm.starts_at desc, ms.updated_at desc
   ),
   ordered as (
@@ -197,6 +200,8 @@ as $$
       and (r.valid_to is null or r.valid_to >= current_date)
       and r.role_kind in ('MISTER', 'DIRIGENTE', 'STAFF', 'RESPONSABILE')
       and not coalesce((to_jsonb(r)->>'needs_review')::boolean, false)
+      and case when (to_jsonb(r)->>'valid_from') ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+               then (to_jsonb(r)->>'valid_from')::date <= current_date else true end
     join public.scd_people p on p.id = r.person_id
     where p.left_at is null and coalesce(p.status, 'ACTIVE') = 'ACTIVE'
       and p.birth_date is not null and p.birth_date <= current_date - interval '18 years'
