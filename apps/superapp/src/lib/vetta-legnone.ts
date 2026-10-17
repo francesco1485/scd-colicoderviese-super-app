@@ -157,7 +157,7 @@ export const VETTA_EPOCHS: readonly Epoch[] = [
     story: "La prima stagione documentata è il 2011/12. Dei primi anni l'archivio conserva le liste del Settore Giovanile e Scolastico.",
     highlights: [
       { when: "2011/12", category: "Società", result: "Prima stagione documentata: l'archivio digitale parte il 13/07/2011", source: ALBUM_V1, tag: "VERIFIED" },
-      { when: "2014", category: "Settore Giovanile e Scolastico", result: "Iniziativa Fair Play nell'archivio del club", source: ALBUM_V1, tag: "VERIFIED" },
+      { when: "2014", category: "Settore Giovanile e Scolastico", result: "Fair Play 2014 nell'archivio del club", source: ALBUM_V1, tag: "VERIFIED" },
       { when: "2015", category: "Piccoli Amici", result: "Attività dei Piccoli Amici documentata", source: ALBUM_V1, tag: "VERIFIED" },
     ],
   },

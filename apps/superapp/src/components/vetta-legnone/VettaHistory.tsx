@@ -6,7 +6,7 @@
  * Content and sources: src/lib/vetta-legnone.ts (VETTA_EPOCHS, VETTA_MILESTONES, vettaHistoryCta).
  */
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Flag, Trophy } from "lucide-react";
+import { ArrowRight, Flag } from "lucide-react";
 import { useRef, useState, type KeyboardEvent } from "react";
 
 import { SectionHead } from "@/components/vetta-legnone/VettaSections";
@@ -72,7 +72,7 @@ export function HistoryEpochs() {
                   aria-controls={`vl-epoca-${e.id}`}
                   onClick={() => setOpenId(e.id)}
                   onKeyDown={(ev) => onKey(ev, i)}
-                  className={`scd-focus group flex w-full flex-col items-start gap-1 rounded-2xl p-3 text-left motion-safe:transition-colors ${
+                  className={`scd-focus group flex h-full w-full flex-col items-start gap-1 rounded-2xl p-3 text-left motion-safe:transition-colors ${
                     open ? "scd-band text-white shadow-[var(--scd-card-shadow)]" : "border border-[var(--scd-line)] bg-white text-[var(--scd-navy)] hover:bg-[#f2f9ff]"
                   }`}
                   data-epoch={e.id}
@@ -132,7 +132,7 @@ export function HistoryEpochs() {
 
       <div className="mt-6" data-testid="vetta-milestones">
         <h3 className="m-0 flex items-center gap-2 font-display text-[20px] font-bold text-[var(--scd-navy)] lg:text-[24px]">
-          <Trophy className="size-5 text-[var(--scd-blue)]" aria-hidden="true" />
+          <Flag className="size-5 text-[var(--scd-blue)]" aria-hidden="true" />
           Le nostre tappe
         </h3>
         <ol className="m-0 -mx-4 mt-2 flex list-none snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-2 lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0">
