@@ -1,7 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ChevronLeft, Store } from "lucide-react";
 
+import { CardAdditionsCard, ConvenzioniPublicCard } from "@/components/scd/ClubCatalogPublic";
 import { ClubCardDetails, ClubCardFace, ClubCardLinks, ClubCardRules } from "@/components/scd/ClubCards";
+import { catalogWithin } from "@/lib/club-catalog";
+import { getPublicClubCatalog } from "@/lib/club-catalog.functions";
 import { CLUB_CARDS, clubCard, isClubCardId } from "@/lib/club-cards";
 import { CREST_SHARE_IMAGE, PUBLIC_PAGES, pageHead } from "@/lib/share";
 
@@ -10,9 +13,10 @@ import { CREST_SHARE_IMAGE, PUBLIC_PAGES, pageHead } from "@/lib/share";
  * it as a QR code; it explains the card and sends people to the Club House. No sign-up form, no payment, no personal data.
  */
 export const Route = createFileRoute("/card/$tipo")({
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     if (!isClubCardId(params.tipo)) throw notFound();
-    return { id: params.tipo };
+    const catalog = await catalogWithin(getPublicClubCatalog(), { ready: false, entries: [] });
+    return { id: params.tipo, catalog };
   },
   head: ({ loaderData }) => {
     const t = loaderData ? clubCard(loaderData.id) : null;
@@ -30,7 +34,7 @@ export const Route = createFileRoute("/card/$tipo")({
 });
 
 function CardPage() {
-  const { id } = Route.useLoaderData();
+  const { id, catalog } = Route.useLoaderData();
   const tier = clubCard(id);
   return (
     <main className="scd-interior min-h-screen bg-[var(--in-ground)] pb-24 lg:pb-12" data-testid={`club-card-page-${id}`}>
@@ -61,6 +65,8 @@ function CardPage() {
         <div className="grid gap-5">
           <ClubCardDetails tier={tier} />
           <ClubCardRules />
+          <CardAdditionsCard entries={catalog.entries} card={tier.id} />
+          <ConvenzioniPublicCard entries={catalog.entries} card={tier.id} />
           <ClubCardLinks current={tier.id} />
         </div>
       </div>
