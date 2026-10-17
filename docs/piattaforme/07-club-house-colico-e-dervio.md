@@ -1,6 +1,6 @@
 # 07 · Club House Colico e Dervio
 
-Responsabile: vedi `.claude/agents/PIPELINE.md` §0 · Stato: da compilare al primo ciclo
+Responsabile: scd-clubhouse · Stato: In parte · Pagina: `/tesoreria/club-house` · verificato 17/10/2026 (mappa `apps/superapp/src/lib/piattaforme.ts`)
 
 ## Stato reale
 
