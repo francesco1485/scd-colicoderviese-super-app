@@ -176,11 +176,9 @@ describe("desktop sidebar (Eurobet structure, SCD colours)", () => {
 describe("«Le tue aree» bar on phones (Francesco 17/10/2026 19:09)", () => {
   it("is hidden for guests and for people without reserved areas", () => {
     expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
-    state.session = session("FAMILY");
-    const family = workAreasFor(session("FAMILY"));
-    const html = renderToStaticMarkup(<MyAreasBar />);
-    if (family.length === 0) expect(html).toBe("");
-    else expect(html).toContain('data-testid="my-areas-bar"');
+    state.session = { user: { email: "persona@example.org" }, roles: [], memberships: [] };
+    expect(workAreasFor(state.session as never)).toEqual([]);
+    expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
   });
 
   it("shows a dirigente every area they can open, led by the count that opens the full menu", () => {
@@ -196,10 +194,13 @@ describe("«Le tue aree» bar on phones (Francesco 17/10/2026 19:09)", () => {
     expect(html).toContain("lg:hidden");
   });
 
-  it("stays out of board screens, which have their own header", () => {
+  it("stays out of board screens with their own header, but stays on a work area to switch area", () => {
     state.session = session("DIRECTION");
     state.pathname = "/calendario";
     expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
+    const area = workAreasFor(session("DIRECTION"))[0]!;
+    state.pathname = area.link.path;
+    expect(renderToStaticMarkup(<MyAreasBar />)).toContain('data-testid="my-areas-bar"');
   });
 });
 

@@ -127,6 +127,9 @@ const isActive = (pathname: string, to: string) =>
 const ACCESS_SCREEN_PATHS = [...ACCESS_SCREEN_IDS, ...WORK_AREA_IDS]
   .map((id) => findArea(id)?.path)
   .filter((p): p is string => !!p);
+// Entry pages of the reserved work areas (/direzione, /gestionale…): the «Le tue aree» bar stays there, to jump between areas.
+const WORK_AREA_PATHS = WORK_AREA_IDS.map((id) => findArea(id)?.path).filter((p): p is string => !!p);
+const isWorkAreaPath = (p: string) => WORK_AREA_PATHS.includes(p.replace(/\/$/, "") || "/");
 const BOARD_ROUTES = [
   "/calendario",
   "/allenamenti",
@@ -395,22 +398,23 @@ export function SiteHeader() {
 /**
  * «Le tue aree» bar (Francesco DG 17/10/2026 19:09: «il dirigente deve vedere le barre a cui può accedere … barra in
  * alto che gli fa vedere le sue barre dove può premere ed entrare, al di là delle tre linette»). Phone and tablet: one
- * row of buttons under the top bar with every reserved area the person's positions open (same list as the desktop
+ * row of buttons under the top bar (below the lg breakpoint) with every reserved area the person's positions open (same list as the desktop
  * sidebar, which already shows them), led by a yellow «Le tue aree · N» button that opens the full menu. Navigation only: every area keeps its own gate.
- * Hidden when signed out, when the person has no reserved area, and on board screens (they have their own header).
+ * Hidden when signed out, when the person has no reserved area, and on board screens with their own header that are
+ * not a work area (calendario, allenamenti, core…); on a work area's entry page it stays, to switch area.
  */
 export function MyAreasBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { session } = useSession();
   const areas = workAreasFor(session);
-  if (!areas.length || isBoardRoute(pathname)) return null;
+  if (!areas.length || (isBoardRoute(pathname) && !isWorkAreaPath(pathname))) return null;
   return (
     <nav
       aria-label="Le tue aree"
       className="scd-pub border-b border-[#d7e3f2] bg-white font-text lg:hidden"
       data-testid="my-areas-bar"
     >
-      <div className="flex items-center gap-2 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex scroll-pl-[9rem] items-center gap-2 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           type="button"
           onClick={openAccessMenu}
