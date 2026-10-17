@@ -69,6 +69,92 @@ export const GRANTABLE_ROLES = [
 ] as const;
 export type GrantableRole = (typeof GRANTABLE_ROLES)[number]["id"];
 
+/**
+ * One person, many hats (UD-189, r121). The office ticks everything the person is — parent of one or more children,
+ * athlete, one or more organigram positions — and the app account gets the highest base level among them. The base
+ * level opens nothing by itself (r100: sections are granted one by one by the Direzione); it only says which area the
+ * person lands in. Order = r64 rank (a level only ever goes up).
+ */
+export const BASE_RANK: readonly GrantableRole[] = ["ATHLETE", "FAMILY", "STAFF", "MANAGER", "MISTER"];
+
+/** organigram role_kind (scd_structure_roles) -> base level of the account. */
+export const KIND_BASE: Readonly<Record<string, GrantableRole>> = {
+  ORGANO_SOCIETARIO: "MANAGER",
+  DIRIGENTE: "MANAGER",
+  RESPONSABILE: "MANAGER",
+  MISTER: "MISTER",
+  STAFF: "STAFF",
+  AUTISTA: "STAFF",
+};
+
+export interface HatChoice {
+  parent: boolean;
+  athlete: boolean;
+  /** role_kind of every position ticked (new or already held). */
+  positionKinds: readonly string[];
+}
+
+/** Highest base level among the hats; null when nothing is ticked yet. */
+export function baseRoleFor(h: HatChoice): GrantableRole | null {
+  const hats: GrantableRole[] = [];
+  if (h.athlete) hats.push("ATHLETE");
+  if (h.parent) hats.push("FAMILY");
+  for (const k of h.positionKinds) {
+    const b = KIND_BASE[k];
+    if (b) hats.push(b);
+  }
+  if (!hats.length) return null;
+  return hats.reduce((best, r) => (BASE_RANK.indexOf(r) > BASE_RANK.indexOf(best) ? r : best));
+}
+
+/**
+ * Which ticked card stays when several cards are the same human: the one already holding organigram roles, then the
+ * one with a birth date, then the first ticked. The others are merged into it (r121 scd_merge_people).
+ */
+export function cardToKeep<C extends { personId: string; roleCount: number; birthYear: number | null }>(ticked: readonly C[]): C | null {
+  if (!ticked.length) return null;
+  return [...ticked].sort((a, b) => b.roleCount - a.roleCount || Number(b.birthYear !== null) - Number(a.birthYear !== null))[0] ?? null;
+}
+
+/** Positions only Presidente or Direttore generale assign (r111 scd_is_creator_position). */
+export const CREATOR_POSITIONS: readonly string[] = ["presidente", "direttore-generale"];
+
+/** Codes that describe a tesseramento or a working relationship, not an organigram seat (catalogue note 16/10). */
+export function isSeatPosition(code: string): boolean {
+  return !code.startsWith("rasd-tessera-") && !code.startsWith("ls-");
+}
+
+/** Pairs of active cards with the same name (accents and case folded), to check as possible duplicates. */
+export function duplicateNamePairs<P extends { id: string; displayName: string; status: string; birthYear: number | null; roles?: readonly unknown[] }>(
+  people: readonly P[],
+  currentYear: number = new Date().getFullYear(),
+): Array<[P, P]> {
+  const minor = (p: P) => p.birthYear !== null && currentYear - p.birthYear < 18;
+  const maybeAdult = (p: P) => p.birthYear === null || (p.roles?.length ?? 0) > 0;
+  const key = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+  const groups = new Map<string, P[]>();
+  for (const p of people) {
+    if (p.status === "LEFT") continue;
+    const k = key(p.displayName);
+    if (!k) continue;
+    groups.set(k, [...(groups.get(k) ?? []), p]);
+  }
+  const out: Array<[P, P]> = [];
+  for (const g of groups.values()) {
+    for (let i = 0; i < g.length; i++)
+      for (let j = i + 1; j < g.length; j++) {
+        const x = g[i]!;
+        const y = g[j]!;
+        // Two different known birth years are two people (often parent and child with the same name).
+        if (x.birthYear !== null && y.birthYear !== null && x.birthYear !== y.birthYear) continue;
+        // A minor next to a card that may be an adult (no year, or organigram roles) is a parent and a child.
+        if ((minor(x) && maybeAdult(y)) || (minor(y) && maybeAdult(x))) continue;
+        out.push([x, y]);
+      }
+  }
+  return out;
+}
+
 export const MATCH_LABEL: Readonly<Record<string, string>> = {
   EMAIL: "stessa e-mail",
   NAME_BIRTH: "stesso nome e data di nascita",

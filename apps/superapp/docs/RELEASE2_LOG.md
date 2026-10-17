@@ -1056,3 +1056,11 @@ Francesco DG 17:20 «Spegni notizia» → «Costruisci il pulsante».
 - `components/scd/FrontPageDesk.tsx` in Direzione → Contenuti (role direzione): today's items with «Spegni / Riaccendi» and «Spegni tutto».
 - r120 (APPLICATA 17/10 dopo «applica r120»): `scd_front_page_switch` (RLS, no direct access), `scd_front_page_set_hidden` (DIRECTION only, audit with item id and day), `scd_public_front_page_hidden` (anon, ids only). PGlite test.
 - Server: the public home applies the switch on every request (30 s cache); unreadable switch → the whole front page is hidden; before r120 nothing is switched off. The agent never writes the switch.
+
+## 2026-10-17 — Una persona, più ruoli (UD-189, r121) · chat CLOUD
+
+- Why (Francesco DG 17:51): «uno può essere più cose come prevede lo statuto e la legge». The approval dialog allowed one card and one role; the Presidente had two cards (tesserati master + registrations).
+- Engine: PERSONE. Measure: duplicate cards with the same e-mail or name + birth date; requests approved with more than one role.
+- `AccessRequestsCard`: 1) tick every card that is the same person (merged into one, «Scheda che resta» selectable); 2) genitore of one or more children, atleta, any number of organigram positions from the catalogue (team for mister/dirigente); 3) base access = highest level among the hats, sections still from Direzione → Accessi. Minors: no positions.
+- r121 (STAGED, «applica r121»): `scd_merge_people` (moves every reference to the card, fail-closed on conflicts, audit MERGE_PEOPLE; Presidente/DG cards only by them), `scd_approve_access_request_multi`. Before r121 a simple request still goes through r64. PGlite test.
+- Access-request area and the whole of Iride move to the CLOUD chat (AGENTS.md SCD:SESSIONI). UD-190/UD-191 recorded (Iride: secretary with the club memory; proactive duties; writes first to staff, families with daily ok).
