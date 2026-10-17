@@ -51,6 +51,7 @@ import { sessionRolesFrom, type Membership } from "@/lib/session";
 
 import {
   BottomNav,
+  MyAreasBar,
   SIDEBAR_SECTIONS,
   SideNav,
   SiteHeader,
@@ -169,6 +170,37 @@ describe("desktop sidebar (Eurobet structure, SCD colours)", () => {
     for (const a of direction) expect(a.entry.reserved).toBe(true);
     state.session = session("DIRECTION");
     expect(renderToStaticMarkup(<SideNav />)).toContain('data-testid="side-work-areas"');
+  });
+});
+
+describe("«Le tue aree» bar on phones (Francesco 17/10/2026 19:09)", () => {
+  it("is hidden for guests and for people without reserved areas", () => {
+    expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
+    state.session = { user: { email: "persona@example.org" }, roles: [], memberships: [] };
+    expect(workAreasFor(state.session as never)).toEqual([]);
+    expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
+  });
+
+  it("shows a dirigente every area they can open, led by the count that opens the full menu", () => {
+    state.session = session("DIRECTION");
+    state.pathname = "/";
+    const html = renderToStaticMarkup(<MyAreasBar />);
+    expect(html).toContain('data-testid="my-areas-bar"');
+    expect(html).toContain('aria-label="Le tue aree"');
+    const links = hrefs(html);
+    for (const a of workAreasFor(session("DIRECTION"))) expect(links).toContain(a.link.href);
+    expect(html).not.toMatch(/aria-current="page"/);
+    expect(html).toContain(`aria-label="Le tue aree: ${workAreasFor(session("DIRECTION")).length}. Apri l&#x27;elenco completo"`);
+    expect(html).toContain("lg:hidden");
+  });
+
+  it("stays out of board screens with their own header, but stays on a work area to switch area", () => {
+    state.session = session("DIRECTION");
+    state.pathname = "/calendario";
+    expect(renderToStaticMarkup(<MyAreasBar />)).toBe("");
+    const area = workAreasFor(session("DIRECTION"))[0]!;
+    state.pathname = area.link.path;
+    expect(renderToStaticMarkup(<MyAreasBar />)).toContain('data-testid="my-areas-bar"');
   });
 });
 

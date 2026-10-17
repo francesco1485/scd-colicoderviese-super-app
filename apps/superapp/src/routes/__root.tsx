@@ -13,7 +13,7 @@ import {
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { BottomNav, MenuDrawer, SideNav, SiteFooter, SiteHeader } from "../components/SiteChrome";
+import { BottomNav, MenuDrawer, SideNav, SiteFooter, MyAreasBar, SiteHeader } from "../components/SiteChrome";
 import { DESKTOP_CONTENT_CLEARANCE, PHONE_CONTENT_CLEARANCE, SkyChat } from "../components/SkyChat";
 import { PwaManager } from "../components/PwaManager";
 import { SponsorBand } from "../components/SponsorBand";
@@ -188,6 +188,7 @@ function RootComponent() {
           Vai al contenuto
         </a>
         <SiteHeader />
+        <MyAreasBar />
         <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)]" data-testid="shell-body">
           <SideNav />
           <div className="min-w-0" data-testid="shell-content">
