@@ -4369,6 +4369,28 @@
         "implementationStatus": "IMPLEMENTED",
         "implementation": "branch feat/crovi-home-2 (PR to staging/superapp); tests lib/crovi-welcome.test.ts, lib/assistant-open.test.ts; assistant, cast-personas, SkyJolly and public-home tests updated"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "15:06",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-185",
+      "name": "TEAM_DOCUMENTS_RETENTION_UNTIL_SEASON_END",
+      "sourceQuoteFragments": [
+        "Tenere fino al 30 giugno 2027"
+      ],
+      "normalizedCommand": {
+        "rule": "Removed team match documents (referto, distinte) stay unreadable for everyone and their files are kept until 30 June of the season in which they were removed (2026/27: 30/06/2027); only after that date they become clean-up candidates. Nothing is deleted automatically today.",
+        "scope": "SCD PULSE scd_match_documents, scd_team_docs_retention_candidates (r119), scd-private bucket",
+        "supersedes": "the 30-day PROPOSED term of r117 (never confirmed)",
+        "implementationStatus": "IMPLEMENTED_STAGED",
+        "implementation": "migration r119 (STAGED until «applica r119»): scd_team_docs_season_end + scd_team_docs_retention_candidates by season end; PGlite assertions in supabase/tests/r117_area_partite.pglite.mjs",
+        "engines": [
+          "PERSONE"
+        ],
+        "measure": "removed documents older than the season end still stored = 0 after the clean-up job is approved"
+      }
     }
   ],
   "completionGate": {

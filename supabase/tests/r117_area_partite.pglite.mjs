@@ -22,6 +22,7 @@ const PGlite = await loadPGlite();
 const file = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), "utf8");
 const R117 = file("../migrations/20261017_r117_area_partite.sql");
 const R118 = file("../migrations/20261017_r118_area_allenamenti.sql");
+const R119 = file("../migrations/20261017_r119_team_docs_retention_season.sql");
 
 const ORG = "00000000-0000-0000-0000-000000000001";
 const U = (n) => `10000000-0000-0000-0000-0000000000${String(n).padStart(2, "0")}`;
@@ -297,11 +298,20 @@ const objs = async (uid) => {
 assert.deepEqual(await objs(MIS15), [path2], "storage policy hides the removed file");
 assert.deepEqual(await objs(MIS16), []);
 assert.deepEqual(await objs(FAM), []);
-// retention placeholder: service only, lists removed documents older than 30 days, deletes nothing
+// retention (r117 placeholder, r119 season rule): service only, deletes nothing
 const ret = async () => (await db.query(`select document_id, storage_path from public.scd_team_docs_retention_candidates()`)).rows;
 assert.deepEqual(await ret(), [], "removed today: not yet a candidate");
 await db.query(`update public.scd_match_documents set removed_at = now() - interval '31 days' where id = $1`, [r1.id]);
-assert.deepEqual(await ret(), [{ document_id: r1.id, storage_path: path1 }]);
+assert.deepEqual(await ret(), [{ document_id: r1.id, storage_path: path1 }], "r117: 30 days");
+await db.exec(R119);
+await db.exec(R119); // idempotent
+const end = async (t) => (await db.query(`select public.scd_team_docs_season_end($1::timestamptz)::text as d`, [t])).rows[0].d;
+assert.equal(await end("2026-10-17T12:00:00+02:00"), "2027-06-30");
+assert.equal(await end("2027-03-01T12:00:00+01:00"), "2027-06-30");
+assert.equal(await end("2027-07-01T12:00:00+02:00"), "2028-06-30");
+assert.deepEqual(await ret(), [], "r119: removed 31 days ago in this season, kept until 30 June");
+await db.query(`update public.scd_match_documents set removed_at = now() - interval '2 years' where id = $1`, [r1.id]);
+assert.deepEqual(await ret(), [{ document_id: r1.id, storage_path: path1 }], "r119: season ended, candidate");
 assert.equal((await db.query(`select count(*)::int as n from public.scd_match_documents`)).rows[0].n, 2, "nothing deleted");
 const rg = (await db.query(`select has_function_privilege('authenticated', 'public.scd_team_docs_retention_candidates()', 'execute') as auth,
   has_function_privilege('anon', 'public.scd_team_docs_retention_candidates()', 'execute') as anon,
