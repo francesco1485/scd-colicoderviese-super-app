@@ -145,6 +145,10 @@ e `scd-azioni` fa sempre questi passi:
 
 Il comando non dà permessi in più: divisione tra le chat, migrazioni solo dopo "applica", pubblicazione solo dopo "pubblica" e i divieti assoluti restano uguali.
 
+## 4b. Ciclo «Ufficio» (Francesco 17/10/2026 11:57)
+
+Iride e il centralino ricevono da tutti e smistano; il ruolo esegue o prepara; l'esito torna a chi ha chiesto con la prova. Il ciclo lo fa girare `scd-regista` alle 08:52, 13:07 e 18:22 (skill `scd-ufficio`): quattro porte (SCD_INTAKE_LOG, Gmail SCD/DA_GESTIRE, `claude/SCD_POSTA_*`, coda dell'app) → classifica → ruolo del `docs/organizzazione/MANSIONARIO.md` → esegue o prepara → esito + prova + stato (`ESEGUITA`, `IN_ATTESA`, `SERVE_OK_DIREZIONE`, `NON_ESEGUIBILE`, `ERRORE_CORRETTO`) → Iride avvisa → memoria del club e comandi proposti in `docs/piattaforme/IDEE.md`. Quando si sbaglia: si avvisa, ci si scusa una volta, si corregge, si porta a termine, si impara.
+
 ## 5. Regole
 
 - Chi deve sapere (UD-141): ogni variazione e ogni nuova richiesta avvisano le persone coinvolte e sempre il Direttore Generale (in app); un appuntamento chiesto da un superiore è confermato e avvisa chi sta sotto, chiesto da chi sta sotto resta "da confermare" finché il superiore accetta.

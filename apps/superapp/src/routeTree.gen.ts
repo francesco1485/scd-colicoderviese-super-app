@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AllenamentiRouteImport } from './routes/allenamenti'
 import { Route as CalendarioRouteImport } from './routes/calendario'
+import { Route as ClassificheRouteImport } from './routes/classifiche'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ComunicazioniRouteImport } from './routes/comunicazioni'
 import { Route as ContattiRouteImport } from './routes/contatti'
@@ -85,6 +86,7 @@ import { Route as GestionalePlanningRouteImport } from './routes/gestionale.plan
 import { Route as GestionalePostaRouteImport } from './routes/gestionale.posta'
 import { Route as GestionalePulminiRouteImport } from './routes/gestionale.pulmini'
 import { Route as GestionaleRichiesteRouteImport } from './routes/gestionale.richieste'
+import { Route as GestionaleRubricaRouteImport } from './routes/gestionale.rubrica'
 import { Route as GestionaleStrutturaRouteImport } from './routes/gestionale.struttura'
 import { Route as GestionaleImpiantiRouteImport } from './routes/gestionale_.impianti'
 import { Route as LaMiaScdCampioneRouteImport } from './routes/la-mia-scd_.campione'
@@ -147,6 +149,11 @@ const AllenamentiRoute = AllenamentiRouteImport.update({
 const CalendarioRoute = CalendarioRouteImport.update({
   id: '/calendario',
   path: '/calendario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClassificheRoute = ClassificheRouteImport.update({
+  id: '/classifiche',
+  path: '/classifiche',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
@@ -517,6 +524,11 @@ const GestionaleRichiesteRoute = GestionaleRichiesteRouteImport.update({
   path: '/gestionale/richieste',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GestionaleRubricaRoute = GestionaleRubricaRouteImport.update({
+  id: '/gestionale/rubrica',
+  path: '/gestionale/rubrica',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GestionaleStrutturaRoute = GestionaleStrutturaRouteImport.update({
   id: '/gestionale/struttura',
   path: '/gestionale/struttura',
@@ -776,6 +788,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
+  '/classifiche': typeof ClassificheRoute
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
@@ -843,6 +856,7 @@ export interface FileRoutesByFullPath {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
@@ -902,6 +916,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
+  '/classifiche': typeof ClassificheRoute
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
@@ -969,6 +984,7 @@ export interface FileRoutesByTo {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/la-mia-scd/campione': typeof LaMiaScdCampioneRoute
   '/ledwall/player': typeof LedwallPlayerRoute
@@ -1028,6 +1044,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/allenamenti': typeof AllenamentiRoute
   '/calendario': typeof CalendarioRoute
+  '/classifiche': typeof ClassificheRoute
   '/community': typeof CommunityRoute
   '/comunicazioni': typeof ComunicazioniRoute
   '/contatti': typeof ContattiRoute
@@ -1095,6 +1112,7 @@ export interface FileRoutesById {
   '/gestionale/posta': typeof GestionalePostaRoute
   '/gestionale/pulmini': typeof GestionalePulminiRoute
   '/gestionale/richieste': typeof GestionaleRichiesteRoute
+  '/gestionale/rubrica': typeof GestionaleRubricaRoute
   '/gestionale/struttura': typeof GestionaleStrutturaRoute
   '/gestionale_/impianti': typeof GestionaleImpiantiRouteWithChildren
   '/la-mia-scd_/campione': typeof LaMiaScdCampioneRoute
@@ -1156,6 +1174,7 @@ export interface FileRouteTypes {
     | '/'
     | '/allenamenti'
     | '/calendario'
+    | '/classifiche'
     | '/community'
     | '/comunicazioni'
     | '/contatti'
@@ -1223,6 +1242,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/gestionale/impianti'
     | '/la-mia-scd/campione'
@@ -1282,6 +1302,7 @@ export interface FileRouteTypes {
     | '/'
     | '/allenamenti'
     | '/calendario'
+    | '/classifiche'
     | '/community'
     | '/comunicazioni'
     | '/contatti'
@@ -1349,6 +1370,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/la-mia-scd/campione'
     | '/ledwall/player'
@@ -1407,6 +1429,7 @@ export interface FileRouteTypes {
     | '/'
     | '/allenamenti'
     | '/calendario'
+    | '/classifiche'
     | '/community'
     | '/comunicazioni'
     | '/contatti'
@@ -1474,6 +1497,7 @@ export interface FileRouteTypes {
     | '/gestionale/posta'
     | '/gestionale/pulmini'
     | '/gestionale/richieste'
+    | '/gestionale/rubrica'
     | '/gestionale/struttura'
     | '/gestionale_/impianti'
     | '/la-mia-scd_/campione'
@@ -1534,6 +1558,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AllenamentiRoute: typeof AllenamentiRoute
   CalendarioRoute: typeof CalendarioRoute
+  ClassificheRoute: typeof ClassificheRoute
   CommunityRoute: typeof CommunityRoute
   ComunicazioniRoute: typeof ComunicazioniRoute
   ContattiRoute: typeof ContattiRoute
@@ -1601,6 +1626,7 @@ export interface RootRouteChildren {
   GestionalePostaRoute: typeof GestionalePostaRoute
   GestionalePulminiRoute: typeof GestionalePulminiRoute
   GestionaleRichiesteRoute: typeof GestionaleRichiesteRoute
+  GestionaleRubricaRoute: typeof GestionaleRubricaRoute
   GestionaleStrutturaRoute: typeof GestionaleStrutturaRoute
   GestionaleImpiantiRoute: typeof GestionaleImpiantiRouteWithChildren
   LaMiaScdCampioneRoute: typeof LaMiaScdCampioneRoute
@@ -1672,6 +1698,13 @@ declare module '@tanstack/react-router' {
       path: '/calendario'
       fullPath: '/calendario'
       preLoaderRoute: typeof CalendarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/classifiche': {
+      id: '/classifiche'
+      path: '/classifiche'
+      fullPath: '/classifiche'
+      preLoaderRoute: typeof ClassificheRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community': {
@@ -2185,6 +2218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GestionaleRichiesteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gestionale/rubrica': {
+      id: '/gestionale/rubrica'
+      path: '/gestionale/rubrica'
+      fullPath: '/gestionale/rubrica'
+      preLoaderRoute: typeof GestionaleRubricaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gestionale/struttura': {
       id: '/gestionale/struttura'
       path: '/gestionale/struttura'
@@ -2549,6 +2589,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AllenamentiRoute: AllenamentiRoute,
   CalendarioRoute: CalendarioRoute,
+  ClassificheRoute: ClassificheRoute,
   CommunityRoute: CommunityRoute,
   ComunicazioniRoute: ComunicazioniRoute,
   ContattiRoute: ContattiRoute,
@@ -2616,6 +2657,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestionalePostaRoute: GestionalePostaRoute,
   GestionalePulminiRoute: GestionalePulminiRoute,
   GestionaleRichiesteRoute: GestionaleRichiesteRoute,
+  GestionaleRubricaRoute: GestionaleRubricaRoute,
   GestionaleStrutturaRoute: GestionaleStrutturaRoute,
   GestionaleImpiantiRoute: GestionaleImpiantiRouteWithChildren,
   LaMiaScdCampioneRoute: LaMiaScdCampioneRoute,

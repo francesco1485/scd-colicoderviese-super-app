@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ExternalLink, Trophy } from "lucide-react";
 
 import { OFFICIAL_RESULT_LINKS, RESULTS_VERIFIED_ON, SECONDARY_RESULT_LINKS, resultLinkFor } from "@/lib/official-links";
@@ -5,8 +6,8 @@ import { OFFICIAL_RESULT_LINKS, RESULTS_VERIFIED_ON, SECONDARY_RESULT_LINKS, res
 const verifiedOn = RESULTS_VERIFIED_ON.split("-").reverse().join("/");
 
 /**
- * "Risultati ufficiali" block: the federation pages where scores and standings live.
- * The app shows no score of its own. Tone "light" on white pages, "dark" on the outside palette.
+ * "Risultati ufficiali" block: the federation pages where scores and standings live, plus the link to /classifiche
+ * (UD-182: only official LND data, with source and link; the app computes no score of its own). Tone "light" on white pages, "dark" on the outside palette.
  */
 export function OfficialResults({ tone = "light", className = "" }: { tone?: "light" | "dark"; className?: string }) {
   const dark = tone === "dark";
@@ -19,7 +20,11 @@ export function OfficialResults({ tone = "light", className = "" }: { tone?: "li
         Risultati ufficiali
       </h2>
       <p className={`m-0 mt-1 text-[14px] leading-snug ${sub}`}>
-        Risultati e classifiche li pubblica la federazione: qui trovi i link diretti. Campionati verificati su gare.lnd.it il {verifiedOn}.
+        Pubblichiamo solo i dati ufficiali LND, con fonte e link: li trovi in{" "}
+        <Link to="/classifiche" className={`font-semibold underline ${dark ? "text-white" : "text-[var(--scd-blue)]"}`}>
+          Classifiche
+        </Link>
+        . Qui i link diretti alle fonti; campionati verificati su gare.lnd.it il {verifiedOn}.
       </p>
       <ul className="m-0 mt-3 grid list-none gap-2 p-0 sm:grid-cols-2">
         {OFFICIAL_RESULT_LINKS.map((l) => (

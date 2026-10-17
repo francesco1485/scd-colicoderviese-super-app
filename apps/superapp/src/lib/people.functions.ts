@@ -42,7 +42,6 @@ type PersonDbRow = {
   display_name: string | null;
   birth_date: string | null;
   email: string | null;
-  phone: string | null;
   status: PersonRow["status"];
   left_at: string | null;
   left_reason: string | null;
@@ -51,7 +50,8 @@ type PersonDbRow = {
   scd_athletes: AthleteRow[] | null;
 };
 
-const PERSON_SELECT = "id,first_name,last_name,display_name,birth_date,email,phone,status,left_at,left_reason,source_id,scd_structure_roles(id,role_label,role_kind,area_id,active,valid_to,scd_teams(code,name)),scd_athletes(registration_status,medical_certificate_expires_at,scd_team_memberships(valid_to,scd_teams(code,name,status)))";
+// No phone here: since r141 (UD-167) the phone column is not readable directly; the detail asks scd_person_phone.
+const PERSON_SELECT = "id,first_name,last_name,display_name,birth_date,email,status,left_at,left_reason,source_id,scd_structure_roles(id,role_label,role_kind,area_id,active,valid_to,scd_teams(code,name)),scd_athletes(registration_status,medical_certificate_expires_at,scd_team_memberships(valid_to,scd_teams(code,name,status)))";
 
 function toRoles(rows: RoleRow[] | null, today: string): PersonRole[] {
   return (rows ?? [])
@@ -128,9 +128,10 @@ export const getPerson = createServerFn({ method: "GET" })
     if (gate.view !== "page" || !sb || !org) return null;
     const { data: p, error } = await sb.from("scd_people").select(PERSON_SELECT).eq("id", data.id).eq("organization_id", org.organizationId).maybeSingle();
     if (error || !p) return null;
-    const [events, consents] = await Promise.all([
+    const [events, consents, phone] = await Promise.all([
       sb.from("scd_person_events").select("id,event_type,event_date,reason,other_club,note").eq("person_id", data.id).order("event_date", { ascending: false }).order("id", { ascending: false }).limit(100),
       sb.from("scd_person_consents").select("consent_type,granted,given_at,revoked_at").eq("person_id", data.id).order("given_at", { ascending: false }).limit(50),
+      import("./people-phone.server").then(({ officePhone }) => officePhone(sb as unknown as Parameters<typeof officePhone>[0], org.organizationId, data.id)),
     ]);
     const row = toRow(p as unknown as PersonDbRow, today);
     const pr = p as unknown as PersonDbRow;
@@ -138,7 +139,7 @@ export const getPerson = createServerFn({ method: "GET" })
       ...row,
       birthDate: pr.birth_date,
       email: pr.email,
-      phone: pr.phone,
+      phone,
       events: ((events.data ?? []) as Array<{ id: number; event_type: string; event_date: string; reason: string | null; other_club: string | null; note: string | null }>).map((e) => ({ id: e.id, type: e.event_type, date: e.event_date, reason: e.reason, otherClub: e.other_club, note: e.note })),
       consents: ((consents.data ?? []) as Array<{ consent_type: string; granted: boolean; given_at: string; revoked_at: string | null }>).map((c) => ({ type: c.consent_type, granted: c.granted, givenAt: c.given_at, revokedAt: c.revoked_at })),
     };
@@ -221,7 +222,7 @@ export const insertPerson = createServerFn({ method: "POST" })
     const id = (person as { id: string }).id;
     await sb.from("scd_person_events").insert({ organization_id: org.organizationId, person_id: id, event_type: "ENTRATA", reason: data.kind === "staff" ? "Nuovo incarico" : "Nuovo tesserato", note: data.note ?? null });
     if (data.kind === "staff") {
-      await sb.from("scd_structure_roles").insert({ organization_id: org.organizationId, person_id: id, role_label: data.roleLabel, role_kind: data.roleKind, contact_email: data.email ?? null, contact_phone: data.phone ?? null, source_id: "SUPERAPP_DIREZIONE" });
+      await sb.from("scd_structure_roles").insert({ organization_id: org.organizationId, person_id: id, role_label: data.roleLabel, role_kind: data.roleKind, source_id: "SUPERAPP_DIREZIONE" });
     } else {
       await sb.from("scd_athletes").insert({ organization_id: org.organizationId, person_id: id, registration_status: "UNVERIFIED" });
     }

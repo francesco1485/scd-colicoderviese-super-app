@@ -222,9 +222,10 @@ export const PLATFORMS: readonly Platform[] = [
     id: "07", name: "Club House Colico e Dervio", slug: "club-house", dossier: "07-club-house-colico-e-dervio.md",
     sector: "struttura", responsible: "scd-clubhouse", support: ["scd-tesoreria", "scd-community", "scd-convenzioni"],
     route: "/tesoreria/club-house", status: "parziale",
-    purpose: "Cassa del bar e serate della Club House: listino ancora da caricare.",
+    purpose: "Cassa del bar, orari di Colico e Dervio, listino e menu per gruppi (inserimento r115 da attivare) e serate della Club House.",
     today: [
-      { label: "Cassa della Club House", to: "/tesoreria/club-house" },
+      { label: "Cassa e inserimento di orari, listino e menu per gruppi", to: "/tesoreria/club-house" },
+      { label: "Orari, listino e menu in pubblico", to: "/impianti" },
       { label: "Serate Club House in Attività in struttura", to: "/gestionale/struttura" },
     ],
     audiences: ["direzione", "tesoreria", "responsabili"], icon: "coffee",
@@ -285,12 +286,13 @@ export const PLATFORMS: readonly Platform[] = [
     route: "/gestionale/impianti", status: "live",
     purpose: "Rotazioni, simulazioni, affitti a terzi ed eventi sui campi di Colico e Dervio.",
     today: [
-      { label: "Impianti e campi", to: "/gestionale/impianti" },
+      { label: "Piano Dervio: 1 gara giovanile a settimana", to: "/gestionale/impianti/dervio" },
       { label: "Simula una rotazione Colico/Dervio", to: "/gestionale/impianti/simulazione" },
       { label: "Nuova prenotazione da approvare", to: "/gestionale/impianti/nuova" },
     ],
     audiences: ["direzione", "responsabili"], icon: "repeat",
-    engine: "TEMPO", measure: "gare spostate su Dervio con preavviso di un mese",
+    // DG 16/10/2026: team notice 14 days before; the Comune is informed with the season programme (no monthly notice).
+    engine: "TEMPO", measure: "settimane con la gara Dervio assegnata e avviso alla squadra entro 14 giorni; giorni con sovrapposti sul campo 1",
   },
   {
     id: "12", name: "Nutrizionista", slug: "nutrizionista", dossier: "12-nutrizionista.md",
@@ -381,10 +383,10 @@ export const PLATFORMS: readonly Platform[] = [
     id: "19", name: "Convenzioni", slug: "convenzioni", dossier: "19-convenzioni.md",
     sector: "crescita", responsible: "scd-convenzioni", support: ["scd-commerciale", "scd-sponsor"],
     route: starterPath("convenzioni"), status: "in-costruzione",
-    purpose: "Accordi con attività del territorio a favore di soci e famiglie.",
+    purpose: "Accordi con attività del territorio a favore di soci e famiglie, collegati alle card del club.",
     today: [
+      { label: "Convenzioni e card in pubblico", to: "/card" },
       { label: "Richieste di convenzione nella Vetrina richieste", to: "/gestionale/richieste" },
-      { label: "Contatti delle attività nel CRM", to: "/crm" },
       { label: "Chiedi o proponi una convenzione", to: ASK_PATH },
     ],
     audiences: ["direzione", "segreteria", "responsabili"], icon: "percent",

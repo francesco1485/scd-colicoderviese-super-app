@@ -136,7 +136,7 @@ describe("scheda per la Direzione", () => {
       rooms: [],
     };
     expect(directionBrief(clash, ctx)).toMatch(
-      /Conflitti sul campo: SÌ.*Juniores U19 15:00/,
+      /Conflitti sul campo: SÌ.*Juniores U19 Élite 15:00/,
     );
     const dv: Booking = { ...clash, pitch: "DV", date: "2026-10-25" };
     const brief = directionBrief(dv, ctx);

@@ -15,6 +15,7 @@ import { InteriorShell } from "@/components/scd/InteriorShell";
 import { PushCard } from "@/components/scd/PushCard";
 import { TransportLiveFamilyCard } from "@/components/scd/TransportLiveFamilyCard";
 import { TransportRequestCard } from "@/components/scd/TransportRequestCard";
+import { StaffDirectoryList } from "@/components/scd/StaffDirectory";
 import { EmptyState } from "@/components/scd/work-area-ui";
 import { getClubHouseDesk, type ClubHouseDesk } from "@/lib/area-requests.functions";
 import { getSession } from "@/lib/auth.functions";
@@ -31,6 +32,7 @@ import { loadCalendar } from "@/lib/public-snapshots";
 import { awayMatchesFor, type AwayMatch } from "@/lib/transport-requests";
 import { getFamilyTransport, type FamilyTransport } from "@/lib/transport-requests.functions";
 import { getFamilyLive, type FamilyLive } from "@/lib/transport-live.functions";
+import { getStaffDirectory, type DirectoryView } from "@/lib/staff-directory.functions";
 
 /**
  * Family area (UD-061, UD-062). Signed out: the access screen of the registry. Signed in: the caller's
@@ -40,7 +42,7 @@ import { getFamilyLive, type FamilyLive } from "@/lib/transport-live.functions";
  */
 export const Route = createFileRoute("/famiglia")({
   loader: async () => {
-    const [session, family, callups, fees, transport, clubHouse, live] = await Promise.all([
+    const [session, family, callups, fees, transport, clubHouse, live, staff] = await Promise.all([
       getSession(),
       getMyFamily(),
       getMyCallups(),
@@ -48,11 +50,13 @@ export const Route = createFileRoute("/famiglia")({
       getFamilyTransport(),
       getClubHouseDesk().catch((): ClubHouseDesk => ({ state: "off" })),
       getFamilyLive().catch((): FamilyLive => ({ state: "unavailable", items: [], checkedAt: new Date().toISOString() })),
+      // UD-167: the child's team staff and the Segreteria (r141); numbers only when the person shared them.
+      getStaffDirectory().catch((): DirectoryView => ({ status: "unavailable", directory: null })),
     ]);
     // Away matches of the family's teams from the official calendar copy (only what the family can ask a seat for).
     const teamCodes = family.state === "ok" ? [...new Set(family.members.flatMap((m) => m.teamCodes))] : [];
     const awayMatches: AwayMatch[] = teamCodes.length ? awayMatchesFor(loadCalendar().events, teamCodes, todayRome()) : [];
-    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [], transport, awayMatches, clubHouse, live };
+    return { roles: session.roles, badge: session.badge, family, callups, fees: fees.state === "ok" ? fees.fees : [], transport, awayMatches, clubHouse, live, staff };
   },
   head: () => accessHead("famiglia"),
   component: FamigliaRoute,
@@ -61,7 +65,7 @@ export const Route = createFileRoute("/famiglia")({
 function FamigliaRoute() {
   const data = Route.useLoaderData();
   if (data.family.state !== "ok" && data.family.state !== "error") return <AccessScreenPage id="famiglia" />;
-  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} clubHouse={data.clubHouse} live={data.live} />;
+  return <FamilyHome roles={data.roles} badge={data.badge} members={data.family.members} callups={data.callups} fees={data.fees} failed={data.family.state === "error"} transport={data.transport} awayMatches={data.awayMatches} clubHouse={data.clubHouse} live={data.live} staff={data.staff} />;
 }
 
 const TONE: Readonly<Record<CallupResponse, ChipTone>> = { CONFIRMED: "ok", DECLINED: "warn", PENDING: "info" };
@@ -70,7 +74,7 @@ function todayRome(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Rome", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
-function FamilyHome({ roles, badge, members, callups, fees, failed, transport, awayMatches, clubHouse, live }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean; transport: FamilyTransport; awayMatches: AwayMatch[]; clubHouse: ClubHouseDesk; live: FamilyLive }) {
+function FamilyHome({ roles, badge, members, callups, fees, failed, transport, awayMatches, clubHouse, live, staff }: { roles: string[]; badge: string | null; members: FamilyMember[]; callups: MyCallup[]; fees: MyFee[]; failed: boolean; transport: FamilyTransport; awayMatches: AwayMatch[]; clubHouse: ClubHouseDesk; live: FamilyLive; staff?: DirectoryView }) {
   const [items, setItems] = useState(callups);
   const pending = items.filter((c) => c.response === "PENDING").length;
   const kids = members.filter((m) => m.relationship !== "SELF");
@@ -131,6 +135,14 @@ function FamilyHome({ roles, badge, members, callups, fees, failed, transport, a
             </ul>
           )}
         </Card>
+
+        {staff?.status === "live" && staff.directory && (
+          <Card id="fam-contatti" title="Contatti della squadra" sub="Lo staff della squadra di tuo figlio e la Segreteria. Il numero c'è solo se la persona lo ha condiviso.">
+            <div className="px-4 pb-4 sm:px-[18px]">
+              <StaffDirectoryList directory={staff.directory} emptyText="Quando la Segreteria collega tuo figlio a una squadra, qui compaiono il mister e i dirigenti." />
+            </div>
+          </Card>
+        )}
 
         {members.length > 0 && <TransportRequestCard members={members} matches={awayMatches} requests={transport.requests} stops={transport.stops} />}
 

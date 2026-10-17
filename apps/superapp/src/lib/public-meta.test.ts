@@ -11,6 +11,7 @@ import {
   type MetaEntry,
   type PageMetaInput,
 } from "./share";
+import { SHOWCASE_SHARE } from "./team-showcase";
 import { VETTA_SHARE } from "./vetta-legnone";
 
 /**
@@ -40,6 +41,7 @@ const ROUTE_HEADS: ReadonlyArray<{ file: string; ref: string; page: PageMetaInpu
   { file: "src/routes/community.tsx", ref: "PUBLIC_PAGES.community", page: PUBLIC_PAGES.community },
   { file: "src/routes/comunicazioni.tsx", ref: "PUBLIC_PAGES.comunicazioni", page: PUBLIC_PAGES.comunicazioni },
   { file: "src/routes/top11.tsx", ref: "PUBLIC_PAGES.top11", page: PUBLIC_PAGES.top11 },
+  { file: "src/routes/classifiche.tsx", ref: "PUBLIC_PAGES.classifiche", page: PUBLIC_PAGES.classifiche },
   { file: "src/routes/rassegna-stampa.tsx", ref: "PUBLIC_PAGES.rassegnaStampa", page: PUBLIC_PAGES.rassegnaStampa },
   { file: "src/routes/fantacalcio.tsx", ref: "PUBLIC_PAGES.fantacalcio", page: PUBLIC_PAGES.fantacalcio },
   { file: "src/routes/guida.tsx", ref: "PUBLIC_PAGES.guida", page: PUBLIC_PAGES.guida },
@@ -60,7 +62,10 @@ const ROUTE_HEADS: ReadonlyArray<{ file: string; ref: string; page: PageMetaInpu
 ];
 
 /** Dynamic public routes that build their page from loader data (still through pageHead). */
-const DYNAMIC_HEADS = ["src/routes/card.$tipo.tsx", "src/routes/eventi.lotteria-dello-sport.tsx"];
+const DYNAMIC_HEADS = ["src/routes/card.$tipo.tsx", "src/routes/eventi.lotteria-dello-sport.tsx", "src/routes/squadre_.$team.tsx"];
+
+/** Vetrina squadre (UD-168): /squadre/prima, /squadre/u19, /squadre/u16 build their head from SHOWCASE_SHARE. */
+const DYNAMIC_PATHS = Object.values(SHOWCASE_SHARE).map((p) => p.path);
 
 /**
  * Public prefixes whose head() is owned elsewhere (PC chat: access, contacts, install, privacy and safeguarding,
@@ -121,7 +126,7 @@ describe("B8 public link previews", () => {
   });
 
   it("every public prefix is covered or explicitly owned elsewhere", () => {
-    const covered = new Set(ROUTE_HEADS.map((r) => r.page.path));
+    const covered = new Set([...ROUTE_HEADS.map((r) => r.page.path), ...DYNAMIC_PATHS]);
     for (const prefix of PUBLIC_PREFIXES) {
       expect(covered.has(prefix) || prefix in PUBLIC_META_ELSEWHERE, prefix).toBe(true);
     }
