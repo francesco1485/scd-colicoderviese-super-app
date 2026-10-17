@@ -554,6 +554,9 @@ html.uv-big .sa-shell { zoom: 1.12; }
 .scd-tick { display: inline-block; animation: scd-tick 240ms var(--ease-out-strong) both; }
 @keyframes scd-live-pulse { 0% { box-shadow: 0 0 0 0 rgb(255 92 92 / 0.65); } 70%, 100% { box-shadow: 0 0 0 9px rgb(255 92 92 / 0); } }
 .scd-live-dot { animation: scd-live-pulse 1.6s ease-out infinite; }
+/* «Sfida della settimana» done (I-261017-05): five small club-colour dots pop up and fade; none with reduced motion. */
+@keyframes scd-cheer { 0% { opacity: 0; transform: translate(0, 8px) scale(0.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--cx, 0), -34px) scale(1); } }
+.scd-cheer { animation: scd-cheer 700ms var(--ease-out-strong) both; }
 
 .scd-ledband {
   background-color: #0b2a5b;
@@ -584,6 +587,7 @@ html.uv-big .sa-shell { zoom: 1.12; }
 
 @media (prefers-reduced-motion: reduce) {
   .scd-tick, .scd-live-dot { animation: none !important; }
+  .scd-cheer { display: none !important; }
   .scd-marquee { overflow-x: auto !important; scrollbar-width: none; }
   .scd-marquee-track { animation: none !important; }
   .scd-marquee-copy, .scd-marquee-btn { display: none !important; }

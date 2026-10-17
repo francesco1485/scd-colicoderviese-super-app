@@ -50,3 +50,9 @@ export function toneAt(i: number): Tone {
   const order: readonly Tone[] = ["navy", "azzurro", "sole"];
   return order[((i % order.length) + order.length) % order.length]!;
 }
+
+/** White home card with a thin metallic top edge (design system "via di mezzo"), shared by the home blocks. */
+export const HOME_CARD =
+  "relative overflow-hidden rounded-[12px] border border-[#d6deeb] bg-white shadow-[0_6px_18px_-14px_rgb(20_38_77/0.55)] before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-[linear-gradient(90deg,#8ea2c6,#ffffff_22%,#b8c5dd_50%,#ffffff_78%,#8ea2c6)] before:content-['']";
+/** Small uppercase kicker of the home blocks. */
+export const HOME_LABEL = "font-display text-[11px] font-bold uppercase tracking-[0.1em] lg:text-[12px]";

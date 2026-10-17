@@ -45,6 +45,9 @@ const PUBLIC_HOME_FILES = [
   "src/components/home/PublicHome.tsx",
   "src/components/home/HomePractical.tsx",
   "src/components/home/HomeLobby.tsx",
+  "src/components/home/HomeGiornoGara.tsx",
+  "src/lib/home-giochi.ts",
+  "src/lib/home-next-game.ts",
   "src/lib/home-week-board.ts",
   "src/components/home/HomePromo.tsx",
   "src/components/home/HomeBordoCampo.tsx",
@@ -101,9 +104,18 @@ describe("public home v5", () => {
     // 16/10 14:46 "via di mezzo": slim strip of the week's games with a separate "In corso" box, affiliation and FIGC
     // membership first with a small "registrati", Oggi in campo, Servizi e club, Dal club; the calendar is a small side
     // tool (month on desktop, week on phone) with the countdown to the next home game.
-    for (const id of ["home-ticker", "home-live-box", "bar-calendario", "bar-allenamenti", "home-profile", "home-countdown", "home-join", "home-training", "home-services", "home-month", "home-week"])
+    for (const id of ["home-ticker", "home-live-box", "bar-calendario", "bar-allenamenti", "home-profile", "home-join", "home-training", "home-services", "home-month", "home-week"])
       expect(lobby).toContain(`data-testid="${id}"`);
     expect(lobby).not.toMatch(/data-testid="home-(board|tabs|feed|inside|video|highlights)"/);
+    // 17/10 I-261017-04/05: «Prossima gara» with the countdown on top of the main column (phone too), then the
+    // challenge of the week and the quiz of the day; static content, no network.
+    expect(lobby).toContain("<HomeNextMatch next={next}");
+    expect(lobby).toContain("<HomeSfidaQuiz");
+    const gara = code("src/components/home/HomeGiornoGara.tsx");
+    for (const id of ["home-countdown", "home-countdown-none", "home-next-match", "home-sfida", "home-quiz", "sfida-fatto"])
+      expect(gara).toContain(`data-testid="${id}"`);
+    expect(gara).toContain("Nessuna gara nei prossimi 14 giorni");
+    expect(gara).not.toMatch(/fetch\(|createServerFn|supabase/);
     // Allenamenti are for members: the bar opens the access screen first.
     expect(lobby).toMatch(/to="\/accedi" search=\{loginSearch\("\/allenamenti"\)\}/);
     // The three marks are transparent and never on a white plate; no photo of the pitch or the centre on the home.

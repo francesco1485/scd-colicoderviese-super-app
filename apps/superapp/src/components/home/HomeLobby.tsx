@@ -10,8 +10,9 @@
  *      Club House hours.
  *   4. Servizi e club — Kit, Club House, Pulmini, Tornei ed eventi.
  *   5. In primo piano — organized slides (HomeSlides): avatar, Iride 24 ore su 24, the day's palinsesto.
- *   Side tool: the calendar is small and collateral (desktop: month with game days; phone: the week), plus the
- *   countdown to the next home game.
+ *   Top of the main column (17/10/2026, I-261017-04/05, HomeGiornoGara): «Prossima gara» of the club with the
+ *   countdown, on phone and desktop, then «Sfida della settimana» and «Quiz del giorno».
+ *   Side tool: the calendar is small and collateral (desktop: month with game days; phone: the week).
  * Data: public calendar and the training timetable only. No minor named, no mascot, no photo of the pitch.
  */
 import { Link } from "@tanstack/react-router";
@@ -34,7 +35,8 @@ import { CLUB_CREDENTIALS } from "@/lib/club-credentials";
 import { CLUB_PROFILE } from "@/lib/club-profile";
 import { crestFor } from "@/lib/crests";
 import { weekBoardEvents } from "@/lib/home-week-board";
-import { romeParts, romeToIso } from "@/lib/home-week";
+import { romeParts } from "@/lib/home-week";
+import { nextGame } from "@/lib/home-next-game";
 import type { PublicEvent, PublicGroup } from "@/lib/public-snapshots";
 import { CLUB_HOUSE_HOURS, PULMINO_ZONES, type PublicTrainingDay } from "@/lib/public-training";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
@@ -70,69 +72,7 @@ function Heading({ id, children, action, sub }: { id: string; children: ReactNod
 
 /* ------------------------------------------------------------ helpers */
 
-/** Rome wall-clock date + time → epoch ms (DST-safe, same helper as the calendar). */
-export function romeMs(date: string, time: string): number {
-  return Date.parse(romeToIso(date, time));
-}
-
-/** "tra 2 giorni e 3 ore" / "tra 4 ore e 10 minuti" / "tra 12 minuti". */
-export function countdownLabel(ms: number): string {
-  const min = Math.max(0, Math.floor(ms / 60_000));
-  const d = Math.floor(min / 1440);
-  const h = Math.floor((min % 1440) / 60);
-  const m = min % 60;
-  const n = (v: number, one: string, many: string) => `${v} ${v === 1 ? one : many}`;
-  if (d > 0) return `tra ${n(d, "giorno", "giorni")}${h ? ` e ${n(h, "ora", "ore")}` : ""}`;
-  if (h > 0) return `tra ${n(h, "ora", "ore")}${m ? ` e ${n(m, "minuto", "minuti")}` : ""}`;
-  return `tra ${n(m, "minuto", "minuti")}`;
-}
-
-/** Countdown split for the digit tiles: whole days, hours and minutes left (never negative). */
-export function countdownParts(ms: number): { d: number; h: number; m: number } {
-  const min = Math.max(0, Math.floor(ms / 60_000));
-  return { d: Math.floor(min / 1440), h: Math.floor((min % 1440) / 60), m: min % 60 };
-}
-
-/** Next home game with a time, from the public calendar. */
-export function nextHome(events: readonly PublicEvent[], nowMs: number): { e: PublicEvent; at: number } | null {
-  const n = nextGame(events, nowMs, { homeOnly: true, horizonDays: Infinity });
-  return n && n.hasTime ? { e: n.e, at: n.at } : null;
-}
-
-export type NextGame = {
-  e: PublicEvent;
-  /** Kick-off in epoch ms (Rome wall clock); start of the day when the time is not known. */
-  at: number;
-  hasTime: boolean;
-  /** Other games of the club at the same date and time. */
-  sameSlot: number;
-};
-
-/**
- * Next game of the club (home or away) from the public calendar, within `horizonDays` (default 14).
- * Games without a time count until the end of their Rome day and sort at the start of it.
- * With `homeOnly` only games in casa with a time are considered (the old nextHome behaviour).
- */
-export function nextGame(
-  events: readonly PublicEvent[],
-  nowMs: number,
-  { homeOnly = false, horizonDays = 14 }: { homeOnly?: boolean; horizonDays?: number } = {},
-): NextGame | null {
-  const limit = nowMs + horizonDays * 86_400_000;
-  let best: { e: PublicEvent; at: number; hasTime: boolean } | null = null;
-  for (const e of events) {
-    if (homeOnly && (e.homeAway !== "CASA" || !e.time)) continue;
-    const hasTime = /^\d{2}:\d{2}$/.test(e.time);
-    const at = romeMs(e.date, hasTime ? e.time : "00:00");
-    const stillOn = hasTime ? at > nowMs : romeMs(e.date, "23:59") > nowMs;
-    if (!stillOn || at > limit) continue;
-    if (!best || at < best.at || (at === best.at && hasTime && !best.hasTime)) best = { e, at, hasTime };
-  }
-  if (!best) return null;
-  const b = best;
-  const sameSlot = events.filter((x) => x !== b.e && x.date === b.e.date && x.time === b.e.time && (!homeOnly || x.homeAway === "CASA")).length;
-  return { ...b, sameSlot };
-}
+export { countdownLabel, countdownParts, nextGame, nextHome, romeMs, type NextGame } from "@/lib/home-next-game";
 
 /** The week's games split for the strip: games being played now go to the "In corso" box, the others scroll. */
 export function splitLive(events: readonly PublicEvent[], nowMs: number): { live: PublicEvent[]; strip: PublicEvent[] } {
@@ -494,16 +434,14 @@ function Services() {
 
 /* ----------------------------------------------------- calendario a lato */
 
-function MonthCard({ events, today, nowMs, groups }: { events: readonly PublicEvent[]; today: string; nowMs: number; groups: readonly PublicGroup[] }) {
+function MonthCard({ events, today }: { events: readonly PublicEvent[]; today: string }) {
   const ym = today.slice(0, 7);
   const gameDays = useMemo(() => new Set(events.filter((e) => e.date.startsWith(ym)).map((e) => Number(e.date.slice(8, 10)))), [events, ym]);
   const cells = monthGrid(ym);
   const todayN = Number(today.slice(8, 10));
   const m = Number(ym.slice(5, 7)) - 1;
-  const next = nextHome(events, nowMs);
-  const ng = next ? groups.find((g) => g.id === next.e.group) : undefined;
   return (
-    <aside className="hidden flex-col gap-4 lg:flex" aria-label="Calendario e prossima gara in casa">
+    <aside className="hidden flex-col gap-4 lg:flex" aria-label="Calendario del mese">
       <div className={`${CARD} p-4`} data-testid="home-month">
         <div className="flex items-baseline justify-between pb-2">
           <span className="font-display text-[19px] font-bold capitalize text-[#14264d]">
@@ -546,17 +484,6 @@ function MonthCard({ events, today, nowMs, groups }: { events: readonly PublicEv
           Apri il calendario
         </Link>
       </div>
-      {next && (
-        <Link to="/calendario" search={{ annata: next.e.group, vista: "settimana" }} className={`${CARD} scd-focus grid gap-1 p-4 hover:border-[#0457af]`} data-testid="home-countdown">
-          <span className={`${LABEL} text-[#0457af]`}>Prossima gara in casa</span>
-          <span className="font-display text-[22px] font-bold leading-none text-[#14264d]">{countdownLabel(next.at - nowMs)}</span>
-          <span className="text-[13px] text-[#52627f]">
-            {groupShort(ng, next.e.category)}
-            {next.e.opponent ? ` · con ${crestFor(next.e.opponent).label}` : ""}
-            {next.e.venue ? ` · ${venueShort(next.e.venue)}` : ""}
-          </span>
-        </Link>
-      )}
     </aside>
   );
 }
@@ -609,6 +536,8 @@ export function HomeLobby({
 }) {
   const nowMs = useMinuteClock(serverNow);
   const week = useMemo(() => weekBoardEvents(calendar.events, today), [calendar.events, today]);
+  // I-261017-04: the next game of the club (home or away, 14 days) on top of the page, phone and desktop alike.
+  const next = useMemo(() => nextGame(calendar.events, nowMs), [calendar.events, nowMs]);
   const slots = useMemo(() => {
     // One item per family, no mascot; no "dirette" promise on the public home (video stays private);
     // the games of the old "Gioca" block are reached from Servizi e club and the menu.
@@ -628,12 +557,14 @@ export function HomeLobby({
       <ClubAffiliation />
       <div className={`${WRAP} grid grid-cols-[minmax(0,1fr)] gap-5 pt-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 lg:pt-6`}>
         <div className="grid min-w-0 gap-5 lg:gap-7">
+          <HomeNextMatch next={next} groups={calendar.groups} nowMs={nowMs} />
+          <HomeSfidaQuiz nowMs={nowMs} today={today} />
           <WeekDays events={calendar.events} today={today} />
           <TodayOnPitch day={training} today={today} nowMs={nowMs} />
           <HomeSlides slots={slots} />
           <Services />
         </div>
-        <MonthCard events={calendar.events} today={today} nowMs={nowMs} groups={calendar.groups} />
+        <MonthCard events={calendar.events} today={today} />
       </div>
       <div className={`${WRAP} pb-6 pt-5 lg:pb-10 lg:pt-7`}>
         <HomeBordoCampo day={today} />
