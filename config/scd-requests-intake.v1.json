@@ -2,8 +2,8 @@
   "version": "1.0.0",
   "effective_at": "2026-10-16",
   "purpose": "Public door of the Vetrina richieste (UD-163, Francesco 16/10/2026 15:44 «Esterni Tally, soci app»): ONE Tally form \"Richieste alla SCD\" for external parties, a branch per kind selected by the hidden field tipo. Members and families never use it (in-app area). Read by apps/superapp/src/lib/intake-links.ts.",
-  "intakeTallyFormUrl": null,
-  "intakeTallyFormUrl_rule": "null until the form exists and Francesco approves it: every link shows «Modulo in preparazione». When set: https://tally.so/r/<formId> only (no query string); the app adds tipo and the allowed non-personal hints.",
+  "intakeTallyFormUrl": "https://tally.so/r/YjDovq",
+  "intakeTallyFormUrl_rule": "Set 17/10/2026: form YjDovq published by Francesco and linked to Make scenario 8002637. Format https://tally.so/r/<formId> only (no query string); the app adds tipo and the allowed non-personal hints. null closes every link («Modulo in preparazione»).",
   "hiddenFields": ["tipo", "torneo", "pacchetto", "sede"],
   "kinds": {
     "torneo": "ISCRIZIONE_TORNEO",

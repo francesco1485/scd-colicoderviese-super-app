@@ -1014,6 +1014,13 @@ Backlog cloud B10. Motori: PERSONE (una famiglia che apre la mappa non legge pi�
 - Motore PERSONE; misura: visite settimanali di /classifiche e del blocco Classifica delle squadre; freschezza ≤ 6 ore (≤ 1 ora nel weekend) dopo l'attivazione dello script.
 - **r116 APPLICATA** (17/10/2026 ~13:35-13:45, SCD PULSE): parti 1-2 con apply_migration; RLS, grant, 4 policy e `scd_public_lnd_results` con execute_sql. Verificato dopo: RLS attiva sulle 4 tabelle, 1 policy ciascuna, anon non inserisce, provvedimenti disciplinari non leggibili da anon, search_path della funzione con pg_temp. Lo script di lettura resta da programmare.
 
+## 17/10/2026 · Modulo d'iscrizione tornei nella zona iscrizioni (UD-163)
+
+Francesco 17/10/2026 00:08: «io voglio che il modulo sia interno al gestionale o esterno pronto nella zona iscrizioni nella piattaforma tornei».
+- `config/scd-requests-intake.v1.json`: `intakeTallyFormUrl` = `https://tally.so/r/YjDovq` (modulo «Richieste alla SCD» pubblicato da Francesco, collegato allo scenario Make 8002637). Tutti i link pubblici e la pagina `/gestionale/richieste` ora puntano al modulo vero.
+- `/tornei`: accanto a «Iscrivi la squadra» compare «Modulo d'iscrizione SCD» per ogni torneo che il modulo conosce (Christmas Lario Cup maschile e female, Memorial José Nasazzi, Memorial Sandro Guattini, anche nella lista «In arrivo»), con `tipo=torneo` e l'id del torneo; nessun dato personale nel link.
+- `/eventi/christmas-lario-cup#iscrizioni`: terzo pulsante «Modulo d'iscrizione SCD» (IT/DE/EN) accanto al sito dell'organizzatore e alla mail.
+- Test aggiornati (`intake-links.test.ts`, `IntakeViews.test.tsx`).
 ## B11 — Testi pubblici senza codici interni: mappa impianti, /impianti, /societa · 2026-10-17
 
 Backlog cloud B11. Motore: PERSONE (una famiglia che apre /impianti legge «in aggiornamento» e «indicativo», non i «da inserire», i nomi delle board o i percorsi del repository). Misura: 0 termini interni nella mappa pubblica dopo aver aperto ogni spazio di Colico e Dervio (test di render).

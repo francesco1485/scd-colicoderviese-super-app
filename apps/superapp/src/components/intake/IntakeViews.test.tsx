@@ -79,7 +79,7 @@ describe("IntakeEntry (first block of /gestionale)", () => {
 
 describe("IntakeLinksCard", () => {
   it("shows 'Modulo in preparazione' for every kind while the Tally form is not set", () => {
-    const html = renderToStaticMarkup(<IntakeLinksCard links={allIntakeLinks()} />);
+    const html = renderToStaticMarkup(<IntakeLinksCard links={allIntakeLinks(null)} />);
     expect(html.match(/Modulo in preparazione/g)?.length).toBe(6);
     expect(html).not.toContain("tally.so");
   });

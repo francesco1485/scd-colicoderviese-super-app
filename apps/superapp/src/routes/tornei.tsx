@@ -25,6 +25,8 @@ import { PosterZoom } from "@/components/scd/PosterZoom";
 import { ShareButton } from "@/components/scd/ShareButton";
 import { ClubCrestOfficial } from "@/components/SiteChrome";
 import { confirmedCount } from "@/lib/events";
+import { INTAKE_TOURNAMENT_IDS } from "@/lib/intake-kinds";
+import { intakeLink } from "@/lib/intake-links";
 import { getActiveInitiatives } from "@/lib/initiatives.functions";
 import { romeDay } from "@/lib/public-window";
 import { pageHead, SHARE_PAGES } from "@/lib/share";
@@ -53,6 +55,9 @@ import {
  *   confirmed guest teams («la tua squadra c'è?»), the official poster once as a thumbnail that enlarges;
  *   «Iscrivi la squadra» opens the organiser's public site in a new tab when registrations live there
  *   (Memorial José Nasazzi 2027, `registerUrl`), otherwise the tournament's internal registration section;
+ * - «Modulo d'iscrizione SCD» (Francesco 17/10/2026 00:08 «modulo … esterno pronto nella zona iscrizioni nella piattaforma
+ *   tornei»): the single public Tally form (UD-163) prefilled with tipo=torneo and the tournament id, next to the
+ *   registration action of every tournament the form knows; hidden while the form is not configured;
  * - tournaments without a published programme: one compact «In arrivo» row each, never an empty trophy card;
  * - «Vivi il Lago»: verified facts about Colico, Forte Montecchio Nord, Dervio and the lake (lib/tournament-hub.ts).
  * No minors' names, no faces, no results: guest teams are club names from the official posters.
@@ -126,6 +131,28 @@ function RegisterLink({ t, className = GOLD_CTA }: { t: TournamentEdition; class
       Iscrivi la squadra
       <ArrowRight className="size-5" aria-hidden="true" />
     </Link>
+  );
+}
+
+/** Link to the club's public registration form for one tournament (null when the form or the id is not known). */
+function IntakeFormLink({ t, light = false, place = "card" }: { t: TournamentEdition; light?: boolean; place?: "hero" | "card" | "coming" }) {
+  if (!(INTAKE_TOURNAMENT_IDS as readonly string[]).includes(t.id)) return null;
+  const link = intakeLink("ISCRIZIONE_TORNEO", { torneo: t.id });
+  if (!link.href) return null;
+  return (
+    <a
+      href={link.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`scd-focus inline-flex min-h-11 items-center gap-1.5 rounded-[12px] px-4 font-display text-[15px] font-semibold ${
+        light ? "text-[#0457af] shadow-[inset_0_0_0_2px_#0457af]" : "text-white shadow-[inset_0_0_0_2px_rgb(255_255_255/0.6)]"
+      }`}
+      data-testid={`tornei-modulo-${place}-${t.id}`}
+    >
+      <ClipboardList className="size-4" aria-hidden="true" />
+      Modulo d'iscrizione SCD
+      <span className="sr-only">(si apre in una nuova scheda)</span>
+    </a>
   );
 }
 
@@ -212,10 +239,17 @@ function Hero({ hero, editions, serverNow }: { hero: TournamentEdition | null; e
         </div>
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
           {hero && <RegisterLink t={hero} />}
+          {hero && <IntakeFormLink t={hero} place="hero" />}
           {/* The hub is shared from the hero; each card shares its own tournament page. */}
           <ShareButton page={SHARE_PAGES.tornei} />
         </div>
       </div>
+      {hero && intakeLink("ISCRIZIONE_TORNEO").available && (
+        <p className="m-0 mt-3 max-w-[60ch] text-[13.5px] leading-snug text-[#dbe5f7]" data-testid="tornei-modulo-nota">
+          Il «Modulo d'iscrizione SCD» è la richiesta alla nostra società (iscrizione, ospitalità, informazioni): ti ricontattiamo noi.
+          Dove c'è un organizzatore esterno, l'iscrizione è confermata quando lui la registra.
+        </p>
+      )}
     </header>
   );
 }
@@ -306,6 +340,7 @@ function TournamentCard({ t }: { t: TournamentEdition }) {
 
       <div className="flex flex-wrap items-center gap-2 border-t border-[#edf1f7] pt-3">
         <RegisterLink t={t} />
+        <IntakeFormLink t={t} light />
         <ShareButton page={sharePage} tone="light" />
       </div>
       <p className="m-0 text-[11.5px] text-[#5b6b85]">Fonte: {t.source}</p>
@@ -333,6 +368,7 @@ function ComingList({ list }: { list: TournamentEdition[] }) {
             <span className="rounded-full bg-[#eef2f8] px-2.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.06em] text-[#13254d]">
               {TOURNAMENT_STATUS_LABEL[t.status]}
             </span>
+            <IntakeFormLink t={t} light place="coming" />
           </li>
         ))}
       </ul>
