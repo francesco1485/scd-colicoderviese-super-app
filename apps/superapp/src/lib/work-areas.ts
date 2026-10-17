@@ -43,6 +43,7 @@ export type WorkAreaId =
   | "planning"
   | "struttura"
   | "intake"
+  | "numeri"
   | "rubrica";
 
 export interface DriveMaster {
@@ -294,6 +295,12 @@ export const WORK_AREAS: Readonly<Record<WorkAreaId, WorkAreaConfig>> = {
     description: "Le richieste che arrivano da fuori in un solo catalogo: iscrizioni ai tornei, sponsor, convenzioni, affitto dei campi, visite ai centri e altro. Decide chi ha il ruolo, il pagamento lo registra la Tesoreria dopo l'accettazione.",
     sources: ["supabase", "inserimenti"],
     insertRoles: ["Direzione", "Segreteria", "Tesoreria"],
+  },
+  numeri: {
+    id: "numeri", label: "Numeri dell'app", path: pathOf("numeri"), railId: "gestionale",
+    description: "Quante pagine dell'app vengono aperte, da dove arrivano le persone (social, Google, QR) e con quale dispositivo. Solo numeri totali, nessun dato delle persone. Solo Direzione.",
+    sources: ["supabase", "inserimenti"],
+    insertRoles: ["Direzione"],
   },
   rubrica: {
     id: "rubrica", label: "Rubrica staff", path: pathOf("rubrica"), railId: "gestionale",

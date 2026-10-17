@@ -18,6 +18,7 @@ import { DESKTOP_CONTENT_CLEARANCE, PHONE_CONTENT_CLEARANCE, SkyChat } from "../
 import { PwaManager } from "../components/PwaManager";
 import { SponsorBand } from "../components/SponsorBand";
 import { CookieConsent } from "../components/CookieConsent";
+import { PageViewTracker } from "../components/PageViewTracker";
 import { GuideTourHost } from "../components/guide/GuideTour";
 import { NextUpBar } from "../components/scd/NextUpBar";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -211,6 +212,8 @@ function RootComponent() {
       <MenuDrawer />
       <SkyChat />
       <PwaManager />
+      {/* Numeri dell'app (UD-169, r143 STAGED): anonymous daily totals of the public pages only, nothing on the device. */}
+      <PageViewTracker />
     </QueryClientProvider>
   );
 }

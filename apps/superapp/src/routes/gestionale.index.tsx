@@ -1,6 +1,7 @@
 import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { IntakeEntry } from "@/components/intake/IntakeViews";
 import { getIntakeSummary, type IntakeSummary } from "@/lib/intake.functions";
+import { getNumeriLive } from "@/lib/page-views.functions";
 import { StagingBanner, WorkAreaGateView } from "@/components/scd/work-area-ui";
 import { GuideTourAuto } from "@/components/guide/GuideTour";
 import { getWorkAreaGate } from "@/lib/work-areas.functions";
@@ -8,6 +9,7 @@ import { EMPTY_QUADRO } from "@/lib/public-snapshots";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
+  BarChart3,
   Building2,
   CalendarRange,
   ChevronLeft,
@@ -73,10 +75,13 @@ export const Route = createFileRoute("/gestionale/")({
     const cal = loadCalendar();
     const { quadro: q } = gate.view === "page" ? await getTrainingQuadro() : { quadro: EMPTY_QUADRO };
     const intake: IntakeSummary = gate.view === "page" ? await getIntakeSummary() : { state: "none", formReady: false };
-    if (gate.view !== "page") return { gate, interior: false, groups: [], events: [], sourceModifiedAt: cal.sourceModifiedAt, season: cal.season, slots: q.slots, days: q.days, quadroUTC: q.generatedUTC, quadroNote: q.note, intake };
+    // Numeri dell'app (UD-169): entry only for the Direzione and only when r143 answers («Niente pagine vuote»).
+    const numeri = gate.view === "page" ? await getNumeriLive() : false;
+    if (gate.view !== "page") return { gate, interior: false, numeri, groups: [], events: [], sourceModifiedAt: cal.sourceModifiedAt, season: cal.season, slots: q.slots, days: q.days, quadroUTC: q.generatedUTC, quadroNote: q.note, intake };
     return {
       gate,
       intake,
+      numeri,
       interior: gate.view === "page",
       groups: cal.groups,
       events: cal.events,
@@ -125,6 +130,7 @@ function GestionalePage() {
     quadroUTC,
     quadroNote,
     intake,
+    numeri,
   } = Route.useLoaderData();
   const now = useRomeNow();
   const [offset, setOffset] = useState(0);
@@ -196,6 +202,8 @@ function GestionalePage() {
         <PlanningEntry />
 
         <StrutturaEntry />
+
+        {numeri && <NumeriEntry />}
 
         <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[300px_minmax(0,1fr)]">
           <Card
@@ -513,6 +521,27 @@ function StrutturaEntry() {
         Apri
         <ChevronRight className="size-4" strokeWidth={2.2} aria-hidden="true" />
       </span>
+    </Link>
+  );
+}
+
+/** Entry to "Numeri dell'app" (UD-169): Direzione only, anonymous page-view totals (r143 STAGED). */
+function NumeriEntry() {
+  return (
+    <Link
+      to="/gestionale/numeri"
+      className="scd-focus flex items-center gap-4 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 shadow-[var(--in-card-shadow)] transition-colors duration-150 hover:bg-[var(--in-info-bg)] sm:px-6"
+    >
+      <span className="flex size-12 flex-none items-center justify-center rounded-xl bg-[var(--in-info-bg)] text-[var(--in-info)]">
+        <BarChart3 className="size-6" strokeWidth={1.8} aria-hidden="true" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[18px] font-bold leading-tight">Numeri dell'app</span>
+        <span className="mt-1 block text-[14.5px] leading-snug text-[var(--in-sub)]">
+          Quante visite, da quali social e con quale dispositivo. Solo numeri totali. Solo Direzione.
+        </span>
+      </span>
+      <ChevronRight className="size-5 flex-none text-[var(--in-info)]" strokeWidth={2.2} aria-hidden="true" />
     </Link>
   );
 }

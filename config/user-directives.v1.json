@@ -4101,6 +4101,37 @@
       "status": "RECORDED"
     },
     {
+      "sourceDate": "2026-10-16",
+      "sourceTime": "22:34; 23:35",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-169",
+      "name": "NUMERI_DELL_APP_ACCESS_AND_SOURCE_COUNTS_FOR_THE_DIREZIONE",
+      "sourceQuoteFragments": [
+        "area dove dobbiamo sapere quanti accessi sono stati fatti, quanti sono arrivati sopra all'app",
+        "capiamo come migliorare",
+        "a"
+      ],
+      "normalizedCommand": {
+        "rule": "An internal area tells the Direzione how many visits the app receives and where people arrive from, to understand how to improve it. Implemented as anonymous daily totals of the public pages per page, source (direct, Instagram, Facebook, TikTok, WhatsApp, Google, QR, other) and device (phone, tablet, desktop): no cookie, no identifier, no personal or minors' data, unique visitors not counted, internal and reserved areas never counted, rows deleted after 25 months. Page /gestionale/numeri, Direzione only. Migration r143 STAGED on branch feat/app-numeri.",
+        "scope": "APP_USAGE_NUMBERS",
+        "engines": "PERSONE (families and fans reaching the app, from which social) and SOLDI (real audience numbers for sponsors)",
+        "measure": "weekly visits, share from social, share from phone, top 10 public pages (scd_app_page_views_daily via scd_app_stats)",
+        "status": "IMPLEMENTED_ON_BRANCH_NOT_PUBLISHED",
+        "decision": {
+          "sourceDate": "2026-10-16",
+          "sourceTime": "23:35",
+          "sourceQuote": "a",
+          "status": "DECIDED",
+          "rule": "Option A: cookieless anonymous daily totals without consent (nothing read or stored on the device, aggregated counts only). Cookie banner and /privacy updated on the same branch (commit 11c8739 and the review fixes); legal basis stated on /privacy: legitimate interest in measuring the use of the public pages in aggregated form."
+        },
+        "pending": [
+          "«applica r143» for the migration (not applied)"
+        ]
+      },
+      "status": "RECORDED"
+    },
+    {
       "sourceDate": "2026-10-17",
       "sourceTime": "08:09",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
