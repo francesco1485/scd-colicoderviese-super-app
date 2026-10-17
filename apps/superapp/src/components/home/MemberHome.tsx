@@ -42,6 +42,8 @@ import {
 } from "@/components/universe/Feed";
 import type { ReportReason } from "@/lib/moderation";
 import { TeamPicker } from "@/components/universe/TeamBar";
+import { CroviWelcome } from "@/components/home/CroviWelcome";
+import { nextHome } from "@/components/home/HomeLobby";
 import type { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import type { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
 import { CLUB_EVENTS, clubEventsOn } from "@/lib/club-events";
@@ -407,6 +409,12 @@ export function MemberHome({
         ? `Ultima copia verificata del ${freshnessLabel(calendar.sourceModifiedAt)}`
         : `Copia di sicurezza del ${freshnessLabel(calendar.sourceModifiedAt)}`;
   const clubChannel = channel("club");
+  // UD-186: the Crovi card lives inside (tesserati, convocati, famiglie); a match is named only from the public
+  // calendar (next home game with a confirmed time). Later: who is at the pitch right now.
+  const croviMatch = useMemo(() => {
+    const n = nextHome(calendar.events, nowMs);
+    return n && n.e.timeConfirmed ? { date: n.e.date, time: n.e.time, opponent: n.e.opponent } : null;
+  }, [calendar.events, nowMs]);
 
   return (
     <main
@@ -454,6 +462,7 @@ export function MemberHome({
         </p>
       )}
       <UrgentNotices items={alerts} />
+      <CroviWelcome nowMs={nowMs} match={croviMatch} />
       <ClubNoticeCard notice={notice} />
       <MyWeek
         entries={myWeek}

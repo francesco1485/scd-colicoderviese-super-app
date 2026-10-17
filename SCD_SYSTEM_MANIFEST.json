@@ -1775,6 +1775,31 @@
         "imported_at": "2026-10-11"
       },
       {
+        "id": "SCD_FRONT_PAGE_DAILY",
+        "kind": "INTERNAL_AGENT_EDITORIAL",
+        "trust": "AGENT_VERIFIED_ITEMS_ONLY",
+        "status": "ACTIVE",
+        "title": "Prima pagina del giorno del Super Giornalista (UD-187)",
+        "account": "github.com/francesco1485/scd-colicoderviese-super-app",
+        "resource_id": "git branch data/front-page, file front-page.json",
+        "authority_domains": [
+          "PUBLIC_HOME_EDITORIAL"
+        ],
+        "consumers": [
+          "apps/superapp/src/lib/front-page.functions.ts (server read, 5 min cache)",
+          "apps/superapp/src/components/home/FrontPage.tsx"
+        ],
+        "rules": [
+          "WRITTEN_ONLY_BY_SCHEDULED_TASK_SCD_PRIMA_PAGINA_TO_DATA_BRANCH",
+          "NO_DATABASE_WRITE_FROM_THE_AGENT",
+          "SHOWN_ONLY_ON_ITS_OWN_ROME_DAY",
+          "VERIFIED_ITEMS_ONLY",
+          "INTERNAL_LINKS_ONLY",
+          "PERSONAL_DATA_PATTERNS_DROPPED",
+          "DIREZIONE_SWITCH_OFF_REWRITES_FILE_OFF_TRUE"
+        ]
+      },
+      {
         "id": "MASTER_CALENDARIO_2026_27",
         "kind": "INTERNAL_VERIFIED_DOCUMENT",
         "trust": "INTERNAL_VERIFIED",
@@ -2794,7 +2819,7 @@
         "faces": ["accoglienza-chef", "volto-sponsor", "mentore-tornei", "sky"],
         "faces_registry": "apps/superapp/src/lib/cast-personas.ts CAST_FACES (2-3 actions on registered routes, 'Chiedi a Iride')",
         "tip_only": ["era", "acanfora", "preparatore-atletico", "mental-coach", "musica-relax"],
-        "absorbed_by_vera": ["biglietteria", "crovi: no longer absorbed since UD-184 (v3 APPROVED 17/10/2026, public general chat and home welcome card)"]
+        "absorbed_by_vera": ["biglietteria", "crovi: no longer absorbed since UD-184 (v3 APPROVED 17/10/2026, public general chat; welcome card on the member home since UD-186, public home: floating chat only)"]
       },
       "named": {
         "era": "NUTRIZIONISTA_TIP_OF_THE_DAY_ONLY",
@@ -2811,7 +2836,7 @@
         "volto-sponsor"
       ],
       "new_roles_presence": "UD118_FACE_OR_TIP_ONLY_OR_ABSORBED_NO_PORTRAIT_NO_VOICE_NAMES_TBD_AS_ROLE_LABELS",
-      "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era ON_HOLD until a new Direzione-approved image; vera = Iride APPROVED 15/10/2026 (cast/iride; legacy cast/genny stays ON_HOLD, not shown); Crovi v3 APPROVED 17/10/2026 (UD-184): chat avatar crovi-avatar-256.webp and home welcome card",
+      "portraits": "SHOWN_ONLY_WHEN_READY_AND_REGISTERED_APPROVED; era ON_HOLD until a new Direzione-approved image; vera = Iride APPROVED 15/10/2026 (cast/iride; legacy cast/genny stays ON_HOLD, not shown); Crovi v3 APPROVED 17/10/2026 (UD-184): chat avatar crovi-avatar-256.webp and member-home welcome card (UD-186)",
       "voices": "NONE_UNTIL_DIREZIONE_APPROVES_ORIGINAL_SYNTHETIC_VOICE_NOT_TIED_TO_A_REAL_PERSON",
       "safety_rule": "DISTRESS_FIXED_REFERRAL_NO_THERAPY (cast-safety.ts; rules engine and AI pre-router)",
       "area_personas": {

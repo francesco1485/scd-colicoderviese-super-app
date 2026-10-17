@@ -6,6 +6,8 @@ import { getPublicCalendarSnapshot } from "@/lib/calendar.functions";
 import { getPublicFeed, getPublicSchedule } from "@/lib/club.functions";
 import type { PublicFeed } from "@/lib/club.types";
 import { getClubNotice } from "@/lib/club-notice.functions";
+import { EMPTY_FRONT_PAGE, type FrontPage } from "@/lib/front-page";
+import { getFrontPage } from "@/lib/front-page.functions";
 import {
   getMyHomeScope,
   type HomePreview,
@@ -82,6 +84,9 @@ export const Route = createFileRoute("/")({
       // Board home (VR-009, 15/10): "Mondo Colico" is the vetrina of the day; news are not shown (no waiting for them).
       // getVetrina also gives the server Rome day (QA day honoured outside production) that seeds the LED wall.
       const trainingP = getPublicTrainings().catch(() => null);
+      // UD-187: the Super Giornalista's front page of the day (data/front-page); empty until the agent publishes, never invented.
+      const noFront = { day: today, page: EMPTY_FRONT_PAGE };
+      const frontP = withBudget<{ day: string; page: FrontPage }>(getFrontPage().catch(() => noFront), FEED_BUDGET_MS, noFront);
       const vetrina: VetrinaDay = await getVetrina({
         data: { pressRecent: false },
       }).catch((): VetrinaDay => ({ today, worlds: EMPTY_WORLDS }));
@@ -92,6 +97,7 @@ export const Route = createFileRoute("/")({
         feed: await feedP,
         notice: await noticeP,
         training: await trainingP,
+        front: await frontP,
         serverNow,
         today,
       };
@@ -144,6 +150,8 @@ function Home() {
       feed={data.feed}
       notice={data.notice}
       training={data.training}
+      front={data.front.page}
+      frontDay={data.front.day}
       nowMs={data.serverNow}
       today={data.today}
     />

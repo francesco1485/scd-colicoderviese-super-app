@@ -1,5 +1,6 @@
 /**
- * Crovi at the top of the public home (UD-184, Francesco DG 17/10/2026 14:08: «Io voglio vedere in prima pagina app
+ * Crovi's card on the member home for tesserati, convocati and families (UD-186, 17/10/2026 16:23: on the public home
+ * Crovi is only the floating chatbot). First placed at the top of the public home (UD-184, Francesco DG 17/10/2026 14:08: «Io voglio vedere in prima pagina app
  * super web il crovi»; 15/10: «Crovi è avatar + chatbot in cima alla home; divertente da parlarci; si possono chiedere
  * cose o segnalare risultati velocemente; internamente passa la palla agli altri personaggi come un centralinista»).
  *

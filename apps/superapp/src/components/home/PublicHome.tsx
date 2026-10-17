@@ -2,13 +2,15 @@
  * Signed-out public home on board VR-009 (UD-133, then UD-134 Francesco 15/10/2026 09:18).
  *
  * Rebuilt from scratch on the Eurobet structure (Francesco 15/10/2026 22:04): urgent notices (R20 alerts, only when
- * there are) → Crovi's card (UD-184: avatar + chat entry, CroviWelcome) → the one club communication chosen by the Direzione → HomeLobby (team chips, one static match banner,
+ * there are) → the one club communication chosen by the Direzione → HomeLobby (live box + Colico weather on top, team chips, one static match banner,
  * "In programma" event cards, "Dal club", services, "Perché la ColicoDerviese"; desktop right rail "Entra nel club")
  * → weekend results (only with a real source;
  * "Vittoria" and confetti only on a ColicoDerviese win) → footer ("Chi sei?" removed, UD-152). Partners scroll in the fixed SponsorBand on every
  * page; the LED spot, the partner of the month and partner news live on /sponsor (PartnerBand). No stories.
  * Palette: navy #0b2a5b, blue #1556c4, light #eef3f9, white; yellow #ffd600 for changes and the main CTA.
  * Real assets only (public/media); no minor is named.
+ * UD-186 (Francesco DG 17/10/2026 16:23): Crovi stays on the public home only as the floating chatbot (SkyJolly), no
+ * card or bar; the top goes back to live games and weather; the Crovi card moves inside, on the member home.
  */
 import { useMemo } from "react";
 
@@ -19,8 +21,9 @@ import { urgentNotices } from "@/lib/home-today";
 import type { VetrinaSlot, VetrinaWorld } from "@/lib/vetrina";
 import type { PublicTrainingDay } from "@/lib/public-training";
 
-import { CroviWelcome } from "@/components/home/CroviWelcome";
-import { HomeLobby, nextHome } from "@/components/home/HomeLobby";
+import { FrontPage } from "@/components/home/FrontPage";
+import { HomeLobby } from "@/components/home/HomeLobby";
+import { EMPTY_FRONT_PAGE, type FrontPage as FrontPageData } from "@/lib/front-page";
 import {
   ClubNoticeCard,
   UrgentNotices,
@@ -38,6 +41,8 @@ export function PublicHome({
   feed = null,
   notice = null,
   training = null,
+  front = EMPTY_FRONT_PAGE,
+  frontDay,
   nowMs,
   today,
 }: {
@@ -50,6 +55,10 @@ export function PublicHome({
   notice?: ClubNotice | null;
   /** Public training evening (UD-140): timetable only, from getPublicTrainings. */
   training?: PublicTrainingDay | null;
+  /** UD-187: the Super Giornalista's front page of the day (data/front-page, VERIFIED items only); hidden when empty. */
+  front?: FrontPageData;
+  /** Rome day of the front page (server day, QA day honoured). */
+  frontDay?: string;
   nowMs: number;
   today: string;
 }) {
@@ -58,11 +67,6 @@ export function PublicHome({
     [feed, nowMs],
   );
   const results = useMemo(() => weekendResults(feed, today), [feed, today]);
-  // Crovi names a match only from the public calendar: the next home game with a confirmed time (UD-184).
-  const croviMatch = useMemo(() => {
-    const n = nextHome(calendar.events, nowMs);
-    return n && n.e.timeConfirmed ? { date: n.e.date, time: n.e.time, opponent: n.e.opponent } : null;
-  }, [calendar.events, nowMs]);
   // Order (16/10/2026 07:05–07:36): urgent notices → the one club communication → HomeLobby (games bar, club,
   // "Stasera al campo", "In che anno sei nato?", "Gioca con la ColicoDerviese", "Dal club") → weekend results.
   return (
@@ -75,9 +79,19 @@ export function PublicHome({
         S.C.D. ColicoDerviese, il club di calcio di Colico e Dervio
       </h1>
       <UrgentNotices items={alerts} />
-      <CroviWelcome nowMs={nowMs} match={croviMatch} />
-      <ClubNoticeCard notice={notice} />
-      <HomeLobby calendar={calendar} vetrina={vetrina} training={training} nowMs={nowMs} today={today} />
+      <HomeLobby
+        calendar={calendar}
+        vetrina={vetrina}
+        training={training}
+        nowMs={nowMs}
+        today={today}
+        lead={
+          <>
+            <FrontPage page={front} today={frontDay ?? today} />
+            <ClubNoticeCard notice={notice} />
+          </>
+        }
+      />
       <WeekendResults rows={results} />
     </main>
   );

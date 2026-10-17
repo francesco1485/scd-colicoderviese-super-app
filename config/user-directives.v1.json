@@ -4391,6 +4391,50 @@
         ],
         "measure": "removed documents older than the season end still stored = 0 after the clean-up job is approved"
       }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "16:23",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-186",
+      "name": "CROVI_CHATBOT_ONLY_ON_PUBLIC_HOME_TOP_LIVE_AND_WEATHER",
+      "sourceQuoteFragments": [
+        "il crovi nella app iniziale lascia solo come chatboat non una barra cosi",
+        "li in alto era bello come inizio vedere live diretta e info meteo",
+        "andare a inserire poi dentro tesserati o convocati e poi man mano riempire in futuro con chi è al campo"
+      ],
+      "normalizedCommand": {
+        "rule": "On the public home Crovi is only the floating chatbot (SkyJolly launcher opening the one app chat): no Crovi card or bar. The top of the public home opens on the live box (games in play, always visible on phones) with the Colico weather now, then the week games strip. The Crovi card (CroviWelcome: cut-out, line of the moment, «Chiedi a Crovi…», chips) moves inside, on the member home for tesserati, convocati and families, after the urgent notices. Future: fill it with who is at the pitch right now.",
+        "scope": "SUPER_APP components/home/PublicHome.tsx, HomeLobby.tsx (WeekStrip live box + ColicoNowChip), MemberHome.tsx, CroviWelcome.tsx",
+        "supersedes": "UD-184 only for the position of the Crovi card on the public home (chat persona and hand-offs unchanged)",
+        "engine": "PERSONE",
+        "measure": "public home first screen shows live box + weather; Crovi chat opens from the launcher per visit; Crovi card chat opens on the member home",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "branch feat/home-top-live-weather (PR #201), carried into feat/front-page-agent with UD-187; lib/public-home.test.ts updated"
+      }
+    },
+    {
+      "sourceDate": "2026-10-17",
+      "sourceTime": "16:36",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-187",
+      "name": "SUPER_GIORNALISTA_FRONT_PAGE_ONLINE_EVERY_MORNING",
+      "sourceQuoteFragments": [
+        "io mi sono affidato ad un agente che avevo chiesto di creare e essere sempre sulla prima pagina web app ma non vedo nulla",
+        "la pagina iniziale app doveva essere una esplosione di idee e informazioni ragionate",
+        "Da sola, solo voci VERIFIED (16:40)"
+      ],
+      "normalizedCommand": {
+        "rule": "The Super Giornalista's Prima pagina of the day goes online by itself on the public home every morning, right under the live + weather band: one apertura, up to four brevi, the question of the day (one tap opens the club chat with the answer), then persone / sponsor / dentro l'app. VERIFIED items only. Channel (scd-sicurezza 17/10/2026): the agent commits one file front-page.json to the data branch data/front-page, never a database write; the server reads it and shows it only on its own Rome day, through a whitelist parser and a personal-data filter. Switch-off: «spegni la prima pagina» in chat rewrites the file with off: true. With no file for the day the block is not shown (no invented story). The Google Doc draft in 02_BOZZA_PRONTA stays as the newsroom copy.",
+        "scope": "SUPER_APP components/home/FrontPage.tsx, PublicHome.tsx, HomeLobby.tsx (lead slot), routes/index.tsx loader, lib/front-page.ts, lib/front-page.functions.ts; data branch data/front-page (front-page.json); .claude/agents/scd-super-giornalista.md; scheduled task «SCD Prima pagina · Super Giornalista» (Supabase connector removed)",
+        "supersedes": "the 'drafts only, never change the app' boundary of the Super Giornalista for the front page items (social posting stays draft-only)",
+        "engine": "PERSONE",
+        "measure": "days with an apertura online; items online per day; app visits from the home front page",
+        "implementationStatus": "IMPLEMENTED",
+        "implementation": "branch feat/front-page-agent (PR to staging/superapp); tests lib/front-page.test.ts; no migration"
+      }
     }
   ],
   "completionGate": {

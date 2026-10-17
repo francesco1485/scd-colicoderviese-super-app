@@ -1037,3 +1037,13 @@ Backlog cloud B11. Motore: PERSONE (una famiglia che apre /impianti legge «in a
 ## 17/10/2026 15:06 · Conservazione documenti squadra (UD-185, r119 APPLICATA)
 
 Decisione di Francesco (DG): «Tenere fino al 30 giugno 2027». Referti e distinte rimossi restano illeggibili per tutti e il file resta conservato fino al 30 giugno della stagione in cui è stato rimosso (2026/27: 30/06/2027); solo dopo diventa candidato alla pulizia. Nessuna cancellazione automatica: la pulizia resta da approvare. Migrazione `r119_team_docs_retention_season.sql` applicata il 17/10/2026 dopo «Applica r119» (verificato: fine stagione 30/06/2027, funzione solo per il sistema).
+
+## 2026-10-17 — chat cloud — Home: Crovi solo chat, in cima live + meteo, «La prima pagina» del Super Giornalista online ogni mattina (UD-186, UD-187)
+
+Francesco DG 16:23 «il crovi… lascia solo come chatbot… in alto vedere live diretta e info meteo»; 16:36 «mi sono affidato ad un agente… essere sempre sulla prima pagina web app ma non vedo nulla»; 16:40 «Da sola, solo voci VERIFIED».
+
+- Engine: PERSONE. Measure: days with an apertura online; app visits from the home front page.
+- Public home: CroviWelcome card removed (Crovi = floating chat); the live box is always visible on phones with «Colico adesso» weather (`ColicoNowChip`); the Crovi card moves to the member home after the urgent notices.
+- `components/home/FrontPage.tsx`: right under the live band — apertura (drawn navy/blue band, yellow kicker, CTA), up to 4 brevi (horizontal scroll on phones, columns by count), domanda del giorno (each answer, or «Rispondi in chat», opens the club chat), persone/sponsor/app. Hidden when the day has no file.
+- Channel (scd-sicurezza review): the agent commits `front-page.json` to the data branch `data/front-page`; no database write, no Supabase connector for the agent. `lib/front-page.functions.ts` reads it (no redirects, 4 s timeout, 32 KB cap, 5 min cache); `lib/front-page.ts` shows it only on its own Rome day, VERIFIED items only, internal links split into path/search/hash for the router, personal-data patterns dropped. Switch-off: `"off": true`.
+- `.claude/agents/scd-super-giornalista.md`: publish step and the single exception to «drafts only»; source `SCD_FRONT_PAGE_DAILY` in the manifest; tests `lib/front-page.test.ts`, public-home tests updated.
