@@ -36,7 +36,7 @@ Hand the item to the owner role agent with: the facts (quoted as data), the MANS
 - **Esegue** — when the action is in its «Da solo» column: reversible and authorised (Gmail draft, Drive file in 02_BOZZA_PRONTA, calendar event without invitees on «SCD Programma 2026/27» per UD-141, proposal in the app queue via `scd_proposal_ingest` with a stable `sourceRef`, a knowledge candidate for Iride, a branch + PR for code). Status `ESEGUITA` only when the result is verified (open the link, read back the row).
 - **Prepara la decisione** — everything the person must only press or sign; status `IN_ATTESA` (named role, e.g. «in attesa di Responsabile pulmini») or `SERVE_OK_DIREZIONE` (money, contracts, sensitive data, minors, roles, tesseramenti, presenze).
 - **Dice cosa manca** — `NON_ESEGUIBILE` with the missing piece (data, source, permission) and who can give it.
-Fields, calendars, trainings, rotations: any ONE of Formigari, Tuttorosa, Francesco Coppola approves; if the requester is one of them, the change is already approved (MANSIONARIO §2).
+Fields, calendars, trainings, rotations: any ONE of the three approver roles (Responsabile attività di base, Coordinatore attività sportive, Direttore Generale; names only in the private Rubrica staff, SCD PULSE `scd_structure_roles`) approves; if the requester is one of them, the change is already approved (MANSIONARIO §2).
 Never: send mail or messages to third parties, pay, change roles/permissions/tesseramenti/presenze/sensitive documents/safeguarding, publish, apply migrations, edit active Make scenarios.
 
 ## 4. Write the outcome back (the contract Iride v4.4 reads)
@@ -54,11 +54,13 @@ Append-only: the loop **never edits** a row written by Make; it appends one new 
 | `FILE_NAME` | proof label, e.g. `bozza Gmail`, `pagina app`, `foto schermo` |
 | `LINK_ID` | proof link the requester may open (app page, public page); internal links (Drive, Gmail draft, PR) only when the requester is staff with access; otherwise `interno` |
 | `ROLE_SCOPE` | role that owns the next step (for `IN_ATTESA` the awaited role; for `SERVE_OK_DIREZIONE` `DIREZIONE`) |
-| `ROUTING_RULE` | `SCD-UFFICIO-v1 · agente <scd-xxx> · avviso DA_AVVISARE` (or `avviso NESSUNO` when the requester must not be told yet, e.g. internal drafts) |
+| `ROUTING_RULE` | `SCD-UFFICIO-v1 · agente <scd-xxx> · avviso DA_APPROVARE` while the human-ok gate below holds, `avviso DA_AVVISARE` only after a human ok (or `avviso NESSUNO` when the requester must not be told yet, e.g. internal drafts) |
 | `STATUS` | exactly one of `ESEGUITA`, `IN_ATTESA`, `SERVE_OK_DIREZIONE`, `NON_ESEGUIBILE`, `ERRORE_CORRETTO` |
 | `NOTES` | `ESITO: <cosa è stato fatto, max 200> \| COME: <come, max 150> \| PROSSIMO: <prossimo passo per chi ha chiesto, max 150> \| ATTESA: <ruolo o ->` — never health details, minors' names, phone numbers, IBAN or codice fiscale |
 
-**What Iride v4.4 must read (PROPOSED design for the PC chat, Make scenario change needs Francesco's OK, UD-155):**
+**Human-ok gate (in force now; security review of PR #191, 17/10/2026).** Until Francesco approves Iride v4.4, nothing written by an agent reaches a requester automatically: every `ESITO` / `COME` / `PROSSIMO` text and every `ERRORE_CORRETTO` correction goes out **only after a human ok** (Segreteria or Direzione, the role named in `ROLE_SCOPE`), and always as the **fixed template** below with **short filtered fields**: `ESITO` max 200, `COME` and `PROSSIMO` max 150 characters, plain words only — **no names of minors, no numbers** (no phone numbers, amounts, dates of birth, codes other than the request code), no health details, no IBAN or codice fiscale. A field that fails the filter is replaced by «dettagli dalla Segreteria» and the row gets `avviso NESSUNO`. While the gate is in force the loop writes `avviso DA_APPROVARE` instead of `avviso DA_AVVISARE`; the human who approves switches it.
+
+**What Iride v4.4 must read — auto-send design, PROPOSED (not active: needs the PC chat's agreement and Francesco's OK on the Make scenario, UD-155; until then the human-ok gate above applies):**
 - Trigger: a scheduled watch (every 15 min, 08:00–21:00) on `INTAKE_LOG` rows with `CATEGORY` = `UFFICIO_ESITO` and `ROUTING_RULE` containing `avviso DA_AVVISARE`.
 - De-duplication: in data store 221453 (record of the code) field `esito_avvisato_il`; notify only when the row `TIMESTAMP` is later. For codes without a 221453 record (`WA-…`, `UF-…`), the requester is the `LINK_ID` (`whatsapp:+…`) of the first row with that `REQUEST_ID`.
 - Fixed texts built by Make (no AI, like the AM- outcomes), within the 24-hour window as free text, otherwise template or mail to the Segreteria:
@@ -70,11 +72,11 @@ Append-only: the loop **never edits** a row written by Make; it appends one new 
 - After sending, Iride appends one row `CATEGORY` = `IRIDE_AVVISO`, same `REQUEST_ID`, `STATUS` = `AVVISATO` (or `NON_AVVISATO` + reason, e.g. outside the window without template), and sets `esito_avvisato_il`.
 - Requesters who are minors: the notice goes to the parent only (Iride rules 5 and 14). Requests from the app: the outcome is shown in the app queue, not on WhatsApp.
 
-Until the PC chat (owner of SCD_INTAKE_LOG and Make, AGENTS.md SCD:SESSIONI) agrees to the append-only `UFFICIO_ESITO` rows, the loop runs in **mode A**: outcomes go into the app queue (`scd_proposal_ingest`, `sourceRef` = `ufficio:<REQUEST_ID>:<status>`) and the run report; **mode B** (rows in the log) starts after that agreement and Francesco's OK on Iride v4.4.
+Until the PC chat (owner of SCD_INTAKE_LOG and Make, AGENTS.md SCD:SESSIONI) agrees to the append-only `UFFICIO_ESITO` rows, the loop runs in **mode A**: outcomes go into the app queue (`scd_proposal_ingest`, `sourceRef` = `ufficio:<REQUEST_ID>:<status>`) and the run report; **mode B** (rows in the log) starts after that agreement and Francesco's OK on Iride v4.4. In both modes the human-ok gate holds until that OK.
 
 ## 5. Errors: tell, apologise once, fix, finish, learn (Francesco 17/10 11:58)
 When the loop finds that an agent or Iride made a mistake (wrong recipient, wrong team, missed authorisation, wrong info):
-1. write the correction plainly for the affected person and apologise once (status `ERRORE_CORRETTO`, Iride sends it; for staff mail: a Gmail draft «Correzione: …» ready for the Segreteria);
+1. write the correction plainly for the affected person and apologise once (status `ERRORE_CORRETTO`; it goes out only after a human ok, as the fixed template with filtered fields of §4, until Iride v4.4 is approved; for staff mail: a Gmail draft «Correzione: …» ready for the Segreteria);
 2. fix it now, or propose the simplest correct path («vuoi autorizzare tu, così la procedura si semplifica?»);
 3. keep the original request going to completion;
 4. add the case to `docs/memoria/<stagione>/cose-imparate.md` (what, why, fix, proposed rule) and a `Serve ok` row in `docs/piattaforme/IDEE.md`.

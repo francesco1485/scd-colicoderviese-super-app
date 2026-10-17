@@ -18,17 +18,19 @@ Fonti: iscrizioni sul portale LND 2026/27 (codici tra parentesi), partecipazione
 | Piccoli Amici | 2020 + 2021 | sì | Picc. Amici Sondrio aut. (PA) | VERIFIED; la dicitura «Sondrio» del codice va verificata (delegazione/girone) |
 
 ## Staff tecnico (Direzione 17/10/2026)
+Solo ruoli: per ogni casella «→ Rubrica staff» il nome sta nella Rubrica staff (SCD PULSE scd_structure_roles, privata). Il repository è pubblico.
+
 | Squadra | Mister | Secondo | Dirigenti e altri |
 |---|---|---|---|
-| Prima Squadra | Mastrolonardo Agostino | Bonacina Matteo | Team manager Sinopoli Salvatore; preparatore atletico Conforti Alessandro; preparatore portieri Tramuzzi Stefano; DS Dell'Orto Luca |
-| Juniores U19 Élite | Bertaglia | Tuttorosa Giuseppe | Bettiga Bruno, Galluccio Antonio |
-| U16 Élite | Dell'Adamino Ambrogio | Valentini Simone | Marieni Raoul |
-| U15 Giovanissimi | Fumagalli Fulvio | Quintero | Rusconi Antonello |
-| Esordienti 2014 | Pagliuca | Acerboni Cristian | — |
-| Esordienti 2015 | Olivetti Mauro Ariel | Vecchi Ruggero | Dego Michele |
-| Pulcini 2016-2017 | Da Silva Gasparini Gian Luca | Riva Alan | Girotti Davide |
-| Primi Calci 2018-2019 | Ciminelli Enzo Daniel | Maglia Filippo | Dell'Oca Roberto (INFERRED) |
-| Piccoli Amici 2020-2021 | Perico | Maglia Pietro | — |
+| Prima Squadra | → Rubrica staff | → Rubrica staff | Team manager, preparatore atletico, preparatore portieri, DS → Rubrica staff |
+| Juniores U19 Élite | → Rubrica staff | → Rubrica staff (è anche il Coordinatore attività sportive) | 2 dirigenti → Rubrica staff |
+| U16 Élite | → Rubrica staff | → Rubrica staff | 1 dirigente → Rubrica staff |
+| U15 Giovanissimi | → Rubrica staff | → Rubrica staff | 1 dirigente → Rubrica staff |
+| Esordienti 2014 | → Rubrica staff | → Rubrica staff | — |
+| Esordienti 2015 | → Rubrica staff | → Rubrica staff | 1 dirigente → Rubrica staff |
+| Pulcini 2016-2017 | → Rubrica staff | → Rubrica staff | 1 dirigente → Rubrica staff |
+| Primi Calci 2018-2019 | → Rubrica staff | → Rubrica staff | 1 dirigente → Rubrica staff (INFERRED) |
+| Piccoli Amici 2020-2021 | → Rubrica staff | → Rubrica staff | — |
 
 ## Attenzione (cose che si confondono)
 - Nell'archivio lo staff di Pulcini e Primi Calci era scambiato: il 17/10 sono partite mail ai mister con le squadre sbagliate, corrette la stessa mattina (vedi `cose-imparate.md`). Vale questa tabella.

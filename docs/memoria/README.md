@@ -7,16 +7,16 @@ La memoria del club è il quaderno che ogni agente legge prima di lavorare e che
 Motori: TEMPO (nessuno rifà da capo le stesse ricerche ogni anno) e PERSONE (le persone vengono riconosciute e ricordate). Misura: quante voci «da confermare» vengono confermate entro 30 giorni; quante lezioni diventano comandi approvati.
 
 ## Cosa non entra mai
-Numeri di telefono, indirizzi e-mail, codici fiscali, IBAN, date di nascita di persone, dati di salute, ISEE, nomi di minori, foto. Le annate delle squadre (es. «2012-2013») sono categorie, non dati personali. I contatti stanno solo nella rubrica riservata della Segreteria. Il repository è pubblico: si scrive come se lo leggesse chiunque.
+Nomi e cognomi di persone (staff, collaboratori, referenti esterni: solo il ruolo, il nome sta nella Rubrica staff, SCD PULSE `scd_structure_roles`, privata), numeri di telefono, indirizzi e-mail, codici fiscali, IBAN, date di nascita di persone, dati di salute, ISEE, nomi di minori, foto. Le annate delle squadre (es. «2012-2013») sono categorie, non dati personali. I contatti stanno solo nella rubrica riservata della Segreteria. Il repository è pubblico: si scrive come se lo leggesse chiunque.
 
 ## Struttura (una cartella per stagione, `AAAA-AA`)
 
 | File | Contenuto | Chi lo aggiorna |
 |---|---|---|
-| `persone-e-ruoli.md` | Organigramma della stagione: ruolo → persona (solo nome e cognome di adulti), fonte e data; grafie e incarichi «da confermare» | Segreteria tramite il ciclo Ufficio; conferma la Direzione |
+| `persone-e-ruoli.md` | Organigramma della stagione: solo ruoli, fonte e data (i nomi stanno nella Rubrica staff, SCD PULSE `scd_structure_roles`, privata); grafie e incarichi «da confermare» | Segreteria tramite il ciclo Ufficio; conferma la Direzione |
 | `squadre-e-annate.md` | Squadre attive o ritirate, annate unificate, campionati e coppe con codici LND, staff tecnico | scd-squadre, scd-figc-lnd |
 | `decisioni-direzione.md` | Decisioni della Direzione con data e ora, chi le ha prese, dove si applicano | il ciclo Ufficio, da chat e documenti di progetto |
-| `fornitori-partner-enti.md` | Enti, federazione, Comuni, associazioni, fornitori e partner: ruolo del rapporto, referente (solo ruolo o nome di adulto), stato | scd-negoziazione, scd-sponsor, scd-tesoreria |
+| `fornitori-partner-enti.md` | Enti, federazione, Comuni, associazioni, fornitori e partner: ruolo del rapporto, ruolo del referente (mai il nome), stato | scd-negoziazione, scd-sponsor, scd-tesoreria |
 | `cose-imparate.md` | Errori e correzioni, richieste che si ripetono, soluzioni che funzionano, regole proposte; riga «Ultimo ciclo Ufficio» | ogni ciclo Ufficio (scritto alle 18:22) |
 | `ricorrenze.md` | Date che tornano ogni anno: scadenze federali, tornei, programmi ai Comuni, chiusura stagione | scd-segreteria, scd-tornei |
 
@@ -26,7 +26,7 @@ Ogni riga porta un'etichetta: **VERIFIED** (fonte e data), **INFERRED** (dedotto
 - Una riga per fatto, con data (gg/mm/aaaa) e fonte (chat di Francesco con ora, documento, portale, mail con data).
 - Si corregge, non si cancella: la riga vecchia resta barrata o con «superato il gg/mm, vedi …».
 - Le decisioni si citano con le parole di chi decide quando ci sono.
-- Le persone si ricordano per ruolo: «chi fa cosa» serve a Iride e agli agenti per smistare.
+- Le persone si ricordano solo per ruolo, mai per nome: «chi fa cosa» serve a Iride e agli agenti per smistare.
 
 ## Cambio di stagione (ogni 1° luglio)
 Il ciclo Ufficio del 1° luglio (o il primo dopo) prepara il passaggio su un ramo, la Direzione approva con la PR:
