@@ -285,12 +285,13 @@ export const PLATFORMS: readonly Platform[] = [
     route: "/gestionale/impianti", status: "live",
     purpose: "Rotazioni, simulazioni, affitti a terzi ed eventi sui campi di Colico e Dervio.",
     today: [
-      { label: "Impianti e campi", to: "/gestionale/impianti" },
+      { label: "Piano Dervio: 1 gara giovanile a settimana", to: "/gestionale/impianti/dervio" },
       { label: "Simula una rotazione Colico/Dervio", to: "/gestionale/impianti/simulazione" },
       { label: "Nuova prenotazione da approvare", to: "/gestionale/impianti/nuova" },
     ],
     audiences: ["direzione", "responsabili"], icon: "repeat",
-    engine: "TEMPO", measure: "gare spostate su Dervio con preavviso di un mese",
+    // DG 16/10/2026: team notice 14 days before; the Comune is informed with the season programme (no monthly notice).
+    engine: "TEMPO", measure: "settimane con la gara Dervio assegnata e avviso alla squadra entro 14 giorni; giorni con sovrapposti sul campo 1",
   },
   {
     id: "12", name: "Nutrizionista", slug: "nutrizionista", dossier: "12-nutrizionista.md",

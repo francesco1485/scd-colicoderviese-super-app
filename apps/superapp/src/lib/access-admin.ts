@@ -72,7 +72,7 @@ export const POSITION_LABEL: Readonly<Record<string, string>> = {
   fisioterapista: "Fisioterapista",
   "dirigente-annata": "Dirigente di annata",
   mister: "Mister",
-  "responsabile-trasporti": "Responsabile trasporti (pulmini)",
+  "responsabile-trasporti": "Responsabile servizio pulmini",
   autista: "Autista (pulmini)",
   "responsabile-club-house": "Club House",
   "addetto-biglietteria": "Biglietteria",

@@ -14,20 +14,20 @@ import type { TrainingSlot } from "@/lib/public-snapshots";
 import { getTrainingQuadro } from "@/lib/quadro.functions";
 import { defaultDay, weekdayKey } from "@/lib/training-view";
 import { VanSeatMap, type TeamColor } from "@/components/scd/VanSeatMap";
-import { PeoplePins } from "@/components/scd/PeoplePins";
 import { InternalBadgeImage } from "@/components/scd/InternalBadge";
 import { lineBadgeFor } from "@/lib/internal-badges";
 import { PULMINI_SERVICE, trainingServiceFor } from "@/lib/member-services";
 import { PULMINI_DEMAND, itDate, sortedCounts } from "@/lib/roster-aggregates";
-import { peopleForArea, type StaffPerson } from "@/lib/staff-roster";
+import type { StaffPerson } from "@/lib/staff-roster";
 import { getStaffEmails, getStaffRoster } from "@/lib/staff-roster.functions";
-import { PULMINI_FLEET, factStamp, nextWeekend, weekendMatches } from "@/lib/work-areas";
+import { PULMINI_FLEET, factStamp } from "@/lib/work-areas";
 import { TransportFleetCard, TransportPlanner, TransportQueueCard } from "@/components/scd/TransportDesk";
 import { getTransportBoard, type TransportData } from "@/lib/transport.functions";
 import { TransportRequestsOffice } from "@/components/scd/TransportRequestsOffice";
 import { getTransportRequests } from "@/lib/transport-requests.functions";
-import type { OfficeRequest } from "@/lib/transport-requests";
-import { draftFromEvent, runsForEvent, type RunDraft, type TransportBoard, type TransportRun } from "@/lib/transport";
+import { TRANSPORT_ACK_LIVE, type OfficeRequest } from "@/lib/transport-requests";
+import { FLEET_2026_27, TRANSPORT_OFFICE, TRANSPORT_OFFICE_BACKUP, demandBySeasonTeam, draftFromEvent, runsForEvent, serviceWeekend, serviceWeekendTrips, type RunDraft, type TransportBoard, type TransportRun } from "@/lib/transport";
+import { TransportCrewCard } from "@/components/scd/TransportCrewCard";
 import { getPulminiVans } from "@/lib/pulmini-vans.functions";
 import type { VanId, VanPlan } from "@/lib/pulmini-vans";
 import { SlotVans, VanDetailPanel, VanLines } from "@/components/scd/PulminiVans";
@@ -71,10 +71,10 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
   const vanMoves = vanPlan ? vanPlan.slots.reduce((n, p) => n + p.vans.length, 0) : 0;
   const [draft, setDraft] = useState<RunDraft | null>(null);
   const router = useRouter();
-  const transportManagers = peopleForArea(people, "pulmini");
   const now = useRomeNow();
-  const trips = useMemo(() => weekendMatches(events, now.date, true), [events, now.date]);
-  const { sat, sun } = nextWeekend(now.date);
+  // The weekend in progress on Saturday and Sunday (today's trips first), otherwise the coming one.
+  const trips = useMemo(() => serviceWeekendTrips(events, now.date), [events, now.date]);
+  const { sat, sun } = serviceWeekend(now.date);
   const byId = useMemo(() => new Map(groups.map((g) => [g.id, g])), [groups]);
   const teamColors = useMemo(() => new Map<string, TeamColor>(groups.map((g) => [g.id, { label: g.label, color: readableOnWhite(g.color ?? "#3b5683") }])), [groups]);
   const vansByEvent = useMemo(() => runsByEvent(runs), [runs]);
@@ -104,7 +104,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
       ]}
       note={<>Calendario ufficiale: copia del {freshnessLabel(sourceModifiedAt)} · Flotta: {factStamp(F)}.</>}
     >
-      <TransportLiveDriverPanel panel={live} />
+      {live.state === "open" && <TransportLiveDriverPanel panel={live} />}
       <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="flex min-w-0 flex-col gap-[18px]">
         <Card
@@ -191,14 +191,14 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
 
         <Card
           id="pul-trasferte"
-          title="Trasferte del prossimo weekend"
+          title={now.date === sat || now.date === sun ? "Trasferte di questo weekend" : "Trasferte del prossimo weekend"}
           sub={`Partite fuori casa di ${weekendLabel}, dal calendario ufficiale. Decidi tu quali hanno bisogno del pulmino.`}
           aside={<Chip tone="info">{trips.length} {trips.length === 1 ? "trasferta" : "trasferte"}</Chip>}
           className="lg:self-start"
         >
           {trips.length === 0 ? (
             <div className="px-4 pb-4 sm:px-[18px]">
-              <EmptyState title="Nessuna trasferta nel prossimo weekend">Il calendario ufficiale di questa copia non ha partite fuori casa per sabato e domenica.</EmptyState>
+              <EmptyState title="Nessuna trasferta da servire">Il calendario ufficiale di questa copia non ha partite fuori casa per {weekendLabel}{now.date === sun ? " ancora da giocare" : ""}.</EmptyState>
             </div>
           ) : (
             <ol className="m-0 list-none p-0">
@@ -207,7 +207,7 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
               ))}
             </ol>
           )}
-          <SourceLine>Calendario ufficiale FIGC/LND, copia del {freshnessLabel(sourceModifiedAt)}. {board?.canManage ? "\"Organizza\" apre la corsa già compilata con data, squadra e destinazione." : "Le corse le organizzano Direzione, Segreteria e responsabile trasporti."}</SourceLine>
+          <SourceLine>Calendario ufficiale FIGC/LND, copia del {freshnessLabel(sourceModifiedAt)}. {board?.canManage ? "\"Organizza\" apre la corsa già compilata con data, squadra e destinazione." : `Le corse le organizza il ${TRANSPORT_OFFICE} (in sua assenza ${TRANSPORT_OFFICE_BACKUP}).`}</SourceLine>
         </Card>
 
         {board && <TransportPlanner board={board} today={now.date} draft={draft} setDraft={setDraft} onSaved={() => router.invalidate()} />}
@@ -217,9 +217,10 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
 
         </div>
         <div className="flex min-w-0 flex-col gap-[18px]">
+          <TransportCrewCard people={people} emails={emails} board={board} ackLive={TRANSPORT_ACK_LIVE} />
           {board && <TransportQueueCard board={board} now={new Date(`${now.date}T12:00:00Z`)} />}
           {vanPlan && (
-            <Card id="pul-mezzi" title="I quattro pulmini" sub="Ogni linea resta un pulmino a sé. Premi per chi c'è sempre, dove va e il percorso.">
+            <Card id="pul-mezzi" title="Le quattro linee" sub={`Ogni linea resta un pulmino a sé. Premi per chi c'è sempre, dove va e il percorso. Il quarto mezzo è dell'${FLEET_2026_27.partnerOwner}, usato all'occorrenza: su quale linea, da confermare.`}>
               <div className="px-4 pb-3 sm:px-[18px]">
                 <VanLines plan={vanPlan} onOpen={setOpenVan} />
               </div>
@@ -247,12 +248,13 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
             </div>
             <div className="border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
               <p className="m-0 mb-1.5 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-[var(--in-sub)]">Per squadra</p>
-              <div className="flex flex-wrap gap-1.5">
-                {sortedCounts(PULMINI_DEMAND.byGroup).map(([g, n]) => {
-                  const off = /U16|U18|JUNIORES/.test(g);
-                  return <Chip key={g} tone={off ? "warn" : "info"}>{g.replace(/ \d{4}(-\d{4})?$/, "")} · {n}{off ? " · allenamenti non previsti" : ""}</Chip>;
+              <div className="flex flex-wrap gap-1.5" data-testid="pulmini-demand-teams">
+                {demandBySeasonTeam(PULMINI_DEMAND.byGroup).map((t) => {
+                  const note = t.status === "withdrawn" ? " · da ricollocare nel Master" : t.status === "unknown" ? " · da verificare" : t.trainingServed === false ? " · allenamenti non previsti" : "";
+                  return <Chip key={t.key ?? t.label} tone={t.status === "withdrawn" ? "crit" : note ? "warn" : "info"}>{t.label} · {t.count}{note}</Chip>;
                 })}
               </div>
+              <p className="m-0 mt-1.5 text-[13px] leading-snug text-[var(--in-sub)]">Nomi delle squadre 2026/27; il Master usa ancora le vecchie sigle (U12, U13, U18).</p>
               <p className="m-0 mb-1.5 mt-3 text-[12.5px] font-extrabold uppercase tracking-[0.05em] text-[var(--in-sub)]" id="pul-linee">Per linea</p>
               <LineList counts={sortedCounts(PULMINI_DEMAND.byLine)} />
             </div>
@@ -271,21 +273,13 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
           </Card>
 
           {board ? (
-            <TransportFleetCard
-              board={board}
-              today={now.date}
-              managers={transportManagers.length > 0 ? (
-                <div className="border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
-                  <PeoplePins people={transportManagers} emails={emails} label="Responsabile trasporti" />
-                </div>
-              ) : null}
-            />
+            <TransportFleetCard board={board} today={now.date} />
           ) : (
-          <Card id="pul-flotta" title="Flotta" sub="Dal Master Flotta e Trasporti: i posti non sono ancora confermati.">
+          <Card id="pul-flotta" title="Flotta" sub={`${FLEET_2026_27.clubVans} ${FLEET_2026_27.model} del club + ${FLEET_2026_27.partnerVans} dell'${FLEET_2026_27.partnerOwner} usato all'occorrenza (Direzione, 17/10/2026). Copia del Master non leggibile da questa sessione.`}>
             <div className="grid grid-cols-3 gap-2 px-4 pb-4 sm:px-[18px]" data-testid="fleet">
-              <StatTile value={PULMINI_SERVICE.vehiclesInService} of={F.vehicles} label="in servizio su mezzi in flotta" />
-              <StatTile value={F.driversActive} of={F.driversRegistered} label="autisti attivi in anagrafica" />
-              <StatTile value={F.membersActive} of={F.membersTotal} label="iscritti attivi" />
+              <StatTile value={FLEET_2026_27.clubVans} of={FLEET_2026_27.clubVans + FLEET_2026_27.partnerVans} label="pulmini del club sui mezzi disponibili" />
+              <StatTile value={FLEET_2026_27.drivers} label="autisti volontari indicati dalla Direzione" />
+              <StatTile value={F.membersActive} of={F.membersTotal} label={`iscritti attivi al ${itDate(F.asOf)}`} />
             </div>
             <dl className="m-0 grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5 border-t border-[var(--in-line)] px-4 py-3 text-[14.5px] sm:px-[18px]">
               <dt className="text-[var(--in-sub)]">Posti per mezzo</dt>
@@ -293,11 +287,6 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
               <dt className="text-[var(--in-sub)]">Corse registrate</dt>
               <dd className="m-0 font-semibold">{runs.length === 0 ? "nessuna" : `${runs.length} (${weekdayRuns} in settimana, ${runs.length - weekdayRuns} trasferte)`}</dd>
             </dl>
-            {transportManagers.length > 0 && (
-              <div className="border-t border-[var(--in-line)] px-4 py-3 sm:px-[18px]">
-                <PeoplePins people={transportManagers} emails={emails} label="Responsabile trasporti" />
-              </div>
-            )}
             <SourceLine>{factStamp(F)}. Sul pulmino compare il nome dell'autista; i ragazzi sono figure senza nome.</SourceLine>
           </Card>
           )}
@@ -319,9 +308,10 @@ function PulminiPage({ groups, events, sourceModifiedAt, preview, runs, runsAsOf
 
           <p className="m-0 flex gap-2.5 rounded-2xl border border-[var(--in-line)] bg-white px-4 py-3.5 text-[14.5px] leading-snug text-[var(--in-sub)] shadow-[var(--in-card-shadow)]">
             <ShieldCheck className="mt-[1px] size-5 flex-none text-[var(--in-info)]" strokeWidth={1.8} aria-hidden="true" />
-            Sotto gli allenamenti i ragazzi compaiono con nome e iniziale del cognome solo per Direzione, Segreteria, responsabile trasporti e autisti, verificati dal server. Mai telefoni, genitori o indirizzi; nelle trasferte restano figure senza nome.
+            Sotto gli allenamenti i ragazzi compaiono con nome e iniziale del cognome solo per il {TRANSPORT_OFFICE}, Direzione, Segreteria e autisti, verificati dal server. Mai telefoni, genitori o indirizzi; nelle trasferte restano figure senza nome.
           </p>
 
+          {live.state !== "open" && <TransportLiveDriverPanel panel={live} />}
           <SourcesBox id="pulmini" />
         </div>
       </div>
@@ -394,7 +384,7 @@ function TripRow({ e, group, vans, teams, board, onOrganize }: { e: PublicEvent;
             {planned.length ? "Aggiungi pulmino" : "Organizza"}
           </button>
         ) : (
-          <PendingButton reason="Le corse le organizzano Direzione, Segreteria e responsabile trasporti">Organizza</PendingButton>
+          <PendingButton reason={`Le corse le organizza il ${TRANSPORT_OFFICE}`}>Organizza</PendingButton>
         )}
       </div>
       <div className="col-span-2 grid gap-4 rounded-2xl bg-[#f5f9ff] p-3 sm:col-span-3 md:grid-cols-2" data-testid="van-seat-maps">

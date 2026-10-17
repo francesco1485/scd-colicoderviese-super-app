@@ -7,17 +7,18 @@ const trainingsForGroup = (g: string) => trainingsFor(QUADRO_SNAPSHOT, g);
 const TODAY = romeToday(new Date('2026-10-09T16:00:00Z'));
 
 describe('La mia squadra / Il mio settore', () => {
-  test('156 ID unici invariati', () => {
+  test('171 ID unici (copia del master 15/10/2026)', () => {
     const ids = calendario.events.map(e => e.id);
-    expect(ids.length).toBe(156);
-    expect(new Set(ids).size).toBe(156);
+    expect(ids.length).toBe(171);
+    expect(new Set(ids).size).toBe(171);
   });
   test('data Roma 9/10/2026', () => expect(TODAY).toBe('2026-10-09'));
-  test('annata 2015: prima gara Penta Piateda 11/10 14:30', () => {
+  // Il master del 15/10 ha spostato il calcio d'inizio alle 15:00 (la vecchia copia 09/10 diceva 14:30).
+  test('annata 2015: prima gara Penta Piateda 11/10 15:00', () => {
     const n = nextForGroup(calendario.events, '2015', TODAY);
     expect(n.length).toBe(5);
     expect(n[0]!.id).toBe('EVT-ES-20261011-PENTAPIATEDA-CASA');
-    expect(n[0]!.time).toBe('14:30');
+    expect(n[0]!.time).toBe('15:00');
   });
   test('U16: tre allenamenti lun/mer/ven 20:10–21:20, nessuna fascia altrui', () => {
     const t = trainingsForGroup('u16')!;
