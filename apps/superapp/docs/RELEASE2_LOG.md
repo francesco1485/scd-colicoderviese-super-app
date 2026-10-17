@@ -923,3 +923,9 @@ Decisioni di Francesco 16/10/2026 15:44: «Esterni Tally, soci app» e «Li crea
 - /top11: «Come funziona» in 4 passi al posto del vuoto; premi solo se esistono.
 - /squadre da non collegati: variante di UD-100 — solo categoria, campionato verificato, annate e link alle gare; resta tra le pagine solo soci (no-store, noindex). /crea e /la-mia-scd da non collegati: pagina di iscrizione JoinClub (porta solo a /registrati e /accedi).
 - Revisioni indipendenti scd-revisore + scd-sicurezza sull'integrazione 320b47a: PASS × 2.
+
+## 2026-10-17 ~00:30 — chat cloud — accessi (Francesco 16/10 23:12–23:34 «sì vai», 23:58 «ok ruoli - applica r112 - applica r113»)
+- Un solo risolutore degli accessi (access-resolver.ts): regola di prima OPPURE base di ogni socio OPPURE aree automatiche della famiglia verificata OPPURE abilitazioni della Direzione. Aggiunge soltanto, in caso di dubbio chiude.
+- Base di ogni socio: quadro settimanale (senza menu staff, etichetta «Socio») e servizio pulmini su /allenamenti (orari, ritrovo, posti, numero di ragazzi; nessun nome).
+- Abilitazioni della Direzione: per ora aprono solo Mister e Impianti e campi (pagine che ne leggono già i dati); le altre aree quando le loro funzioni dati leggeranno le abilitazioni.
+- r112 (ruolo ↔ posizione dell'organigramma) e r113 (le mie abilitazioni) applicate su SCD PULSE il 17/10/2026. Nuova direttiva UD-144.

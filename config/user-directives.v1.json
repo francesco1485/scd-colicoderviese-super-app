@@ -3954,6 +3954,28 @@
     },
     {
       "sourceDate": "2026-10-16",
+      "sourceTime": "23:12-23:34",
+      "sourceStatus": "EXPLICIT_USER_COMMAND",
+      "authority": "FRANCESCO_SCD",
+      "id": "UD-144",
+      "name": "VISIBILITY_AUTOMATIC_AREAS_PLUS_DIRECTION_ASSIGNED",
+      "sourceQuoteFragments": [
+        "le persone vedono solo le aree che vengono assegnate in automatico da te quando si iscrivono e poi quelle che assegno io quando si iscrivono come dirigenti , responsabili , mister , direttore sportivo , soci , consiglieri",
+        "vede anche calendario e allenamenti poi vede avatar crea vede area statistiche calciatori , classifiche e tutto quello che mondo sport calcio o mondo social e mondo esterno",
+        "se è papa si vede anche quello e in automatico",
+        "si vai",
+        "gli allenamti settimanali e le dinamiceh servizio opulmin devono poter veder",
+        "ok ruoli - applica r112 - applica r113"
+      ],
+      "normalizedCommand": {
+        "rule": "Every signed-in member automatically sees the base areas (calendar, weekly trainings board, minibus service dynamics without children's or drivers' names, avatar, statistics and standings once a page exists, community, games, sport/social/external world). A verified parent automatically also sees the child's areas (team, trainings, minibus run, documents) through own-family RPCs only. Dirigenti, responsabili, mister, direttore sportivo, soci and consiglieri get the areas the Direzione assigns (r100 grants), opened only where the page's data actually honours the grant; no empty pages. Agents never change roles or permissions.",
+        "scope": "SUPER_APP access resolver, sidebar, work-area gates",
+        "implementationStatus": "IMPLEMENTED_PENDING_PUBLISH",
+        "implementation": "apps/superapp/src/lib/access-resolver.ts, access-resolver.server.ts; supabase/migrations r112, r113 (APPLIED 17/10/2026)"
+      }
+    },
+    {
+      "sourceDate": "2026-10-16",
       "sourceTime": "22:40",
       "sourceStatus": "EXPLICIT_USER_COMMAND",
       "authority": "FRANCESCO_SCD",
