@@ -2,7 +2,7 @@
 
 Francesco 16/10/2026 22:58: un solo link (vetrina) e un gestionale interno con 26 piattaforme. 23:23: «io voglio che gli agenti lavorano e migliorano le piattaforme, creano, immaginano come deve essere la piattaforma, copiare piattaforme nel mondo simili per renderla migliore, riempirsi di nozioni per migliorare quella piattaforma e migliorarsi per interagire tra le piattaforme in parallelo e in sequenza, interloquendo col cervellone e l'orchestratore tutti».
 
-Ogni piattaforma ha qui la sua **scheda viva** (`NN-nome.md`): la memoria del suo agente responsabile. Il ciclo notturno «SCD Cantiere piattaforme» la riempie e la migliora, due piattaforme per notte, nell'ordine di `ROTAZIONE.md`.
+Ogni piattaforma ha qui la sua **scheda viva** (`NN-nome.md`): la memoria del suo agente responsabile. Il ciclo notturno «SCD Cantiere piattaforme», guidato da **scd-direttore**, la riempie e la migliora: una piattaforma per notte, tre notti a settimana, nell'ordine di `ROTAZIONE.md`, prendendo l'idea migliore da `IDEE.md` (l'elenco unico delle idee). Le ricerche complete stanno in `ricerche/`.
 
 ## Il ciclo (sempre uguale, in sequenza)
 1. **Stato reale**: cosa esiste nell'app (codice, pagine, dati) e nel Cervellone (tabelle, fogli master, Drive). Etichette VERIFIED / INFERRED / PROPOSED.

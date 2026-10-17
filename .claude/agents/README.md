@@ -1,9 +1,10 @@
 # Agenti SCD
 
-Cinquantatré agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
+Cinquantacinque agenti di ruolo SCD più la squadra di sviluppo ECC per la S.C.D. ColicoDerviese. Si chiamano in chat: "usa l'agente scd-tesoreria per la chiusura di settembre", "chiedi a scd-bandi i bandi in scadenza".
 
 | Agente | Cosa fa |
 | --- | --- |
+| scd-direttore | Direttore del miglioramento: tiene l'elenco unico delle idee (docs/piattaforme/IDEE.md), ogni notte di Cantiere fa costruire una miglioria, la fa controllare due volte e apre la richiesta di pubblicazione |
 | scd-grafica | Disegna e migliora pagine, schermate, grafiche, partendo dalle piattaforme migliori |
 | scd-iride | Responsabile di Iride, la segreteria AI su WhatsApp: conoscenza, regole, qualità (modifiche allo scenario solo con l'ok di Francesco) |
 | scd-tavola-esatta | Riproduce le tavole approvate di Francesco come schermate vere, misurando |
